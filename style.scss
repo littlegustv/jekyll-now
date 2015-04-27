@@ -153,6 +153,12 @@ img {
 // .masthead
 //
 
+.top-container
+{
+   width: 100%;
+   background-image: url('http://subtlepatterns.com/patterns/twinkle_twinkle.png');
+}
+
 .wrapper-masthead {
   //margin-bottom: 50px;
 }
@@ -161,7 +167,8 @@ img {
   padding: 20px 0;
   border-bottom: 1px solid $lightGray;
   height: 200px;
-  background-image: url('./images/fractal.jpg');
+  max-width: 740px;
+  margin: auto;
   @include mobile {
     text-align: center;
   }
@@ -196,7 +203,7 @@ img {
 
 .site-name {
   margin: 0;
-  color: white; /*$darkGray;*/
+  color: $white;
   cursor: pointer;
   font-family: $helveticaNeue;
   font-weight: 300;
@@ -206,7 +213,7 @@ img {
 
 .site-description {
   margin: -5px 0 0 0;
-  color: $gray;
+  color: $white;
   font-size: 16px;
 
   @include mobile {
@@ -229,7 +236,7 @@ nav {
 
   a {
     margin-left: 20px;
-    color: $darkGray;
+    color: white;
     text-align: right;
     font-weight: 300;
     letter-spacing: 1px;
