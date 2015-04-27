@@ -164,9 +164,9 @@ img {
 }
 
 .masthead {
-  padding: 20px 0;
+  /*padding: 20px 0;*/
   /*border-bottom: 1px solid $lightGray;*/
-  height: 200px;
+  /*height: 200px;*/
   max-width: 740px;
   margin: auto;
   @include mobile {
@@ -207,7 +207,7 @@ img {
   cursor: pointer;
   font-family: $helveticaNeue;
   font-weight: 300;
-  font-size: 100px;
+  font-size: 25vh;
   letter-spacing: -3px;
 }
 
@@ -226,8 +226,8 @@ nav {
   margin-top: 23px; // @TODO: Vertically middle align
   font-family: $helveticaNeue;
   font-size: 18px;
-  width: 20px;
-
+  width: 100px;
+  text-align: right;
   @include mobile {
     float: none;
     margin-top: 9px;
