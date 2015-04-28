@@ -9,7 +9,9 @@ Programmer, developer and other things in Montreal, QC.  An unhealthy combinatio
 ### More Information
 
 [JSFiddle](http://jsfiddle.net/user/littlegustv/fiddles/)
+
 [GURU](http://www.guru.com/freelancers/benny-heller)
+
 [Old site](http://www.twocatgames.com)
 
 ### Contact me
