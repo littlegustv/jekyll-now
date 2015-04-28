@@ -4,12 +4,14 @@ title: About
 permalink: /about/
 ---
 
-Some information about you!
+Programmer, developer and other things in Montreal, QC.  An unhealthy combination of possibility and necessity.
 
 ### More Information
 
-A place to include any other types of information that you'd like to include about yourself.
+[JSFiddle](http://jsfiddle.net/user/littlegustv/fiddles/)
+[GURU](http://www.guru.com/freelancers/benny-heller)
+[Old site](http://www.twocatgames.com)
 
 ### Contact me
 
-[email@domain.com](mailto:email@domain.com)
+[echo29x@gmail.com](mailto:echo29x@gmail.com)
