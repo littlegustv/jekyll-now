@@ -14,4 +14,5 @@ body
     *background: url('http://subtlepatterns.com/patterns/contemporary_china_2.png');
     /*background: linear-gradient(to right, #DD6600, #EE5500);*/
     position: relative;
+	margin: auto;
 }
