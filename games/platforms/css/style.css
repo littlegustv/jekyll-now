@@ -7,9 +7,9 @@ body
 }
 #mygame {
 	*border: 15px solid rgba(0,150,255,0.2);
-	border: 7px solid black;
+	*border: 7px solid black;
 	*border-radius: 20px;
-	padding: 10px;
+	*padding: 10px;
 	-webkit-app-region: no-drag;
 	*margin: 2px;
     *border: 1px solid black;
@@ -17,4 +17,5 @@ body
     /*background: linear-gradient(to right, #DD6600, #EE5500);*/
     position: relative;
 	margin: auto;
+	*margin-top: 10px;
 }

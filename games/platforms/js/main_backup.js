@@ -13,7 +13,7 @@ window.onload = function () {
 	function loadSound(name) {
 		sounds[name] = new Audio();
 		sounds[name].src = "./res/" + name + ".wav";
-		sounds[name].volume = 0.1;
+		sounds[name].volume = 0.5;
 	}
 	
 	function loadImage(name) {
@@ -24,9 +24,6 @@ window.onload = function () {
 	loadSound("jump");
 	loadSound("select");
 	loadSound("fall");
-	loadSound("movecursor");
-	loadSound("addplatform");
-	loadSound("complete");
 	
 	loadImage("platform");
 	loadImage("obstacle");
@@ -47,7 +44,6 @@ window.onload = function () {
 	//var output = document.getElementById('json_output');
 
 	var TILESIZE = 64,
-		FRAMESIZE = 64,
 		BUTTON_TIME = 0.5,
 		FPS = 30,
 		START = false;
@@ -62,9 +58,6 @@ window.onload = function () {
 	// Cursor Location
 	var mx = -1,
 		my = -1;
-		
-	var mouse = {down: false, sx: 0, sy: 0, ex: 0 , ey: 0};
-	var touch = {down: false, sx: 0, sy: 0, ex: 0 , ey: 0};
 	// Location of the EXIT
 	var ex = Math.floor(0.5 * canvas.width / TILESIZE),
 		ey = 9;
@@ -112,16 +105,17 @@ window.onload = function () {
 		},
 		draw: function() {
 			ctx.beginPath();
+			ctx.rect(this.x - 6,this.y - 4,200,100);
 			if (this.selected) ctx.fillStyle = "rgba(0,0,100,0.5)"
 			else ctx.fillStyle = "rgba(0,0,0,0.5)";
-
-			ctx.rect(this.x - 6,this.y - 4,200,100);			
 			ctx.fill()
+			//ctx.strokeStyle = "black";
+			//ctx.lineWidth = 4;
 			ctx.rect(this.x + 6, this.y + 4, 200, 100);
 			ctx.fill();
-			
+			//ctx.stroke();
 			ctx.fillStyle = "white";
-			ctx.font = '80px Ubuntu Mono';
+			ctx.font = '80px monospace';
 			ctx.textAlign = 'center';
 			ctx.fillText(this.text, this.x + 95, this.y + 68);
 			ctx.lineWidth = lw;
@@ -141,33 +135,21 @@ window.onload = function () {
 			return this;
 		},
 		draw: function () {
-			ctx.strokeStyle = "rgba(0,0,0," + (100 - Math.round(100*this.dt)) / 200 + ")";
+			ctx.strokeStyle = "rgba(0,0,0," + (100 - this.dt) / 100 + ")";
 			ctx.beginPath();
-			ctx.rect(this.x * TILESIZE - 50*this.dt, this.y * TILESIZE - 50*this.dt + TILESIZE / 3, TILESIZE + 100*this.dt, TILESIZE + 100 * this.dt, 20);
+			ctx.rect(this.x * TILESIZE - this.dt, this.y * TILESIZE - this.dt + TILESIZE / 3, TILESIZE + 2*this.dt, TILESIZE + 2 * this.dt, 20);
 			ctx.closePath();
 			ctx.stroke();
 			ctx.strokeStyle = "black";
 		},
-		update: function (dt) {
-			this.dt += dt;
-			if (this.dt > 1)
+		update: function () {
+			this.dt += 1;
+			if (this.dt > 100)
 			{
 				var ind = effects.indexOf(this);
 				effects.splice(ind, 1);
 			}
 		}
-	};
-	
-	var SmallRipple = Object.create(Ripple);
-	SmallRipple.draw = function () {
-		ctx.strokeWidth = 4;
-		ctx.strokeStyle = "rgba(0,0,0," + (100 - Math.round(100*this.dt)) / 400 + ")";
-		ctx.beginPath();
-		ctx.rect(this.x * TILESIZE - 25*this.dt, this.y * TILESIZE - 25*this.dt + TILESIZE / 3, TILESIZE + 50*this.dt, TILESIZE + 50 * this.dt, 20);
-		ctx.closePath();
-		ctx.stroke();
-		ctx.strokeStyle = "black";
-		ctx.strokeWidth = lw;
 	};
 	
 	// Base PLATFORM class
@@ -183,7 +165,17 @@ window.onload = function () {
 		color: "rgba(0,0,200,0.5)",
 		collidable: true,
 		draw: function () {
+			/*
+			ctx.beginPath();
+			//ctx.globalAlpha = this.fade / this.duration;
+			ctx.roundRect(this.x * TILESIZE + lw / 2, this.y * TILESIZE + lw / 2, TILESIZE - lw, TILESIZE - lw, TILESIZE / 4);
+			ctx.fillStyle = this.color;
+			ctx.fill();
+			ctx.stroke();
+			ctx.globalAlpha = 1;
+			*/
 			ctx.drawImage(images['platform'], this.x * TILESIZE, this.y * TILESIZE - TILESIZE / 3, TILESIZE, 1.7*TILESIZE);
+
 		},
 		update: function () {}
 	};
@@ -196,15 +188,51 @@ window.onload = function () {
 		return this;
 	};
 	TurnPlatform.draw = function () {
+		/*
+		ctx.beginPath();
+		ctx.roundRect(this.x * TILESIZE + lw / 2, this.y * TILESIZE + lw / 2, TILESIZE - lw, TILESIZE - lw,TILESIZE/4);
+		ctx.fillStyle = this.color;
+		ctx.fill();
+		ctx.stroke();
+		*/
+
 		ctx.drawImage(images['platform'], this.x * TILESIZE, this.y * TILESIZE - TILESIZE / 3, TILESIZE, 1.7* TILESIZE);
+		
+		/*
+		ctx.globalAlpha = 0.4;
+		ctx.translate(this.x * TILESIZE + TILESIZE /2, this.y * TILESIZE+ TILESIZE /2 );
+		ctx.rotate(this.angle);
+		ctx.drawImage(arrow_0, -TILESIZE / 3, -TILESIZE / 3, 2 * TILESIZE / 3, 2 * TILESIZE / 3);
+		ctx.rotate(-this.angle);
+		ctx.translate(- (this.x * TILESIZE + TILESIZE /2), - (this.y * TILESIZE+ TILESIZE /2));
+		ctx.globalAlpha = 1;*/
+		/*
+		ctx.beginPath();
+		ctx.arc((this.x + 0.5) * TILESIZE, (this.y + (1/2)) * TILESIZE, TILESIZE / 3,
+		this.angle + 7 * Math.PI / 4, this.angle + 1 * Math.PI / 4, false);
+		ctx.stroke();
+		*/
+		//var arrow = 
+		
 		ctx.fillStyle = "black";
-		ctx.font = "40px bold Ubuntu Mono";
-		ctx.fillText(arrows[Math.round(this.angle / (Math.PI / 2))], this.x * TILESIZE + TILESIZE / 2, this.y * TILESIZE + 2 * TILESIZE / 3);	
+		//ctx.font = "40px bold monospace";
+		ctx.font = "40px bold monospace";
+		ctx.fillText(arrows[Math.round(this.angle / (Math.PI / 2))], this.x * TILESIZE + TILESIZE / 2, this.y * TILESIZE + 2 * TILESIZE / 3);
+		
+
+		
 	};
 	
 	// OBSTACLE solid barrier that can't be jumped over
 	var Obstacle = Object.create(Platform);
 	Obstacle.draw = function () {
+		/*
+		ctx.beginPath();
+		ctx.roundRect(this.x * TILESIZE + lw / 2, this.y * TILESIZE + lw / 2, TILESIZE - lw, TILESIZE - lw, TILESIZE / 4);
+		ctx.fillStyle = this.collidable ? "grey" : "rgba(100,100,100,0.4)";
+		ctx.fill();
+		ctx.stroke();
+		*/
 		ctx.globalAlpha = this.collidable ? 1 : 0.5;
 		ctx.drawImage(images['obstacle'], this.x * TILESIZE, this.y * TILESIZE - TILESIZE / 3, TILESIZE, 1.7*TILESIZE);
 		ctx.globalAlpha = 1;
@@ -263,17 +291,34 @@ window.onload = function () {
 			if (this.distance <= 0) this.distance = n;
 		},
 		draw: function () {
+			/*
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.arc(this.x * TILESIZE + TILESIZE / 2, this.y * TILESIZE + 7 * TILESIZE / 16, 0.4 * this.scale * TILESIZE, 0, Math.PI * 2, true);
+			ctx.fillStyle = "rgba(255,50,50,0.5)";
+			ctx.fill();
+			ctx.stroke();
+			ctx.lineWidth = lw;
+			*/
 			ctx.drawImage(charImages[Math.round(this.angle/(Math.PI / 2))],
-			this.frame * FRAMESIZE, 0, FRAMESIZE, FRAMESIZE, // Clipping, for animation frame
+			this.frame * TILESIZE, 0, TILESIZE, TILESIZE, // Clipping, for animation frame
 			this.x * TILESIZE + (1 - this.scale) * TILESIZE / 2, 
 			this.y * TILESIZE  + (1 - this.scale) * TILESIZE - 8,
 			this.scale * TILESIZE,
 			this.scale * TILESIZE);
 		},
 		update: function (dt) {
-			this.frames = charImages[Math.round(this.angle/(Math.PI / 2))].width / FRAMESIZE;
+			//animations
+			/*
+			this.delay -= dt;
+			if (this.delay <= 0) {
+				this.frame = (this.frame + 1) % this.frames;
+				this.delay = this.animationSpeed;
+			}*/
+			this.frames = charImages[Math.round(this.angle/(Math.PI / 2))].width / TILESIZE;
 			
 			this.frame = Math.floor((this.frames - 1)* Math.max(this.distance, 0) / this.maxDistance);
+			//console.log(this.frame, this.distance, this.maxDistance);
 			
 			if (this.distance > 0) {
 				this.scale = 1 + Math.sin(Math.PI * this.distance / this.maxDistance) / 3
@@ -292,11 +337,8 @@ window.onload = function () {
 				this.y = Math.round(this.y);
 				this.speed = 0;
 				var p = findPlatform(this.x, this.y);
-				if (!p && START) {
-					START = false;
+				if (!p) {
 					this.maxDistance = 0;
-					var e1 = Object.create(Ripple).init(this.x, this.y);
-					effects.push(e1);
 					sounds['fall'].play();
 					setTimeout(reset, 500);
 				}
@@ -307,8 +349,6 @@ window.onload = function () {
 					if (p.angle !== undefined) {
 						this.angle = p.angle;
 						sounds["jump"].play();
-						var e1 = Object.create(SmallRipple).init(Math.round(this.x), Math.round(this.y));
-						effects.push(e1);
 					}
 				
 					//CHECK IF WE SHOULD MOVE
@@ -368,6 +408,10 @@ window.onload = function () {
 		distance = 2;
 		c = Object.create(Character);
 		doLevel();
+//		start = Object.create(Platform).init(c.x, c.y);
+//		exit = Object.create(Platform).init(ex, ey);
+//		platforms = [start, exit];
+//		obstacles = [];
 	}
 
 	// Check if Character is at EXIT
@@ -441,7 +485,7 @@ window.onload = function () {
 	
 	function doLoading(dt) {
 		ctx.clearRect(0,0,canvas.width, canvas.height);
-		ctx.font = 'bold 80px Ubuntu Mono';
+		ctx.font = 'bold 80px monospace';
 		ctx.textAlign = 'center';
 		ctx.fillStyle = 'black';
 		ctx.fillText('loading...', canvas.width/2, canvas.height/2);
@@ -449,12 +493,7 @@ window.onload = function () {
 	
 	function doMainMenu(dt) {
 		ctx.clearRect(0,0,canvas.width,canvas.height);
-		
-		ctx.fillStyle = "rgba(0,180,0,0.5)";
-		ctx.fillRect(canvas.width/2 - 250 - 5, canvas.height/2 - 100 - 5, 500, 150);
-		ctx.fillRect(canvas.width/2 - 250 + 5, canvas.height/2 - 100 + 5, 500, 150);
-		
-		ctx.font = '80px Ubuntu Mono';
+		ctx.font = '80px monospace';
 		ctx.textAlign = 'center';
 		ctx.fillStyle = 'black';
 		ctx.fillText('flat_FORMS', canvas.width/2, canvas.height/2);
@@ -467,11 +506,22 @@ window.onload = function () {
 	
 	function doLevelMenu(dt) {
 		ctx.clearRect(0,0,canvas.width,canvas.height);
-		ctx.font = '20px Ubuntu Mono';
+		ctx.font = '20px monospace';
 		ctx.textAlign = 'center';
 		var lvls = 6;
+		//ctx.fillStyle = 'black';
 		for (var i = 0; i < levels.length; i++)
 		{
+			/*
+			if (i == currentLevel)
+				ctx.fillStyle = "rgba(255,0,255,0.5)";
+			else
+				ctx.fillStyle = "rgba(0,255,255,0.5)";
+			ctx.roundRect(2*TILESIZE + (i % lvls) * 2 * TILESIZE, 2 * TILESIZE + Math.floor(i / lvls) * 2 * TILESIZE, TILESIZE, TILESIZE, TILESIZE / 4);
+			ctx.fill();
+			ctx.stroke();
+			ctx.fillStyle = "black";
+			*/
 			if (i == currentLevel) {
 				ctx.fillStyle = "rgba(0,0,100,0.5)";
 				ctx.roundRect(2*TILESIZE + (i % lvls) * 2 * TILESIZE, 2 * TILESIZE + Math.floor(i / lvls) * 2 * TILESIZE, TILESIZE - 1, TILESIZE - 1, TILESIZE / 6);
@@ -487,7 +537,7 @@ window.onload = function () {
 				ctx.drawImage(images['lock'], 2*TILESIZE + (i % lvls) * 2 * TILESIZE + 2, 2 * TILESIZE + Math.floor(i / lvls) * 2 * TILESIZE + 2, TILESIZE - 4, TILESIZE - 4);			
 			}
 			ctx.fillStyle = "black";
-			ctx.fillText('"' + levels[i].name + '"', 2*TILESIZE + (i % lvls) * 2 * TILESIZE + TILESIZE / 2, 2 * TILESIZE + Math.floor(i / lvls) * 2 * TILESIZE + TILESIZE + 20);
+			ctx.fillText('Level ' + i, 2*TILESIZE + (i % lvls) * 2 * TILESIZE + TILESIZE / 2, 2 * TILESIZE + Math.floor(i / lvls) * 2 * TILESIZE + TILESIZE + 20);
 		}
 	}
 	
@@ -536,7 +586,6 @@ window.onload = function () {
 					//BUTTON 'A' is DOWN:
 						if (pad.buttons[0].pressed) {
 							addPlatform();	//A
-							sounds['addplatform'].play();
 							buttonDelay = BUTTON_TIME;
 						}								
 						if (pad.buttons[1].pressed) {
@@ -597,6 +646,7 @@ window.onload = function () {
 							doLevel();
 							gameState = "play";
 							sounds['select'].play();
+							//console.log('here');
 						}
 						if (pad.axes[0] > 0.5) {
 							currentLevel = (currentLevel + 1) % (levelCompleted + 1);
@@ -615,7 +665,11 @@ window.onload = function () {
 				if (buttonDelay < 0) {
 
 					if (pad.buttons[9].pressed) { //START
-						if (gameState == 'play')
+						if (gameState == 'mainmenu')
+						{
+							gameState = 'play';
+						}
+						else
 						{
 							if (START) {
 								reset();
@@ -626,13 +680,7 @@ window.onload = function () {
 						}
 						buttonDelay = BUTTON_TIME;
 					} else if (pad.buttons[8].pressed) { //BACK (exit game)
-						buttonDelay = BUTTON_TIME;
-						if (gameState == 'mainmenu')
-							window.close();
-						else if (gameState == 'levelmenu' || gameState == 'help')
-							gameState = 'mainmenu';
-						else if (gameState == 'play')
-							gameState = 'levelmenu';
+						window.close();
 					} 
 
 					if (choice >= types.length) choice = 0;
@@ -648,7 +696,7 @@ window.onload = function () {
 	
 		ctx.clearRect(0,0,canvas.width, canvas.height);
 		ctx.fillStyle = "black";
-		ctx.font = "bold 20px Ubuntu Mono";
+		ctx.font = "bold 20px monospace";
 		ctx.fillText("HELP! I need somebody...", canvas.width/2, canvas.height/2);
 	
 	}
@@ -657,28 +705,32 @@ window.onload = function () {
 	function doStuff(dt) {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		
-		//LEVEL NAME
-		ctx.fillStyle = "rgba(100,100,100,0.5)"
-		//console.log(levels[currentLevel].name.length );
-		ctx.font = 150.0 / levels[currentLevel].name.length + "vw Ubuntu Mono";
-		ctx.fillText(levels[currentLevel].name, canvas.width / 2, canvas.height * 0.8); 
-		
 		//CURSOR INDICATION
 		ctx.globalAlpha = 0.3;
-
+		/*
+		ctx.fillStyle = "rgba(100,100,255,0.2)";
+		ctx.roundRect(Math.floor(mx) * TILESIZE, Math.floor(my) * TILESIZE, TILESIZE, TILESIZE, TILESIZE / 4);
+		ctx.fill();
+		*/
 		ctx.drawImage(images['platform'], Math.floor(mx) * TILESIZE, Math.floor(my) * TILESIZE - TILESIZE / 3, TILESIZE, TILESIZE * 1.7);
-		ctx.font = "40px bold Ubuntu Mono";
+		ctx.font = "40px bold monospace";
 		ctx.fillStyle = "black";
 		ctx.fillText(arrows[choice], Math.floor(mx) * TILESIZE + TILESIZE / 2, Math.floor(my) * TILESIZE + 2 * TILESIZE / 3);
 		ctx.globalAlpha = 1;
-
+		/*
+		ctx.beginPath();
+		ctx.strokeStyle = "rgba(0,0,0,0.2)";
+		ctx.arc((Math.floor(mx) + 0.5) * TILESIZE, (Math.floor(my) + 0.5) * TILESIZE, TILESIZE / 3,
+		choice * Math.PI / 2 + 7 * Math.PI / 4, choice * Math.PI / 2 + 1 * Math.PI / 4, false);
+		ctx.stroke();
+		ctx.strokeStyle = "black";
+		*/
 		//DRAW/UPDATE
-
 		// (effects)
 		for (var i = 0; i < effects.length; i++)
 		{
 			effects[i].draw();
-			effects[i].update(dt);
+			effects[i].update();
 		}
 		
 		var objects_sorted = (platforms.concat(obstacles)).sort(function(a,b) {
@@ -688,7 +740,6 @@ window.onload = function () {
 							return 1;
 						return 0;
 					});
-
 		//pre-draw shadows
 		ctx.fillStyle = "rgba(0,0,0,0.2)";
 		for (var i = 0; i < objects_sorted.length; i++)
@@ -704,27 +755,35 @@ window.onload = function () {
 		
 		//EXIT SIGN
 		ctx.fillStyle = "black";
-		ctx.font = "bold 20px Ubuntu Mono";
+		ctx.font = "bold 20px monospace";
 		ctx.textAlign = "center";
 		ctx.fillText("EXIT", (exit.x + 0.5) * TILESIZE, (exit.y + 0.65) * TILESIZE);
 
+		/*
+		for (var i = 0; i < platforms.length; i++) {
+			platforms[i].draw();
+			platforms[i].update();
+		}
+		for (var i = 0; i < obstacles.length; i++) {
+			obstacles[i].draw();
+		}
+		*/
 		if (START) {
 			c.update(dt);
 		}
 		c.draw();
 		
 		//SCROLLING BG
-		//by -= 0.3;
-		//canvas.style.backgroundPosition = "0px " + by + "px";
+		by -= 0.3;
+		canvas.style.backgroundPosition = "0px " + by + "px";
 
+		//roundRect(10,10,100,100,20);
+		//ctx.stroke();
+		
 		//CHECK WIN
-		if (checkWin() && START) {
-			sounds['complete'].play();
-			START = false;
-			setTimeout(function () {
-				currentLevel++;
-				gameState = "levelmenu";
-			}, 500);
+		if (checkWin()) {
+			currentLevel++;
+			gameState = "levelmenu";
 		}
 	}
 
@@ -771,10 +830,11 @@ window.onload = function () {
 	// create a platform at the given cursor
 	function addPlatform() {
 		if (findPlatform(mx, my) === undefined && findObstacle(mx, my) === undefined) {
-			var p1 = Object.create(TurnPlatform).init(Math.floor(mx), Math.floor(my), Math.PI * choice / 2);
+			var p1 = Object.create(types[choice]).init(Math.floor(mx), Math.floor(my), Math.PI * choice / 2);
 			platforms.push(p1);
+			/*
 			var e1 = Object.create(Ripple).init(Math.floor(mx), Math.floor(my));
-			effects.push(e1);
+			effects.push(e1);*/
 		}
 	}
 	
@@ -785,56 +845,28 @@ window.onload = function () {
 		}
 	}
 	
-	// MOUSE BEHAVIOR
-	canvas.addEventListener("mouseup", function (e) {
-		if (gameState == "play") {
-			mouse.down = false;
-			addPlatform();
-		}
-	});
-	
-	canvas.addEventListener("mousedown", function (e) {
-		if (gameState == "play") {
-			mouse.down = true;
-			mouse.sx = e.offsetX, mouse.sy = e.offsetY;
-		}
+	/* MOUSE BEHAVIOR
+	canvas.addEventListener("click", function (e) {
+		addPlatform();
 	});
 
 	canvas.addEventListener("mousemove", function (e) {
-		if (gameState == "play") {
-			if (mouse.down) {
-				mouse.ex = e.offsetX, mouse.ey = e.offsetY;
-				choice = Math.round((Math.atan2((mouse.ey - mouse.sy),(mouse.ex - mouse.sx)) + Math.PI * 2) / (Math.PI / 2)) % 4;
-			}
-			else {
-				mx = Math.floor(e.offsetX / TILESIZE);
-				my = Math.floor(e.offsetY / TILESIZE);
-			}
-		}
-	});
-	//TOUCH BEHAVIOR
-	canvas.addEventListener("touchend", function (e) {
-		if (gameState == "play") {
-			addPlatform();
-		}
-	});
-	
-	canvas.addEventListener("touchstart", function (e) {
-		if (gameState == "play") {
-			touch.sx = e.changedTouches[0].clientX, touch.sy = e.changedTouches[0].clientY;
-			mx = Math.floor(e.changedTouches[0].clientX / TILESIZE);
-			my = Math.floor(e.changedTouches[0].clientY / TILESIZE);
-		}
-	});
+		mx = Math.floor(e.offsetX / TILESIZE);
+		my = Math.floor(e.offsetY / TILESIZE);
+	});*/
 
-	canvas.addEventListener("touchmove", function (e) {
-		if (gameState == "play") {
-			touch.ex = e.changedTouches[0].clientX, touch.ey = e.changedTouches[0].clientY;
-			choice = Math.round((Math.atan2((touch.ey - touch.sy),(touch.ex - touch.sx)) + Math.PI * 2) / (Math.PI / 2)) % 4;
-		}
-	});
-	
+	//INITIALIZE
+	//reset();
 
+	//SAMPLE PLATFORMS
+	platforms.push(Object.create(TurnPlatform).init(2, 4, Math.PI));
+	platforms.push(Object.create(TurnPlatform).init(0, 4, Math.PI / 2));
+	
+	obstacles.push(Object.create(Obstacle).init(6,4));
+	
+	var s = Object.create(Switch).init(3, 4, obstacles[0]);
+	//console.log(JSON.stringify(s));
+	
 	//GET GOING
 	window.requestAnimationFrame(step);
 
