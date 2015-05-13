@@ -29,6 +29,8 @@ window.onload = function () {
 	loadSound("complete");
 	
 	loadImage("platform");
+	loadImage("switch-up");
+	loadImage("switch-down");
 	loadImage("obstacle");
 	loadImage("checkbox");
 	loadImage("square");
@@ -52,7 +54,10 @@ window.onload = function () {
 		FPS = 30,
 		START = false;
 	var gameState = "loading";
-	var lw = 3;
+	function changeState (newstate) {
+		gameState = newstate;
+	}
+	var lw = 3, lvls = 6;
 	ctx.lineWidth = lw;
 
 	var jsonSave = "";
@@ -81,7 +86,7 @@ window.onload = function () {
 	var platforms = [];
 	var obstacles = [];
 	var switches = [];
-	var buttons = [];
+	var buttons = {"loading": [], "mainmenu": [], "levelmenu": [], "help": [], "play": []};
 	var effects = [];
 	var selection = 0;
 	
@@ -92,11 +97,12 @@ window.onload = function () {
 	var request = new XMLHttpRequest();
 	request.open('GET', './levels/levels.json', true);
 	request.onload = function () {
-		gameState = "mainmenu";
+		changeState("mainmenu");
 		levels = JSON.parse(request.response).levels;
 		levels.forEach(function (l) {
 			//console.log(l);
 		});
+		initButtons();
 		//console.log(levels);
 	};
 	request.send();
@@ -105,19 +111,34 @@ window.onload = function () {
 		init: function (x, y, text, callback) {
 			this.x = x;
 			this.y = y;
+			this.h = 100;
+			this.w = 200;
 			this.text = text;
 			this.callback = callback;
-			this.selected = false;
 			return this;
 		},
 		draw: function() {
 			ctx.beginPath();
-			if (this.selected) ctx.fillStyle = "rgba(0,0,100,0.5)"
-			else ctx.fillStyle = "rgba(0,0,0,0.5)";
+			ctx.fillStyle = "rgba(0,0,0,0.5)";
 
-			ctx.rect(this.x - 6,this.y - 4,200,100);			
+			ctx.rect(this.x - 6,this.y - 4,this.w,this.h);			
 			ctx.fill()
-			ctx.rect(this.x + 6, this.y + 4, 200, 100);
+			ctx.rect(this.x + 6, this.y + 4, this.w, this.h);
+			ctx.fill();
+			
+			ctx.fillStyle = "white";
+			ctx.font = '80px Ubuntu Mono';
+			ctx.textAlign = 'center';
+			ctx.fillText(this.text, this.x + 95, this.y + 68);
+			ctx.lineWidth = lw;
+		},
+		drawSelected: function() {
+			ctx.beginPath();
+			ctx.fillStyle = "rgba(0,0,100,0.5)"
+
+			ctx.rect(this.x - 6,this.y - 4,this.w,this.h);			
+			ctx.fill()
+			ctx.rect(this.x + 6, this.y + 4, this.w, this.h);
 			ctx.fill();
 			
 			ctx.fillStyle = "white";
@@ -128,10 +149,63 @@ window.onload = function () {
 		}
 	};
 	
-	buttons.push(Object.create(Button).init(canvas.width / 4, canvas.height * 2/3, "play", function() {gameState = "levelmenu"}));
-	buttons.push(Object.create(Button).init(canvas.width * 3/4 - 200, canvas.height * 2/3, "help", function() {gameState = "help"}));
+	var LevelButton = Object.create(Button);
+	LevelButton.init = function(level,name) {
+		this.x = 2*TILESIZE + (level % lvls) * 2 * TILESIZE;
+		this.y = 2 * TILESIZE + Math.floor(level / lvls) * 2 * TILESIZE;
+		this.h = TILESIZE;
+		this.w = TILESIZE;
+		this.level = level;
+		this.name = name;
+		this.callback = function () {
+			if (this.level <= levelCompleted) {
+				currentLevel = this.level;
+				doLevel();
+				changeState("play");
+			}
+		};
+		return this;
+	}
+	LevelButton.draw = function() {
+		ctx.font = '20px Ubuntu Mono';
+		ctx.textAlign = 'center';
+		if (this.level < levelCompleted) {
+			ctx.drawImage(images['checkbox'], 2*TILESIZE + (this.level % lvls) * 2 * TILESIZE, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE, TILESIZE, TILESIZE);
+		}
+		else {
+			ctx.drawImage(images['square'], 2*TILESIZE + (this.level % lvls) * 2 * TILESIZE, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE, TILESIZE, TILESIZE);
+		}
+		if (this.level > levelCompleted) {
+			ctx.drawImage(images['lock'], 2*TILESIZE + (this.level % lvls) * 2 * TILESIZE + 2, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE + 2, TILESIZE - 4, TILESIZE - 4);			
+		}
+		ctx.fillStyle = "black";
+		ctx.fillText('"' + this.name + '"', 2*TILESIZE + (this.level % lvls) * 2 * TILESIZE + TILESIZE / 2, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE + TILESIZE + 20);
+	}
+	LevelButton.drawSelected = function() {
+		if (this.level <= levelCompleted) {
+			ctx.fillStyle = "rgba(0,0,100,0.5)";
+			ctx.roundRect(2*TILESIZE + (this.level % lvls) * 2 * TILESIZE, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE, TILESIZE - 1, TILESIZE - 1, TILESIZE / 6);
+			ctx.fill();
+		}
+		this.draw();
+	}
 	
-	buttons[0].selected = true;
+	function initButtons() {
+	
+		for (var i = 0; i < levels.length; i++) {
+			buttons["levelmenu"].push(Object.create(LevelButton).init(i,levels[i].name));
+		}
+		
+		buttons["mainmenu"].push(Object.create(Button).init(canvas.width / 4, canvas.height * 2/3, "play", function() {changeState("levelmenu")}));
+		buttons["mainmenu"].push(Object.create(Button).init(canvas.width * 3/4 - 200, canvas.height * 2/3, "help", function() {changeState("help")}));
+		
+		buttons["help"].push(Object.create(Button).init(canvas.width / 2 - 100, canvas.height - 160, "back", function() {changeState("mainmenu")}));
+		buttons["levelmenu"].push(Object.create(Button).init(canvas.width / 2 - 100, canvas.height - 160, "back", function() {changeState("mainmenu")}));
+		
+		buttons["play"].push(Object.create(Button).init(canvas.width * 4/5 - 100, canvas.height - 160, "back", function() {changeState("levelmenu")}));
+		buttons["play"].push(Object.create(Button).init(canvas.width * 1/2 - 100, canvas.height - 160, "reset", function() {reset();}));
+		buttons["play"].push(Object.create(Button).init(canvas.width * 1/5 - 100, canvas.height - 160, "run", function() {	START = true;}));
+	}
 	
 	var Ripple = {
 		init: function (x, y) {
@@ -233,11 +307,18 @@ window.onload = function () {
 		ctx.strokeStyle = "black";
 	
 		// switch
+		if (this.target.collidable) {
+			ctx.drawImage(images["switch-down"], this.x * TILESIZE, this.y * TILESIZE - TILESIZE / 3, TILESIZE, 1.7 * TILESIZE);
+		}
+		else {
+			ctx.drawImage(images["switch-up"], this.x * TILESIZE, this.y * TILESIZE - TILESIZE / 3, TILESIZE, 1.7 * TILESIZE);		
+		}
+		/*
 		ctx.beginPath();
 		ctx.roundRect(this.x * TILESIZE + lw/2, this.y * TILESIZE + lw / 2, TILESIZE - lw, TILESIZE - lw, TILESIZE / 4);
 		ctx.fillStyle = this.color;
 		ctx.fill();
-		ctx.stroke();
+		ctx.stroke();*/
 	};
 	Switch.trigger = function () {
 		this.color = "rgba(0,255,0,0.6)";
@@ -375,6 +456,7 @@ window.onload = function () {
 		if (c.x === exit.x && c.y === exit.y) {
 			if ((currentLevel + 1) > levelCompleted) {
 				levelCompleted = (currentLevel + 1);
+				selection = currentLevel + 1;
 			}
 			return true;
 		}
@@ -458,18 +540,13 @@ window.onload = function () {
 		ctx.textAlign = 'center';
 		ctx.fillStyle = 'black';
 		ctx.fillText('flat_FORMS', canvas.width/2, canvas.height/2);
-		
-		for (var i = 0; i < buttons.length; i++)
-		{
-			buttons[i].draw();
-		}
 	}
 	
 	function doLevelMenu(dt) {
 		ctx.clearRect(0,0,canvas.width,canvas.height);
-		ctx.font = '20px Ubuntu Mono';
+		
+		/*ctx.font = '20px Ubuntu Mono';
 		ctx.textAlign = 'center';
-		var lvls = 6;
 		for (var i = 0; i < levels.length; i++)
 		{
 			if (i == currentLevel) {
@@ -488,17 +565,20 @@ window.onload = function () {
 			}
 			ctx.fillStyle = "black";
 			ctx.fillText('"' + levels[i].name + '"', 2*TILESIZE + (i % lvls) * 2 * TILESIZE + TILESIZE / 2, 2 * TILESIZE + Math.floor(i / lvls) * 2 * TILESIZE + TILESIZE + 20);
-		}
+		}*/
 	}
 	
 	function doSelected() {
-		for (var i = 0; i < buttons.length; i++) {
-			if (buttons[i].selected) {
+/*
+	for (var i = 0; i < buttons.length; i++) {
+			if (buttons[gameState][i].selected) {
 				buttons[i].callback();
 				sounds['select'].play();
 				break;
 			}
-		}
+		}*/
+		buttons[gameState][selection].callback();
+		sounds['select'].play();
 	}
 	
 	// Handle GAMEPAD input
@@ -572,15 +652,15 @@ window.onload = function () {
 							doSelected();
 						}
 						if (pad.axes[0] > 0.5) {
-							buttons[selection].selected = false;
-							selection = (selection + 1) % buttons.length;
-							buttons[selection].selected = true;
+							//buttons[gameState][selection].selected = false;
+							selection = (selection + 1) % buttons[gameState].length;
+							//buttons[gameState][selection].selected = true;
 							buttonDelay = BUTTON_TIME;
 						}
 						else if (pad.axes[0] < -0.5) {
-							buttons[selection].selected = false;
-							selection = ((selection - 1) % buttons.length + buttons.length) % buttons.length;
-							buttons[selection].selected = true;
+							//buttons[gameState][selection].selected = false;
+							selection = ((selection - 1) % buttons[gameState].length + buttons[gameState].length) % buttons[gameState].length;
+							//buttons[gameState][selection].selected = true;
 							buttonDelay = BUTTON_TIME;
 						}
 					}
@@ -594,16 +674,22 @@ window.onload = function () {
 					if (buttonDelay < 0) {
 						if (pad.buttons[0].pressed) {
 							buttonDelay = BUTTON_TIME;
+							/*
 							doLevel();
-							gameState = "play";
-							sounds['select'].play();
+							changeState("play");
+							sounds['select'].play();*/
+							doSelected();
 						}
 						if (pad.axes[0] > 0.5) {
 							currentLevel = (currentLevel + 1) % (levelCompleted + 1);
+							selection = currentLevel;
+							console.log("gamepad1", currentLevel);
 							buttonDelay = BUTTON_TIME;
 						}
 						else if (pad.axes[0] < -0.5) {
 							currentLevel = ((currentLevel - 1) % (levelCompleted + 1) + (levelCompleted + 1)) % (levelCompleted + 1);
+							selection = currentLevel;
+							console.log("gamepad2", currentLevel);
 							buttonDelay = BUTTON_TIME;
 						}
 					}
@@ -630,13 +716,13 @@ window.onload = function () {
 						if (gameState == 'mainmenu')
 							window.close();
 						else if (gameState == 'levelmenu' || gameState == 'help')
-							gameState = 'mainmenu';
+							changeState('mainmenu');
 						else if (gameState == 'play')
-							gameState = 'levelmenu';
+							changeState('levelmenu');
 					} 
 
-					if (choice >= types.length) choice = 0;
-					else if (choice < 0) choice = types.length - 1;
+					if (choice >= 4) choice = 0;
+					else if (choice < 0) choice = 4 - 1;
 				} else {
 					buttonDelay -= dt;
 				}
@@ -653,6 +739,18 @@ window.onload = function () {
 	
 	}
 	
+	function doButtons(dt) {
+		for (var i = 0; i < buttons[gameState].length; i++)
+		{
+			if (i == selection) {
+				buttons[gameState][i].drawSelected();
+			}	
+			else {
+				buttons[gameState][i].draw();
+			}
+		}
+	}
+	
 	// do all the updating and drawing, etc.
 	function doStuff(dt) {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -661,16 +759,18 @@ window.onload = function () {
 		ctx.fillStyle = "rgba(100,100,100,0.5)"
 		//console.log(levels[currentLevel].name.length );
 		ctx.font = 150.0 / levels[currentLevel].name.length + "vw Ubuntu Mono";
-		ctx.fillText(levels[currentLevel].name, canvas.width / 2, canvas.height * 0.8); 
+		ctx.fillText(levels[currentLevel].name, canvas.width / 2, canvas.height * 0.4); 
 		
 		//CURSOR INDICATION
-		ctx.globalAlpha = 0.3;
+		if (findButton(mx * TILESIZE, my * TILESIZE) === undefined) { 
+			ctx.globalAlpha = 0.3;
 
-		ctx.drawImage(images['platform'], Math.floor(mx) * TILESIZE, Math.floor(my) * TILESIZE - TILESIZE / 3, TILESIZE, TILESIZE * 1.7);
-		ctx.font = "40px bold Ubuntu Mono";
-		ctx.fillStyle = "black";
-		ctx.fillText(arrows[choice], Math.floor(mx) * TILESIZE + TILESIZE / 2, Math.floor(my) * TILESIZE + 2 * TILESIZE / 3);
-		ctx.globalAlpha = 1;
+			ctx.drawImage(images['platform'], Math.floor(mx) * TILESIZE, Math.floor(my) * TILESIZE - TILESIZE / 3, TILESIZE, TILESIZE * 1.7);
+			ctx.font = "40px bold Ubuntu Mono";
+			ctx.fillStyle = "black";
+			ctx.fillText(arrows[choice], Math.floor(mx) * TILESIZE + TILESIZE / 2, Math.floor(my) * TILESIZE + 2 * TILESIZE / 3);
+			ctx.globalAlpha = 1;
+		}
 
 		//DRAW/UPDATE
 
@@ -723,7 +823,7 @@ window.onload = function () {
 			START = false;
 			setTimeout(function () {
 				currentLevel++;
-				gameState = "levelmenu";
+				changeState("levelmenu");
 			}, 500);
 		}
 	}
@@ -760,14 +860,28 @@ window.onload = function () {
 		
 		//CHECK GAMEPAD INPUT
 		doGamepads(dt);
+
+		doButtons(dt);
 		
 		window.requestAnimationFrame(step);
 	}
 
 	//... awkward way for choosing platform to create
-	var types = [TurnPlatform, TurnPlatform, TurnPlatform, TurnPlatform];
 	var choice = 1;
 
+	function findButton(x,y) {
+		for (var i = 0; i < buttons[gameState].length; i++) {
+			//console.log(buttons[gameState]);
+			if (x > buttons[gameState][i].x && x < buttons[gameState][i].x + buttons[gameState][i].w) {
+				if (y > buttons[gameState][i].y && y < buttons[gameState][i].y + buttons[gameState][i].h) {
+					selection = i;
+					return buttons[gameState][i];
+				}
+			}
+		}
+		return undefined;
+	}
+	
 	// create a platform at the given cursor
 	function addPlatform() {
 		if (findPlatform(mx, my) === undefined && findObstacle(mx, my) === undefined) {
@@ -787,9 +901,15 @@ window.onload = function () {
 	
 	// MOUSE BEHAVIOR
 	canvas.addEventListener("mouseup", function (e) {
-		if (gameState == "play") {
-			mouse.down = false;
+		mouse.down = false;
+		var b = findButton(e.offsetX, e.offsetY);
+		if (b !== undefined) {
+			b.callback();
+			sounds['select'].play();
+		}
+		else if (gameState == "play") {
 			addPlatform();
+			sounds['addplatform'].play();
 		}
 	});
 	
@@ -801,7 +921,9 @@ window.onload = function () {
 	});
 
 	canvas.addEventListener("mousemove", function (e) {
+		findButton(e.offsetX, e.offsetY);
 		if (gameState == "play") {
+			console.log("move!");
 			if (mouse.down) {
 				mouse.ex = e.offsetX, mouse.ey = e.offsetY;
 				choice = Math.round((Math.atan2((mouse.ey - mouse.sy),(mouse.ex - mouse.sx)) + Math.PI * 2) / (Math.PI / 2)) % 4;

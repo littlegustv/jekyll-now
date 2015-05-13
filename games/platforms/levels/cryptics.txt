@@ -6,6 +6,8 @@ cryptic messages between levels:  (maybe: slightly melancholy things supposedly 
 "would you believe me if I said I was a romantic?"
 "it's what my parents did - and so on, to the next generation"
 "I know you're only trying to help"
+"...and if I disobeyed?"
+"being in control won't make you happy"
 
 detect 'infinite loops' and getting stuck, but only mention them in this text ("always moving, never getting anywhere")
 

@@ -1,7 +1,7 @@
 body
 {
 	margin: 0px;
-	text-align: center;
+	*text-align: center;
 	-webkit-app-region: drag;
 	*background: rgba(100,200,100,0.5);
 }
@@ -13,9 +13,10 @@ body
 	-webkit-app-region: no-drag;
 	*margin: 2px;
     *border: 1px solid black;
-    *background: url('http://subtlepatterns.com/patterns/contemporary_china_2.png');
+    background: url('http://subtlepatterns.com/patterns/rockywall.png');
     /*background: linear-gradient(to right, #DD6600, #EE5500);*/
     position: relative;
-	margin: auto;
+	*margin: auto;
 	*margin-top: 10px;
+	box-shadow: 0px 0px 10px 10px rgba(0,0,0,0.1) inset;
 }
