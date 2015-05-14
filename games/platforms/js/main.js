@@ -180,6 +180,17 @@ window.onload = function () {
 		}
 		ctx.fillStyle = "black";
 		ctx.fillText('"' + this.name + '"', 2*TILESIZE + (this.level % lvls) * 2 * TILESIZE + TILESIZE / 2, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE + TILESIZE + 20);
+		if (levels[this.level].score != 0) {
+			ctx.font = "40px Monospace bold";
+			if  (levels[this.level].score <= levels[this.level].gold)
+				ctx.fillStyle = "gold";
+			else if (levels[this.level].score <= levels[this.level].gold + Math.pow(levels[this.level].gold, 0.5))
+				ctx.fillStyle = "silver";
+			else
+				ctx.fillStyle = "peru";
+			ctx.fillText("\u2605", 2*TILESIZE + (this.level % lvls) * 2 * TILESIZE + TILESIZE - 10, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE + 20);
+		}
+
 	}
 	LevelButton.drawSelected = function() {
 		if (this.level <= levelCompleted) {
@@ -455,6 +466,7 @@ window.onload = function () {
 	function checkWin() {
 		if (c.x === exit.x && c.y === exit.y) {
 			if ((currentLevel + 1) > levelCompleted) {
+				levels[currentLevel].score = platforms.length - 2;
 				levelCompleted = (currentLevel + 1);
 				selection = currentLevel + 1;
 			}

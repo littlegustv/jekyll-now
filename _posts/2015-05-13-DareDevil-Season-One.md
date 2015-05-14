@@ -1,0 +1,11 @@
+---
+layout: post
+title: DareDevil - Season One
+draft: true
+---
+
+Nobody enjoys watching movies with me anymore.  Or if they do, they are being awfully covert about it.  Maybe it would help if I would just keep my mouth shut when the movie's done, but learning is hard and life is short.  But it turns out that not watching movies doesn't help - I've come to deelpy despise the Marvel Cinematic Universe, and I've only seen... eight of them?  Christ.  Well, at least I didn't just binge watch the first season of Daredevil, and actually almost think it was not bad.  That would be humiliating.
+
+I've put up with plenty of tv shows that are half-baked at best, so I'm not sure why I was so worried about this one.  Marvel adaptations in general have a kind of lower threshold for quality that is impressive if not quite respectable.  Or to put it more consisely: they are not DC.  But part of me cringes a bit when the "Marvel can do no wrong" or "They haven't messed up yet - maybe next time" or whatever - that thing, as long as that mantra keeps on churning I will feel uncomfortable.  Because, while it is nice that a studio can be so consistent, the Marvel properties have always had problems and it looks like those problems are settling in to a nice comfortable middle age.  What's more, they're spreading.
+
+Expectations are a funny thing.  Many trite philosophers in their day have suggested that we can just change our expectations and thus be impervious to the outside world - completely free.  I think it was Crow who said it best: "It's not having what you want; it's wanting what you've got."  If ever there was a sentiment more in need of a sea burial.  Most critics these days seem content with it; "it was great summer blockbuster fun", or "they achieved everything you can expect from this kind of movie" and so on.  The problem is, expectations are where we get any ambition from - particularly our own expectations, and the fact that these can change.  Being disappointed with ourselves or each other - even for doing something that was previously acceptable - is a powerful force for creativity - trying to escape from that disappointment, from stale expectations.

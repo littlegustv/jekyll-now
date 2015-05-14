@@ -3,6 +3,7 @@ layout: default
 ---
 <div class="posts">
   {% for post in site.posts %}
+	{% unless post.draft %}
     <article class="post">
           <div class="entry">
             <h3>{{ post.title }}</h3>
@@ -10,5 +11,6 @@ layout: default
           </div>
           <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
     </article>
+	{% endunless %}
   {% endfor %}
 </div>
