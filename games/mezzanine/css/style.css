@@ -1,0 +1,634 @@
+body
+{
+	background: url('../media/images/stardust.png');
+	cursor: pointer;
+	margin: 0px;
+	font-family: Jolly Lodger, serif;
+}
+div
+{
+	position: absolute;
+	box-sizing: border-box;
+}
+#content
+{
+	width: 320px;
+	height: 775px;
+	overflow: hidden;
+	position: relative;
+}
+.ending
+{
+	display: block;
+	position: fixed;
+	top: 250px;
+	width: 100%;
+	text-align: center;
+	color: black;
+	padding: 20px;
+	box-sizing: border-box;
+	z-index: 15;
+	font-size: 24px;
+	transition: top 2s;
+	background: rgba(255, 255, 255, 0.9);
+}
+.floor
+{
+	background-color: white;
+*	background-image: url('../media/images/floor-0-bg.png');
+*	background-image: url('../media/images/bottomfloor-1.png');
+
+*	background-image: url('http://subtlepatterns.com/patterns/ravenna.png');
+	padding: 20px;
+	color: white;
+	font-size: 24px;
+	*border: 8px solid transparent;
+	*border-bottom: 4px solid black;
+	box-shadow: 0px 0px 15px 7px rgba(0,0,0,0.5) inset;
+	background-size: 100% 100%;
+	transition: transform 2s, box-shadow 2s;
+	*background-position: left top;
+	background-repeat-y: no-repeat;
+}
+.floor:before
+{
+	content: attr(floor);
+	font-size: 24px;
+	color: white;
+	display: block;
+	position: relative;
+	left: -40px;
+	top: calc(50% - 12px);
+	width: 300px;
+	height: 32px;
+	overflow: hidden;
+	background-color: transparent !important;
+	text-shadow: 1px 1px 6px black;
+	z-index: 25;
+}
+.floor:hover:before
+{
+	content: attr(floor) " : " attr(description);
+}
+.floor:nth-child(-n + 1)
+{
+	background-image: url('../media/images/bottomfloor-1.png');
+}
+.floor:nth-child(-n + 6)
+{
+	background-image: url('../media/images/midfloor-1.png');
+}
+.floor:nth-child(6)
+{
+	background-image: url('../media/images/midfloor-2.png');
+}
+.floor:nth-child(-n + 3)
+{
+	background-image: url('../media/images/topfloor-1.png');
+}
+.floor:nth-child(-n +2)
+{
+	background-image: url('../media/images/topfloor-2.png');
+}
+.floor:nth-child(1)
+{
+	background-image: url('../media/images/utility-1.png');
+}
+.floor:nth-child(2)
+{
+	background-image: url('../media/images/development-1.png');
+}
+.floor:nth-child(3)
+{
+	background-image: url('../media/images/research-1.png');
+}
+.floor:nth-child(4)
+{
+	background-image: url('../media/images/management-1.png');
+}
+.floor:nth-child(5)
+{
+	background-image: url('../media/images/support-1.png');
+}
+.floor:nth-child(6)
+{
+	background-image: url('../media/images/refectory-1.png');
+}
+.floor:nth-child(7)
+{
+	background-image: url('../media/images/boardroom-1.png');
+}
+.floor:nth-child(8)
+{
+	background-image: url('../media/images/cubicle-1.png');
+}
+.floor:nth-child(9)
+{
+	background-image: url('../media/images/lobby-1.png');
+}
+.floor-overlay
+{
+	content: '';
+	display: block;
+	width: calc(100% + 40px);
+	height: calc(100% + 40px);
+	position: relative;
+	left: -20px;
+	top: -49px;
+	opacity: 0.0;
+}
+.floor:after
+{
+	display: block;
+	content: '';
+	height: calc(100% + 10px);
+	width: 10px;
+	position: absolute;
+	right: -40px;
+	top: -12px;
+	z-index: 20;
+	opacity: 0;
+	border: 0px solid white;
+	transition: opacity 1s;
+}
+.destination
+{
+	box-shadow: 0px 0px 15px 7px rgba(255,255,255,0.5) inset;
+}
+/*
+.destination:after
+{
+	border-right-width: 4px;
+	border-top-width: 4px;
+	border-bottom-width: 4px;
+	opacity: 1;
+}*/
+.elevator
+{
+	box-shadow: 0px 0px 5px 2px rgba(149, 214, 223, 0.5) inset;
+	border: 3px inset #CCC;
+	/* background: url('../media/images/elevator-1.png'); */
+	background: linear-gradient(to right, #FFF, rgba(255,255,255,0.1));
+	pointer-events: none;
+}
+.shaft
+{
+	border-right: 4px dotted rgba(0,0,0,0.4);
+	border-left: 4px dotted rgba(0,0,0,0.4);
+	font-size: 58px;
+	/* padding: 2px; */
+	text-align: center;
+	pointer-events: none;
+}
+.cable
+{
+	background: url('http://subtlepatterns.com/patterns/gun_metal.png');
+	pointer-events: none;
+}
+.person
+{
+	height: 48px;
+	width: 18px;
+	*background: black;
+	padding: 2px;
+	color: white;
+	background-image: url('../media/images/person-4.png');
+	opacity: 0.0;
+	border-bottom: 0px solid rgba(200,0,0,0.0);
+}
+.person:before
+{
+	content: attr(destination);
+	display: block;
+	height: 20px;
+	border-top-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	width: 12px;
+	color: white;
+	position: relative;
+	top: -29px;
+	left: calc(50% - 8px);
+	padding: 2px;
+	text-align: center;
+	background-color: none;
+	*border: black 1px solid;
+	box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.4) inset;
+}
+.neutral:before, .neutral .floor-overlay
+{
+	background-color: gray;
+}
+.opener:before, .opener .floor-overlay
+{
+	background-color: #CC0000;
+}
+.opener .floor-overlay
+{
+	background-image: url('../media/images/overlay-opener-1.png');
+}
+.closer:before, .closer .floor-overlay
+{
+	background-color: #0000CC;/*#12AA21;*/
+}
+.closer .floor-overlay
+{
+	background-image: url('../media/images/overlay-closer-1.png');
+}
+.flipped
+{
+    -moz-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+	filter: FlipH;
+	-ms-filter: "FlipH";
+}
+.flipped:before
+{
+	-moz-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+	filter: FlipH;
+	-ms-filter: "FlipH";
+}
+.selected
+{
+	*-webkit-filter: invert(100%);
+}
+.selected:after
+{
+	content: '';
+  display: block;
+  width: 16px;
+  position: relative;
+  padding: 2px;
+  top: -63px;
+  left: calc(50% - 12px);
+  border: 4px solid white;
+  border-bottom-width: 0px;
+  opacity: 1;
+}
+/* OPENING SPLASH SCREEN AND EXTERIOR OF BUILDING */
+#debug
+{
+	position: fixed;
+	width: 300px;
+	height: 200px;
+	background: white;
+	bottom: 10px;
+	right: 10px;
+	display: none;
+}
+#ground
+{
+	top: 675px;
+	width: 100%;
+	height: 100px;
+	background: linear-gradient(to bottom, #1a0322, #000006 30%);
+
+}
+#exterior, #main
+{
+	width: 240px;
+	height: 775px;
+	z-index: 10;
+	*transition: transform 2s;
+	*transform-origin: 0% 50%;
+}
+#main
+{
+	*transform: rotateY(-90deg);
+	z-index: 5;
+}
+.tier-0,.tier-1,.tier-2,.tier-3
+{
+	background-image: url('../media/images/rockywall.png');
+	box-shadow: 0px -5px 5px 2px rgba(0,0,0,0.3) inset;
+	border-right: 10px solid rgb(61, 61, 61);
+	border-left: 10px solid grey;
+	border-top: solid black 4px;
+}
+.tier-0
+{
+	left: 40px;
+	top: 590px;
+	height: 100px;
+	width: 240px;
+	box-shadow: 1px 60px 5px 20px rgba(0,0,0,0.4);
+}
+
+.tier-1
+{
+	left: 45px;
+	top: 450px;
+	height: 140px;
+	width: 216px;
+}
+.tier-2
+{
+	left: 77px;
+	top: 240px;
+	height: 210px;
+	width: 180px;
+}
+.tier-3
+{
+	left: 81px;
+	top: 30px;
+	height: 210px;
+	width: 164px;
+}
+.col-1, .col-2, .col-4
+{
+	width: 20%;
+	height: calc(100% - 20px);
+	margin-top: 10px;
+	position: relative;
+	float: left;
+	text-align: center;
+}
+.col-4
+{
+	width: 40%;
+}
+.center-2, .center-3, .center-1
+{
+	width: 60%;
+	height: calc(100% - 12px);
+	position: relative;
+	float: left;
+	margin-top: 10px;
+	text-align: center;
+	background: url('http://subtlepatterns.com/patterns/escheresque.png');
+
+}
+.center-1
+{
+	width: calc(100% - 20px);
+	margin: 10px;
+}
+.center-3
+{
+	width: calc(60% - 20px);
+	margin: 10px;
+	border-top-left-radius: 20px;
+	border-top-right-radius: 20px;
+	border: 10px rgba(0,0,0,0.08) dotted;
+	border-bottom: none;
+	box-shadow: 0px -5px 8px 2px rgba(0,0,0,0.4);
+	background: url('http://subtlepatterns.com/patterns/escheresque.png');
+	background-clip: content-box;
+}
+.center-2
+{
+	border-right: 10px solid rgb(61, 61, 61);
+	border-left: 10px solid grey;
+	border-top: solid black 4px;
+	box-shadow: 0px -5px 8px -2px rgba(0,0,0,0.3);
+}
+.window, .window-2
+{
+	width: 16px;
+	height: 48px;
+	margin: 4px;
+	margin-top: 9px;
+	margin-bottom: 9px;
+	background: linear-gradient(to bottom, #F1F3F3, #007C78);
+	box-shadow: 0px 0px 5px 5px rgba(0,0,0,0.4) inset;
+	border: 2px #333 inset;
+	position: relative;
+	display: inline-block;
+}
+.window-2
+{
+	width: 16px;
+	height: 64px;
+}
+.center-2 .window
+{
+	margin-top: 6px;
+	margin-bottom: 7px;
+}
+.door
+{
+	width: 20%;
+	position: relative;
+	float: left;
+	height: calc(100% - 40px);
+	margin-top: 43px;
+	*background-image: url('http://pixabay.com/static/uploads/photo/2014/12/21/23/45/doors-575961_640.png');
+	*background-size: 100% 100%;
+	background: linear-gradient(to right, #222, #222 47%, #000 50%, #333 53%, #333);
+	border: 2px black inset;
+	box-shadow: 0px 0px 5px 5px rgba(0,0,0,0.4) inset;
+}
+.glass-1
+{
+	width: calc(100% - 20px);
+	height: calc(100% + 20px);
+	margin: 10px;
+	top: -6px;
+	border-top-left-radius: 50%;
+	border-top-right-radius: 50%;
+	border: 10px rgba(0,0,0,0.08) dotted;
+	/* border-bottom-left-radius: 20px; */
+	/* border-bottom-right-radius: 20px; */
+	box-shadow: 0px 0px 15px 6px rgba(0,0,0,0.4) inset;
+	background-clip: content-box;
+	background-size: 100% 100%;
+	/* background: linear-gradient(to right, #890707, #089760); */
+	/* box-sizing: content-box; */
+	background-image: url('../media/images/stained-glass-1.png');
+}
+.clock-1, .clock-2
+{
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	margin: auto;
+	position: relative;
+	background-image: url('http://www.lucylearns.com/images/clock-face-template-printable-5.gif');
+	background-size: 100% 100%;
+	border: 4px solid black;
+	/* top: calc(100% - 86px); */
+	top: 35px;
+	z-index: 11;
+}
+.clock-2
+{
+	width: 50px;
+	height: 50px;
+	z-index: 0;
+	position: absolute;
+	border-width: 2px;
+	left: calc(50% - 24px);
+	top: 10px;
+}
+.m-hand, .h-hand
+{
+/*
+	position: absolute;
+	height: 40%;
+	width: 4px;
+	background: url('http://www.vectors4all.net/preview/minute-hand-clip-art.jpg');
+	background-size: cover;
+	top: 10%;
+	left: calc(50% - 2px);
+	transform-origin: 50% 100%;
+*/
+	position: absolute;
+	/* height: 40%; */
+	width: 4px;
+	/* background: url('http://www.vectors4all.net/preview/minute-hand-clip-art.jpg'); */
+	/* background-size: cover; */
+	top: 5px;
+	left: calc(50% - 1px);
+	transform-origin: 50% 100%;
+	border-bottom: 40px solid black;
+	border-right: 2px solid transparent;
+	border-left: 2px solid transparent;
+}
+.h-hand
+{
+	/*top: 25%;
+	height: 25%;*/
+	border-bottom: 25px solid red;
+	top: 20px;
+}
+.clock-2 .m-hand
+{
+	border-bottom-width: 20px;
+}
+.clock-2 .h-hand
+{
+	border-bottom-width: 10px;
+	top: 15px;
+}
+.alarm
+{
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	z-index: 20;
+	font-size: 40px;
+	padding: 10px;
+}
+.alarm:hover, .stop:hover, .alarm:active, .stop:active
+{
+	color: #DDD;
+	background: black;
+	border-color:black;
+}
+.stop
+{
+	position: fixed;
+	right: 10px;
+	top: 84px;
+	z-index: 20;
+	font-size: 40px;
+	padding: 10px;
+}
+
+/* THE SPEECH BUBBLE
+------------------------------------------------------------------------------------------------------------------------------- */
+
+.triangle-isosceles {
+*  position:relative;
+  position: absolute;
+  top: 65px;
+  min-width: 120px;
+  display: none;
+  padding:15px;
+  margin:1em 0 3em;
+  color:#000;
+  background:linear-gradient(to bottom, rgba(240,240,240,0.8), rgba(224,224,224,0.8)); /* default background for browsers without gradient support */
+  /* css3 */
+  *background:-webkit-gradient(linear, 0 0, 0 100%, from(#f9d835), to(#f3961c));
+  *background:-moz-linear-gradient(#f9d835, #f3961c);
+  *background:-o-linear-gradient(#f9d835, #f3961c);
+  *background:linear-gradient(#f9d835, #f3961c);
+  -webkit-border-radius:10px;
+  -moz-border-radius:10px;
+   border-radius:10px;
+   pointer-events: none;
+   z-index: 25;
+  }
+
+/* Variant : for top positioned triangle
+------------------------------------------ */
+
+.triangle-isosceles.top {
+  *background:-webkit-gradient(linear, 0 0, 0 100%, from(#f3961c), to(#f9d835));
+  *background:-moz-linear-gradient(#f3961c, #f9d835);
+  *background:-o-linear-gradient(#f3961c, #f9d835);
+  *background:linear-gradient(#f3961c, #f9d835);
+}
+
+/* Variant : for left/right positioned triangle
+------------------------------------------ */
+
+.triangle-isosceles.left {
+  margin-left:50px;
+  background:#eee;
+}
+
+/* Variant : for right positioned triangle
+------------------------------------------ */
+
+.triangle-isosceles.right {
+  margin-right:50px;
+  background:#f3961c;
+}
+
+/* THE TRIANGLE
+------------------------------------------------------------------------------------------------------------------------------- */
+
+/* creates triangle */
+.triangle-isosceles:after {
+  content:"";
+  position:absolute;
+  bottom:-15px; /* value = - border-top-width - border-bottom-width */
+  left:10px; /* controls horizontal position */
+  border-width:15px 15px 0; /* vary these values to change the angle of the vertex */
+  border-style:solid;
+  border-color:#f3961c transparent;
+  /* reduce the damage in FF3.0 */
+  display:block;
+  width:0;
+}
+
+/* Variant : top
+------------------------------------------ */
+
+.triangle-isosceles.top:after {
+  top:-15px; /* value = - border-top-width - border-bottom-width */
+  right:50px; /* controls horizontal position */
+  bottom:auto;
+  left:auto;
+  border-width:0 15px 15px; /* vary these values to change the angle of the vertex */
+  border-color:rgba(240,240,240,0.8) transparent;
+}
+
+/* Variant : left
+------------------------------------------ */
+
+.triangle-isosceles.left:after {
+  top:16px; /* controls vertical position */
+  left:-50px; /* value = - border-left-width - border-right-width */
+  bottom:auto;
+  border-width:10px 50px 10px 0;
+  border-color:transparent #f3961c;
+}
+
+/* Variant : right
+------------------------------------------ */
+
+.triangle-isosceles.right:after {
+  top:16px; /* controls vertical position */
+  right:-50px; /* value = - border-left-width - border-right-width */
+  bottom:auto;
+  left:auto;
+  border-width:10px 0 10px 50px;
+  border-color:transparent #f3961c;
+}

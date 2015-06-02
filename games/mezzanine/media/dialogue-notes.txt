@@ -1,0 +1,24 @@
+Beginning:
+"Hello, machine.  Welcome to life."  -> fade in game
+
+Trusting:
+[
+	["you work all day, and what do ya get?","home..."
+	["to go home?",""]
+]
+[
+	["I can't really tell you without spoiling it", "no but you would",""]
+	["I honestly couldn't care less", "I'm never going to see it.","just tell me or stop going on about it."]
+]
+[
+	[]
+]
+
+
+Suspicious:
+
+Hostile:
+
+Devious:
+
+(Filler?):

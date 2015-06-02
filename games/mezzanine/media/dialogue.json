@@ -1,0 +1,33 @@
+{
+	"dialogue": {
+		"trusting": [
+			[["Ho hum..."]],
+			[["Hard times sure bring out the revolutionary in a person.","I suppose."],["Or the cynic."]],
+			[["*Sigh*"]],
+			[["It feels like last week just ended."]],
+			[["You busy for lunch?", "I've got a business lunch - all paid for.", "Too bad."],["Busy?","Ah, I brought leftovers.",""]],
+			[["The elevator ride always seems like the hardest part.", "It's the waiting, you know?"],["Hmm?"]],
+			[["You got a shift today?", "Probably something, then."],["I'm on call.", "Yeah, sure."]],
+			[["You coming down with something?"],["Nah, just tired."]],
+			[["Aren't you working nights?", "Ah, sorry."],["Overtime.", "It's all good."]],
+			[["Running late?", "Good luck, then."],["More or less."]],
+			[["Oh, remind me to tell you something later.", "Don't want to bother everyone."],["You can't now?"]],
+			[["I don't see why I need to choose.","So why does it matter?"],["It's not life or death.","Can't you just pick a favorite flavor?"]],
+			[["Difficult to say...", "...but I'd have to pick 'The Best of the Beatles'"]],
+			[["Did I leave the stove on?", "Oh... I was talking to myself"],["How should I know?"]],
+			[["...and he just got it fixed today."],["Two days before we're done?  Come on!"]],
+			[["Was it raining when you got here?"], ["I took the subway."]],
+			[["Why is she giving up her office?","So who gets it?"], ["Maybe she's upgraded.", "Neither of us, to be sure."]],
+			[["Oh, sorry... I think I stepped on someone."]],
+			[["Could someone press my floor please?"]],
+			[["I know I recognize that song from somewhere..."]],
+			[["Do you mind taking you bag off?"], ["Oh, my bad."]],
+			[["So let me tell you this story from last night..."], ["You sure it's work appropriate?"]],
+			[["**You think I'll have time to eat before the meeting?**", "**Uh, what is time anyway?**", "**Right, thanks.**"]],
+			[["Drink too much last night?", "Sure, sure."], ["I'll be fine.", "Can I have the rest of your coffee?"]],
+			[["Where'd you get that?!", "Seriously?  Since when?"], ["Uh... the vending machine?", "I don't know, I never checked..."]],
+			[["God, it feels like death in here.", "Nothing."], ["What?"]],
+			[["I could certainly use a cup of tea."]]
+		]
+	}
+}

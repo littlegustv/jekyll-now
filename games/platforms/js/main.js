@@ -52,7 +52,8 @@ window.onload = function () {
 		FRAMESIZE = 64,
 		BUTTON_TIME = 0.5,
 		FPS = 30,
-		START = false;
+		START = false,
+		FONT = " Monospace";
 	var gameState = "loading";
 	function changeState (newstate) {
 		gameState = newstate;
@@ -91,7 +92,7 @@ window.onload = function () {
 	var selection = 0;
 	
 	var levels = [];
-	var currentLevel = 0, levelCompleted = 0;
+	var currentLevel = 0, levelCompleted = 100;
 	
 	// LOAD DATA FILE
 	var request = new XMLHttpRequest();
@@ -101,6 +102,7 @@ window.onload = function () {
 		levels = JSON.parse(request.response).levels;
 		levels.forEach(function (l) {
 			//console.log(l);
+			l.score = 0;
 		});
 		initButtons();
 		//console.log(levels);
@@ -127,7 +129,7 @@ window.onload = function () {
 			ctx.fill();
 			
 			ctx.fillStyle = "white";
-			ctx.font = '80px Ubuntu Mono';
+			ctx.font = '80px' + FONT;
 			ctx.textAlign = 'center';
 			ctx.fillText(this.text, this.x + 95, this.y + 68);
 			ctx.lineWidth = lw;
@@ -142,7 +144,7 @@ window.onload = function () {
 			ctx.fill();
 			
 			ctx.fillStyle = "white";
-			ctx.font = '80px Ubuntu Mono';
+			ctx.font = '80px' + FONT;
 			ctx.textAlign = 'center';
 			ctx.fillText(this.text, this.x + 95, this.y + 68);
 			ctx.lineWidth = lw;
@@ -167,7 +169,7 @@ window.onload = function () {
 		return this;
 	}
 	LevelButton.draw = function() {
-		ctx.font = '20px Ubuntu Mono';
+		ctx.font = '20px' + FONT;
 		ctx.textAlign = 'center';
 		if (this.level < levelCompleted) {
 			ctx.drawImage(images['checkbox'], 2*TILESIZE + (this.level % lvls) * 2 * TILESIZE, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE, TILESIZE, TILESIZE);
@@ -181,7 +183,7 @@ window.onload = function () {
 		ctx.fillStyle = "black";
 		ctx.fillText('"' + this.name + '"', 2*TILESIZE + (this.level % lvls) * 2 * TILESIZE + TILESIZE / 2, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE + TILESIZE + 20);
 		if (levels[this.level].score != 0) {
-			ctx.font = "40px Monospace bold";
+			ctx.font = "40px bold" + FONT;
 			if  (levels[this.level].score <= levels[this.level].gold)
 				ctx.fillStyle = "gold";
 			else if (levels[this.level].score <= levels[this.level].gold + Math.pow(levels[this.level].gold, 0.5))
@@ -213,9 +215,9 @@ window.onload = function () {
 		buttons["help"].push(Object.create(Button).init(canvas.width / 2 - 100, canvas.height - 160, "back", function() {changeState("mainmenu")}));
 		buttons["levelmenu"].push(Object.create(Button).init(canvas.width / 2 - 100, canvas.height - 160, "back", function() {changeState("mainmenu")}));
 		
-		buttons["play"].push(Object.create(Button).init(canvas.width * 4/5 - 100, canvas.height - 160, "back", function() {changeState("levelmenu")}));
-		buttons["play"].push(Object.create(Button).init(canvas.width * 1/2 - 100, canvas.height - 160, "reset", function() {reset();}));
-		buttons["play"].push(Object.create(Button).init(canvas.width * 1/5 - 100, canvas.height - 160, "run", function() {	START = true;}));
+		buttons["play"].push(Object.create(Button).init(canvas.width * 4/5 - 100, canvas.height - 160, "\u21B6", function() {changeState("levelmenu")}));
+		buttons["play"].push(Object.create(Button).init(canvas.width * 1/2 - 100, canvas.height - 160, "\u267B", function() {reset();}));
+		buttons["play"].push(Object.create(Button).init(canvas.width * 1/5 - 100, canvas.height - 160, "\u25B6", function() {	START = true;}));
 	}
 	
 	var Ripple = {
@@ -283,7 +285,7 @@ window.onload = function () {
 	TurnPlatform.draw = function () {
 		ctx.drawImage(images['platform'], this.x * TILESIZE, this.y * TILESIZE - TILESIZE / 3, TILESIZE, 1.7* TILESIZE);
 		ctx.fillStyle = "black";
-		ctx.font = "40px bold Ubuntu Mono";
+		ctx.font = "40px bold" + FONT;
 		ctx.fillText(arrows[Math.round(this.angle / (Math.PI / 2))], this.x * TILESIZE + TILESIZE / 2, this.y * TILESIZE + 2 * TILESIZE / 3);	
 	};
 	
@@ -407,6 +409,7 @@ window.onload = function () {
 					if (this.distance <= 0) {
 						this.distance = 2;
 						this.maxDistance = this.distance;
+						console.log(this.angle, this.x + 2 * Math.cos(this.angle), this.y + 2 * Math.sin(this.angle));
 						for (var d = 0; d <= 2; d++) {
 							var o = findObstacle(this.x + d * Math.cos(this.angle), this.y + d * Math.sin(this.angle));
 							if (o && o.collidable) {
@@ -447,7 +450,7 @@ window.onload = function () {
 	
 	function findObstacle(dx, dy) {
 		for (var i = 0; i < obstacles.length; i++) {
-			if (obstacles[i].x == Math.floor(dx) && obstacles[i].y == Math.floor(dy)) {
+			if (obstacles[i].x == Math.round(dx) && obstacles[i].y == Math.round(dy)) {
 				return obstacles[i];
 			}
 		}
@@ -465,8 +468,10 @@ window.onload = function () {
 	// Check if Character is at EXIT
 	function checkWin() {
 		if (c.x === exit.x && c.y === exit.y) {
-			if ((currentLevel + 1) > levelCompleted) {
+			if (platforms.length - 2 < levels[currentLevel].score || levels[currentLevel].score == 0) {
 				levels[currentLevel].score = platforms.length - 2;
+			}
+			if ((currentLevel + 1) > levelCompleted) {
 				levelCompleted = (currentLevel + 1);
 				selection = currentLevel + 1;
 			}
@@ -507,6 +512,8 @@ window.onload = function () {
 		{
 			if (sourceObj.platforms[i].angle !== undefined)
 				platforms.push(Object.create(TurnPlatform).init(sourceObj.platforms[i].x, sourceObj.platforms[i].y, sourceObj.platforms[i].angle));
+			else
+				platforms.push(Object.create(Platform).init(sourceObj.platforms[i].x, sourceObj.platforms[i].y));
 		}
 		for (var i = 0; i < sourceObj.obstacles.length; i++)
 		{
@@ -535,7 +542,7 @@ window.onload = function () {
 	
 	function doLoading(dt) {
 		ctx.clearRect(0,0,canvas.width, canvas.height);
-		ctx.font = 'bold 80px Ubuntu Mono';
+		ctx.font = 'bold 80px' + FONT;
 		ctx.textAlign = 'center';
 		ctx.fillStyle = 'black';
 		ctx.fillText('loading...', canvas.width/2, canvas.height/2);
@@ -548,7 +555,7 @@ window.onload = function () {
 		ctx.fillRect(canvas.width/2 - 250 - 5, canvas.height/2 - 100 - 5, 500, 150);
 		ctx.fillRect(canvas.width/2 - 250 + 5, canvas.height/2 - 100 + 5, 500, 150);
 		
-		ctx.font = '80px Ubuntu Mono';
+		ctx.font = '80px' + FONT;
 		ctx.textAlign = 'center';
 		ctx.fillStyle = 'black';
 		ctx.fillText('flat_FORMS', canvas.width/2, canvas.height/2);
@@ -746,7 +753,7 @@ window.onload = function () {
 	
 		ctx.clearRect(0,0,canvas.width, canvas.height);
 		ctx.fillStyle = "black";
-		ctx.font = "bold 20px Ubuntu Mono";
+		ctx.font = "bold 20px" + FONT;
 		ctx.fillText("HELP! I need somebody...", canvas.width/2, canvas.height/2);
 	
 	}
@@ -770,7 +777,7 @@ window.onload = function () {
 		//LEVEL NAME
 		ctx.fillStyle = "rgba(100,100,100,0.5)"
 		//console.log(levels[currentLevel].name.length );
-		ctx.font = 150.0 / levels[currentLevel].name.length + "vw Ubuntu Mono";
+		ctx.font = 150.0 / levels[currentLevel].name.length + "vw" + FONT;
 		ctx.fillText(levels[currentLevel].name, canvas.width / 2, canvas.height * 0.4); 
 		
 		//CURSOR INDICATION
@@ -778,7 +785,7 @@ window.onload = function () {
 			ctx.globalAlpha = 0.3;
 
 			ctx.drawImage(images['platform'], Math.floor(mx) * TILESIZE, Math.floor(my) * TILESIZE - TILESIZE / 3, TILESIZE, TILESIZE * 1.7);
-			ctx.font = "40px bold Ubuntu Mono";
+			ctx.font = "40px bold" + FONT;
 			ctx.fillStyle = "black";
 			ctx.fillText(arrows[choice], Math.floor(mx) * TILESIZE + TILESIZE / 2, Math.floor(my) * TILESIZE + 2 * TILESIZE / 3);
 			ctx.globalAlpha = 1;
@@ -816,7 +823,7 @@ window.onload = function () {
 		
 		//EXIT SIGN
 		ctx.fillStyle = "black";
-		ctx.font = "bold 20px Ubuntu Mono";
+		ctx.font = "bold 20px" + FONT;
 		ctx.textAlign = "center";
 		ctx.fillText("EXIT", (exit.x + 0.5) * TILESIZE, (exit.y + 0.65) * TILESIZE);
 
@@ -896,12 +903,14 @@ window.onload = function () {
 	
 	// create a platform at the given cursor
 	function addPlatform() {
-		if (findPlatform(mx, my) === undefined && findObstacle(mx, my) === undefined) {
+		if (findPlatform(mx, my) === undefined && findObstacle(mx, my) === undefined && platforms.length - 2 < levels[currentLevel].gold) {
 			var p1 = Object.create(TurnPlatform).init(Math.floor(mx), Math.floor(my), Math.PI * choice / 2);
 			platforms.push(p1);
 			var e1 = Object.create(Ripple).init(Math.floor(mx), Math.floor(my));
 			effects.push(e1);
+			return true;
 		}
+		return false;
 	}
 	
 	function addObstacle() {
@@ -911,17 +920,40 @@ window.onload = function () {
 		}
 	}
 	
+	function removePlatform() {
+		var p = findPlatform(mx, my);
+		if (p !== undefined && p != start && p != exit && p.angle !== undefined) {
+			var i = platforms.indexOf(p);
+			platforms.splice(i, 1);
+			return true;
+		}
+		return false;
+	}
+	
 	// MOUSE BEHAVIOR
+	
+	canvas.addEventListener("contextmenu", function (e) {
+		e.preventDefault();
+		return false;
+	});
+	
 	canvas.addEventListener("mouseup", function (e) {
+		e.preventDefault();
 		mouse.down = false;
 		var b = findButton(e.offsetX, e.offsetY);
 		if (b !== undefined) {
 			b.callback();
 			sounds['select'].play();
 		}
-		else if (gameState == "play") {
-			addPlatform();
-			sounds['addplatform'].play();
+		else if (gameState == "play" && !START) {
+			if (e.which === 3 || e.button === 2) {
+				if (removePlatform())
+					sounds['fall'].play();
+			}
+			else {
+				if (addPlatform())
+					sounds['addplatform'].play();
+			}
 		}
 	});
 	
@@ -935,7 +967,6 @@ window.onload = function () {
 	canvas.addEventListener("mousemove", function (e) {
 		findButton(e.offsetX, e.offsetY);
 		if (gameState == "play") {
-			console.log("move!");
 			if (mouse.down) {
 				mouse.ex = e.offsetX, mouse.ey = e.offsetY;
 				choice = Math.round((Math.atan2((mouse.ey - mouse.sy),(mouse.ex - mouse.sx)) + Math.PI * 2) / (Math.PI / 2)) % 4;
