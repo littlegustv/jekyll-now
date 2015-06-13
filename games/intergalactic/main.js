@@ -18,12 +18,13 @@ window.onload = function () {
 	bulletImage.src = "http://v-play.net/doc/images/ball.png";
 
 	var entities = [];
-
+	
 	var Entity = {
 		x: canvas.width / 2,
 		y: canvas.height / 2,
 		speed: 0,
 		angle: 0,
+		team: "enemy",
 		alive: true,
 		update: function (dt) {
 			this.x += dt * this.speed * Math.cos(this.angle);
@@ -55,9 +56,9 @@ window.onload = function () {
 			ctx.translate(-this.getX(),-this.getY());
 	};
 	var Projectile = Object.create(Entity);
-	Projectile.init = function (image, x, y, angle, speed) {
+	Projectile.init = function (image, x, y, angle, speed, team) {
 		this.x = x, this.y = y, this.image = image, this.angle = angle, this.speed = speed;
-		this.w = image.width, this.h = image.height;
+		this.w = image.width, this.h = image.height, this.team = team;
 		return this;
 	}
 	Projectile.checkBounds = function () {
@@ -65,12 +66,15 @@ window.onload = function () {
 			this.alive = false;
 		}
 	}
+	Projectile.handleCollision = function (obj) {
+		this.alive = false;
+	}
 	var Ship = Object.create(Entity);
-	Ship.init = function (image, x, y) {
+	Ship.init = function (image, x, y, team) {
 		this.x = x, this.y = y, this.image = image;
 		this.w = image.width, this.h = image.height;
 		this.health = 100, this.temperature = 0, this.cooldown = 0;
-		this.shield = false;
+		this.shield = false, this.team = team;
 		return this;
 	};
 	Ship.update = function (dt) {
@@ -83,6 +87,19 @@ window.onload = function () {
 		if (this.cooldown > 0) {
 			this.cooldown -= dt;
 		} else this.cooldown = 0;
+		
+		if (this.health <= 0) {
+			this.alive = false;
+			this.health = 0;
+		}
+	}
+	Ship.handleCollision = function (obj) {
+		if (this.shield && this.temperature < 85) {
+			this.temperature += 15;
+		}
+		else {
+			this.health -= 5;
+		}
 	}
 	Ship.canShoot = function() { return this.temperature < 95 && this.cooldown <= 0; }
 	Ship.draw = function (ctx) {
@@ -93,17 +110,18 @@ window.onload = function () {
 			ctx.stroke(); 
 		}
 	}
-	function CheckCollision (obj1, obj2) {
+	function checkCollision (obj1, obj2) {
 		if (obj1.x + obj1.w / 2 > obj2.x - obj2.w / 2 &&
 			obj1.x - obj1.w / 2 < obj2.x + obj2.w / 2) {
 			if (obj1.y + obj1.h / 2 > obj2.y - obj2.h / 2 &&
 				obj1.y - obj1.h / 2 < obj2.y + obj2.h / 2) {
 				obj1.handleCollision(obj2);
+				obj2.handleCollision(obj1);
 			}
 		}
 	}
 
-	var ship = Object.create(Ship).init(shipImage, canvas.width/2, canvas.height/2);
+	var ship = Object.create(Ship).init(shipImage, canvas.width/2, canvas.height/2, "player");
 	entities.push(ship);
 
 	var camera = Object.create(Camera);
@@ -144,7 +162,7 @@ window.onload = function () {
 				break;
 		}
 		if (ship.canShoot()) {
-			var b = Object.create(Projectile).init(bulletImage, ship.getX(), ship.getY(), angle, 1000);
+			var b = Object.create(Projectile).init(bulletImage, ship.getX(), ship.getY(), angle, 1000, "player");
 			entities.push(b);
 			ship.cooldown = 0.2;
 			ship.temperature += 5;
@@ -167,6 +185,13 @@ window.onload = function () {
 		var dt = (newTime - startTime) / 1000;
 		startTime = newTime;
 		
+		//randomly spawn enemy bullets
+		if (Math.random() * 100 < 50)
+		{
+			var b = Object.create(Projectile).init(bulletImage, Math.random() * bg.width, 0, Math.PI / 2, 1000, "enemy");
+			entities.push(b);
+		}
+		
 		ctx.clearRect(0,0,canvas.width,canvas.height);
 		ctx.save();
 		
@@ -185,6 +210,15 @@ window.onload = function () {
 		for (var i = 0; i < entities.length; i++) {
 			entities[i].draw(ctx);
 		}
+		//check collisions
+		for (var i = 0; i < entities.length; i++) {
+			for (var j = i + 1; j < entities.length; j++) {
+				if (entities[i].team != entities[j].team) {
+					checkCollision(entities[i], entities[j]);
+				}
+			}
+		}
+		
 		camera.speed = 6 * distance(camera.x,camera.y,
 								ship.x-canvas.width/2,
 								ship.y-canvas.height/2);
@@ -202,8 +236,11 @@ window.onload = function () {
 		
 		ctx.fillStyle = "black";
 		ctx.fillRect(10,10,108,28);
+		ctx.fillRect(canvas.width - 118,10,108,28)
+		
 		ctx.fillStyle = "white"
 		ctx.fillRect(14,14,ship.temperature, 20);
+		ctx.fillRect(canvas.width - 114, 14,ship.health,20);
 		
 		window.requestAnimationFrame(step);
 		
