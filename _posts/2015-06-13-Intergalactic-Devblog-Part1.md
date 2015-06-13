@@ -11,7 +11,7 @@ So the central mechanic would be: you have two main resources, 'hull' (see 'hp')
 
 The Luftrausers parallel is the contrast between shooting and manoeuvring, albeit slower and more methodical.  I also like the idea of exploration in a 2d, top down bullet-hell game.  A seamless world, without map screens (which always frustrate me), perhaps even borrowing a checkpoint system from Dark Souls as well - bases that you can land at to restock.  Here is the progress so far, and much of it will likely be changed (I am thinking movement and shooting with a gamepad, though possible mouse+keyboard as well).
 
-<iframe width="100%" height="404px" src="../games/intergalactic/index.html" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+<iframe width="100%" height="420px" src="../games/intergalactic/index.html" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 Note the influence of Dark Souls even extends to prototypes - the background image I am using.  But in truth, I really just wanted something large.  Now though, I like the aesthetic of it quite a bit - clean, block colors in smooth shapes.  Very stylized, without being pixel-art.  Along those lines, I have made a demo of a possible explosion system to create a little variety.
 
