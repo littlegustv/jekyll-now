@@ -42,6 +42,7 @@ window.onload = function () {
 	charImages[1].src = "./res/character-2.png";
 	charImages[2].src = "./res/character-side.png";
 	charImages[3].src = "./res/character-2-back.png";
+
 	
 	var arrows = ["\u2192","\u2193","\u2190","\u2191"];
 	
@@ -110,18 +111,22 @@ window.onload = function () {
 	request.send();
 	
 	var Button = {
-		init: function (x, y, text, callback) {
+		init: function (x, y, w, h, text, callback) {
 			this.x = x;
 			this.y = y;
-			this.h = 100;
-			this.w = 200;
+			this.h = h;
+			this.w = w;
 			this.text = text;
 			this.callback = callback;
 			return this;
 		},
-		draw: function() {
+		draw: function(selected) {
 			ctx.beginPath();
-			ctx.fillStyle = "rgba(0,0,0,0.5)";
+			
+			if (selected)
+				ctx.fillStyle = "rgba(155,155,255,0.5)"	
+			else
+				ctx.fillStyle = "rgba(155,155,155,0.5)";
 
 			ctx.rect(this.x - 6,this.y - 4,this.w,this.h);			
 			ctx.fill()
@@ -129,14 +134,13 @@ window.onload = function () {
 			ctx.fill();
 			
 			ctx.fillStyle = "white";
-			ctx.font = '80px' + FONT;
+			ctx.font = 0.8 * this.h + 'px' + FONT;
 			ctx.textAlign = 'center';
-			ctx.fillText(this.text, this.x + 95, this.y + 68);
+			ctx.fillText(this.text, this.x + this.w/2 - 5, this.y + this.h * .68);
 			ctx.lineWidth = lw;
 		},
 		drawSelected: function() {
 			ctx.beginPath();
-			ctx.fillStyle = "rgba(0,0,100,0.5)"
 
 			ctx.rect(this.x - 6,this.y - 4,this.w,this.h);			
 			ctx.fill()
@@ -168,9 +172,14 @@ window.onload = function () {
 		};
 		return this;
 	}
-	LevelButton.draw = function() {
+	LevelButton.draw = function(selected) {
 		ctx.font = '20px' + FONT;
 		ctx.textAlign = 'center';
+		if (selected && this.level <= levelCompleted) {
+			ctx.fillStyle = "rgba(140,140,255,0.5)";
+			ctx.roundRect(2*TILESIZE + (this.level % lvls) * 2 * TILESIZE, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE, TILESIZE - 1, TILESIZE - 1, TILESIZE / 6);
+			ctx.fill();
+		}
 		if (this.level < levelCompleted) {
 			ctx.drawImage(images['checkbox'], 2*TILESIZE + (this.level % lvls) * 2 * TILESIZE, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE, TILESIZE, TILESIZE);
 		}
@@ -180,7 +189,7 @@ window.onload = function () {
 		if (this.level > levelCompleted) {
 			ctx.drawImage(images['lock'], 2*TILESIZE + (this.level % lvls) * 2 * TILESIZE + 2, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE + 2, TILESIZE - 4, TILESIZE - 4);			
 		}
-		ctx.fillStyle = "black";
+		ctx.fillStyle = "white";
 		ctx.fillText('"' + this.name + '"', 2*TILESIZE + (this.level % lvls) * 2 * TILESIZE + TILESIZE / 2, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE + TILESIZE + 20);
 		if (levels[this.level].score != 0) {
 			ctx.font = "40px bold" + FONT;
@@ -194,14 +203,6 @@ window.onload = function () {
 		}
 
 	}
-	LevelButton.drawSelected = function() {
-		if (this.level <= levelCompleted) {
-			ctx.fillStyle = "rgba(0,0,100,0.5)";
-			ctx.roundRect(2*TILESIZE + (this.level % lvls) * 2 * TILESIZE, 2 * TILESIZE + Math.floor(this.level / lvls) * 2 * TILESIZE, TILESIZE - 1, TILESIZE - 1, TILESIZE / 6);
-			ctx.fill();
-		}
-		this.draw();
-	}
 	
 	function initButtons() {
 	
@@ -209,52 +210,50 @@ window.onload = function () {
 			buttons["levelmenu"].push(Object.create(LevelButton).init(i,levels[i].name));
 		}
 		
-		buttons["mainmenu"].push(Object.create(Button).init(canvas.width / 4, canvas.height * 2/3, "play", function() {changeState("levelmenu")}));
-		buttons["mainmenu"].push(Object.create(Button).init(canvas.width * 3/4 - 200, canvas.height * 2/3, "help", function() {changeState("help")}));
+		buttons["mainmenu"].push(Object.create(Button).init(canvas.width / 4, canvas.height * 2/3, 200, 100,  "play", function() {changeState("levelmenu")}));
+		buttons["mainmenu"].push(Object.create(Button).init(canvas.width * 3/4 - 200, canvas.height * 2/3, 200, 100, "help", function() {changeState("help")}));
 		
-		buttons["help"].push(Object.create(Button).init(canvas.width / 2 - 100, canvas.height - 160, "back", function() {changeState("mainmenu")}));
-		buttons["levelmenu"].push(Object.create(Button).init(canvas.width / 2 - 100, canvas.height - 160, "back", function() {changeState("mainmenu")}));
+		buttons["help"].push(Object.create(Button).init(canvas.width / 2 - 100, canvas.height - 160, 50, 50, "\u2630", function() {changeState("mainmenu")}));
+		buttons["levelmenu"].push(Object.create(Button).init(canvas.width / 2 - 100, canvas.height - 160, 50, 50, "\u2630", function() {changeState("mainmenu")}));
 		
-		buttons["play"].push(Object.create(Button).init(canvas.width * 4/5 - 100, canvas.height - 160, "\u21B6", function() {changeState("levelmenu")}));
-		buttons["play"].push(Object.create(Button).init(canvas.width * 1/2 - 100, canvas.height - 160, "\u267B", function() {reset();}));
-		buttons["play"].push(Object.create(Button).init(canvas.width * 1/5 - 100, canvas.height - 160, "\u25B6", function() {	START = true;}));
+		buttons["play"].push(Object.create(Button).init(canvas.width - 100, 50, 50, 50, "\u2630", function() {changeState("levelmenu")}));
+		buttons["play"].push(Object.create(Button).init(canvas.width - 100, 120, 50, 50, "\u21BA", function() {reset();}));
+		buttons["play"].push(Object.create(Button).init(canvas.width - 100, 190, 50, 50, "\u25B6", function() {	START = true;}));
 	}
 	
 	var Ripple = {
-		init: function (x, y) {
+		init: function (x, y, color) {
 			this.x = x;
 			this.y = y;
+			this.color = color;
 			this.dt = 0;
 			return this;
 		},
 		draw: function () {
-			ctx.strokeStyle = "rgba(0,0,0," + (100 - Math.round(100*this.dt)) / 200 + ")";
+			ctx.lineWidth = 24;
+			ctx.strokeStyle = "rgba(" + this.color.red + "," + this.color.green + "," + this.color.blue + "," + (100 - Math.round(100*this.dt)) / 200 + ")";
 			ctx.beginPath();
-			ctx.rect(this.x * TILESIZE - 50*this.dt, this.y * TILESIZE - 50*this.dt + TILESIZE / 3, TILESIZE + 100*this.dt, TILESIZE + 100 * this.dt, 20);
+			ctx.rect(this.x * TILESIZE - Math.floor(50*this.dt), this.y * TILESIZE - Math.floor(50*this.dt) + TILESIZE / 3, TILESIZE + Math.floor(100*this.dt), TILESIZE + Math.floor(100 * this.dt), 20);
 			ctx.closePath();
 			ctx.stroke();
 			ctx.strokeStyle = "black";
+			ctx.lineWidth = lw;
 		},
 		update: function (dt) {
 			this.dt += dt;
-			if (this.dt > 1)
-			{
-				var ind = effects.indexOf(this);
-				effects.splice(ind, 1);
-			}
 		}
 	};
 	
 	var SmallRipple = Object.create(Ripple);
 	SmallRipple.draw = function () {
-		ctx.strokeWidth = 4;
-		ctx.strokeStyle = "rgba(0,0,0," + (100 - Math.round(100*this.dt)) / 400 + ")";
+		ctx.lineWidth = 14;
+		ctx.strokeStyle = "rgba(" + this.color.red + "," + this.color.green + "," + this.color.blue + "," + (100 - Math.round(100*this.dt)) / 400 + ")";
 		ctx.beginPath();
-		ctx.rect(this.x * TILESIZE - 25*this.dt, this.y * TILESIZE - 25*this.dt + TILESIZE / 3, TILESIZE + 50*this.dt, TILESIZE + 50 * this.dt, 20);
+		ctx.rect(this.x * TILESIZE - Math.floor(25*this.dt), this.y * TILESIZE - Math.floor(25*this.dt) + TILESIZE / 3, TILESIZE + Math.floor(50*this.dt), TILESIZE + Math.floor(50 * this.dt), 20);
 		ctx.closePath();
 		ctx.stroke();
 		ctx.strokeStyle = "black";
-		ctx.strokeWidth = lw;
+		ctx.lineWidth = lw;
 	};
 	
 	// Base PLATFORM class
@@ -279,11 +278,23 @@ window.onload = function () {
 	var TurnPlatform = Object.create(Platform);
 	TurnPlatform.init = function (x, y, angle) {
 		this.x = x, this.y = y, this.angle = angle, this.distance = distance;
-		this.color = "rgba(0,200,0,0.5)";
+		//this.color = "rgba(0,200,0,0.5)";
+		this.color = {red: Math.floor(Math.random() * 255), green: Math.floor(Math.random() * 255), blue: Math.floor(Math.random() * 255)};
 		return this;
 	};
 	TurnPlatform.draw = function () {
-		ctx.drawImage(images['platform'], this.x * TILESIZE, this.y * TILESIZE - TILESIZE / 3, TILESIZE, 1.7* TILESIZE);
+		ctx.beginPath();
+		ctx.fillStyle = "rgba(" + this.color.red + "," + this.color.green + "," + this.color.blue + ", 0.5)";
+		ctx.rect(this.x * TILESIZE + lw, this.y * TILESIZE + 8, TILESIZE - 2*lw, TILESIZE - 14);
+		ctx.fill();
+		ctx.stroke();
+		ctx.fillStyle = "rgba(" + this.color.red/2 + "," + this.color.green/2 + "," + this.color.blue/2 + ", 0.5)";
+		ctx.rect(this.x * TILESIZE + lw, this.y * TILESIZE + TILESIZE - 6, TILESIZE - 2*lw, TILESIZE * 0.4);
+		ctx.fill();
+		ctx.stroke();
+		ctx.closePath();
+
+		//ctx.drawImage(images['platform'], this.x * TILESIZE, this.y * TILESIZE - TILESIZE / 3, TILESIZE, 1.7* TILESIZE);
 		ctx.fillStyle = "black";
 		ctx.font = "40px bold" + FONT;
 		ctx.fillText(arrows[Math.round(this.angle / (Math.PI / 2))], this.x * TILESIZE + TILESIZE / 2, this.y * TILESIZE + 2 * TILESIZE / 3);	
@@ -389,8 +400,10 @@ window.onload = function () {
 				if (!p && START) {
 					START = false;
 					this.maxDistance = 0;
-					var e1 = Object.create(Ripple).init(this.x, this.y);
+					var e1 = Object.create(Ripple).init(this.x, this.y, {red: 41, green: 9, blue: 57});
+					var e2 = Object.create(SmallRipple).init(this.x, this.y, {red: 99, green: 54, blue: 123});
 					effects.push(e1);
+					effects.push(e2);
 					sounds['fall'].play();
 					setTimeout(reset, 500);
 				}
@@ -401,7 +414,7 @@ window.onload = function () {
 					if (p.angle !== undefined) {
 						this.angle = p.angle;
 						sounds["jump"].play();
-						var e1 = Object.create(SmallRipple).init(Math.round(this.x), Math.round(this.y));
+						var e1 = Object.create(SmallRipple).init(Math.round(this.x), Math.round(this.y), p.color);
 						effects.push(e1);
 					}
 				
@@ -409,7 +422,7 @@ window.onload = function () {
 					if (this.distance <= 0) {
 						this.distance = 2;
 						this.maxDistance = this.distance;
-						console.log(this.angle, this.x + 2 * Math.cos(this.angle), this.y + 2 * Math.sin(this.angle));
+						//console.log(this.angle, this.x + 2 * Math.cos(this.angle), this.y + 2 * Math.sin(this.angle));
 						for (var d = 0; d <= 2; d++) {
 							var o = findObstacle(this.x + d * Math.cos(this.angle), this.y + d * Math.sin(this.angle));
 							if (o && o.collidable) {
@@ -761,12 +774,7 @@ window.onload = function () {
 	function doButtons(dt) {
 		for (var i = 0; i < buttons[gameState].length; i++)
 		{
-			if (i == selection) {
-				buttons[gameState][i].drawSelected();
-			}	
-			else {
-				buttons[gameState][i].draw();
-			}
+			buttons[gameState][i].draw(i == selection);
 		}
 	}
 	
@@ -845,6 +853,15 @@ window.onload = function () {
 				changeState("levelmenu");
 			}, 500);
 		}
+		
+		//Cleanup
+		for (var i = 0; i < effects.length; i++) {
+			if (effects.dt > 1)
+			{
+				var ind = effects.indexOf(this);
+				effects.splice(ind, 1);
+			}
+		}
 	}
 
 	//TIME FOR dt VARIABLE
@@ -906,7 +923,7 @@ window.onload = function () {
 		if (findPlatform(mx, my) === undefined && findObstacle(mx, my) === undefined && platforms.length - 2 < levels[currentLevel].gold) {
 			var p1 = Object.create(TurnPlatform).init(Math.floor(mx), Math.floor(my), Math.PI * choice / 2);
 			platforms.push(p1);
-			var e1 = Object.create(Ripple).init(Math.floor(mx), Math.floor(my));
+			var e1 = Object.create(Ripple).init(Math.floor(mx), Math.floor(my), p1.color);
 			effects.push(e1);
 			return true;
 		}

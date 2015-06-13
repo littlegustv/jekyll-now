@@ -16,11 +16,12 @@ div
 	height: 775px;
 	overflow: hidden;
 	position: relative;
+	margin: auto;
 }
 .ending
 {
 	display: block;
-	position: fixed;
+	position: absolute;
 	top: 250px;
 	width: 100%;
 	text-align: center;
@@ -505,29 +506,28 @@ div
 	border-bottom-width: 10px;
 	top: 15px;
 }
-.alarm
+.alarm, .stop
 {
-	position: fixed;
+	position: absolute;
 	top: 10px;
 	right: 10px;
 	z-index: 20;
 	font-size: 40px;
 	padding: 10px;
+	background: transparent;
+	color: white;
+	border: none;
+	line-height: 40px;
+	text-align: center;
+	width: 60px;
 }
 .alarm:hover, .stop:hover, .alarm:active, .stop:active
 {
-	color: #DDD;
-	background: black;
-	border-color:black;
+	color: #CC0000;
 }
 .stop
 {
-	position: fixed;
-	right: 10px;
 	top: 84px;
-	z-index: 20;
-	font-size: 40px;
-	padding: 10px;
 }
 
 /* THE SPEECH BUBBLE

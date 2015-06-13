@@ -2,7 +2,14 @@
 layout: post
 title: DareDevil - Season One
 draft: true
+tags: review tv marvel
 ---
+
+I was having trouble starting this, until I realized that the first step would be to admit that I do in fact like DareDevil quite a bit.  Which is disappointing.  I had wanted it to be the nail in the coffin, the last bit of proof that Marvel is the mascot for our cultural deterioration, that it's all vanity, vanity, and there is nothing new under the sun.  Which it is, of course, but I still *like* it.  In some ways, I like it quite a lot.
+
+
+***
+
 
 It wouldn't be fair to be too hard on DareDevil.  Compared to most other television, it holds its own.  Compared to the slew of DC and Marvel properties, it excels.  But fairness is a suspect goal at best, and I'm not interested in being particularly even-handed.  Even, or perhaps especially, where DareDevil wields its flaws more elegantly than most, it shows just how fatal those flaws can be.
 

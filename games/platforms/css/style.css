@@ -13,7 +13,8 @@ body
 	-webkit-app-region: no-drag;
 	*margin: 2px;
     *border: 1px solid black;
-    background: url('http://subtlepatterns.com/patterns/rockywall.png');
+    background: url('http://subtlepatterns.com/patterns/blackorchid.png');
+    *background: url('http://subtlepatterns.com/patterns/rockywall.png');
     /*background: linear-gradient(to right, #DD6600, #EE5500);*/
     position: relative;
 	*margin: auto;
