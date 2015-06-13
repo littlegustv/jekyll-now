@@ -14,6 +14,6 @@ Programmer, developer and other things in Montreal, QC.  An unhealthy combinatio
 
 [Old site](http://www.twocatgames.com)
 
-### Contact me
+### Send me an email! 
 
 [echo29x@gmail.com](mailto:echo29x@gmail.com)
