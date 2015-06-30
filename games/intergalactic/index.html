@@ -1,20 +1,28 @@
 <html>
 <head>
-<script src='main.js'></script>
-<style>
-	#game
-	{
-		border: 1px solid black;
-		margin: auto;
-	}
-	body
-	{
-		text-align: center;
-	}
-</style>
+    <meta name="viewport" content="initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <script src='entities.js'></script>
+    <script src='main.js'></script>
+    <style>
+        #game
+        {
+            border: 1px solid black;
+            margin: auto;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        body
+        {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 <!--<center><h1>Intergalactic</h1></center>-->
-<canvas id='game' height=400 width=600></canvas>
+<canvas unselectable='on' id='game' height=400 width=600></canvas>
 </body>
 </canvas>
