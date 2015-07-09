@@ -1,0 +1,47 @@
+<script src='collisions.js'></script>
+<script src='main.js'></script>
+<style>
+#webgl
+{
+    border: 1px solid black;
+    background: url('http://subtlepatterns.com/patterns/argyle.png');
+}
+#webgl:-webkit-full-screen {
+  border: 0px solid black;
+  margin: 0px;
+}
+body
+{
+	margin: 0;
+}
+</style>
+<canvas id='webgl' height=675 width=1200></canvas>
+<script src='http://greggman.github.io/webgl-fundamentals/webgl/resources/webgl-utils.js'></script>
+<script id="2d-vertex-shader" type="x-shader/x-vertex">
+    attribute vec2 a_position;
+    attribute vec2 a_texCoord;
+    
+    varying vec2 v_texCoord;
+    
+    uniform vec2 u_resolution;
+
+    void main() {
+       // convert the rectangle from pixels to 0.0 to 1.0
+       vec2 clipSpace = 2.0 * (a_position / u_resolution) - 1.0;
+    
+       gl_Position = vec4(clipSpace, 0, 1);
+    
+        v_texCoord = a_texCoord;
+    }
+</script>
+<script id="2d-fragment-shader" type="x-shader/x-fragment">
+	precision mediump float;
+
+	uniform vec4 u_color;
+	
+	uniform float u_flicker;
+
+	void main() {
+	   gl_FragColor = (1.0 + u_flicker) * u_color;
+	}
+</script>

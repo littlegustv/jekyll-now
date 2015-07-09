@@ -1,8 +1,12 @@
 var WINDOW = {width: 600, height: 400};
 var GAME = {width: 4500, height: 10240};
-var MAX_SPEED = 200; // load this kind of stuff from JSON?
+var MAX_SPEED = 300; // load this kind of stuff from JSON?
+var ACEL = 200;
 
 var entities = [];
+
+var gamestate = "menu";
+var menu = false;
 
 function distance(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
@@ -53,8 +57,10 @@ var Entity = {
     this.y = y;
     return this;
   },
-  getX: function() { return this.x|0; },
-  getY: function() { return this.y|0; }
+  getX: function() { return this.x; },
+  //getX: function() { return this.x|0; },
+  getY: function() { return this.y; }
+  //getY: function() { return this.y|0; }
 }
 var Camera = Object.create(Entity);
 Camera.draw = function (ctx) {
@@ -69,46 +75,25 @@ Camera.shake = function (depth) {
     setTimeout(function() { th.shake(depth - 1); }, 1000 / 60);
   }
 };
-var Projectile = Object.create(Entity);
-Projectile.init = function (x, y, angle, speed, team) {
-  this.x = x, this.y = y, this.angle = angle, this.speed = speed;
-  this.team = team, this.h = 8, this.w = 8, this.type = "bullet";
-  return this;
-}
-Projectile.checkBounds = function () {
-  if (this.x > GAME.width || this.x < 0 || this.y > GAME.height || this.y < 0) {
-    this.alive = false;
-  }
-}
-Projectile.handleCollision = function (obj) {
-  this.alive = false;
-  var e = Object.create(Explosion).init(this.x, this.y, this.w, "rgba(200,100,45,0.7");
-  entities.push(e);
-  console.log(e);
-}
-Projectile.draw = function (ctx) {
-  ctx.beginPath();
-  ctx.arc(this.getX(), this.getY(), this.w/2, 0, Math.PI * 2, true);
-  ctx.stroke();
-}
 
 var Ship = Object.create(Entity);
 Ship.init = function (image, x, y, team) {
+  this.inventory = [];
   this.x = x, this.y = y, this.image = image;
-  this.w = 32, this.h = 32;
+  this.radius = 16;
   this.health = 100, this.temperature = 0, this.cooldown = 0;
   this.shield = false, this.team = team;
-  this.d_angle = 0, this.acel = 0, this.a_angle = 0;
+  this.d_angle = 0, this.acel = 0;
   this.type = "ship";
+  this.equipment = {weapon: null, shield: Object.create(Shield).init("Basic", 10, 10, Math.PI), engine: null};
   //this.maxFrames = 2;
   //this.maxAnimationDelay = 0.2;
   return this;
 };
 Ship.update = function (dt) {
 
-  this.d_angle += this.a_angle * dt;
-  this.speed = Math.min(this.speed + this.acel * dt, MAX_SPEED);
-  if (this.acel == 0 && this.speed > 25) this.speed -= 1;
+  this.speed = Math.max(- MAX_SPEED, Math.min(this.speed + this.acel * dt, MAX_SPEED));
+  if (this.acel == 0 && this.speed > 0) this.speed -= ACEL * dt;
 
   this.angle += this.d_angle * dt;
   this.x += dt * this.speed * Math.cos(this.angle);
@@ -116,7 +101,7 @@ Ship.update = function (dt) {
 
   this.checkBounds();
   if (this.temperature > 0) {
-    this.temperature -= 15 * (dt - 0.75 * dt * this.shield);
+    this.temperature -= 15 * (dt - 0.75 * dt * this.equipment.shield.active);
   } else this.temperature = 0;
   if (this.cooldown > 0) {
     this.cooldown -= dt;
@@ -125,22 +110,34 @@ Ship.update = function (dt) {
   if (this.health <= 0) {
     this.alive = false;
     //sounds["explosion"].play();
-    var e = Object.create(Explosion).init(this.x, this.y, this.w, "rgba(0,100,240,0.7)");
+    var e = Object.create(Explosion).init(this.x, this.y, 2 * this.radius, "rgba(0,100,240,0.7)");
     entities.push(e);
     this.health = 0;
   }
+  
+  if (this.equipment.engine) this.equipment.engine.updateUse(dt, this);
 }
 Ship.handleCollision = function (obj) {
-  if (this.shield && this.temperature < 85) {
-    this.temperature += 15;
-  }
-  else {
-    this.health -= 5;
-    //sounds["hit"].play();
-    //camera.shake(25);
-  }
+	if (obj.type == "bullet" && obj.team != this.team) {
+		if (this.equipment.shield.active && this.temperature < 85) {
+			if (this.equipment.shield.inRange(angle(this.x, this.y, obj.x, obj.y))) {
+				this.temperature += 15;
+				console.log("blocked");
+			}
+			else this.health -= 1;
+		}
+		else {
+			this.health -= 1;
+		}
+	}
+	else if (obj.type == "solid") {
+		var d = this.radius + obj.radius;
+		var theta = angle(obj.x, obj.y, this.x, this.y);
+		this.x = obj.x + d * Math.cos(theta);
+		this.y = obj.y + d * Math.sin(theta);
+	}
 }
-Ship.canShoot = function() { return this.temperature < 80 && this.cooldown <= 0; }
+Ship.canShoot = function(cost) { return this.temperature < 100 - cost && this.cooldown <= 0; }
 Ship.draw = function (ctx) {
   //ctx.drawRotatedImage(this.image, this.getX(), this.getY(), this.angle, this.w, this.h,
   //                    (this.frame % this.maxFrames) * this.w, 0, this.w, this.h);
@@ -151,29 +148,36 @@ Ship.draw = function (ctx) {
   ctx.lineTo(this.getX() + 16 * Math.cos(this.angle + 2.7), this.getY() + 16 * Math.sin(this.angle + 2.7));
   ctx.lineTo(this.getX() + 16 * Math.cos(this.angle - 2.7), this.getY() + 16 * Math.sin(this.angle - 2.7));
   ctx.closePath();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "black"
+  ctx.fillStyle = "gray";
+  ctx.fill();
   ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(this.x, this.y, this.radius * 0.7, 0, Math.PI * 2, true);
+  ctx.fillStyle = "rgba(100,100,225,1)";
+  ctx.stroke();
+  ctx.fill();
 
-  if (this.shield) {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.w * 0.6, 0, 2*Math.PI, true);
-    ctx.stroke();
-  }
-
+  if (this.equipment && this.equipment.shield) {
+	this.equipment.shield.draw(ctx, this);
+  }  
   if (this.acel > 0) {
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "orange";
     ctx.beginPath();
     ctx.arc(this.getX() - 16 * Math.cos(this.angle),
             this.getY() - 16 * Math.sin(this.angle),
           4, this.angle + Math.PI /2, this.angle - Math.PI/2, false);
-    ctx.stroke();
+    ctx.fill();
   }
 }
 var Enemy = Object.create(Ship);
 Enemy.init = function (image, x, y, target) {
   this.x = x, this.y = y, this.image = image;
-  this.w = 32, this.h = 32, this.target = target;
+  this.radius = 16, this.target = target;
   this.health = 100, this.temperature = 0, this.cooldown = 0;
   this.shield = false, this.team = "enemy", this.type = "ship";
+  this.equipment = {weapon: null, shield: Object.create(Shield).init("Basic", 10, 10, 0), engine: null};
   return this;
 }
 Enemy.update = function (dt) {
@@ -193,7 +197,7 @@ Enemy.update = function (dt) {
   }
   if (this.health <= 0) {
     this.alive = false;
-    var e = Object.create(Explosion).init(this.x, this.y, this.w, "rgba(0,240,240,0.7)");
+    var e = Object.create(Explosion).init(this.x, this.y, 2*this.radius, "rgba(0,240,240,0.7)");
     entities.push(e);
     this.health = 0;
     //sounds["explosion"].play();
@@ -247,13 +251,24 @@ var Explosion = {
 
 };
 
+var Solid = Object.create(Entity);
+Solid.init = function (x, y, radius, color) {
+	this.type = "solid"; this.team = "solid";
+	this.x = x, this.y = y, this.radius = radius, this.color = color;
+	return this;
+}
+Solid.draw = function (ctx) {
+	ctx.beginPath();
+	ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+	ctx.fillStyle = this.color;
+	ctx.fill();
+}
+Solid.handleCollision = function (other) {};
+
 function checkCollision (obj1, obj2) {
-  if (obj1.x + obj1.w / 2 > obj2.x - obj2.w / 2 &&
-      obj1.x - obj1.w / 2 < obj2.x + obj2.w / 2) {
-    if (obj1.y + obj1.h / 2 > obj2.y - obj2.h / 2 &&
-        obj1.y - obj1.h / 2 < obj2.y + obj2.h / 2) {
-      obj1.handleCollision(obj2);
-      obj2.handleCollision(obj1);
-    }
+  if (distance(obj1.x, obj1.y, obj2.x, obj2.y) < obj1.radius + obj2.radius) {
+	obj1.handleCollision(obj2);
+	obj2.handleCollision(obj1);
   }
 }
+

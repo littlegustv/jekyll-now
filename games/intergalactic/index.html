@@ -1,28 +1,44 @@
+<!--
+nwbuild -r -v v0.12.0 ./
+-->
 <html>
 <head>
     <meta name="viewport" content="initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
+	<link href='http://fonts.googleapis.com/css?family=Stardos+Stencil' rel='stylesheet' type='text/css'>
     <script src='entities.js'></script>
+    <script src='gamepad.js'></script>
+    <script src='projectiles.js'></script>
+    <script src='items.js'></script>
     <script src='main.js'></script>
     <style>
         #game
         {
-            border: 1px solid black;
+            /*border: 1px solid black;*/
+			box-shadow: 0px 0px 10px 10px rgba(0,0,0,0.2) inset;
             margin: auto;
             -moz-user-select: -moz-none;
             -khtml-user-select: none;
             -ms-user-select: none;
             -webkit-user-select: none;
             user-select: none;
+			background: url('http://subtlepatterns.com/patterns/ravenna.png');
         }
+		#game:-webkit-full-screen {
+		  
+		  height: 100%;
+		  border: 0px solid black;
+		  margin: 0px;
+		}
         body
         {
             text-align: center;
+			margin: 0px;
         }
     </style>
 </head>
 <body>
 <!--<center><h1>Intergalactic</h1></center>-->
-<canvas unselectable='on' id='game' height=400 width=600></canvas>
+<canvas unselectable='on' id='game' height=450 width=800></canvas>
 </body>
 </canvas>
