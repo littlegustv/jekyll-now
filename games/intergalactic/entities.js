@@ -1,4 +1,4 @@
-var WINDOW = {width: 600, height: 400};
+var WINDOW = {width: 800, height: 450};
 var GAME = {width: 4500, height: 10240};
 var MAX_SPEED = 300; // load this kind of stuff from JSON?
 var ACEL = 200;
@@ -7,6 +7,8 @@ var entities = [];
 
 var gamestate = "menu";
 var menu = false;
+
+var camera = null;
 
 function distance(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
@@ -27,11 +29,21 @@ function clockwise(angle1, angle2) {
   }
 }
 
+function onscreen (obj) {
+	if (obj.x > camera.x && obj.x < camera.x + WINDOW.width) {
+		if (obj.y > camera.y && obj.y < camera.y + WINDOW.height) {
+			return true;
+		}
+	}
+	return false;
+}
+
 var Entity = {
   x: WINDOW.width / 2,
   y: WINDOW.height / 2,
   speed: 0,
   angle: 0,
+  radius: 0,
   team: "enemy",
   alive: true,
   collideable: true,
@@ -57,10 +69,12 @@ var Entity = {
     this.y = y;
     return this;
   },
+  handleCollision: function (obj) {},
   getX: function() { return this.x; },
   //getX: function() { return this.x|0; },
-  getY: function() { return this.y; }
+  getY: function() { return this.y; },
   //getY: function() { return this.y|0; }
+  
 }
 var Camera = Object.create(Entity);
 Camera.draw = function (ctx) {
@@ -85,15 +99,18 @@ Ship.init = function (image, x, y, team) {
   this.shield = false, this.team = team;
   this.d_angle = 0, this.acel = 0;
   this.type = "ship";
-  this.equipment = {weapon: null, shield: Object.create(Shield).init("Basic", 10, 10, Math.PI), engine: null};
+  this.equipment = {weapon: null, shield: Object.create(Shield).init("Basic", 10, 10, Math.PI), engine: null, radar: null};
   //this.maxFrames = 2;
   //this.maxAnimationDelay = 0.2;
   return this;
 };
+Ship.doAI = function (dt) {};
 Ship.update = function (dt) {
 
-  this.speed = Math.max(- MAX_SPEED, Math.min(this.speed + this.acel * dt, MAX_SPEED));
-  if (this.acel == 0 && this.speed > 0) this.speed -= ACEL * dt;
+  this.doAI(dt);
+
+  this.speed = Math.max(50, Math.min(this.speed + this.acel * dt, MAX_SPEED));
+  if (this.acel == 0 && this.speed > 0) this.speed -= 0.4 * ACEL * dt;
 
   this.angle += this.d_angle * dt;
   this.x += dt * this.speed * Math.cos(this.angle);
@@ -116,6 +133,7 @@ Ship.update = function (dt) {
   }
   
   if (this.equipment.engine) this.equipment.engine.updateUse(dt, this);
+  if (this.equipment.radar) this.equipment.radar.update(dt, this);
 }
 Ship.handleCollision = function (obj) {
 	if (obj.type == "bullet" && obj.team != this.team) {
@@ -129,8 +147,8 @@ Ship.handleCollision = function (obj) {
 		else {
 			this.health -= 1;
 		}
-	}
-	else if (obj.type == "solid") {
+	} 
+	if (obj.type == "solid" || obj.type == "ship") {
 		var d = this.radius + obj.radius;
 		var theta = angle(obj.x, obj.y, this.x, this.y);
 		this.x = obj.x + d * Math.cos(theta);
@@ -138,6 +156,9 @@ Ship.handleCollision = function (obj) {
 	}
 }
 Ship.canShoot = function(cost) { return this.temperature < 100 - cost && this.cooldown <= 0; }
+Ship.turn = function (amount) {
+	this.d_angle = amount * ((1.2 * MAX_SPEED - this.speed) / MAX_SPEED) * Math.PI;
+}
 Ship.draw = function (ctx) {
   //ctx.drawRotatedImage(this.image, this.getX(), this.getY(), this.angle, this.w, this.h,
   //                    (this.frame % this.maxFrames) * this.w, 0, this.w, this.h);
@@ -160,8 +181,11 @@ Ship.draw = function (ctx) {
   ctx.fill();
 
   if (this.equipment && this.equipment.shield) {
-	this.equipment.shield.draw(ctx, this);
+	this.equipment.shield.drawUse(ctx, this);
   }  
+  if (this.equipment.radar) {
+	this.equipment.radar.draw(ctx, this);
+  }
   if (this.acel > 0) {
     ctx.fillStyle = "orange";
     ctx.beginPath();
@@ -176,10 +200,35 @@ Enemy.init = function (image, x, y, target) {
   this.x = x, this.y = y, this.image = image;
   this.radius = 16, this.target = target;
   this.health = 100, this.temperature = 0, this.cooldown = 0;
+  this.speed = 0, this.d_angle = 0, this.acel = 0;
   this.shield = false, this.team = "enemy", this.type = "ship";
-  this.equipment = {weapon: null, shield: Object.create(Shield).init("Basic", 10, 10, 0), engine: null};
+  this.equipment = {
+	  weapon: Object.create(Weapon).init("Enemy", 10, 10, 10),
+	  shield: Object.create(Shield).init("Basic", 10, 10, 0), 
+	  engine: Object.create(Engine).init("Enemy", 10, 100, 0.6),
+	  radar: Object.create(Pulse).init(),
+  };
+  this.inventory = [];
   return this;
+};
+Enemy.doAI = function (dt) {
+	if (this.equipment.radar.detected.indexOf(this.target) != -1) {
+		if (clockwise(this.angle, angle(this.x, this.y, this.target.x, this.target.y))) {
+			this.turn(-0.5);
+		} else { this.turn (0.5); }
+		
+		if (Math.random() * 100 < 1) {
+			this.equipment.weapon.attacks[0](this);
+		} else if (Math.random() * 100 < 1.5) {
+			this.equipment.weapon.attacks[1](this);
+		}
+		
+		if (distance(this.x, this.y, this.target.x, this.target.y) > 300) {
+			this.equipment.engine.activate(1.0, this);
+		}
+	}
 }
+/*
 Enemy.update = function (dt) {
   //this.angle = angle(this.x, this.y, this.target.x, this.target.y);
 
@@ -191,6 +240,7 @@ Enemy.update = function (dt) {
 
   this.y += 100 * Math.sin(this.angle) * dt;
   this.x += 100 * Math.cos(this.angle) * dt;
+  
   if (Math.random() * 100 < 1) {
     var b = Object.create(Projectile).init(this.getX(), this.getY(), this.angle, 1000, "enemy");
     entities.push(b);
@@ -202,7 +252,7 @@ Enemy.update = function (dt) {
     this.health = 0;
     //sounds["explosion"].play();
   }
-};
+};*/
 
 var Explosion = {
   init: function (x, y, radius, color) {

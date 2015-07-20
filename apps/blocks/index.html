@@ -1,0 +1,53 @@
+<html>
+<head>
+<!-- STYLESHEETS -->
+<link rel="shortcut icon" href="./media/images/bloks_icon.png" type="image/x-icon" />
+<link rel="apple-touch-icon" href="./media/images/bloks_icon57.png" type="image/x-icon" />
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+<link href='http://fonts.googleapis.com/css?family=Sarpanch:600' rel='stylesheet' type='text/css' />
+<link href='./css/style.css' rel='stylesheet' type='text/css' />
+
+<!-- SCRIPTS -->
+<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+<script src="http://code.jquery.com/ui/1.8.21/jquery-ui.min.js"></script>
+
+<script src="./js/jquery.ui.touch-punch.min.js"></script>
+<script src="./js/main.js"></script>
+
+<!-- INFO -->
+<title>Bloks</title>
+<meta name="viewport" content="initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+</head>
+<body>
+<div id="addModal">
+	<form id="addEvent">
+		<h1>Add New</h1>
+		<input id="task" type="text" name="name" placeholder="Task Name..." />
+		<input id="hours" type="number" name="hours" placeholder="Hours" min="0" max="12" step="1" />
+		<input id="minutes" type="number" name="minutes" placeholder="Minutes" min="0" max="60" step="1" />
+		<input type="submit" name="submit" value="Add Task" />
+	</form>
+</div>
+<div id="app-content">
+<a id="add"><i class="fa fa-plus-square"></i></a>
+
+    <div id="end"><span id="endTime">
+        <span id="time"><input type='time' name='time' value="17:00:00" id="finaltime"/></span>
+</span>
+    </div>
+    <div id="main-content">
+	<!--
+        <div class='task'> <span class='taskName'>TEST
+        </span><span class='time'>
+        <span class='duration'>1:12</span>
+ <span class='endtime'>4:35</span>
+ <span class='starttime'>3:24</span>
+</span>
+        </div>-->
+    </div>
+
+</div>
+</body>
+</html>

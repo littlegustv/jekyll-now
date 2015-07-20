@@ -1,0 +1,296 @@
+body {
+    font-family:'Sarpanch', sans-serif;
+    font-variant: small-caps;
+    background: url('http://subtlepatterns.com/patterns/linedpaper.png');
+	margin: 0px;
+}
+input {
+    font-family: inherit;
+	font-variant: inherit;
+    outline: none;
+	border: none !important;
+}
+div {
+    box-sizing: border-box;
+}
+#app-content {
+    max-width: 800px;
+    min-width: 300px;
+    margin: auto;
+    overflow: auto;
+}
+#end {
+    float: right;
+    font-size: 40px;
+	margin-right: 15px;
+}
+#main-content {
+    width: 100%;
+    height: calc(100% - 50px);
+    margin: auto;
+	margin-top: 10px;
+    *border-top: 3px solid black;
+}
+#add, #edit {
+    color: black;
+    font-size: 40px;
+	padding: 15px;
+    transition: color 0.2s;
+}
+#add:hover, #add:active, #edit:hover, #edit:active {
+    color: grey;
+}
+#addModal {
+	position: fixed;
+	display: none;
+	padding: 20px;
+	/* background: linear-gradient(to bottom, #449944, #33AA33); */
+	background: rgba(30,174,64,0.4);
+	overflow: auto;
+	/* text-align: left; */
+	/* box-shadow: 1px -5px 5px rgba(0,0,0,0.1) inset; */
+	text-align: center;
+	height: 100%;
+	width: 100%;
+}
+#addModal input , .editing input{
+    text-align: left;
+    font-variant: small-caps;
+    width: calc(100% - 28px);
+    margin: auto;
+    margin-top: 10px;
+    padding: 8px;
+}
+#addEvent {
+	max-width: 400px;
+	padding: 10px;
+	padding-bottom: 20px;
+	margin: auto;
+	margin-top: calc(50vh - 200px);
+}
+.editing input
+{
+	width: calc(15% - 16px);
+	margin: 8px;
+}
+.editing input[name=edit-name]
+{
+	width: calc(40% - 16px);
+}
+.remove
+{
+	font-size: 22px;
+}
+/*
+#addModal input[name=name]
+{
+	width: calc(25% - 22px);
+}
+#addModal input[name=hours] {
+    width: calc(15% - 30px);
+}
+#addModal input[name=minutes] {
+    width: calc(25% - 22px);
+}*/
+#addModal input[type=submit], .editing input[type=submit] {
+	*width: calc(25% - 22px);
+    border: none;
+    background: linear-gradient(to bottom, #000, #222);
+    color: white;
+    padding: 8px;
+    border: 2px #444 outset;
+}
+#addModal input[type=submit]:hover, #addModal input[type=submit]:active {
+    border: 2px #444 inset;
+}
+.task, .task-placeholder {
+    width: 100%;
+	padding: 5px 20px 5px 10px;
+    min-height: 40px;
+    background: transparent;
+    *background: linear-gradient(to bottom, #99FF66, #66FF33);
+    overflow: hidden;
+	border-left-width: 0px;
+	border-left-color: rgb(232, 21, 61);
+	border-left-style: solid;
+    transition: background 1s, box-shadow 1s, opacity 1s, border-left 1s;
+	/*border-radius: 20xp;*/
+}
+.task-placeholder
+{
+	height: 100px;
+	background: rgba(100,200,100,0.3);
+	/*border-radius: 10px;
+	border: 6px solid rgba(0,100,0,0.4);*/
+}
+.current, .past
+{
+    transition: background 1s, box-shadow 1s, opacity 1s, border-left 1s;
+}
+.task:nth-child(even) {
+    background: rgba(221, 221, 221, 0.5);
+	box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.05) inset;/*-4px -2px 5px 1px rgba(0,0,0,0.2) inset;*/
+    *background: linear-gradient(to bottom, #77EE44, #44EE22);
+}
+.edit, .remove
+{
+	margin: 14px 5px 0px 5px;
+	float: left;
+	font-size: 40px;
+}
+.remove
+{
+	float: right;
+	margin: 7px 5px 0px 5px;
+	background: black;
+	color: white;
+	border: none;
+	font-size: 40px;
+	padding: 4px 8px 4px 8px;
+}
+.remove:hover, .remove:active
+{
+	color: #CC0000;
+}
+.edit:hover, .edit:active
+{
+	color: grey;
+}
+.taskName, .duration {
+    float: left;
+    margin: 5px;
+    font-size: 35px;
+	cursor: move;
+}
+.taskName
+{
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: calc(100% - 170px);
+}
+.complete {
+    float: left;
+    display: block;
+}
+.duration
+{
+	float: right;
+	text-align: right;
+	cursor: arrow;
+}
+.time {
+    width: 100%;
+    float: right;
+    margin: 0px;
+    padding: 0px;
+    font-size: 25px;
+    text-align: right;
+}
+.starttime, .endtime, .arrow-right {
+    float: right;
+    margin: 5px;
+    font-size: 14px;
+    display: block;
+    line-height: 15px;
+    width: 120px;
+}
+.starttime
+{
+	float: left;
+	text-align: left;
+    color: #009900;
+}
+.endtime
+{
+    color: #990000;
+}
+.starttime::before {
+    content:"Start: ";
+}
+.endtime::before {
+    content:"End: ";
+}
+.duration::before {
+    /*content:"for: ";*/
+}
+#time input, .duration input {
+    /*width: 160px;*/
+    overflow: auto;
+    font-size: inherit;
+    line-height: inherit;
+    margin: 0px;
+    padding: 0px;
+    border: none;
+    background: transparent;
+}
+.current
+{
+	*background: #64e21b !important;
+	*border: 5px solid rgba(100,255,100,0.5);
+	*box-shadow: 1px -5px 5px rgba(100,255,100,0.5) inset !important;
+	*box-shadow: 0px 0px 0px 5px rgba(100,255,100,0.5) inset !important;
+	border-left-width: 14px;
+}
+.past
+{
+	opacity: 0.2;
+	*background: #B08B8E;
+}
+.past:nth-child(even)
+{
+	*background: #904F53;
+}
+.editing
+{
+	border: none !important;
+	box-shadow: none !important;
+	background: green !important;
+}
+@media only screen 
+/*and (min-device-width : 320px) */
+and (max-device-width : 480px) {
+    html, body
+    {
+		min-width: 320px;
+		width: 100%;
+        margin: 0px;
+        padding: 0px;
+    }
+    #app-content
+    {
+        width:100%;
+        margin:0px;
+        top:0px;
+        left:0px;
+    }
+    #addModal
+	{
+        width: 100%;
+    }
+    input {
+        font-size: 22px;
+        background: #eee;
+    }
+    #addModal input
+       { 
+        width: calc(100% - 28px) !important;
+    }
+    #addModal input[type=number]
+       { 
+        width: calc(50% - 16px) !important;
+    }
+	.editing input, .editing input[name=edit-name]
+	{
+		width: calc(50% - 16px);
+		margin: 8px;
+	}
+	.editing input[name=edit-hours], .editing input[name=edit-minutes]
+	{
+		width: calc(25% - 16px);
+		text-align: right;
+	}
+	.editing input[type=submit]
+	{
+		width: calc(100% - 100px);
+	}
+}

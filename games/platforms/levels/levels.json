@@ -1,5 +1,7 @@
 {"levels" : 
 	[
+		{"platforms":[],"obstacles":[{"x":7,"y":5},{"x":9,"y":4},{"x":4,"y":4}],"exit":{"x":9,"y":3},"start":{"x":7,"y":1}, "gold": 20, "name": "3s"},
+		{"platforms":[],"obstacles":[{"x":7,"y":5},{"x":9,"y":4},{"x":4,"y":4}],"exit":{"x":10,"y":3},"start":{"x":7,"y":2}, "gold": 6, "name": "threes"},
 		{"platforms":[],"obstacles":[],"exit":{"x":9,"y":4},"start":{"x":7,"y":1},"gold":20,"name":"blank"},
 		{"platforms":[{"x":7,"y":3}],"obstacles":[{"x":8,"y":1},{"x":9,"y":2},{"x":11,"y":3},{"x":9,"y":5},{"x":4,"y":3},{"x":5,"y":4}],"exit":{"x":9,"y":3},"start":{"x":7,"y":1},"gold":20,"name":"new1"},
 		{"platforms":[],"obstacles":[{"x":4,"y":3},{"x":9,"y":3}],"exit":{"x":8,"y":2},"start":{"x":7,"y":1},"gold":7,"name":"options"},

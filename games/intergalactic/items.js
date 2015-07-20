@@ -15,8 +15,10 @@ Item.position = function (x, y) {
 	return this;
 };
 Item.handleCollision = function (other) {
-	other.inventory.push(this);
-	entities.splice(entities.indexOf(this), 1);
+	if (other.type == "ship") {
+		other.inventory.push(this);
+		entities.splice(entities.indexOf(this), 1);
+	}
 };
 
 var Weapon = Object.create(Item);
@@ -100,14 +102,74 @@ Shield.inRange = function (theta) {
 
 var Engine = Object.create(Item);
 Engine.init = function (name, weight, cost, boost) {
-	this.name = name, this.weight = weight, this.cost = cost, this.boost = boost, this.timer = 0;
+	this.name = name, this.weight = weight, this.cost = 25, this.boost = boost, this.timer = 0;
 	this.color = "#0000CC";
 	this.type = "engine";
 	return this;
 }
-Engine.updateUse = function (dt, player) {
+Engine.activate = function (timer, p) {
+	if (this.timer > 0) return;
+	if (p.temperature < 100 - this.cost) {
+		p.temperature += this.cost * timer;
+		this.timer = timer;
+	}
+}
+Engine.updateUse = function (dt, p) {
 	if (this.timer > 0) {
 		this.timer -= dt;
-		player.acel = ACEL;
-	} else { player.acel = 0; }
+		p.acel = ACEL * this.boost;
+	} else { p.acel = 0; }
+}
+
+var Radar = Object.create(Item);
+Radar.init = function() {
+	this.name = "radar", this.weight = 1, this.cost = 1, this.method = "pulse", this.frequency = 4, this.timer = 0, this.range = 800;
+	this.detected = [];
+	return this;
+};
+Radar.update = function (dt, e) {
+	if (this.timer > this.frequency) {
+		this.detected = [];
+		this.timer = 0;
+	}
+	this.timer += dt;
+	
+	this.detect(e);
+};
+Radar.draw = function (ctx, e) {
+	ctx.strokeStyle = "black";
+	ctx.lineWidth = 1;
+	ctx.beginPath();
+	ctx.arc(e.x, e.y, this.range * this.timer / this.frequency, 0, Math.PI * 2, true);
+	ctx.stroke();
+};
+Radar.detect = function () {};
+
+var Pulse = Object.create(Radar);
+Pulse.draw = function (ctx, e) {
+		var delta = this.range * this.timer / this.frequency;
+	ctx.strokeStyle = "black";
+	ctx.lineWidth = 1;
+	ctx.beginPath();
+	for (var i = 0; i < 50; i++) {
+		var theta = i * Math.PI * 2 / 50;
+		ctx.moveTo(e.x + Math.cos(theta) * delta, e.y + Math.sin(theta) * delta);
+		ctx.lineTo(e.x + Math.cos(theta) * (delta + 10), e.y + Math.sin(theta) * (delta + 10));
+	}
+	ctx.stroke();
+};
+Pulse.detect = function (e) {
+	var currentRange = this.range * this.timer / this.frequency;
+	for (var i = 0; i < entities.length; i++) {
+		if (entities[i].type == "ship" && entities[i] != e) {
+			var delta = distance(e.x, e.y, entities[i].x, entities[i].y);
+			if (delta < currentRange + 10 && delta < currentRange - 10) {
+				var index = this.detected.indexOf(entities[i]);
+				if (index != -1) {
+					this.detected.splice(index, 1);
+				}
+				this.detected.push(entities[i]);
+			}
+		}
+	}
 }

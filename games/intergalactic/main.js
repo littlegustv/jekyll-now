@@ -1,3 +1,24 @@
+// i like the art style here: http://lunar.lostgarden.com/game_HardVacuum.htm
+
+/* ideas:  
+
+radar = sonar: has active (Y) and passive (listening)
+	- pulse - basic, active detects relatively stationary objects in range (i.e. not moving directly towards)
+	- doppler - active detects objects in motion, higher energy requirement
+	- towed-array sonar - passive eliminates baffles, larger range... active is weaker pulse, ship speed is slowed
+Active sonar can reveal existence to other craft, so be careful!
+	
+weapons: torpedos, mines, harpoons, ramming?, deck guns? (surfaced?)
+enemy weapons: (see above), depth charge, mortar, net (harbor)
+	
+countermeasures (x), has active and passive components
+	- decoys, chaffs, flares
+	- sound dampening panels
+	
+enemies: subs, turrets, frogmen, planes above surface
+
+*/
+
 document.addEventListener( "DOMContentLoaded", function () {
 	var canvas = document.getElementById("game");
 	var ctx = canvas.getContext("2d");
@@ -21,7 +42,8 @@ console.log(ctx.imageSmoothingEnabled);
 	var player = Object.create(Ship).init(shipImage, GAME.width/2,GAME.height/2, "player");
 	player.speed = 200;
 	player.equipment.weapon = Object.create(Gun).init("basic", 100, 100, 100);
-	player.equipment.engine = Object.create(Engine).init("basic", 100, 100, 1.0);
+	player.equipment.engine = Object.create(Engine).init("basic", 10, 100, 1.0);
+	player.equipment.radar = Object.create(Pulse).init();
   entities.push(player);
  
 	var s1 = Object.create(Shield).init("new", 100, 100, 100).position(GAME.width/2 + 400, GAME.height / 2 - 200);
@@ -38,8 +60,8 @@ console.log(ctx.imageSmoothingEnabled);
   }
   
   
-	var camera = Object.create(Camera);
-  camera.x = player.x, camera.y = player.y;
+	camera = Object.create(Camera);
+	camera.x = player.x, camera.y = player.y;
 
 	canvas.addEventListener("click", function (e) {
 		e.preventDefault();
@@ -110,7 +132,7 @@ console.log(ctx.imageSmoothingEnabled);
 	window.addEventListener("focus", function () { startTime = new Date(); });
 	
   for (var i = 0; i < 3; i++ ) {
-      var b = Object.create(Enemy).init(shipImage, Math.random() * GAME.width, 100, player);
+      var b = Object.create(Enemy).init(shipImage, player.x + 100 * i, player.y, player);
       b.health = 15;
       b.angle = Math.PI / 2;
       entities.push(b);
@@ -154,18 +176,25 @@ console.log(ctx.imageSmoothingEnabled);
 			for (var i = 0; i < entities.length; i++) {
 				entities[i].update(dt);
 			}
-			for (var i = 0; i < entities.length; i++) {
+			
+			ctx.fillStyle = "rgba(255,100,200,0.2)";
+			ctx.beginPath();
+			ctx.arc(player.x, player.y, 80, 0, Math.PI * 2, true);
+			ctx.fill();
+			
+			for (var i = entities.length - 1; i >= 0; i--) {
 				entities[i].draw(ctx);
 			}
+			
 			//check collisions
 			for (var i = 0; i < entities.length; i++) {
 				for (var j = i + 1; j < entities.length; j++) {
 					if (entities[i].collideable == false || entities[j].collideable == false) {
 					  continue;
 					}
-					else if (entities[i].team != entities[j].team && entities[i].type != entities[j].type) {
-						checkCollision(entities[i], entities[j]);
-					}
+					//else if (entities[i].team != entities[j].team) {// && entities[i].type != entities[j].type) {
+					checkCollision(entities[i], entities[j]);
+					//}
 				}
 			}
 
@@ -182,6 +211,15 @@ console.log(ctx.imageSmoothingEnabled);
 					}
 				}
 
+			// radar signals
+			
+			ctx.fillStyle = "red";
+			var dcx = player.x - camera.x, dcy = player.y - camera.y;
+			for (var i = 0; i < player.equipment.radar.detected.length; i++) {
+				var theta = angle(player.x, player.y, player.equipment.radar.detected[i].x, player.equipment.radar.detected[i].y);
+				ctx.fillRect(dcx + 80 * Math.cos(theta), dcy + 80 * Math.sin(theta), 4, 4);
+			}	
+				
 			//overlay (fixed position)
 
 			ctx.fillStyle = "black";
@@ -191,6 +229,8 @@ console.log(ctx.imageSmoothingEnabled);
 			ctx.fillStyle = "white"
 			ctx.fillRect(14,14,Math.min(player.temperature, 100), 20);
 			ctx.fillRect(canvas.width - 114, 14,Math.max(0, player.health),20);
+			
+			//inventory (in-game) menu
 			
 			if (menu) {
 								

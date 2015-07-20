@@ -13,8 +13,9 @@ body
 	-webkit-app-region: no-drag;
 	*margin: 2px;
     *border: 1px solid black;
-    background: url('http://subtlepatterns.com/patterns/blackorchid.png');
+    *background: url('http://subtlepatterns.com/patterns/blackorchid.png');
     *background: url('http://subtlepatterns.com/patterns/rockywall.png');
+    background: url('http://i.istockimg.com/file_thumbview_approve/10000203/3/stock-illustration-10000203-computer-circuit-board-seamless-pattern.jpg');
     /*background: linear-gradient(to right, #DD6600, #EE5500);*/
     position: relative;
 	*margin: auto;

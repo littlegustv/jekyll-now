@@ -11,9 +11,12 @@ Projectile.checkBounds = function () {
   }
 }
 Projectile.handleCollision = function (obj) {
-  this.alive = false;
-  var e = Object.create(Explosion).init(this.x, this.y, 2 * this.radius, "rgba(200,100,45,0.7");
-  entities.push(e);
+	if (obj.team == this.team) return;
+	else {
+	  this.alive = false;
+	  var e = Object.create(Explosion).init(this.x, this.y, 2 * this.radius, "rgba(200,100,45,0.7");
+	  entities.push(e);
+	 }
 }
 Projectile.draw = function (ctx) {
 	ctx.lineWidth = 1;

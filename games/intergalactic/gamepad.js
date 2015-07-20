@@ -53,9 +53,9 @@ function doGamePads (player) {
 				}
 				
 				//player.acel = - ACEL * (Math.abs(pad.axes[1]) > 0.5 ? 2 * (pad.axes[1] - 0.5) : 0);
-				player.d_angle = ((1.2 * MAX_SPEED - player.speed) / MAX_SPEED) * Math.PI * (Math.abs(pad.axes[0]) > 0.5 ? (pad.axes[0] / 2) : 0);
-				if (player.equipment.engine.timer <= 0 && pad.buttons[6].pressed)
-						player.equipment.engine.timer = player.equipment.engine.boost;
+				player.turn((Math.abs(pad.axes[0]) > 0.5 ? (pad.axes[0] / 2) : 0));
+				if (pad.buttons[6].pressed)
+						player.equipment.engine.activate(1.0, player);
 			}
 			
 

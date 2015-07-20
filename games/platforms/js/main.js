@@ -1,6 +1,17 @@
-// music: PAMGAEA (incompetech)
+//NOTE: git branch mod3
+
+// DISTANCE variable increases, to increase complexity and difficulty of puzzles ("you can now jump further") - play on powerups, but really makes the puzzles more challenging.  :)
+
+// music: PAMGAEA (incompetech) - no!  more like kraftwerk, artificial and mechanical sounding   ...  in fact, whole aesthetic should be more like this (pixel art as well?);
+
+// pixel art - make character fluffier, softer looking (with ears?! and idle animation), make platforms and obstacles more distinctive, have more personality
+// http://faustbane.deviantart.com/art/Pixel-Fur-tutorial-149272131
+// http://opengameart.org/content/chapter-7-textures-and-dithering
 
 window.onload = function () {
+
+	var DISTANCE = 3;
+	var DEBUG = true;
 
 	console.log("NEW");
 
@@ -9,6 +20,14 @@ window.onload = function () {
 		
 	var images = {};
 	var sounds = {};
+	
+	function randInt(min, max) {
+		return Math.floor(Math.random() * (max - min)) + min;
+	}
+	
+	function modulo(n, p) {
+		return (n % p + p) % p;
+	}
 	
 	function loadSound(name) {
 		sounds[name] = new Audio();
@@ -49,7 +68,11 @@ window.onload = function () {
 	//output
 	//var output = document.getElementById('json_output');
 
+	
+	
 	var TILESIZE = 64,
+		TILES_X = canvas.width / TILESIZE,
+		TILES_Y = canvas.height / TILESIZE,
 		FRAMESIZE = 64,
 		BUTTON_TIME = 0.5,
 		FPS = 30,
@@ -97,13 +120,15 @@ window.onload = function () {
 	
 	// LOAD DATA FILE
 	var request = new XMLHttpRequest();
-	request.open('GET', './levels/levels.json', true);
+	request.open('GET', './levels/newlevels.json', true);
 	request.onload = function () {
 		changeState("mainmenu");
 		levels = JSON.parse(request.response).levels;
 		levels.forEach(function (l) {
 			//console.log(l);
 			l.score = 0;
+			l.name = "blank";
+			l.gold = 20;
 		});
 		initButtons();
 		//console.log(levels);
@@ -227,15 +252,16 @@ window.onload = function () {
 			this.y = y;
 			this.color = color;
 			this.dt = 0;
+			this.thickness = 24;
 			return this;
 		},
 		draw: function () {
-			ctx.lineWidth = 24;
-			ctx.strokeStyle = "rgba(" + this.color.red + "," + this.color.green + "," + this.color.blue + "," + (100 - Math.round(100*this.dt)) / 200 + ")";
+			ctx.lineWidth = this.thickness;
+			ctx.fillStyle = "rgba(" + this.color.red + "," + this.color.green + "," + this.color.blue + "," + (100 - Math.round(100*this.dt)) / 200 + ")";
 			ctx.beginPath();
-			ctx.rect(this.x * TILESIZE - Math.floor(50*this.dt), this.y * TILESIZE - Math.floor(50*this.dt) + TILESIZE / 3, TILESIZE + Math.floor(100*this.dt), TILESIZE + Math.floor(100 * this.dt), 20);
+			ctx.roundRect(this.x * TILESIZE - Math.floor(50*this.dt), this.y * TILESIZE - Math.floor(50*this.dt) + TILESIZE / 3, TILESIZE + Math.floor(100*this.dt), TILESIZE + Math.floor(100 * this.dt), 20);
 			ctx.closePath();
-			ctx.stroke();
+			ctx.fill();
 			ctx.strokeStyle = "black";
 			ctx.lineWidth = lw;
 		},
@@ -245,6 +271,8 @@ window.onload = function () {
 	};
 	
 	var SmallRipple = Object.create(Ripple);
+	SmallRipple.thickness = 14;
+	/*
 	SmallRipple.draw = function () {
 		ctx.lineWidth = 14;
 		ctx.strokeStyle = "rgba(" + this.color.red + "," + this.color.green + "," + this.color.blue + "," + (100 - Math.round(100*this.dt)) / 400 + ")";
@@ -254,13 +282,14 @@ window.onload = function () {
 		ctx.stroke();
 		ctx.strokeStyle = "black";
 		ctx.lineWidth = lw;
-	};
+	};*/
 	
 	// Base PLATFORM class
 	var Platform = {
 		init: function (x, y) {
 			this.x = x;
 			this.y = y;
+			this.color = {red: Math.floor(Math.random() * 255), green: Math.floor(Math.random() * 255), blue: Math.floor(Math.random() * 255)};
 			return this;
 		},
 		moving: false,
@@ -279,22 +308,26 @@ window.onload = function () {
 	TurnPlatform.init = function (x, y, angle) {
 		this.x = x, this.y = y, this.angle = angle, this.distance = distance;
 		//this.color = "rgba(0,200,0,0.5)";
+//		this.color = {red: Math.floor((this.angle > Math.PI) * 255), green: Math.floor((this.angle < Math.PI) * 255), blue: Math.floor((this.angle >= Math.PI / 2 && this.angle <= 3 * Math.PI / 2) * 255 )};
 		this.color = {red: Math.floor(Math.random() * 255), green: Math.floor(Math.random() * 255), blue: Math.floor(Math.random() * 255)};
 		return this;
 	};
 	TurnPlatform.draw = function () {
+		/*
+		ctx.beginPath();*/
 		ctx.beginPath();
 		ctx.fillStyle = "rgba(" + this.color.red + "," + this.color.green + "," + this.color.blue + ", 0.5)";
-		ctx.rect(this.x * TILESIZE + lw, this.y * TILESIZE + 8, TILESIZE - 2*lw, TILESIZE - 14);
+		ctx.roundRect(this.x * TILESIZE + lw, this.y * TILESIZE + 14, TILESIZE - 2*lw, TILESIZE - 20, 10);
 		ctx.fill();
+		ctx.closePath();/*
 		ctx.stroke();
 		ctx.fillStyle = "rgba(" + this.color.red/2 + "," + this.color.green/2 + "," + this.color.blue/2 + ", 0.5)";
 		ctx.rect(this.x * TILESIZE + lw, this.y * TILESIZE + TILESIZE - 6, TILESIZE - 2*lw, TILESIZE * 0.4);
 		ctx.fill();
 		ctx.stroke();
 		ctx.closePath();
-
-		//ctx.drawImage(images['platform'], this.x * TILESIZE, this.y * TILESIZE - TILESIZE / 3, TILESIZE, 1.7* TILESIZE);
+		*/
+		ctx.drawImage(images['platform'], this.x * TILESIZE, this.y * TILESIZE - TILESIZE / 3, TILESIZE, 1.7* TILESIZE);
 		ctx.fillStyle = "black";
 		ctx.font = "40px bold" + FONT;
 		ctx.fillText(arrows[Math.round(this.angle / (Math.PI / 2))], this.x * TILESIZE + TILESIZE / 2, this.y * TILESIZE + 2 * TILESIZE / 3);	
@@ -413,18 +446,24 @@ window.onload = function () {
 					
 					if (p.angle !== undefined) {
 						this.angle = p.angle;
-						sounds["jump"].play();
+						//sounds["jump"].cloneNode().play();
+					}
+
+					if (p.color !== undefined) {
 						var e1 = Object.create(SmallRipple).init(Math.round(this.x), Math.round(this.y), p.color);
 						effects.push(e1);
 					}
+					
+					sounds["jump"].play();
+					//new Audio("./res/jump.wav").play();
 				
 					//CHECK IF WE SHOULD MOVE
 					if (this.distance <= 0) {
-						this.distance = 2;
+						this.distance = DISTANCE;
 						this.maxDistance = this.distance;
 						//console.log(this.angle, this.x + 2 * Math.cos(this.angle), this.y + 2 * Math.sin(this.angle));
-						for (var d = 0; d <= 2; d++) {
-							var o = findObstacle(this.x + d * Math.cos(this.angle), this.y + d * Math.sin(this.angle));
+						for (var d = 0; d <= DISTANCE; d++) {
+							var o = findObstacle(Math.round(this.x + d * Math.cos(this.angle)), Math.round(this.y + d * Math.sin(this.angle)));
 							if (o && o.collidable) {
 								this.distance = d - 1;
 								this.maxDistance = this.distance;
@@ -463,7 +502,7 @@ window.onload = function () {
 	
 	function findObstacle(dx, dy) {
 		for (var i = 0; i < obstacles.length; i++) {
-			if (obstacles[i].x == Math.round(dx) && obstacles[i].y == Math.round(dy)) {
+			if (obstacles[i].x == Math.floor(dx) && obstacles[i].y == Math.floor(dy)) {
 				return obstacles[i];
 			}
 		}
@@ -492,10 +531,21 @@ window.onload = function () {
 		}
 	}
 	
+	function randomLevel() {
+		var start = {x: randInt(0, TILES_X), y: randInt(0, TILES_Y / 2)};
+		var exit = {x: randInt(0, TILES_X), y: randInt(0, TILES_Y / 2)};
+		var o1 = {x: (Math.abs(start.x - exit.x) % DISTANCE + start.x) % TILES_X, y: (start.y + DISTANCE) % TILES_Y};
+		var o2 = {x: (start.x + DISTANCE) % TILES_X, y: (Math.abs(start.y - exit.y) % DISTANCE + start.y) % TILES_Y};
+		
+		var newLevel = {platforms: [], obstacles: [o1, o2], exit: exit, start: start, gold: 20, name: "random!"};
+		levels[currentLevel] = newLevel;
+	}
+	
 	function saveLevel() {
-		var save = {platforms: platforms, obstacles: obstacles, exit: exit, start: start};
+		var save = {platforms: [], obstacles: obstacles, exit: exit, start: start};
 		jsonSave = JSON.stringify(save);
-		output.value = jsonSave;
+		//output.value = jsonSave;
+		prompt("Level JSON", jsonSave);
 	}
 	
 	function loadLevel(sourceString) {
@@ -660,7 +710,11 @@ window.onload = function () {
 							buttonDelay = BUTTON_TIME;
 						}
 						if (pad.buttons[3].pressed) {
-							saveLevel(); //Y
+							removePlatform();
+							buttonDelay = BUTTON_TIME;
+						}
+						if (pad.buttons[7].pressed) {
+							saveLevel(); // RT
 							buttonDelay = BUTTON_TIME;
 						}
 						if (pad.buttons[5].pressed) {
@@ -712,6 +766,10 @@ window.onload = function () {
 							sounds['select'].play();*/
 							doSelected();
 						}
+						else if (pad.buttons[1].pressed) {
+							randomLevel();
+						}
+						
 						if (pad.axes[0] > 0.5) {
 							currentLevel = (currentLevel + 1) % (levelCompleted + 1);
 							selection = currentLevel;
@@ -839,6 +897,12 @@ window.onload = function () {
 			c.update(dt);
 		}
 		c.draw();
+		
+		if (DEBUG) {
+			ctx.fillStyle = "red";
+			ctx.font = "20px " + FONT;
+			ctx.fillText(modulo(Math.floor(mx) - levels[currentLevel].start.x, DISTANCE) + ", " + modulo(Math.floor(my) - levels[currentLevel].start.y, DISTANCE), Math.floor(mx) * TILESIZE, Math.floor(my) * TILESIZE);
+		}
 		
 		//SCROLLING BG
 		//by -= 0.3;
@@ -1014,6 +1078,10 @@ window.onload = function () {
 			touch.ex = e.changedTouches[0].clientX, touch.ey = e.changedTouches[0].clientY;
 			choice = Math.round((Math.atan2((touch.ey - touch.sy),(touch.ex - touch.sx)) + Math.PI * 2) / (Math.PI / 2)) % 4;
 		}
+	});
+
+	window.addEventListener("focus", function (e) {
+		startTime = new Date();
 	});
 	
 
