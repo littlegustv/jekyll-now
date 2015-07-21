@@ -1,14 +1,19 @@
 /**
 todo:
- - add edit/remove
- - localstorage
  - test (browser/mobile)
  - phonegap
+ - updatetime periodically
  
 features:
  - ability to set date for final time
  - arrow pointer shows progress in current block
  - alerts
+ 
+stretch goals
+ - themes (colors schemes)
+ - analytics (graphs)
+ - labels
+ 
  **/
 
 
@@ -23,87 +28,49 @@ Number.prototype.mod = function(n) {
 
 function finalTime () {
 	var ft = $("#finaltime").val().split(":");
-	console.log(ft);
 	var result = new Date();
 	result.setHours(ft[0]);
 	result.setMinutes(ft[1]);
 	result.setSeconds(0);
-	console.log(result.getTime());
 	return result.getTime();
 }
 
 finalTime();
 
 if(typeof(Storage) !== "undefined") {
-    // Code for localStorage/sessionStorage.
-	console.log("possible");
-
+	console.log("possible");	    // Code for localStorage/sessionStorage.
 } else {
-	console.log("impossible!");
-    // Sorry! No Web Storage support..
+	console.log("impossible!"); 	// Sorry! No Web Storage support..
 }
 
-blok_list = new Array();
-
-$data_list = new Array();
-$data_list.push($("#finaltime").val());
 
 //LOAD FROM STORAGE, if applicable:
 
 try
 {
-	$data_list = JSON.parse(localStorage.bloks_data);
-	setupList($data_list);
+	var data_list = JSON.parse(localStorage.blocks_data);
+	load(data_list);
 }
 catch (e)
 {
 	console.log("No valid JSON source in local storage.", e);
 }
 
-// add modal, click to open, then click anywhere to close
+function save () {
+	var json = JSON.stringify(createJSON());
+	localStorage.blocks_data = json;
+}
 
-$("#add").click(function () {
-    $("#addModal").slideToggle('fast', 'linear');
-    $("#task").focus();
-});
+function load(data) {
+	for (var i = 0; i < data.length; i++) {
+		var n = createTask(data[i].name, data[i].duration);
+		$("#main-content").append(n);
+	}
+	setSortable();
+	updateList();
+}
 
-$("#addModal").click(function (e) {
-	m = $("#addEvent");
-	
-    if (m[0] != e.target && m.has(e.target).length <= 0 && $("#add")[0] != e.target && $("#add").has(e.target).length <= 0) {
-        e.preventDefault();
-        $(this).slideUp('fast', 'linear');
-    }
-});
-
-$("#finaltime").change(updateList);
-//$(".duration input[name=time]").change(updateList);
-
-$("#addEvent").submit(function (e) {
-    e.preventDefault();
-
-	var hours = $("#hours").val();
-	var minutes = $("#minutes").val();
-	var duration = 3600000 * hours + 60000 * minutes;
-
-	var task = $("#task").val();
-	
-	var newTask = $("<div class='task'>" +
-					"<a class='edit' title='Edit'><i class='fa fa-edit'></i></a>" + 
-					"<span class='taskName'>" + task + "</span>" + 
-					"<span class='duration'></span>" +
-					"<span class='time'>" +
-						"<span class='endtime'></span>" +
-						"<span class='starttime'></span>" +
-					"</span></div>");
-					
-	newTask.attr("duration", duration);
-	newTask.attr("task", task);
-	
-	$("#main-content").append(newTask);
-	$("#addEvent")[0].reset();
-    $("#addModal").slideUp();
-	newTask.hide();
+function setSortable () {
     $("#main-content").sortable({
 		placeholder: 'task-placeholder',
         stop: updateList,
@@ -119,11 +86,123 @@ $("#addEvent").submit(function (e) {
 		}		
     });
     $("#main-content").disableSelection();
-    newTask.slideDown();
+}
+
+function createJSON () {
+	var blocks = [];
+	for (var i = 0; i < $(".task").length; i++) {
+		var t = $(".task").eq(i);
+		blocks.push({name: t.attr("task"), duration: t.attr("duration")});
+	}
+	return blocks;
+}
+
+// add modal, click to open, then click anywhere to close
+
+$("#add").click(function () {
+    $("#addModal").slideToggle('fast', 'linear');
+    $("#addModal .name").focus();
+});
+
+$("#addModal").click(function (e) {
+	m = $("#addEvent");
+	
+    if (m[0] != e.target && m.has(e.target).length <= 0 && $("#add")[0] != e.target && $("#add").has(e.target).length <= 0) {
+        e.preventDefault();
+        $(this).slideUp('fast', 'linear');
+    }
+});
+
+$("#editModal").click(function (e) {
+	m = $("#editEvent");
+	
+    if (m[0] != e.target && m.has(e.target).length <= 0 && $(".edit")[0] != e.target && $(".edit").has(e.target).length <= 0) {
+        e.preventDefault();
+        $(this).slideUp('fast', 'linear');
+    }
+});
+
+function createTask(task, duration) {
+	var n = $("<div class='task'>" +
+					"<a class='edit' title='Edit'><i class='fa fa-edit'></i></a>" + 
+					"<span class='taskName'>" + task + "</span>" + 
+					"<span class='duration'></span>" +
+					"<span class='time'>" +
+						"<span class='endtime'></span>" +
+						"<span class='starttime'></span>" +
+					"</span></div>");
+					
+	n.attr("duration", duration);
+	n.attr("task", task);
+	
+	n.find(".edit").click ( function (e) {
+		// Remove any previous lingering event listeners
+		$("#editModal .submit").off("click");
+		$("#editModal #delete").off("click");
+		
+		$("#editModal").slideToggle('fast', 'linear');
+		$("#editModal .name").focus();
+		$("#editModal .name").val(n.attr("task"));
+		$("#editModal .hours").val(toHours(n.attr("duration")));
+		$("#editModal .minutes").val(toMinutes(n.attr("duration")));
+		
+		//Rebind submit event to edit this particular task
+		$("#editModal .submit").on("click", function (e) {
+			e.preventDefault();
+			var hours = $("#editModal .hours").val();
+			var minutes = $("#editModal .minutes").val();
+			var duration = 3600000 * hours + 60000 * minutes;
+			
+			n.attr("task", $("#editModal .name").val());
+			n.find(".taskName").text($("#editModal .name").val());
+			n.attr("duration", duration);
+			
+			$("#editEvent")[0].reset();
+			$("#editModal").slideUp();			
+			updateList();
+		});
+		
+		$("#editModal #delete").on("click", function (e) {
+			e.preventDefault();
+			var d = confirm("Are you sure you want to delete this item?");
+			if (d) {
+				n.remove();
+				$("#editEvent")[0].reset();
+				$("#editModal").slideUp();	
+				updateList();
+			}
+		});
+	});
+	return n;
+}
+
+$("#finaltime").change(updateList);
+//$(".duration input[name=time]").change(updateList);
+
+$("#addModal .submit").click(function (e) {
+    e.preventDefault();
+
+	var hours = $("#addModal .hours").val();
+	var minutes = $("#addModal .minutes").val();
+	var duration = 3600000 * hours + 60000 * minutes;
+
+	var task = $("#addModal .name").val();
+	
+	var newTask = createTask(task, duration);
+	
+	$("#main-content").append(newTask);
+
+	newTask.hide();
+	$("#addEvent")[0].reset();
+    $("#addModal").slideUp();
+	setSortable();
+	newTask.slideDown();
 	
 	updateList();
-					
+		
 });
+
+
 
 function timeString(time) {
 	var d = new Date(Number(time));
@@ -135,11 +214,20 @@ function timeString(time) {
 	return hours + ":" + minutes + " " + mer;
 }
 
+// millisecond chunks of time to hours or minutes
+
+function toHours(time) {
+	return Math.floor(Number(time) / 3600000);
+}
+
+function toMinutes(time) {
+	return Math.floor((Number(time) % 3600000) / 60000);	
+}
+
 function durationString(time) {
-	var d = Number(time);
-	var hours = Math.floor(d / 3600000);
-	var minutes  = Math.floor((d % 3600000) / 60000);
-	if (hours == 0) hours = "12";
+	//var d = Number(time);
+	var hours = toHours(time);		//= Math.floor(d / 3600000);
+	var minutes  = toMinutes(time);	//= Math.floor((d % 3600000) / 60000);
 	if (minutes < 10) minutes = "0" + String(minutes);
 	return hours + ":" + minutes;
 }
@@ -169,6 +257,7 @@ function updateList() {
 			e.removeClass("past");			
 		}
 	}
+	save();
 }
 
 });

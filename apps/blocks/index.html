@@ -1,8 +1,8 @@
 <html>
 <head>
 <!-- STYLESHEETS -->
-<link rel="shortcut icon" href="./media/images/bloks_icon.png" type="image/x-icon" />
-<link rel="apple-touch-icon" href="./media/images/bloks_icon57.png" type="image/x-icon" />
+<link rel="shortcut icon" href="./media/images/blocks_icon.png" type="image/x-icon" />
+<link rel="apple-touch-icon" href="./media/images/blocks_icon57.png" type="image/x-icon" />
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
 <link href='http://fonts.googleapis.com/css?family=Sarpanch:600' rel='stylesheet' type='text/css' />
 <link href='./css/style.css' rel='stylesheet' type='text/css' />
@@ -24,10 +24,20 @@
 <div id="addModal">
 	<form id="addEvent">
 		<h1>Add New</h1>
-		<input id="task" type="text" name="name" placeholder="Task Name..." />
-		<input id="hours" type="number" name="hours" placeholder="Hours" min="0" max="12" step="1" />
-		<input id="minutes" type="number" name="minutes" placeholder="Minutes" min="0" max="60" step="1" />
-		<input type="submit" name="submit" value="Add Task" />
+		<input class="name" type="text" name="name" placeholder="Task Name..." />
+		<input class="hours" type="number" name="hours" placeholder="Hours" min="0" max="12" step="1" />
+		<input class="minutes" type="number" name="minutes" placeholder="Minutes" min="0" max="60" step="1" />
+		<button class="submit button">Add Task...</button>
+	</form>
+</div>
+<div id="editModal">
+	<form id="editEvent">
+		<h1>Edit</h1>
+		<input class="name" type="text" name="name" placeholder="Task Name..." />
+		<input class="hours" type="number" name="hours" placeholder="Hours" min="0" max="12" step="1" />
+		<input class="minutes" type="number" name="minutes" placeholder="Minutes" min="0" max="60" step="1" />
+		<button class="submit button"/>Confirm...</button>
+		<button id='delete' class='button'><i class="fa fa-trash"></i></button>
 	</form>
 </div>
 <div id="app-content">

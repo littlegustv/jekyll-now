@@ -40,7 +40,7 @@ div {
 #add:hover, #add:active, #edit:hover, #edit:active {
     color: grey;
 }
-#addModal {
+#addModal, #editModal {
 	position: fixed;
 	display: none;
 	padding: 20px;
@@ -53,7 +53,11 @@ div {
 	height: 100%;
 	width: 100%;
 }
-#addModal input , .editing input{
+#editModal
+{
+	background: rgba(174,64,30,0.4);
+}
+#addModal input , #editModal input, .button{
     text-align: left;
     font-variant: small-caps;
     width: calc(100% - 28px);
@@ -61,47 +65,23 @@ div {
     margin-top: 10px;
     padding: 8px;
 }
-#addEvent {
+#addEvent, #editEvent {
 	max-width: 400px;
 	padding: 10px;
 	padding-bottom: 20px;
 	margin: auto;
 	margin-top: calc(50vh - 200px);
 }
-.editing input
-{
-	width: calc(15% - 16px);
-	margin: 8px;
-}
-.editing input[name=edit-name]
-{
-	width: calc(40% - 16px);
-}
-.remove
-{
-	font-size: 22px;
-}
-/*
-#addModal input[name=name]
-{
-	width: calc(25% - 22px);
-}
-#addModal input[name=hours] {
-    width: calc(15% - 30px);
-}
-#addModal input[name=minutes] {
-    width: calc(25% - 22px);
-}*/
-#addModal input[type=submit], .editing input[type=submit] {
-	*width: calc(25% - 22px);
+.button {
     border: none;
-    background: linear-gradient(to bottom, #000, #222);
+    background: #222;
     color: white;
     padding: 8px;
-    border: 2px #444 outset;
 }
-#addModal input[type=submit]:hover, #addModal input[type=submit]:active {
-    border: 2px #444 inset;
+.button:active, .button:hover
+{
+	background: #EFE;
+	color: black;
 }
 .task, .task-placeholder {
     width: 100%;
@@ -250,14 +230,14 @@ div {
 /*and (min-device-width : 320px) */
 and (max-device-width : 480px) {
     html, body
-    {
+	{
 		min-width: 320px;
 		width: 100%;
         margin: 0px;
         padding: 0px;
     }
     #app-content
-    {
+	{
         width:100%;
         margin:0px;
         top:0px;
@@ -267,30 +247,15 @@ and (max-device-width : 480px) {
 	{
         width: 100%;
     }
-    input {
+    input, .button {
         font-size: 22px;
-        background: #eee;
     }
-    #addModal input
+/*    #addModal input
        { 
         width: calc(100% - 28px) !important;
     }
     #addModal input[type=number]
        { 
         width: calc(50% - 16px) !important;
-    }
-	.editing input, .editing input[name=edit-name]
-	{
-		width: calc(50% - 16px);
-		margin: 8px;
-	}
-	.editing input[name=edit-hours], .editing input[name=edit-minutes]
-	{
-		width: calc(25% - 16px);
-		text-align: right;
-	}
-	.editing input[type=submit]
-	{
-		width: calc(100% - 100px);
-	}
+    }*/
 }
