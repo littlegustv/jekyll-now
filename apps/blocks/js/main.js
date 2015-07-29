@@ -3,6 +3,7 @@ todo:
  - test (browser/mobile)
  - phonegap
  - updatetime periodically
+ - tutorial/tips for first time use
  
 features:
  - ability to set date for final time
