@@ -6,7 +6,7 @@ layout: default
 	{% unless post.draft %}
     <article class="post">
           <div class="entry">
-            <h3>{{ post.title }}</h3>
+            <a href="{{ site.baseurl }}{{ post.url }}" class="read-more"><h3>{{ post.title }}</h3></a>
               {{ post.content | truncatewords:55}}
           </div>
           <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
