@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Manipulation and Vulnerability in WHIPLASH and EX MACHINA
+title: Manipulation and Vulnerability in "Whiplash" and "Ex Machina"
 tags: whiplash ex-machina hegel master slave
 ---
 
