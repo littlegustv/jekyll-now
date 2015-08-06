@@ -4,7 +4,7 @@ title: Manipulation and Vulnerability in WHIPLASH and EX MACHINA
 tags: whiplash ex-machina hegel master slave
 ---
 
-![Image here](https://www.google.ca/search?q=whiplash&es_sm=122&source=lnms&tbm=isch&sa=X&ved=0CAgQ_AUoAmoVChMIwZbNsKWTxwIVSBs-Ch1WhgPi&biw=1600&bih=775#imgrc=0kUaZXfZOMiGMM%3A "This is what it feels like.")
+![Image here](http://lynncinnamon.com/wp-content/uploads/2014/12/Whiplash-Scream.jpg "This is what it feels like.")
 
 Creating life is tricky, and if certain recent and generally excellent movies are to be believe, thoroughly messed up.  The role of a parent is a delicate one, and it is often taken up without regard for the consequences, by which I don't mean the various material responsibilities - I mean the philosophical ones.  So let's talk about *Whiplash* and *Ex Machina*.
 
@@ -12,7 +12,7 @@ Creating life is tricky, and if certain recent and generally excellent movies ar
 
 It is interesting that *Ex Machina* frames itself, even to the end, as a 'test' for the existence of true Artificial Intelligence.  To me it seems much more like the process of creating it, or at least one way.  Probably not a great way, either.  Ava, the AI in question, has most of her knowledge (it is implied) implanted from her first moment of life, or consciousness.  Her creator (Nathan Bateman), decides to 'test' her level of consciousness by manipulating her into trying to escape - from him.  This would prove to him that she is intelligent, and that he has been successful.
 
-![Image here](https://www.google.ca/search?q=ex+machina&es_sm=122&source=lnms&tbm=isch&sa=X&ved=0CAgQ_AUoAmoVChMIi8aI-6WTxwIVAXY-Ch2CKQJl&biw=1600&bih=775#imgrc=pfEd4rCnrC6lmM%3A "This is what it looks like.")
+![Image here](https://pmcvariety.files.wordpress.com/2014/10/ex-machina-movie.jpg?w=670&h=377&crop=1 "This is what it looks like.")
 
 *Whiplash* has an interesting parallel with the figure of Terence Fletcher, the band leader.  He both grooms and bullies the drummer, Andrew Neiman, citing the inspiration that Charlie Parker drew from a symbol thrown at his head.  His goal is simple, if we take his word for it - he wants to create 'one of the greats'.  He wants to push them harder than they are willing to go, and break through the barriers of ordinary musicians.  The proof that someone is 'great' is that they persevere, that they overcome any obstacles or humiliation thrust in their path.
 
