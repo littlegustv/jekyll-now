@@ -4,8 +4,16 @@ document.addEventListener( "DOMContentLoaded", function () {
 
 	var content = document.getElementById("content");
 	var download = document.getElementById("download");
+	var tab1 = document.getElementById("tab1");
+	var tab2 = document.getElementById("tab2");
+	var success = document.getElementById("success");
+		
+	var customerList = [];
+	var invoiceList = [];
 		
 	function readFile (evt) {
+		customerList = [];
+		invoiceList = [];
 		var files = evt.target.files;
 		var file = files[0];           
 		var reader = new FileReader();
@@ -26,10 +34,12 @@ document.addEventListener( "DOMContentLoaded", function () {
 
 	function downloadButton(xml, filename) {
 		fp = filename.split("-input.csv")[0] + "-output-xml.cei";
-		console.log('here', download);
 		download.download = fp;
 		download.innerHTML = fp;
 		download.href = "data:text/plain," + encodeURIComponent(xml);
+		success.innerHTML = "<h5>" + customerList.length + " customer" + (customerList.length > 1 ? "s" : "") + " and " + invoiceList.length + " invoice" + (invoiceList.length > 1 ? "s" : "") + " processed.</h5>";
+		tab1.style.display = "none";
+		tab2.style.display = "block";
 	}
 	
 	function twoDigits(number) {
@@ -59,17 +69,24 @@ document.addEventListener( "DOMContentLoaded", function () {
 	}
 	
 	function invoiceToXML (invoice) {
-		console.log(invoice);
+
+		// count customers and invoices here...
+		
+		if (customerList.indexOf(invoice.customer_computerease_id) == -1) customerList.push(invoice.customer_computerease_id);
+		if (invoiceList.indexOf(invoice.invoice_number) == -1) invoiceList.push(invoice.invoice_number);
+		
 		result = '<invoice>\n';
-		result += '\t<cusnum>' + invoice.customer_computerease_id + '</cusnum>\n';
+		result += '\t<cusnum>' + invoice.customer_computerease_id + '</cusnum>\n';  // might need a different field
 		result += '\t<invnum>' + invoice.invoice_number + '</invnum>\n';
 		result += '\t<notes>' + invoice.notes + '</notes>\n';
 		result += '\t<invdate>' + formatDate(invoice.transaction_date) + '</invdate>\n';
-		result += '\t<items>\n';
-		for (item_id in invoice.items) {
-			result += itemToXML (invoice.items[item_id]);
+		if (invoice.items != undefined) {
+			result += '\t<items>\n';
+			for (item_id in invoice.items) {
+				result += itemToXML (invoice.items[item_id]);
+			}
+			result += '\t</items>\n';
 		}
-		result += '\t</items>\n';
 		result += '</invoice>\n';
 
 		return result;
@@ -105,7 +122,9 @@ document.addEventListener( "DOMContentLoaded", function () {
 			if (invoices[arr[i][id]] == undefined) {
 				invoices[arr[i][id]] = newInvoice;
 			}
-			invoices[arr[i][id]].items[newItem.item_id] = newItem;
+			if (newItem.item_id != "") {
+				invoices[arr[i][id]].items[newItem.item_id] = newItem;
+			}
 		}
 		return invoices;
 	}

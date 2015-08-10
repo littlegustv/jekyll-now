@@ -8,6 +8,10 @@ table, th, td {
 td {
     padding: 3px;
 }
+#tab2
+{
+	display: none;
+}
 </style>
 </head>
 <body>
@@ -23,7 +27,20 @@ td {
 </ol>
 </div>
 <div id='tab2'>
+	<div id='success'>
+	</div>
 	<a id='download' target="_blank"></a>
+	<div class='instructions'>
+		<ol>
+			<li>Download the ComputerEase customer import XML file to your computer.</li>
+			<li>Import the customer import XML file into ComputerEase.</li>
+			<li>Download the ComputerEase import XML file to your computer.</li>
+			<li>Import the invoice import XML file into ComputerEase.</li>
+			<h3>If the customer and invoice imports were successful:</h3>
+			<li>Download the ServiceTrade invoice import XML file to your computer.</li>
+			<li>Mass-update the status of the invoices in ServiceTrades by going to Customer -> Bulk Import -> Invoice Update, then selecting the invoice update CSV file that is saved to your computer.</li>
+		</ol>
+	</div>
 </div>
 </div>
 </body>
