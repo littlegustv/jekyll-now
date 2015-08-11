@@ -3,28 +3,57 @@ document.addEventListener( "DOMContentLoaded", function () {
 	document.getElementById('file').addEventListener('change', readFile, false);
 
 	var content = document.getElementById("content");
-	var download = document.getElementById("download");
+	var download = document.getElementsByClassName("download");
 	var tab1 = document.getElementById("tab1");
 	var tab2 = document.getElementById("tab2");
+	var tab3 = document.getElementById("tab3");
 	var success = document.getElementById("success");
+	var modal = document.getElementById("modal");
+	
+	document.addEventListener('error', function (e) {
+		tab3.style.display = "block";
+		tab2.style.display = "none";
+		tab1.style.display = "none";
+		console.log(e);
+		tab3.innerHTML = "<h3 style='color:red;'>Processing failed.</h3>" +
+						e.detail;
+	});
 		
 	var customerList = [];
 	var invoiceList = [];
-		
+	var processed = [];
+	
+	String.prototype.htmlEscape = function() {
+		return $('<div/>').text(this.toString()).html();
+	};
+	
 	function readFile (evt) {
 		customerList = [];
 		invoiceList = [];
 		var files = evt.target.files;
 		var file = files[0];           
 		var reader = new FileReader();
+		if (file != undefined) {
+			modal.style.display = "block";
+		}
 		reader.onload = function() {
+			modal.style.display = "none";
 			//toTable(parseCSV(this.result));
-			downloadButton(invoicesToXML(loadInvoices(parseCSV(this.result))), file.name);
+			downloadButton(0, invoicesToXML(loadInvoices(parseCSV(this.result))), file.name, "-output-xml.cei");
+			downloadButton(1, invoiceCSV(), file.name, "-output-csv.csv");
+			successState();
 		}
 		reader.readAsText(file)
 	}
 
+	function successState() {
+		success.innerHTML = "<h5>" + customerList.length + " customer" + (customerList.length > 1 ? "s" : "") + " and " + invoiceList.length + " invoice" + (invoiceList.length > 1 ? "s" : "") + " processed.</h5>";
+		tab1.style.display = "none";
+		tab2.style.display = "block";
+	}
+	
 	function parseCSV (data) {
+		data = data.htmlEscape();
 		rows = data.split("\n");
 		for (var i = 0; i < rows.length; i++) {
 			rows[i] = rows[i].splitIgnore(",", '"');
@@ -32,14 +61,19 @@ document.addEventListener( "DOMContentLoaded", function () {
 		return rows;
 	}
 
-	function downloadButton(xml, filename) {
-		fp = filename.split("-input.csv")[0] + "-output-xml.cei";
-		download.download = fp;
-		download.innerHTML = fp;
-		download.href = "data:text/plain," + encodeURIComponent(xml);
-		success.innerHTML = "<h5>" + customerList.length + " customer" + (customerList.length > 1 ? "s" : "") + " and " + invoiceList.length + " invoice" + (invoiceList.length > 1 ? "s" : "") + " processed.</h5>";
-		tab1.style.display = "none";
-		tab2.style.display = "block";
+	function invoiceCSV() {
+		var result = "id,status\n";
+		for (var i = 0; i < invoiceList.length; i++) {
+			result += invoiceList[i] + ",processed\n";
+		}
+		return result;
+	}
+	
+	function downloadButton(index, file, filename, suffix) {
+		fp = filename.split("-input.csv")[0] + suffix;
+		download[index].download = fp;
+		download[index].innerHTML = fp;
+		download[index].href = "data:text/plain," + encodeURIComponent(file);
 	}
 	
 	function twoDigits(number) {
@@ -71,6 +105,10 @@ document.addEventListener( "DOMContentLoaded", function () {
 	function invoiceToXML (invoice) {
 
 		// count customers and invoices here...
+		if (invoice.customer_computerease_id == undefined) {
+			var er = new CustomEvent("error", {detail: "No valid 'customer_computerease_id' field detected."});
+			document.dispatchEvent(er);
+		}
 		
 		if (customerList.indexOf(invoice.customer_computerease_id) == -1) customerList.push(invoice.customer_computerease_id);
 		if (invoiceList.indexOf(invoice.invoice_number) == -1) invoiceList.push(invoice.invoice_number);

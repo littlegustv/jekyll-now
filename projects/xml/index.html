@@ -1,6 +1,8 @@
 <html>
 <head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src='main.js'></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 <style>
 table, th, td {
    border: 1px solid black;
@@ -11,6 +13,22 @@ td {
 #tab2
 {
 	display: none;
+}
+#modal
+{
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	display: none;
+	height: 100%;
+	width: 100%;
+	background: rgba(255,255,255,0.6);
+}
+#loading
+{
+	text-align: center;
+	font-size: 50px;
+	margin-top: calc(25% - 25px);
 }
 </style>
 </head>
@@ -29,7 +47,8 @@ td {
 <div id='tab2'>
 	<div id='success'>
 	</div>
-	<a id='download' target="_blank"></a>
+	<a class='download' target="_blank"></a><br>
+	<a class='download' target="_blank"></a>
 	<div class='instructions'>
 		<ol>
 			<li>Download the ComputerEase customer import XML file to your computer.</li>
@@ -42,6 +61,15 @@ td {
 		</ol>
 	</div>
 </div>
+<div id='tab3'>
+
+</div>
+</div>
+<div id='modal'>
+	<div id='loading'>
+		<h3>Processing data...</h3>
+		<i class="fa fa-spinner fa-pulse"></i>
+	</div>
 </div>
 </body>
 </html>
