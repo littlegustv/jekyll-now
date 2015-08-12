@@ -9,19 +9,13 @@ document.addEventListener( "DOMContentLoaded", function () {
 	var tab3 = document.getElementById("tab3");
 	var success = document.getElementById("success");
 	var modal = document.getElementById("modal");
-	
-	document.addEventListener('error', function (e) {
-		tab3.style.display = "block";
-		tab2.style.display = "none";
-		tab1.style.display = "none";
-		console.log(e);
-		tab3.innerHTML = "<h3 style='color:red;'>Processing failed.</h3>" +
-						e.detail;
-	});
 		
 	var customerList = [];
 	var invoiceList = [];
 	var processed = [];
+		
+	var reader = new FileReader();
+
 	
 	String.prototype.htmlEscape = function() {
 		return $('<div/>').text(this.toString()).html();
@@ -32,19 +26,30 @@ document.addEventListener( "DOMContentLoaded", function () {
 		invoiceList = [];
 		var files = evt.target.files;
 		var file = files[0];           
-		var reader = new FileReader();
 		if (file != undefined) {
 			modal.style.display = "block";
 		}
 		reader.onload = function() {
 			modal.style.display = "none";
 			//toTable(parseCSV(this.result));
-			downloadButton(0, invoicesToXML(loadInvoices(parseCSV(this.result))), file.name, "-output-xml.cei");
-			downloadButton(1, invoiceCSV(), file.name, "-output-csv.csv");
-			successState();
+			try {
+				downloadButton(0, invoicesToXML(loadInvoices(parseCSV(this.result))), file.name, "-output-xml.cei");
+				downloadButton(1, invoiceCSV(), file.name, "-output-csv.csv");
+				successState();
+			} catch (err) {
+				console.log();
+				error(err);
+			}
 		}
-		reader.readAsText(file)
+		reader.readAsText(file);
 	}
+	
+	function error (e) {
+		tab3.style.display = "block";
+		tab2.style.display = "none";
+		tab1.style.display = "none";
+		tab3.innerHTML = "<h3 style='color:red;'>Processing failed.</h3><p>" +	e + "</p>";
+	};
 
 	function successState() {
 		success.innerHTML = "<h5>" + customerList.length + " customer" + (customerList.length > 1 ? "s" : "") + " and " + invoiceList.length + " invoice" + (invoiceList.length > 1 ? "s" : "") + " processed.</h5>";
@@ -106,8 +111,7 @@ document.addEventListener( "DOMContentLoaded", function () {
 
 		// count customers and invoices here...
 		if (invoice.customer_computerease_id == undefined) {
-			var er = new CustomEvent("error", {detail: "No valid 'customer_computerease_id' field detected."});
-			document.dispatchEvent(er);
+			throw "customer_computerease_id column is missing from source CSV file.";
 		}
 		
 		if (customerList.indexOf(invoice.customer_computerease_id) == -1) customerList.push(invoice.customer_computerease_id);
@@ -146,6 +150,10 @@ document.addEventListener( "DOMContentLoaded", function () {
 		var invoices = {};
 		var id = arr[0].indexOf("id");
 		
+		if (id == -1) {
+			throw "Id column is missing from source CSV file.";
+		}
+		
 		for (var i = 1; i < arr.length; i++) {
 			var newInvoice = {items: {}};
 			var newItem = {};
@@ -157,11 +165,11 @@ document.addEventListener( "DOMContentLoaded", function () {
 					newInvoice[arr[0][j]] = entry;
 				}
 			}
-			if (invoices[arr[i][id]] == undefined) {
+			if (invoices[arr[i][id]] == undefined && arr[i][id] != undefined) {
 				invoices[arr[i][id]] = newInvoice;
-			}
-			if (newItem.item_id != "") {
-				invoices[arr[i][id]].items[newItem.item_id] = newItem;
+				if (newItem.item_id != "") {
+					invoices[arr[i][id]].items[newItem.item_id] = newItem;
+				}
 			}
 		}
 		return invoices;
