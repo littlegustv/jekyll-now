@@ -4,7 +4,7 @@ title: The Iceberg
 tags: art storytelling objects
 ---
 
-![Image here](http://www.pvisoftware.com/blog/wp-content/uploads/2013/11/Pegasus_vertex_Iceberg.png "Watch out.")
+![Image here](https://upload.wikimedia.org/wikipedia/commons/4/46/Victor_Bay_(Arctic_Bay,_Nunavut)_banner_Iceberg.jpg "Watch out.")
 
 There's a saying in storytelling that your narrative should be like an iceberg, with the vast bulk of the story hidden under the surface and only a bare hint revealed explicitly.  While I believe that this is a generally correct and often helpful axiom, it's also quite interesting since it implies that telling a story - or, by extension, an artistic endeavour - must inherently fail to capture what the artist wants it to, in a way that is almost staggering in its scale.  And this in turn is not a weakness, nor is it some kind of artistic license or obtuseness - I think that it's the strength of art, as opposed to other ways we have to access the world.
 
