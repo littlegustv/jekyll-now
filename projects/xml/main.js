@@ -75,7 +75,7 @@ document.addEventListener( "DOMContentLoaded", function () {
 	}
 	
 	function downloadButton(index, file, filename, suffix) {
-		fp = filename.split("-input.csv")[0] + suffix;
+		fp = filename.split(".csv")[0] + suffix;
 		download[index].download = fp;
 		download[index].innerHTML = fp;
 		download[index].href = "data:text/plain," + encodeURIComponent(file);
@@ -110,15 +110,15 @@ document.addEventListener( "DOMContentLoaded", function () {
 	function invoiceToXML (invoice) {
 
 		// count customers and invoices here...
-		if (invoice.customer_computerease_id == undefined) {
-			throw "customer_computerease_id column is missing from source CSV file.";
+		if (invoice.location_computerease_id == undefined) {
+			throw "location_computerease_id column is missing from source CSV file.";
 		}
 		
-		if (customerList.indexOf(invoice.customer_computerease_id) == -1) customerList.push(invoice.customer_computerease_id);
+		if (customerList.indexOf(invoice.location_computerease_id) == -1) customerList.push(invoice.location_computerease_id);
 		if (invoiceList.indexOf(invoice.invoice_number) == -1) invoiceList.push(invoice.invoice_number);
 		
 		result = '<invoice>\n';
-		result += '\t<cusnum>' + invoice.customer_computerease_id + '</cusnum>\n';  // might need a different field
+		result += '\t<cusnum>' + invoice.location_computerease_id + '</cusnum>\n';  // might need a different field
 		result += '\t<invnum>' + invoice.invoice_number + '</invnum>\n';
 		result += '\t<notes>' + invoice.notes + '</notes>\n';
 		result += '\t<invdate>' + formatDate(invoice.transaction_date) + '</invdate>\n';
