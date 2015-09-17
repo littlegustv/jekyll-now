@@ -5,7 +5,7 @@ tags: fairness video-game
 ---
 ###I don't think games should be fair.
 
-![Image Here]("http://edge.alluremedia.com.au/m/k/2014/04/Darksoulsboss.jpg" "Iron Golem, Dark Souls")
+![Image Here](http://edge.alluremedia.com.au/m/k/2014/04/Darksoulsboss.jpg "Iron Golem, Dark Souls")
 
 "Tough but fair" is a phrase used to praise difficult games these days, from roguelikes (FTL or The Binding of Isaac) to behemoths like Dark Souls.  It's often a way of saying "this game is difficult, but I like it", but there's something going on there implicitly that I don't think I like.  There's an assumption that a game *should* be fair, that difficulty is only justified by decency - and that the game is 'beatable' by its very nature.
 
