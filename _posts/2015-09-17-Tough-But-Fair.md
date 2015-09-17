@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Tough But Fair: Video Games
+title: Tough But Fair - Video Games
 tags: fairness video-game
 ---
 ###I don't think games should be fair.
