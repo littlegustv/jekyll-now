@@ -4,8 +4,9 @@
  - levels & enemies
  - effects & music
  - upgrades: weapons, movement, etc.
+ 	- weapons different for different directions ('slots' - bomb, missile, laser, etc.)
  - polish
- - certain endings unlock 'sandbox' open-ended level progression ('freedom' endings)
+ - certain endings unlock 'sandbox' open-ended level progression ('freedom' endings), local multiplayer?
 */
 var debug = {};
 
