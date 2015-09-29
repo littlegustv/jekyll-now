@@ -1,7 +1,13 @@
+@font-face {
+  font-family: 'Sarpanch';
+  font-style: normal;
+  font-weight: 600;
+  src: url(../media/fonts/Sarpanch-SemiBold.ttf) format('truetype');
+}
 body {
-    font-family:'Sarpanch', sans-serif;
+    font-family:'Sarpanch' sans-serif;
     font-variant: small-caps;
-    background: url('http://subtlepatterns.com/patterns/linedpaper.png');
+    background: url('../media/images/linedpaper.png');
 	margin: 0px;
 }
 input {
@@ -20,7 +26,7 @@ div {
     overflow: auto;
 }
 #end {
-    float: right;
+    float: left;
     font-size: 40px;
 	margin-right: 15px;
 }
@@ -36,6 +42,10 @@ div {
     font-size: 40px;
 	padding: 15px;
     transition: color 0.2s;
+}
+#add {
+    float: right;
+    padding-right: 5px;
 }
 #add:hover, #add:active, #edit:hover, #edit:active {
     color: grey;

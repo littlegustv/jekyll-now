@@ -1,0 +1,16 @@
+{
+  "name": "Blocks",
+  "description": "Time management made effective.",
+  "version": "0.1",
+  "manifest_version": 2,
+  "offline_enabled": true,
+  "app": {
+    "background": {
+      "scripts": ["background.js"]
+    }
+  },
+  "permissions": [
+    "storage"
+  ],
+  "icons": { "16": "./media/images/blocks_icon16.png", "128": "./media/images/blocks_icon128.png" }
+}

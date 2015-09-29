@@ -2,7 +2,6 @@
 todo:
  - test (browser/mobile)
  - phonegap
- - updatetime periodically
  - tutorial/tips for first time use
  
 features:
@@ -39,7 +38,7 @@ function finalTime () {
 finalTime();
 
 if(typeof(Storage) !== "undefined") {
-	console.log("possible");	    // Code for localStorage/sessionStorage.
+	console.log("possible");	    // Code for chromestorage
 } else {
 	console.log("impossible!"); 	// Sorry! No Web Storage support..
 }
@@ -49,8 +48,20 @@ if(typeof(Storage) !== "undefined") {
 
 try
 {
-	var data_list = JSON.parse(localStorage.blocks_data);
-	load(data_list);
+	//var data_list;
+	
+	if (chrome.storage) {
+		chrome.storage.local.get(function (d) {
+			load(d.blocks_data);
+			//data_list = JSON.parse(d);
+		});
+	} else {
+		var data_list = localStorage.blocks_data;
+		load(data_list);	
+	}
+	//var data_list = JSON.parse(chrome.storage.local.blocks_data);
+
+	//load(data_list);
 }
 catch (e)
 {
@@ -59,16 +70,26 @@ catch (e)
 
 function save () {
 	var json = JSON.stringify(createJSON());
-	localStorage.blocks_data = json;
+	if (chrome.storage) {
+		chrome.storage.local.set({"blocks_data": json});
+	} else {
+		localStorage.blocks_data = json;
+	}
 }
 
 function load(data) {
-	for (var i = 0; i < data.length; i++) {
-		var n = createTask(data[i].name, data[i].duration);
-		$("#main-content").append(n);
+	try {
+		data = JSON.parse(data);
+		for (var i = 0; i < data.length; i++) {
+			var n = createTask(data[i].name, data[i].duration);
+			$("#main-content").append(n);
+		}
+		setSortable();
+		updateList();
 	}
-	setSortable();
-	updateList();
+	catch (e) {
+		console.log("ERROR ON LOAD", e);
+	}
 }
 
 function setSortable () {
@@ -260,5 +281,7 @@ function updateList() {
 	}
 	save();
 }
+
+setInterval(updateList, 5000);
 
 });
