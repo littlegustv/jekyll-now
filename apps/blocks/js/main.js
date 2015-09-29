@@ -1,18 +1,22 @@
 /**
 todo:
- - test (browser/mobile)
- - phonegap
- - tutorial/tips for first time use
+
+ - alerts/notifications (chrome notifications?)
+ - arrow pointer shows progress in current block
+ - menu/settings - alerts, themes, sync/not, credits
  
 features:
- - ability to set date for final time
- - arrow pointer shows progress in current block
- - alerts
  
-stretch goals
+ - test (browser/mobile)
+ - finalize design/splash screen
  - themes (colors schemes)
+ - graphics/screenshots/icons
+ - phonegap --> chrome app on mobile devices?
+
+stretch goals
+ - multiple days / calendar
  - analytics (graphs)
- - labels
+ - labels / tags
  
  **/
 
@@ -52,12 +56,14 @@ try
 	
 	if (chrome.storage) {
 		chrome.storage.local.get(function (d) {
+			$("#finaltime").val(d.blocks_time);
 			load(d.blocks_data);
 			//data_list = JSON.parse(d);
 		});
 	} else {
 		var data_list = localStorage.blocks_data;
-		load(data_list);	
+		$("#finaltime").val(localStorage.blocks_time);
+		load(data_list);
 	}
 	//var data_list = JSON.parse(chrome.storage.local.blocks_data);
 
@@ -72,8 +78,10 @@ function save () {
 	var json = JSON.stringify(createJSON());
 	if (chrome.storage) {
 		chrome.storage.local.set({"blocks_data": json});
+		chrome.storage.local.set({"blocks_time": $("#finaltime").val() });
 	} else {
 		localStorage.blocks_data = json;
+		localStorage.blocks_time = $("#finaltime").val();
 	}
 }
 
@@ -278,6 +286,15 @@ function updateList() {
 			e.removeClass("current");
 			e.removeClass("past");			
 		}
+	}
+	if ($(".current").attr("endtime") - CURRENT < 300000 && $(".current").attr("endtime") - CURRENT > 295000) {
+		console.log(CURRENT,  $(".current").attr("endtime"));
+		chrome.notifications.create({
+			type: "basic",
+			iconUrl: "./media/images/blocks_icon.png",
+			title: "5 Minutes Left",
+			message: "You have 5 minutes to complete: " + $(".current").attr("task")
+		});
 	}
 	save();
 }

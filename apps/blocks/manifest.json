@@ -10,7 +10,7 @@
     }
   },
   "permissions": [
-    "storage"
+    "storage", "notifications"
   ],
   "icons": { "16": "./media/images/blocks_icon16.png", "128": "./media/images/blocks_icon128.png" }
 }
