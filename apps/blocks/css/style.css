@@ -7,8 +7,9 @@
 body {
     font-family:'Sarpanch' sans-serif;
     font-variant: small-caps;
-    background: url('../media/images/linedpaper.png');
+    background: rgba(0, 153, 0, 0.3);
 	margin: 0px;
+    color: #333;
 }
 input {
     font-family: inherit;
@@ -20,7 +21,7 @@ div {
     box-sizing: border-box;
 }
 #app-content {
-    max-width: 800px;
+    max-width: 640px;
     min-width: 300px;
     margin: auto;
     overflow: auto;
@@ -28,26 +29,36 @@ div {
 #end {
     float: left;
     font-size: 40px;
-	margin-right: 15px;
+}
+#top-content {
+    width: 100%;
+    overflow: hidden;
+    min-height: 10px;
+    padding: 10px;
 }
 #main-content {
+    background: url('../media/images/linedpaper.png');
     width: 100%;
     height: calc(100% - 50px);
     margin: auto;
-	margin-top: 10px;
-    *border-top: 3px solid black;
+    box-shadow: 0px 0px 10px -1px;
 }
-#add, #edit {
-    color: black;
+#bottom-content {
+    padding: 4px;
+}
+.nav, #edit {
+    color: #333;
     font-size: 40px;
-	padding: 15px;
     transition: color 0.2s;
 }
-#add {
+.nav {
     float: right;
     padding-right: 5px;
+    padding-left: 15px;
+    height: 60px;
+    line-height: 60px;
 }
-#add:hover, #add:active, #edit:hover, #edit:active {
+.nav:hover, .nav:active, .nav:hover, .nav:active {
     color: grey;
 }
 #addModal, #editModal {
@@ -92,7 +103,7 @@ div {
 .button:active, .button:hover
 {
 	background: #EFE;
-	color: black;
+	color: #333;
 }
 .task, .task-placeholder {
     width: 100%;
