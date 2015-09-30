@@ -39,7 +39,7 @@ div {
 #main-content {
     background: url('../media/images/linedpaper.png');
     width: 100%;
-    height: calc(100% - 50px);
+    min-height: calc(100% - 50px);
     margin: auto;
     box-shadow: 0px 0px 10px -1px;
 }
