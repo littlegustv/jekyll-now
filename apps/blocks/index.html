@@ -21,22 +21,27 @@
 
 </head>
 <body>
+<div id="menuModal">
+	<div id="menuContent">
+		<h1>Settings</h1>
+	</div>
+</div>
 <div id="addModal">
 	<form id="addEvent">
 		<h1>Add New</h1>
-		<input class="name" type="text" name="name" placeholder="Task Name..." />
-		<input class="hours" type="number" name="hours" placeholder="Hours" min="0" max="12" step="1" />
-		<input class="minutes" type="number" name="minutes" placeholder="Minutes" min="0" max="60" step="1" />
-		<button class="submit button">Add Task...</button>
+		<input class="name" type="text" name="name" placeholder="Task Name" />
+		<input class="hours" type="number" name="hours" placeholder="hrs" min="0" max="12" step="1" />: 
+		<input class="minutes" type="number" name="minutes" placeholder="mins" min="0" max="60" step="1" />
+		<button class="submit button"><i class="fa fa-thumbs-up"></i></button>
 	</form>
 </div>
 <div id="editModal">
 	<form id="editEvent">
 		<h1>Edit</h1>
-		<input class="name" type="text" name="name" placeholder="Task Name..." />
-		<input class="hours" type="number" name="hours" placeholder="Hours" min="0" max="12" step="1" />
-		<input class="minutes" type="number" name="minutes" placeholder="Minutes" min="0" max="60" step="1" />
-		<button class="submit button"/>Confirm...</button>
+		<input class="name" type="text" name="name" placeholder="Task Name" />
+		<input class="hours" type="number" name="hours" placeholder="hrs" min="0" max="12" step="1" />: 
+		<input class="minutes" type="number" name="minutes" placeholder="mins" min="0" max="60" step="1" />
+		<button class="submit button"/><i class="fa fa-thumbs-up"></i></button>
 		<button id='delete' class='button'><i class="fa fa-trash"></i></button>
 	</form>
 </div>

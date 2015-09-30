@@ -127,6 +127,20 @@ function createJSON () {
 	return blocks;
 }
 
+// menu
+$("#menu").click(function () {
+	$("#menuModal").slideToggle('fast', 'linear');
+});
+
+$("#menuModal").click(function (e) {
+	m = $("#menuContent");
+	
+    if (m[0] != e.target && m.has(e.target).length <= 0 && $("#menu")[0] != e.target && $("#menu").has(e.target).length <= 0) {
+        e.preventDefault();
+        $(this).slideUp('fast', 'linear');
+    }
+});
+
 // add modal, click to open, then click anywhere to close
 
 $("#add").click(function () {
