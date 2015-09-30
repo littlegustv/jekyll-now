@@ -63,7 +63,7 @@ try
 		});
 	} else {
 		var data_list = localStorage.blocks_data;
-		$("#finaltime").val(localStorage.blocks_time);
+		$("#finaltime").val(localStorage.blocks_time ? localStorage.blocks_time : "17:00");
 		load(data_list);
 	}
 	//var data_list = JSON.parse(chrome.storage.local.blocks_data);
