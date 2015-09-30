@@ -2,7 +2,6 @@
 todo:
 
  - alerts/notifications (chrome notifications?)
- - arrow pointer shows progress in current block
  - menu/settings - alerts, themes, sync/not, credits
  
 features:
@@ -18,6 +17,8 @@ stretch goals
  - analytics (graphs)
  - labels / tags
  
+BUGS:
+ - arrow pointer doesn't load correct place the first time, only on first auto-update
  **/
 
 
@@ -276,6 +277,19 @@ function durationString(time) {
 	return hours + ":" + minutes;
 }
 
+function doCurrentPointer() {
+	var cp = $("#currentPointer");
+	if ($(".current").length > 0) {
+		var o = $(".current").offset();
+		var h = $(".current").height(), w = $(".current").width();
+		var percentage = (CURRENT - Number($(".current").attr("starttime"))) / Number($(".current").attr("duration"));
+		cp.offset({top: o.top + h - Math.floor(h * percentage) - cp.height() / 2, left: o.left + w + 16});
+		cp.show();
+	} else {
+		cp.hide();
+	}
+}
+
 function updateList() {
 	CURRENT = new Date().getTime();
 	for (var i = 0; i < $(".task").length; i++) {
@@ -301,6 +315,7 @@ function updateList() {
 			e.removeClass("past");			
 		}
 	}
+	setTimeout(doCurrentPointer(), 100);
 	if ($(".current").attr("endtime") - CURRENT < 300000 && $(".current").attr("endtime") - CURRENT > 295000) {
 		console.log(CURRENT,  $(".current").attr("endtime"));
 		chrome.notifications.create({
