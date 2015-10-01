@@ -1,12 +1,12 @@
 /**
 todo:
 
- - alerts/notifications (chrome notifications?)
+ - jquery confirm instead of alert
+ - save settings to storage
  - menu/settings - alerts, themes, sync/not, credits
- - remove the completed items (at end of day?)
- 	- endtime is the 'next' time after current date
- 	- once endtime reached, tasks are removed?
- 
+ - need solution for removing 'completed' tasks - checkbox?
+ 	- when class='past', change edit button to DELETE, no-confirm
+
 features:
  
  - test (browser/mobile)
@@ -19,16 +19,19 @@ stretch goals
  - multiple days / calendar
  - analytics (graphs)
  - labels / tags
- 
-BUGS:
- - arrow pointer doesn't load correct place the first time, only on first auto-update
- **/
+**/
 
 
 $(document).ready( function ()
 {
 
-var CURRENT = new Date();
+var alertTime = 300000;
+$("#alertTime").change( function () {
+	alertTime = Number($(this).val()) * 60 * 1000;
+	// should save this as well
+});
+
+var CURRENT = new Date().getTime();
 
 Number.prototype.mod = function(n) {
     return ((this%n)+n)%n;
@@ -42,8 +45,6 @@ function finalTime () {
 	result.setSeconds(0);
 	return result.getTime();
 }
-
-finalTime();
 
 if(typeof(Storage) !== "undefined") {
 	console.log("possible");	    // Code for chromestorage
@@ -107,7 +108,7 @@ function load(data) {
 function setSortable () {
     $("#main-content").sortable({
 		placeholder: 'task-placeholder',
-        stop: updateList,
+        stop: function () { updateList(true) },
 		items: '.task',
 		axis: 'y',
 		handle: '.taskName',
@@ -172,7 +173,7 @@ $("#editModal").click(function (e) {
 
 function createTask(task, duration) {
 	var n = $("<div class='task'>" +
-					"<a class='edit' title='Edit'><i class='fa fa-edit'></i></a>" + 
+					"<a class='edit' title='Edit Task' data-toggle='tooltip'><i class='fa fa-edit'></i></a>" + 
 					"<span class='taskName'>" + task + "</span>" + 
 					"<span class='duration'></span>" +
 					"<span class='time'>" +
@@ -204,27 +205,34 @@ function createTask(task, duration) {
 			n.attr("task", $("#editModal .name").val());
 			n.find(".taskName").text($("#editModal .name").val());
 			n.attr("duration", duration);
-			
 			$("#editEvent")[0].reset();
 			$("#editModal").slideUp();			
-			updateList();
+			updateList(true);
 		});
 		
-		$("#editModal #delete").on("click", function (e) {
-			e.preventDefault();
-			var d = confirm("Are you sure you want to delete this item?");
-			if (d) {
+		$("#editModal #delete").confirm({
+			text: "Are you sure you want to delete that comment?",
+		    title: "Confirmation required",
+		    confirm: function(button) {
 				n.remove();
 				$("#editEvent")[0].reset();
 				$("#editModal").slideUp();	
 				updateList();
-			}
+		    },
+		    cancel: function(button) {
+		        // nothing to do
+		    },
+		    confirmButton: "Yes I am",
+		    cancelButton: "No",
 		});
+
 	});
 	return n;
 }
 
-$("#finaltime").change(updateList);
+$("#finaltime").change(function () {
+	updateList(true);
+});
 //$(".duration input[name=time]").change(updateList);
 
 $("#addModal .submit").click(function (e) {
@@ -284,17 +292,47 @@ function doCurrentPointer() {
 	var cp = $("#currentPointer");
 	if ($(".current").length > 0) {
 		var o = $(".current").offset();
-		var h = $(".current").height(), w = $(".current").width();
+		var h = $(".current").outerHeight(), w = $(".current").outerWidth();
 		var percentage = (CURRENT - Number($(".current").attr("starttime"))) / Number($(".current").attr("duration"));
-		cp.offset({top: o.top + h - Math.floor(h * percentage) - cp.height() / 2, left: o.left + w + 16});
+		cp.offset({top: o.top + h - Math.floor(h * percentage) - cp.height() / 2, left: o.left + w - 10});
 		cp.show();
 	} else {
 		cp.hide();
 	}
 }
 
-function updateList() {
+function doNotifications() {
+	if ($(".current").attr("endtime") - CURRENT < alertTime && !$(".current").attr("notified")) {
+		if (chrome.notifications) {
+			chrome.notifications.create({
+				type: "basic",
+				iconUrl: "./media/images/blocks_icon.png",
+				title: "5 Minutes Left",
+				message: "You have 5 minutes to complete: " + $(".current").attr("task")
+			});
+		} else if (! "Notification" in window) {
+			console.log("notification API not available");
+		} else if (Notification.permission == "granted") {
+			var n = new Notification("5 Minutes Left", {icon: "./media/images/blocks_icon.png", body: "You have 5 minutes to complete: " + $(".current").attr("task")});
+		} else if (Notification.permission !== "denied") {
+			Notification.requestPermission (function (permission) {
+				if (permission == "granted") {
+					var n = new Notification("5 Minutes Left", {icon: "./media/images/blocks_icon.png", body: "You have 5 minutes to complete: " + $(".current").attr("task")});
+				} else {
+					console.log("notification permission not granted (confirmed)");
+				}
+			});
+		} else {
+			console.log("notification permission not granted (default)");
+		}
+		$(".current").attr("notified", "true");
+	}
+}
+
+function updateList(resetNotifications) {
+	$('[data-toggle="tooltip"]').tooltip();
 	CURRENT = new Date().getTime();
+	finalTime();
 	for (var i = 0; i < $(".task").length; i++) {
 		var e = $(".task").eq(i);
 		var p = e.prev(".task");
@@ -307,6 +345,7 @@ function updateList() {
 		e.find(".duration").html(durationString(e.attr("duration")));
 		e.find(".endtime").html(timeString(e.attr("endtime")));
 		e.find(".starttime").html(timeString(e.attr("starttime")));
+		if (resetNotifications) e.removeAttr("notified");
 		if (CURRENT > e.attr("starttime") && CURRENT < e.attr("endtime")) {
 			e.removeClass("past");
 			e.addClass("current");
@@ -319,15 +358,8 @@ function updateList() {
 		}
 	}
 	setTimeout(doCurrentPointer(), 100);
-	if ($(".current").attr("endtime") - CURRENT < 300000 && $(".current").attr("endtime") - CURRENT > 295000) {
-		console.log(CURRENT,  $(".current").attr("endtime"));
-		chrome.notifications.create({
-			type: "basic",
-			iconUrl: "./media/images/blocks_icon.png",
-			title: "5 Minutes Left",
-			message: "You have 5 minutes to complete: " + $(".current").attr("task")
-		});
-	}
+	// notifications
+	doNotifications();
 	save();
 }
 

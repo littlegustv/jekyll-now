@@ -1,6 +1,7 @@
 <html>
 <head>
 <!-- STYLESHEETS -->
+<link href='./css/bootstrap.min.css' rel='stylesheet' type='text/css' />
 <link rel="shortcut icon" href="./media/images/blocks_icon.png" type="image/x-icon" />
 <link rel="apple-touch-icon" href="./media/images/blocks_icon57.png" type="image/x-icon" />
 <link href="./css/font-awesome.min.css" rel="stylesheet" />
@@ -8,8 +9,10 @@
 <link href='./css/style.css' rel='stylesheet' type='text/css' />
 
 <!-- SCRIPTS -->
-<script src="./js/jquery-1.7.2.min.js"></script>
+<script src="./js/jquery.min.js"></script>
 <script src="./js/jquery-ui.min.js"></script>
+<script src="./js/bootstrap.min.js"></script>
+<script src="./js/jquery.confirm.min.js"></script>
 
 <script src="./js/jquery.ui.touch-punch.min.js"></script>
 <script src="./js/main.js"></script>
@@ -25,6 +28,7 @@
 <div id="menuModal">
 	<div id="menuContent">
 		<h1>Settings</h1>
+		<b>Notify me <input id='alertTime' type='number' value='5' min='0' max='60'></input> minutes before a task is complete.</b>
 	</div>
 </div>
 <div id="addModal">
@@ -43,14 +47,14 @@
 		<input class="hours" type="number" name="hours" placeholder="hrs" min="0" max="12" step="1" />: 
 		<input class="minutes" type="number" name="minutes" placeholder="mins" min="0" max="60" step="1" />
 		<button class="submit button"/><i class="fa fa-thumbs-up"></i></button>
-		<button id='delete' class='button'><i class="fa fa-trash"></i></button>
+		<button id='delete' class='button confirm'><i class="fa fa-trash"></i></button>
 	</form>
 </div>
 <div id="app-content">
 	<div id='top-content'>
-		<a id="add"><i class="fa fa-plus-square nav"></i></a>
-		<a id="menu"><i class="fa fa-bars nav"></i></a>
-		<div id="end"><span id="endTime">
+		<a id="add"><i data-toggle="tooltip" data-placement="bottom" title="Add New" class="fa fa-plus-square nav"></i></a>
+		<a id="menu"><i data-toggle="tooltip" data-placement="bottom" title="Settings" class="fa fa-bars nav"></i></a>
+		<div id="end"><span id="endTime" data-toggle="tooltip" data-placement="bottom" title="End Time">
 		    <span id="time"><input type='time' name='time' value="17:00:00" id="finaltime"/></span>
 		</span>
 		</div>

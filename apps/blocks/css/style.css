@@ -20,6 +20,9 @@ input {
 div {
     box-sizing: border-box;
 }
+a {
+    color: #333;
+}
 #app-content {
     max-width: 640px;
     min-width: 300px;
@@ -113,6 +116,13 @@ div {
 	margin: auto;
 	margin-top: calc(50vh - 200px);
     background: url('../media/images/linedpaper.png');
+}
+#alertTime {
+    width: 50px;
+    border-bottom: 4px solid black;
+}
+#menuContent {
+    font-size: 24px;
 }
 .button {
     border: none;
