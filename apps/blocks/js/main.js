@@ -3,6 +3,9 @@ todo:
 
  - alerts/notifications (chrome notifications?)
  - menu/settings - alerts, themes, sync/not, credits
+ - remove the completed items (at end of day?)
+ 	- endtime is the 'next' time after current date
+ 	- once endtime reached, tasks are removed?
  
 features:
  
