@@ -49,7 +49,7 @@ a {
 #bottom-content {
     padding: 4px;
 }
-.nav, #edit {
+.nav, .edit {
     color: #333;
     font-size: 40px;
     transition: color 0.2s;
@@ -169,7 +169,6 @@ a {
 {
 	margin: 14px 5px 0px 5px;
 	float: left;
-	font-size: 40px;
 }
 .remove
 {
@@ -311,6 +310,17 @@ and (max-device-width : 480px) {
     }
     input, .button {
         font-size: 22px;
+    }
+    .nav, .edit {
+        font-size: 30px;
+        line-height: 44px;
+        height: 44px;
+    }
+    .taskName, .duration {
+        font-size: 24px;
+    }
+    #end {
+        font-size: 30px;
     }
 /*    #addModal input
        { 

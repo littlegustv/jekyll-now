@@ -1,10 +1,9 @@
 /**
 todo:
-
- - jquery confirm instead of alert
+(oct 1st)
+ - notification on beginning of task as well
  - save settings to storage
- - menu/settings - alerts, themes, sync/not, credits
- - need solution for removing 'completed' tasks - checkbox?
+ - menu/settings - notifications allowed, sync/not, credits
  	- when class='past', change edit button to DELETE, no-confirm
 
 features:
