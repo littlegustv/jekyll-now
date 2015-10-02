@@ -1,10 +1,7 @@
 /**
 todo:
-(oct 1st)
- - notification on beginning of task as well
- - save settings to storage
- - menu/settings - notifications allowed, sync/not, credits
- 	- when class='past', change edit button to DELETE, no-confirm
+(oct 2nd)
+ - menu/settings - sync/not, credits
 
 features:
  
@@ -20,14 +17,30 @@ stretch goals
  - labels / tags
 **/
 
+function toMinutes(n) {
+	return Math.floor(n / 60000);
+}
 
 $(document).ready( function ()
 {
 
-var alertTime = 300000;
+var seed = Math.floor(Math.random() * 10000 + 10000);
+var notified = [];
+
+var settings = {
+	alertTime: 300000,
+	notifyOn: true,
+	notifyBefore: true
+}
 $("#alertTime").change( function () {
-	alertTime = Number($(this).val()) * 60 * 1000;
+	settings.alertTime = Number($(this).val()) * 60 * 1000;
 	// should save this as well
+});
+$("#notifyBefore").change( function () {
+	settings.notifyBefore = $(this).prop("checked");
+});
+$("#notifyOn").change( function () {
+	settings.notifyOn = $(this).prop("checked");
 });
 
 var CURRENT = new Date().getTime();
@@ -42,15 +55,9 @@ function finalTime () {
 	result.setHours(ft[0]);
 	result.setMinutes(ft[1]);
 	result.setSeconds(0);
+	$("#time").text(timeString(result.getTime()));
 	return result.getTime();
 }
-
-if(typeof(Storage) !== "undefined") {
-	console.log("possible");	    // Code for chromestorage
-} else {
-	console.log("impossible!"); 	// Sorry! No Web Storage support..
-}
-
 
 //LOAD FROM STORAGE, if applicable:
 
@@ -60,17 +67,23 @@ try
 	
 	if (chrome.storage) {
 		chrome.storage.local.get(function (d) {
-			$("#finaltime").val(d.blocks_time);
+			$("#finaltime").val(d.blocks_time ? d.blocks_time : "17:00");
 			load(d.blocks_data);
+			if (d.blocks_settings) settings = JSON.parse(d.blocks_settings);
 			//data_list = JSON.parse(d);
 		});
 	} else {
 		var data_list = localStorage.blocks_data;
+		if (localStorage.blocks_settings) settings = JSON.parse(localStorage.blocks_settings);
 		$("#finaltime").val(localStorage.blocks_time ? localStorage.blocks_time : "17:00");
 		load(data_list);
 	}
-	//var data_list = JSON.parse(chrome.storage.local.blocks_data);
 
+	$("#alertTime").val(settings.alertTime / (1000 * 60));
+	$("#notifyOn").prop("checked", settings.notifyOn);
+	$("#notifyBefore").prop("checked", settings.notifyBefore);
+	//var data_list = JSON.parse(chrome.storage.local.blocks_data);
+	console.log(settings);
 	//load(data_list);
 }
 catch (e)
@@ -79,12 +92,15 @@ catch (e)
 }
 
 function save () {
-	var json = JSON.stringify(createJSON());
-	if (chrome.storage) {
-		chrome.storage.local.set({"blocks_data": json});
+	var data_json = JSON.stringify(createJSON());
+	var settings_json = JSON.stringify(settings);
+	if (chrome && chrome.storage) {
+		chrome.storage.local.set({"blocks_settings": settings_json});
+		chrome.storage.local.set({"blocks_data": data_json});
 		chrome.storage.local.set({"blocks_time": $("#finaltime").val() });
 	} else {
-		localStorage.blocks_data = json;
+		localStorage.blocks_settings = settings_json;
+		localStorage.blocks_data = data_json;
 		localStorage.blocks_time = $("#finaltime").val();
 	}
 }
@@ -130,6 +146,23 @@ function createJSON () {
 	}
 	return blocks;
 }
+
+
+// menu
+$("#time").click(function () {
+	$("#finalModal").slideToggle('fast', 'linear');
+});
+
+$("#finalModal").click(function (e) {
+	m = $("#finalContent");
+	
+    if (m[0] != e.target && m.has(e.target).length <= 0 && $("#menu")[0] != e.target && $("#menu").has(e.target).length <= 0) {
+        e.preventDefault();
+        $(this).slideUp('fast', 'linear');
+        updateList();
+    }
+});
+
 
 // menu
 $("#menu").click(function () {
@@ -182,6 +215,8 @@ function createTask(task, duration) {
 					
 	n.attr("duration", duration);
 	n.attr("task", task);
+	n.attr("uid", seed);
+	seed += 1;
 	
 	n.find(".edit").click ( function (e) {
 		// Remove any previous lingering event listeners
@@ -226,12 +261,13 @@ function createTask(task, duration) {
 		});
 
 	});
+	n.tooltip();
 	return n;
 }
-
+/*
 $("#finaltime").change(function () {
 	updateList(true);
-});
+});*/
 //$(".duration input[name=time]").change(updateList);
 
 $("#addModal .submit").click(function (e) {
@@ -252,7 +288,8 @@ $("#addModal .submit").click(function (e) {
     $("#addModal").slideUp();
 	setSortable();
 	newTask.slideDown();
-	
+    $('[data-toggle="tooltip"]').tooltip();
+
 	updateList();
 		
 });
@@ -300,38 +337,55 @@ function doCurrentPointer() {
 	}
 }
 
-function doNotifications() {
-	if ($(".current").attr("endtime") - CURRENT < alertTime && !$(".current").attr("notified")) {
-		if (chrome.notifications) {
-			chrome.notifications.create({
-				type: "basic",
-				iconUrl: "./media/images/blocks_icon.png",
-				title: "5 Minutes Left",
-				message: "You have 5 minutes to complete: " + $(".current").attr("task")
-			});
-		} else if (! "Notification" in window) {
-			console.log("notification API not available");
-		} else if (Notification.permission == "granted") {
-			var n = new Notification("5 Minutes Left", {icon: "./media/images/blocks_icon.png", body: "You have 5 minutes to complete: " + $(".current").attr("task")});
-		} else if (Notification.permission !== "denied") {
-			Notification.requestPermission (function (permission) {
-				if (permission == "granted") {
-					var n = new Notification("5 Minutes Left", {icon: "./media/images/blocks_icon.png", body: "You have 5 minutes to complete: " + $(".current").attr("task")});
-				} else {
-					console.log("notification permission not granted (confirmed)");
-				}
-			});
-		} else {
-			console.log("notification permission not granted (default)");
-		}
-		$(".current").attr("notified", "true");
+function notifyBefore() {
+	return {title: toMinutes($(".current").attr("endtime") - CURRENT) + " Minutes Left", body: "You have " + toMinutes($(".current").attr("endtime") - CURRENT) + " minutes to complete: " + $(".current").attr("task")};
+}
+
+function notifyOn () {
+	return {title: $(".current").attr("task") + " is starting now.", body: "It is time to start the next tast: " + $(".current").attr("task")};
+}
+
+function doNotifications(type) {
+
+	var n;
+	if (type == "before" && settings.notifyBefore && notified.indexOf($(".current").attr("uid")) == -1) {
+		n = notifyBefore();
+		notified.push($(".current").attr("uid"));
+	}
+	else if (type == "on" && settings.notifyOn) {
+		n = notifyOn();
+	}
+	if (!n) return;
+	if (chrome && chrome.notifications) {
+		chrome.notifications.create({
+			type: "basic",
+			iconUrl: "./media/images/blocks_icon.png",
+			title: n.title,
+			message: n.body
+		});
+	} else if (! "Notification" in window) {
+		console.log("notification API not available");
+	} else if (Notification.permission == "granted") {
+		var n = new Notification(n.title, {icon: "./media/images/blocks_icon.png", body: n.body});
+	} else if (Notification.permission !== "denied") {
+		Notification.requestPermission (function (permission) {
+			if (permission == "granted") {
+				var n = new Notification(n.title, {icon: "./media/images/blocks_icon.png", body: n.body});
+			} else {
+				console.log("notification permission not granted (confirmed)");
+			}
+		});
+	} else {
+		console.log("notification permission not granted (default)");
 	}
 }
 
 function updateList(resetNotifications) {
-	$('[data-toggle="tooltip"]').tooltip();
+	//$('[data-toggle="tooltip"]').tooltip();
 	CURRENT = new Date().getTime();
 	finalTime();
+	var cid = $(".current").attr("uid");
+	if (resetNotifications) notified = [];
 	for (var i = 0; i < $(".task").length; i++) {
 		var e = $(".task").eq(i);
 		var p = e.prev(".task");
@@ -344,7 +398,6 @@ function updateList(resetNotifications) {
 		e.find(".duration").html(durationString(e.attr("duration")));
 		e.find(".endtime").html(timeString(e.attr("endtime")));
 		e.find(".starttime").html(timeString(e.attr("starttime")));
-		if (resetNotifications) e.removeAttr("notified");
 		if (CURRENT > e.attr("starttime") && CURRENT < e.attr("endtime")) {
 			e.removeClass("past");
 			e.addClass("current");
@@ -356,12 +409,19 @@ function updateList(resetNotifications) {
 			e.removeClass("past");			
 		}
 	}
+	if (cid != $(".current").attr("uid") && Math.abs($('.current').attr("starttime") - CURRENT) < 60 * 1000) {
+		doNotifications("on");
+	}
+	if ($(".current").attr("endtime") - CURRENT < settings.alertTime) {
+		doNotifications("before");		
+	}
+
 	setTimeout(doCurrentPointer(), 100);
 	// notifications
-	doNotifications();
 	save();
 }
 
+$('[data-toggle="tooltip"]').tooltip();
 setInterval(updateList, 5000);
 
 });

@@ -5,7 +5,7 @@
 <link rel="shortcut icon" href="./media/images/blocks_icon.png" type="image/x-icon" />
 <link rel="apple-touch-icon" href="./media/images/blocks_icon57.png" type="image/x-icon" />
 <link href="./css/font-awesome.min.css" rel="stylesheet" />
-<!--<link href='./css/sarpanch.css' rel='stylesheet' type='text/css' />-->
+<link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css'>
 <link href='./css/style.css' rel='stylesheet' type='text/css' />
 
 <!-- SCRIPTS -->
@@ -25,10 +25,19 @@
 </head>
 <body>
 <div id='currentPointer'><i class="fa fa-caret-left"></i></div>
+<div id="finalModal">
+	<div id="finalContent">
+		End By <input type='time' name='time' value="17:00:00" id="finaltime"/>
+	</div>
+</div>
 <div id="menuModal">
 	<div id="menuContent">
 		<h1>Settings</h1>
-		<b>Notify me <input id='alertTime' type='number' value='5' min='0' max='60'></input> minutes before a task is complete.</b>
+		<ul>			
+			<li>Notify At Event <input type='checkbox' id='notifyOn' class='switch'></input></li>
+			<li>Notify Before Event <input type='checkbox' id='notifyBefore' class='switch'></input></li>
+			<li>Alert <input id='alertTime' type='number' value='5' min='0' max='60'></input> minutes before</li>
+		</ul>
 	</div>
 </div>
 <div id="addModal">
@@ -55,7 +64,7 @@
 		<a id="add"><i data-toggle="tooltip" data-placement="bottom" title="Add New" class="fa fa-plus-square nav"></i></a>
 		<a id="menu"><i data-toggle="tooltip" data-placement="bottom" title="Settings" class="fa fa-bars nav"></i></a>
 		<div id="end"><span id="endTime" data-toggle="tooltip" data-placement="bottom" title="End Time">
-		    <span id="time"><input type='time' name='time' value="17:00:00" id="finaltime"/></span>
+		    <span id="time"></span>
 		</span>
 		</div>
 	</div>
