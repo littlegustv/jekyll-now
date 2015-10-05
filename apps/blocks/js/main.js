@@ -1,25 +1,34 @@
 /**
-todo:
-(oct 2nd)
- - menu/settings - sync/not, credits
 
-features:
+DESIGN: interface for ALL modals
+
+chrome app:
  
  - test (browser/mobile)
+ - credits, chrome app specifics (sync)
  - finalize design/splash screen
- - themes (colors schemes)
  - graphics/screenshots/icons
- - phonegap --> chrome app on mobile devices?
 
-stretch goals
+mobile:
+ - all sorts of stuff
+ - android first
+ - then ios
+
+stretch goals (premium)
  - multiple days / calendar
  - analytics (graphs)
  - labels / tags
+ - themes (colors schemes)
+
 **/
 
 function toMinutes(n) {
 	return Math.floor(n / 60000);
 }
+
+Number.prototype.mod = function(n) {
+    return ((this%n)+n)%n;
+};
 
 $(document).ready( function ()
 {
@@ -30,7 +39,8 @@ var notified = [];
 var settings = {
 	alertTime: 300000,
 	notifyOn: true,
-	notifyBefore: true
+	notifyBefore: true,
+	notifyEnd: true
 }
 $("#alertTime").change( function () {
 	settings.alertTime = Number($(this).val()) * 60 * 1000;
@@ -42,20 +52,24 @@ $("#notifyBefore").change( function () {
 $("#notifyOn").change( function () {
 	settings.notifyOn = $(this).prop("checked");
 });
+$("#notifyEnd").change( function () {
+	settings.notifyEnd = $(this).prop("checked");
+});
 
 var CURRENT = new Date().getTime();
 
-Number.prototype.mod = function(n) {
-    return ((this%n)+n)%n;
-};
-
 function finalTime () {
+	return Number($("#time").attr("time"));
+}
+
+function setFinalTime () {
 	var ft = $("#finaltime").val().split(":");
 	var result = new Date();
 	result.setHours(ft[0]);
 	result.setMinutes(ft[1]);
 	result.setSeconds(0);
 	$("#time").text(timeString(result.getTime()));
+	$("#time").attr("time", result.getTime());
 	return result.getTime();
 }
 
@@ -79,11 +93,13 @@ try
 		load(data_list);
 	}
 
+	setFinalTime();
 	$("#alertTime").val(settings.alertTime / (1000 * 60));
 	$("#notifyOn").prop("checked", settings.notifyOn);
 	$("#notifyBefore").prop("checked", settings.notifyBefore);
+	updateList();
+
 	//var data_list = JSON.parse(chrome.storage.local.blocks_data);
-	console.log(settings);
 	//load(data_list);
 }
 catch (e)
@@ -113,7 +129,6 @@ function load(data) {
 			$("#main-content").append(n);
 		}
 		setSortable();
-		updateList();
 	}
 	catch (e) {
 		console.log("ERROR ON LOAD", e);
@@ -148,6 +163,12 @@ function createJSON () {
 }
 
 
+/**
+
+#### OPEN AND CLOSE MODAL MENUS
+
+**/
+
 // menu
 $("#time").click(function () {
 	$("#finalModal").slideToggle('fast', 'linear');
@@ -159,6 +180,7 @@ $("#finalModal").click(function (e) {
     if (m[0] != e.target && m.has(e.target).length <= 0 && $("#menu")[0] != e.target && $("#menu").has(e.target).length <= 0) {
         e.preventDefault();
         $(this).slideUp('fast', 'linear');
+        setFinalTime();
         updateList();
     }
 });
@@ -264,11 +286,6 @@ function createTask(task, duration) {
 	n.tooltip();
 	return n;
 }
-/*
-$("#finaltime").change(function () {
-	updateList(true);
-});*/
-//$(".duration input[name=time]").change(updateList);
 
 $("#addModal .submit").click(function (e) {
     e.preventDefault();
@@ -298,7 +315,7 @@ $("#addModal .submit").click(function (e) {
 
 function timeString(time) {
 	var d = new Date(Number(time));
-	var mer = d.getHours() > 12 ? "PM" : "AM";
+	var mer = d.getHours() >= 12 ? "PM" : "AM";
 	var hours = d.getHours() % 12;
 	var minutes = d.getMinutes();
 	if (hours == 0) hours = "12";
@@ -345,6 +362,10 @@ function notifyOn () {
 	return {title: $(".current").attr("task") + " is starting now.", body: "It is time to start the next tast: " + $(".current").attr("task")};
 }
 
+function notifyEnd () {
+	return {title: "Finished!", body: "You've reached the end of the day.  It's time to stop working."};
+}
+
 function doNotifications(type) {
 
 	var n;
@@ -354,6 +375,10 @@ function doNotifications(type) {
 	}
 	else if (type == "on" && settings.notifyOn) {
 		n = notifyOn();
+	}
+	else if (type == "end" && settings.notifyEnd && notified.indexOf("end") == -1) {
+		n = notifyEnd();
+		notified.push("end");
 	}
 	if (!n) return;
 	if (chrome && chrome.notifications) {
@@ -383,21 +408,30 @@ function doNotifications(type) {
 function updateList(resetNotifications) {
 	//$('[data-toggle="tooltip"]').tooltip();
 	CURRENT = new Date().getTime();
-	finalTime();
+	var ft = finalTime();
 	var cid = $(".current").attr("uid");
 	if (resetNotifications) notified = [];
 	for (var i = 0; i < $(".task").length; i++) {
+		
+		// get current task
+		
 		var e = $(".task").eq(i);
 		var p = e.prev(".task");
 		if (p.attr("endtime") != undefined) {
 			e.attr("endtime", p.attr("starttime"));			
 		} else {
-			e.attr("endtime", finalTime());
+			e.attr("endtime", ft);
 		}
+
+		// update the time values
+
 		e.attr("starttime", e.attr("endtime") - e.attr("duration"));
 		e.find(".duration").html(durationString(e.attr("duration")));
 		e.find(".endtime").html(timeString(e.attr("endtime")));
 		e.find(".starttime").html(timeString(e.attr("starttime")));
+		
+		// update task status accordingly
+
 		if (CURRENT > e.attr("starttime") && CURRENT < e.attr("endtime")) {
 			e.removeClass("past");
 			e.addClass("current");
@@ -409,15 +443,22 @@ function updateList(resetNotifications) {
 			e.removeClass("past");			
 		}
 	}
+	// create appropriate notifications
+
 	if (cid != $(".current").attr("uid") && Math.abs($('.current').attr("starttime") - CURRENT) < 60 * 1000) {
 		doNotifications("on");
 	}
 	if ($(".current").attr("endtime") - CURRENT < settings.alertTime) {
 		doNotifications("before");		
 	}
+	console.log(CURRENT, ft);
+	if (CURRENT >= ft) {
+		console.log("here", settings, notified);
+		doNotifications("end");
+	}
 
 	setTimeout(doCurrentPointer(), 100);
-	// notifications
+	
 	save();
 }
 
