@@ -84,43 +84,42 @@ function setFinalTime () {
 try
 {
 	//var data_list;
-	
-	if (chrome && chrome.storage) {
-		chrome.storage.local.get(function (d) {
-			$("#finaltime").val(d.blocks_time ? d.blocks_time : "17:00");
-			load(d.blocks_data);
-			if (d.blocks_settings) settings = JSON.parse(d.blocks_settings);
-			//data_list = JSON.parse(d);
-		});
-	} else {
-		var data_list = localStorage.blocks_data;
-		if (localStorage.blocks_settings) settings = JSON.parse(localStorage.blocks_settings);
-		$("#finaltime").val(localStorage.blocks_time ? localStorage.blocks_time : "17:00");
-		load(data_list);
-	}
+	chrome.storage.local.get(function (d) {
+		$("#finaltime").val(d.blocks_time ? d.blocks_time : "17:00");
+		load(d.blocks_data);
+		if (d.blocks_settings) settings = JSON.parse(d.blocks_settings);
+		setup();
+		//data_list = JSON.parse(d);
+	});
+}
+catch (e if e instanceof ReferenceError) {
+	var data_list = localStorage.blocks_data;
+	if (localStorage.blocks_settings) settings = JSON.parse(localStorage.blocks_settings);
+	$("#finaltime").val(localStorage.blocks_time ? localStorage.blocks_time : "17:00");
+	load(data_list);
+	setup();
+}
+catch (e) {
+	console.log("No valid JSON source in local storage.", e);	
+}
 
+function setup () {
 	setFinalTime();
 	$("#alertTime").val(settings.alertTime / (1000 * 60));
 	$("#notifyOn").prop("checked", settings.notifyOn);
 	$("#notifyBefore").prop("checked", settings.notifyBefore);
 	updateList();
-
-	//var data_list = JSON.parse(chrome.storage.local.blocks_data);
-	//load(data_list);
-}
-catch (e)
-{
-	console.log("No valid JSON source in local storage.", e);
 }
 
 function save () {
 	var data_json = JSON.stringify(createJSON());
 	var settings_json = JSON.stringify(settings);
-	if (chrome && chrome.storage) {
+	try {
 		chrome.storage.local.set({"blocks_settings": settings_json});
 		chrome.storage.local.set({"blocks_data": data_json});
 		chrome.storage.local.set({"blocks_time": $("#finaltime").val() });
-	} else {
+	} 
+	catch (e if e instanceof ReferenceError){
 		localStorage.blocks_settings = settings_json;
 		localStorage.blocks_data = data_json;
 		localStorage.blocks_time = $("#finaltime").val();
@@ -128,6 +127,7 @@ function save () {
 }
 
 function load(data) {
+	if (!data) return;
 	try {
 		data = JSON.parse(data);
 		for (var i = 0; i < data.length; i++) {
@@ -137,7 +137,7 @@ function load(data) {
 		setSortable();
 	}
 	catch (e) {
-		console.log("ERROR ON LOAD", e);
+		console.log("ERROR ON LOAD", e, data);
 	}
 }
 
@@ -353,7 +353,7 @@ function doCurrentPointer() {
 		var o = $(".current").offset();
 		var h = $(".current").outerHeight(), w = $(".current").outerWidth();
 		var percentage = (CURRENT - Number($(".current").attr("starttime"))) / Number($(".current").attr("duration"));
-		cp.offset({top: o.top + h - Math.floor(h * percentage) - cp.height() / 2, left: o.left + w - 10});
+		cp.offset({top: o.top + h - Math.floor(h * percentage) - cp.height() / 2, left: o.left + w - 14});
 		cp.show();
 	} else {
 		cp.hide();
