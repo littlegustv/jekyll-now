@@ -1,5 +1,11 @@
 /**
 
+settings:
+notifications:
+- on beginning of task 	on/off time before: 5 min
+- on end of task 		on/off time before: 2 min
+- on end of list 		on/off time before: 10 min
+
 DESIGN: interface for ALL modals
 
 chrome app:
@@ -34,7 +40,7 @@ $(document).ready( function ()
 {
 
 var seed = Math.floor(Math.random() * 10000 + 10000);
-var notified = [];
+var notified = {};
 
 var settings = {
 	alertTime: 300000,
@@ -79,7 +85,7 @@ try
 {
 	//var data_list;
 	
-	if (chrome.storage) {
+	if (chrome && chrome.storage) {
 		chrome.storage.local.get(function (d) {
 			$("#finaltime").val(d.blocks_time ? d.blocks_time : "17:00");
 			load(d.blocks_data);
@@ -359,7 +365,7 @@ function notifyBefore() {
 }
 
 function notifyOn () {
-	return {title: $(".current").attr("task") + " is starting now.", body: "It is time to start the next tast: " + $(".current").attr("task")};
+	return {title: $(".current").attr("task") + " is starting now.", body: "It is time to start the next task: " + $(".current").attr("task")};
 }
 
 function notifyEnd () {
@@ -369,16 +375,16 @@ function notifyEnd () {
 function doNotifications(type) {
 
 	var n;
-	if (type == "before" && settings.notifyBefore && notified.indexOf($(".current").attr("uid")) == -1) {
+	if (type == "before" && settings.notifyBefore && !notified[$(".current").attr("uid")]) {
 		n = notifyBefore();
-		notified.push($(".current").attr("uid"));
+		notified[$(".current").attr("uid")] = true;
 	}
 	else if (type == "on" && settings.notifyOn) {
 		n = notifyOn();
 	}
-	else if (type == "end" && settings.notifyEnd && notified.indexOf("end") == -1) {
+	else if (type == "end" && settings.notifyEnd && !notified["end"]) {
 		n = notifyEnd();
-		notified.push("end");
+		notified["end"] = true;
 	}
 	if (!n) return;
 	if (chrome && chrome.notifications) {
@@ -410,9 +416,8 @@ function updateList(resetNotifications) {
 	CURRENT = new Date().getTime();
 	var ft = finalTime();
 	var cid = $(".current").attr("uid");
-	if (resetNotifications) notified = [];
+	if (resetNotifications) notified = {};
 	for (var i = 0; i < $(".task").length; i++) {
-		
 		// get current task
 		
 		var e = $(".task").eq(i);
@@ -433,6 +438,9 @@ function updateList(resetNotifications) {
 		// update task status accordingly
 
 		if (CURRENT > e.attr("starttime") && CURRENT < e.attr("endtime")) {
+			if (e.hasClass("past")) {
+
+			}
 			e.removeClass("past");
 			e.addClass("current");
 		} else if (CURRENT > e.attr("endtime")) {
