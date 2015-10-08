@@ -92,15 +92,16 @@ try
 		//data_list = JSON.parse(d);
 	});
 }
-catch (e if e instanceof ReferenceError) {
-	var data_list = localStorage.blocks_data;
-	if (localStorage.blocks_settings) settings = JSON.parse(localStorage.blocks_settings);
-	$("#finaltime").val(localStorage.blocks_time ? localStorage.blocks_time : "17:00");
-	load(data_list);
-	setup();
-}
 catch (e) {
-	console.log("No valid JSON source in local storage.", e);	
+	if (e instanceof ReferenceError || e instanceof TypeError) {
+		var data_list = localStorage.blocks_data;
+		if (localStorage.blocks_settings) settings = JSON.parse(localStorage.blocks_settings);
+		$("#finaltime").val(localStorage.blocks_time ? localStorage.blocks_time : "17:00");
+		load(data_list);
+		setup();
+	} else {
+		console.log("No valid JSON source in local storage.", e);	
+	}
 }
 
 function setup () {
@@ -119,10 +120,14 @@ function save () {
 		chrome.storage.local.set({"blocks_data": data_json});
 		chrome.storage.local.set({"blocks_time": $("#finaltime").val() });
 	} 
-	catch (e if e instanceof ReferenceError){
-		localStorage.blocks_settings = settings_json;
-		localStorage.blocks_data = data_json;
-		localStorage.blocks_time = $("#finaltime").val();
+	catch (e) {
+		if (e instanceof ReferenceError || e instanceof TypeError){
+			localStorage.blocks_settings = settings_json;
+			localStorage.blocks_data = data_json;
+			localStorage.blocks_time = $("#finaltime").val();
+		} else {
+			console.log(e);
+		}
 	}
 }
 
@@ -387,27 +392,31 @@ function doNotifications(type) {
 		notified["end"] = true;
 	}
 	if (!n) return;
-	if (chrome && chrome.notifications) {
+	try {
 		chrome.notifications.create({
 			type: "basic",
 			iconUrl: "./media/images/blocks_icon.png",
 			title: n.title,
 			message: n.body
 		});
-	} else if (! "Notification" in window) {
-		console.log("notification API not available");
-	} else if (Notification.permission == "granted") {
-		var n = new Notification(n.title, {icon: "./media/images/blocks_icon.png", body: n.body});
-	} else if (Notification.permission !== "denied") {
-		Notification.requestPermission (function (permission) {
-			if (permission == "granted") {
-				var n = new Notification(n.title, {icon: "./media/images/blocks_icon.png", body: n.body});
-			} else {
-				console.log("notification permission not granted (confirmed)");
-			}
-		});
-	} else {
-		console.log("notification permission not granted (default)");
+	} 
+	catch (e) {
+		console.log(n);
+		if (! "Notification" in window) {
+			console.log("notification API not available");
+		} else if (Notification.permission == "granted") {
+			var n = new Notification(n.title, {icon: "./media/images/blocks_icon.png", body: n.body});
+		} else if (Notification.permission !== "denied") {
+			Notification.requestPermission (function (permission) {
+				if (permission == "granted") {
+					var n = new Notification(n.title, {icon: "./media/images/blocks_icon.png", body: n.body});
+				} else {
+					console.log("notification permission not granted (confirmed)");
+				}
+			});
+		} else {
+			console.log("notification permission not granted (default)");
+		}
 	}
 }
 
