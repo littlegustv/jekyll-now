@@ -23,6 +23,10 @@ div {
 a {
     color: #333;
 }
+hr {
+    border-top: 2px dotted #333;
+    width: 50%;
+}
 #app-content {
     max-width: 640px;
     min-width: 300px;
@@ -49,7 +53,7 @@ a {
 #bottom-content {
     padding: 4px;
 }
-.nav, .edit {
+.nav, .edit, .check {
     color: #333;
     font-size: 40px;
     transition: color 0.2s;
@@ -64,51 +68,17 @@ a {
 .nav:hover, .nav:active, .nav:hover, .nav:active {
     color: grey;
 }
-#addModal, #editModal, #menuModal, #finalModal {
-	position: fixed;
-	display: none;
-	padding: 20px;
-	/* background: linear-gradient(to bottom, #449944, #33AA33); */
-	background: rgba(30,174,64,0.4);
-	overflow: auto;
-	/* text-align: left; */
-	/* box-shadow: 1px -5px 5px rgba(0,0,0,0.1) inset; */
-	text-align: center;
-	height: 100%;
-	width: 100%;
-    z-index: 10;
-}
-#editModal
-{
-	background: rgba(255,0,0,0.4);
-}
-#menuModal
-{
-    background: rgba(54,75,165,0.4);
-}
-#addModal input , #editModal input, .button{
-    font-family: inherit;
-    text-align: left;
-    font-variant: small-caps;
-    width: calc(100% - 28px);
-    margin: auto;
-    margin-top: 10px;
-    padding: 8px;
-    font-size: 32px;
-    background: #333;
-    color: #EEE;
-}
 .hours, .minutes
 {
-    font-size: 90px !important;
+*    font-size: 90px !important;
 }
 .hours {
-    width: calc(50% - 18px) !important;
+*    width: calc(50% - 18px) !important;
 }
 .minutes {
-    width: calc(50% - 18px) !important;
+*    width: calc(50% - 18px) !important;
 }
-#addEvent, #editEvent, #menuContent, #finalContent {
+.modalContent {
     box-shadow: 0px 0px 10px -3px;
 	max-width: 400px;
 	padding: 10px;
@@ -126,15 +96,25 @@ a {
 }
 .button {
     border: none;
-    background: #222;
+    background: #333;
     color: white;
     padding: 8px;
 	text-align: center;
+    outline: none;
 }
 .button:active, .button:hover
 {
-	background: #EFE;
+	background: #CCC;
 	color: #333;
+}
+.task .check {
+    display: none;
+}
+.past .check, .current .check {
+    display: block;
+}
+.past .edit, .current .edit {
+    display: none;
 }
 .task, .task-placeholder {
     width: 100%;
@@ -165,7 +145,7 @@ a {
 	box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.05) inset;/*-4px -2px 5px 1px rgba(0,0,0,0.2) inset;*/
     *background: linear-gradient(to bottom, #77EE44, #44EE22);
 }
-.edit, .remove
+.edit, .remove, .check
 {
 	margin: 14px 5px 0px 5px;
 	float: left;
@@ -184,7 +164,7 @@ a {
 {
 	color: #CC0000;
 }
-.edit:hover, .edit:active
+.nav:hover, .nav:active
 {
 	color: grey;
 }
@@ -253,19 +233,6 @@ a {
     color: #009900;
     z-index: 9;
 }
-#finalContent {
-    font-size: 40px;
-}
-#finalContent input, .duration input {
-    /*width: 160px;*/
-    overflow: auto;
-    font-size: inherit;
-    line-height: inherit;
-    margin: 0px;
-    padding: 0px;
-    border: none;
-    background: transparent;
-}
 .current
 {
 	*background: #64e21b !important;
@@ -275,7 +242,7 @@ a {
 	*border-left-width: 14px;
     box-shadow: 22px 0px 1px -12px rgba(0,159,0,0.8) inset !important;
 }
-.past
+.past, .checked
 {
 	opacity: 0.2;
 	*background: #B08B8E;
@@ -284,6 +251,12 @@ a {
 {
 	*background: #904F53;
 }
+.checked > .taskName {
+    text-decoration: line-through;
+}
+.checked > .duration {
+    text-decoration: line-through;
+}
 .editing
 {
 	border: none !important;
@@ -291,34 +264,99 @@ a {
 	background: green !important;
 }
 
-#menuContent ul {
+.modalContent ul {
     text-align: left;
     padding: 0px 10px 0px 10px;
     margin: 0px;
 }
-#menuContent li {
+.modalContent li {
     text-decoration: none;
     list-style: none;
     width: 100%;
-    border-bottom: 2px solid #CCC;
     text-indent: 0px;
     padding: 4px;
+    overflow: hidden;
 }
-#menuContent input {
+#menuContent li:nth-child(even) {
+    background: rgba(200,200,200,0.3);
+}
+#menuContent li:hover {
+    background: #333333;
+    color: white;
+}
+#menuContent li:hover .switch + label:after {
+    color: white !important;
+}
+.modalContent input {
     background: #333;
     color: white;
     padding: 4px;
 }
-.switch:after {
+.switch {
+    display: none;
+}
+.switch + label:after {
     content: "OFF";
-    color: #333;
-    top: -11px;
-    left: 21px;
+    color: #333333;
     position: relative;
 }
-.switch:checked:after {
+.switch:checked + label:after {
     content: "ON";
-    color: #009900;
+    color: #009900 !important;
+}
+.left {
+    float: left;
+}
+.right {
+    text-align: right;
+    float: right;
+}
+.modal {
+    position: fixed;
+    display: none;
+    padding: 20px;
+    /* background: linear-gradient(to bottom, #449944, #33AA33); */
+    background: rgba(30,174,64,0.4);
+    overflow: auto;
+    /* text-align: left; */
+    /* box-shadow: 1px -5px 5px rgba(0,0,0,0.1) inset; */
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+}
+#editModal
+{
+    background: rgba(255,0,0,0.4);
+}
+#menuModal
+{
+    background: rgba(54,75,165,0.4);
+}
+#addModal, #editModal {
+    font-size: 24px;
+}
+#addModal input , #editModal input, #finalContent input, .button{
+    font-family: inherit;
+    text-align: right;
+    font-variant: small-caps;
+    margin: auto;
+    padding: 8px;
+    font-size: 24px;
+    background: #333;
+    color: #EEE;
+}
+#finalContent {
+    font-size: 24px;
+}
+#finalContent input, .duration input {
+    /*width: 160px;*/
+    overflow: auto;
+    font-size: inherit;
+    line-height: inherit;
+    margin: 0px;
+    padding: 0px;
+    border: none;
 }
 
 @media only screen 

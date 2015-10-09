@@ -2,11 +2,20 @@
 
 settings:
 notifications:
-- on beginning of task 	on/off time before: 5 min
-- on end of task 		on/off time before: 2 min
-- on end of list 		on/off time before: 10 min
+- confirm when deleting a task?
+- when 'checking' off a task, offer to update end time
+	- settings "tooltips" can turn this on or off
 
 DESIGN: interface for ALL modals
+
+PLAN:
+- notifications
+	- 'check' should only be available for past/current
+	- otherwise, 'edit' -> can't edit current task?  seems ok REMOVE DOUBLECLICK EFFECT 
+		-> have both, hide/show to avoid confusion
+	- on reaching final, fade (in cascade) all checked tasks, the rest can stay (for next time)
+		- if a task is checked AFTER finaltime, it should fade as well (or maybe on update?)
+- add/edit/final modal design improvements
 
 chrome app:
  
@@ -21,6 +30,8 @@ mobile:
  - then ios
 
 stretch goals (premium)
+- 'start now' button which sets end time so will start now
+ - download record of tasks achieved (receipt, like)
  - multiple days / calendar
  - analytics (graphs)
  - labels / tags
@@ -48,6 +59,7 @@ var settings = {
 	notifyBefore: true,
 	notifyEnd: true
 }
+/*
 $("#alertTime").change( function () {
 	settings.alertTime = Number($(this).val()) * 60 * 1000;
 	// should save this as well
@@ -60,7 +72,7 @@ $("#notifyOn").change( function () {
 });
 $("#notifyEnd").change( function () {
 	settings.notifyEnd = $(this).prop("checked");
-});
+});*/
 
 var CURRENT = new Date().getTime();
 
@@ -106,9 +118,23 @@ catch (e) {
 
 function setup () {
 	setFinalTime();
+	var menu = $("#menuContent").find("input");
+	for (var i = 0; i < menu.length; i++) {
+		var m = menu.eq(i);
+		var mid = m.attr("id").replace("#", "");
+		if (mid in settings) {
+			if (settings[mid] === true || settings[mid] === false) {
+				m.prop("checked", settings[mid]);
+			} else {
+				m.val(settings[mid] / (1000 * 60));
+			}
+		}
+	}
+	console.log(settings);
+	/*
 	$("#alertTime").val(settings.alertTime / (1000 * 60));
 	$("#notifyOn").prop("checked", settings.notifyOn);
-	$("#notifyBefore").prop("checked", settings.notifyBefore);
+	$("#notifyBefore").prop("checked", settings.notifyBefore);*/
 	updateList();
 }
 
@@ -196,6 +222,12 @@ $("#finalModal").click(function (e) {
     }
 });
 
+$("#finalModal .submit").click( function (e) {
+    e.preventDefault();
+    $("#finalModal").slideUp('fast', 'linear');
+    setFinalTime();
+    updateList();
+})
 
 // menu
 $("#menu").click(function () {
@@ -206,10 +238,40 @@ $("#menuModal").click(function (e) {
 	m = $("#menuContent");
 	
     if (m[0] != e.target && m.has(e.target).length <= 0 && $("#menu")[0] != e.target && $("#menu").has(e.target).length <= 0) {
+    	notificationPermission();
+    	setSettings();
         e.preventDefault();
         $(this).slideUp('fast', 'linear');
     }
 });
+
+function notificationPermission () {
+	if (! "Notification" in window) return;
+	if (Notification.permission == "granted") return;
+	if ($("#menuContent input:checked").length <= 0) return;
+	Notification.requestPermission (function (permission) {
+				if (permission == "granted") {
+					console.log("permissions granted");
+				} else {
+					console.log("notification permission not granted (confirmed)");
+				}
+	});
+}
+
+function setSettings () {
+	var menu = $("#menuContent").find("input");
+	for (var i = 0; i < menu.length; i++) {
+		var m = menu.eq(i);
+		var mid = m.attr("id").replace("#", "");
+		console.log("setSettings", mid);
+		if (m.attr("type") == "checkbox") {
+			settings[mid] = m.prop("checked");
+		} else if (m.attr("type") == "number") {
+			settings[mid] = m.val()* (1000 * 60);
+		}
+	}
+	save();
+}
 
 // add modal, click to open, then click anywhere to close
 
@@ -238,6 +300,7 @@ $("#editModal").click(function (e) {
 
 function createTask(task, duration) {
 	var n = $("<div class='task'>" +
+					"<a class='check' title='Completed' data-toggle='tooltip'><i class='fa fa-check'></i></a>" + 
 					"<a class='edit' title='Edit Task' data-toggle='tooltip'><i class='fa fa-edit'></i></a>" + 
 					"<span class='taskName'>" + task + "</span>" + 
 					"<span class='duration'></span>" +
@@ -250,7 +313,17 @@ function createTask(task, duration) {
 	n.attr("task", task);
 	n.attr("uid", seed);
 	seed += 1;
-	
+
+	n.find('.check').click (function (e) {
+		if (n.hasClass('checked')) {
+			n.removeClass('checked');
+		} else {
+			n.addClass('checked');
+		}
+	});
+
+//	n.dblclick( function (e) {
+
 	n.find(".edit").click ( function (e) {
 		// Remove any previous lingering event listeners
 		$("#editModal .submit").off("click");
@@ -321,8 +394,6 @@ $("#addModal .submit").click(function (e) {
 	updateList();
 		
 });
-
-
 
 function timeString(time) {
 	var d = new Date(Number(time));
@@ -401,7 +472,6 @@ function doNotifications(type) {
 		});
 	} 
 	catch (e) {
-		console.log(n);
 		if (! "Notification" in window) {
 			console.log("notification API not available");
 		} else if (Notification.permission == "granted") {
@@ -465,12 +535,11 @@ function updateList(resetNotifications) {
 	if (cid != $(".current").attr("uid") && Math.abs($('.current').attr("starttime") - CURRENT) < 60 * 1000) {
 		doNotifications("on");
 	}
-	if ($(".current").attr("endtime") - CURRENT < settings.alertTime) {
+	if ($(".current").attr("endtime") - CURRENT < settings.beforeAlert) {
 		doNotifications("before");		
 	}
 	console.log(CURRENT, ft);
 	if (CURRENT >= ft) {
-		console.log("here", settings, notified);
 		doNotifications("end");
 	}
 

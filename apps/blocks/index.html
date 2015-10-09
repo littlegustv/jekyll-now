@@ -25,39 +25,119 @@
 </head>
 <body>
 <div id='currentPointer'><i class="fa fa-caret-left"></i></div>
-<div id="finalModal">
-	<div id="finalContent">
-		End By <input type='time' name='time' value="17:00:00" id="finaltime"/>
-	</div>
-</div>
-<div id="menuModal">
-	<div id="menuContent">
-		<h1>Settings</h1>
-		<ul>			
-			<li>Notify At Event <input type='checkbox' id='notifyOn' class='switch'></input></li>
-			<li>Notify Before Event <input type='checkbox' id='notifyBefore' class='switch'></input></li>
-			<li>Notify On End Of Day <input type='checkbox' id='notifyEnd' class='switch'></input></li>
-			<li>Alert <input id='alertTime' type='number' value='5' min='0' max='60'></input> minutes before</li>
+<div id="finalModal" class='modal'>
+	<div id="finalContent" class='modalContent'>
+		<h1>End Time</h1>
+		<ul>
+			<li>
+				<span class='left'>
+					End By:
+				</span>
+				<span class='right'>
+					<input type='time' name='time' value="17:00:00" id="finaltime"/>
+				</span>
+				<div style="clear: both;"></div>
+			</li>
+			<hr>
+			<li>
+				<span class='left'>
+					<button class="submit button">Confirm</button>
+				</span>
+				<div style="clear: both;"></div>
+			</li>
 		</ul>
 	</div>
 </div>
-<div id="addModal">
-	<form id="addEvent">
+<div id="menuModal" class='modal'>
+	<div id="menuContent" class='modalContent'>
+		<h1>Settings</h1>
+		<ul>			
+			<li>
+				<span class='left'>Notify At Event</span>
+				<span class='right'><input type='checkbox' id='notifyOn' class='switch'></input><label for="notifyOn"></label></span>
+				<div style="clear: both;"></div>
+			</li>
+			<li>
+				<span class='left'>Notify Before Event</span>
+				<span class='right'><input type='checkbox' id='notifyBefore' class='switch'></input><label for="notifyBefore"></label></span>
+				<div style="clear: both;"></div>
+			</li>
+			<li>
+				<span class='right'>Alert <input id='beforeAlert' type='number' value='5' min='0' max='60'></input> minutes before</span>
+				<div style="clear: both;"></div>
+			</li>
+			<li>
+				<span class='left'>Notify On End Of Day</span>
+				<span class='right'><input type='checkbox' id='notifyEnd' class='switch'></input><label for="notifyEnd"></label></span>
+				<div style="clear: both;"></div>
+			</li>
+			<li>
+				<span class='left'>Help Messages</span>
+				<span class='right'><input type='checkbox' id='helpMessages' class='switch'></input><label for="helpMessages"></label></span>
+				<div style="clear: both;"></div>
+			</li>
+			<hr>
+			<li>
+				<span class='left'>
+					<button class="submit button">Confirm</button>
+				</span>
+				<div style="clear: both;"></div>
+			</li>
+		</ul>
+	</div>
+</div>
+<div id="addModal" class='modal'>
+	<form id="addEvent" class='modalContent'>
 		<h1>Add New</h1>
-		<input class="name" type="text" name="name" placeholder="Task Name" />
-		<input class="hours" type="number" name="hours" placeholder="hrs" min="0" max="12" step="1" />: 
-		<input class="minutes" type="number" name="minutes" placeholder="mins" min="0" max="60" step="1" />
-		<button class="submit button"><i class="fa fa-thumbs-up"></i></button>
+		<ul>
+			<li>
+				<span class='left'>Name:</span>
+				<span class='right'><input class="name" type="text" name="name" placeholder="My new task" /></span>
+				<div style="clear: both;"></div>
+			</li>
+			<li>
+				<span class='left'>Duration:</span>
+				<span class='right'>
+					<input class="hours" type="number" name="hours" placeholder="hrs" min="0" max="12" step="1" value="0"/>:
+					<input class="minutes" type="number" name="minutes" placeholder="mins" min="0" max="60" step="1" value="30"/>
+				</span>
+				<div style="clear: both;"></div>
+			</li>
+			<hr>
+			<li>
+				<span class='left'><button class="submit button">Add</button></span>
+				<div style="clear: both;"></div>
+			</li>
+	</ul>
 	</form>
 </div>
-<div id="editModal">
-	<form id="editEvent">
+<div id="editModal" class='modal'>
+	<form id="editEvent" class='modalContent'>
 		<h1>Edit</h1>
-		<input class="name" type="text" name="name" placeholder="Task Name" />
-		<input class="hours" type="number" name="hours" placeholder="hrs" min="0" max="12" step="1" />: 
-		<input class="minutes" type="number" name="minutes" placeholder="mins" min="0" max="60" step="1" />
-		<button class="submit button"/><i class="fa fa-thumbs-up"></i></button>
-		<button id='delete' class='button confirm'><i class="fa fa-trash"></i></button>
+		<ul>
+			<li>
+				<span class='left'>Name:</span>
+				<span class='right'><input class="name" type="text" name="name" placeholder="My new task" /></span>
+				<div style="clear: both;"></div>
+			</li>
+			<li>
+				<span class='left'>Duration:</span>
+				<span class='right'>
+					<input class="hours" type="number" name="hours" placeholder="hrs" min="0" max="12" step="1" value="0"/>:
+					<input class="minutes" type="number" name="minutes" placeholder="mins" min="0" max="60" step="1" value="30"/>
+				</span>
+				<div style="clear: both;"></div>
+			</li>
+			<hr>
+			<li>
+				<span class='left'>
+					<button class="submit button">Confirm</button>
+				</span>
+				<span class='right'>
+					<button id='delete' class='button confirm'>Delete</button>	
+				</span>
+				<div style="clear: both;"></div>				
+			</li>
 	</form>
 </div>
 <div id="app-content">
