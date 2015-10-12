@@ -1,21 +1,7 @@
 /**
 
-settings:
-notifications:
-- confirm when deleting a task?
-- when 'checking' off a task, offer to update end time
-	- settings "tooltips" can turn this on or off
-
-DESIGN: interface for ALL modals
-
 PLAN:
 - notifications
-	- 'check' should only be available for past/current
-	- otherwise, 'edit' -> can't edit current task?  seems ok REMOVE DOUBLECLICK EFFECT 
-		-> have both, hide/show to avoid confusion
-	- on reaching final, fade (in cascade) all checked tasks, the rest can stay (for next time)
-		- if a task is checked AFTER finaltime, it should fade as well (or maybe on update?)
-- add/edit/final modal design improvements
 
 chrome app:
  
@@ -245,6 +231,13 @@ $("#menuModal").click(function (e) {
     }
 });
 
+$("#menuModal .submit").click( function (e) {
+    e.preventDefault();
+	notificationPermission();
+    setSettings();
+    $("#menuModal").slideUp('fast', 'linear');
+});
+
 function notificationPermission () {
 	if (! "Notification" in window) return;
 	if (Notification.permission == "granted") return;
@@ -350,20 +343,11 @@ function createTask(task, duration) {
 			updateList(true);
 		});
 		
-		$("#editModal #delete").confirm({
-			text: "Are you sure you want to delete that comment?",
-		    title: "Confirmation required",
-		    confirm: function(button) {
+		$("#editModal #delete").click( function(e) {
 				n.remove();
 				$("#editEvent")[0].reset();
 				$("#editModal").slideUp();	
 				updateList();
-		    },
-		    cancel: function(button) {
-		        // nothing to do
-		    },
-		    confirmButton: "Yes I am",
-		    cancelButton: "No",
 		});
 
 	});
@@ -538,7 +522,7 @@ function updateList(resetNotifications) {
 	if ($(".current").attr("endtime") - CURRENT < settings.beforeAlert) {
 		doNotifications("before");		
 	}
-	console.log(CURRENT, ft);
+	//console.log(CURRENT, ft);
 	if (CURRENT >= ft) {
 		doNotifications("end");
 	}
