@@ -1,9 +1,21 @@
-<link href='http://fonts.googleapis.com/css?family=Tulpen+One' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700' rel='stylesheet' type='text/css'>
-<link href='./css/style.css' rel='stylesheet' type='text/css' />
-<script src='./js/main.js'></script>
-<body>
-<canvas id='mygame' height=640 width=1024 autofocus></canvas>
-<!--<br><br>
-<input type='text' id='json_output'></input>-->
-</body>
+<html>
+	<head>
+		<script src='./js/source.js'></script>
+	</head>
+	<body>
+		<canvas id='mygame' height=396 width=594 style='border: 1px solid black'></canvas>
+		<div id='debug' style='display: block;'>
+			<select id='action'>
+				<option value='obstacle'>Obstacle</option>
+				<option value='platform'>Platform</option>
+				<option value='hotspot'>Hotspot</option>
+				<option value='undertow'>Undertow</option>
+				<option value='unstable'>Unstable</option>
+				<option value='remove'>Remove</option>
+			</select>
+			<br>
+			<textarea id='json'></textarea>
+			<button id='save'>Save</button>
+		</div>
+	</body>
+</html>
