@@ -25,5 +25,3 @@ permalink: /games/
 ### Coming Soon
 
 Polygons - <i>Geometric action game in WebGL</i>
-
-Flat Forms - <i>Logic puzzle game based on jumping</i>
