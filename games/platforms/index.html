@@ -1,13 +1,36 @@
 <html>
 	<head>
 		<script src='./js/source.js'></script>
+		<style>
+			@font-face {
+			  font-family: 'Teko';
+			  font-style: normal;
+			  font-weight: 600;
+			  src: url(./res/Teko-Regular.ttf) format('truetype');
+			}
+			#debug {
+				display: block;
+			    width: 400px;
+			    /* float: right; */
+			    position: fixed;
+			    top: 0px;
+			    right: 0px;
+			    background: rgba(0,0,200,0.4);
+			}
+			div#debug button, #debug select, #debug textarea {
+			    width: calc(100% - 20px);
+			    margin: 4px;
+			    padding: 4px;
+			}
+		</style>
 	</head>
 	<body>
-		<canvas id='mygame' height=396 width=594 style='border: 1px solid black'></canvas>
+		<canvas id='mygame' height=396 width=594 style='border: 1px solid black; background: #e9a419;'></canvas>
+		<div style='font-family: Teko; height: 0px; width: 0px; overflow: hidden;'>Loading Fonts</div>
 		<div id='debug' style='display: block;'>
 			<select id='action'>
-				<option value='obstacle'>Obstacle</option>
 				<option value='platform'>Platform</option>
+				<option value='obstacle'>Obstacle</option>
 				<option value='hotspot'>Hotspot</option>
 				<option value='undertow'>Undertow</option>
 				<option value='unstable'>Unstable</option>
@@ -16,6 +39,8 @@
 			<br>
 			<textarea id='json'></textarea>
 			<button id='save'>Save</button>
+			<button id='clearPlatforms'>Clear Platforms</button>
+			<button id='clearAll'>Clear All</button>
 		</div>
 	</body>
 </html>

@@ -1,3 +1,32 @@
+/**
+
+todo: 
+in order to put off making puzzles:
+- level/stage menu
+- plasma animation
+- reset button
+- score
+- memory (localstorage?)
+- make some puzzles, why not?
+
+touch controls, gamepad controls, mobile optimization, kongregate api
+
+Level 0: Reconnaissance (tutorial)
+Level 1: Habitation -> rescue cats, fishbowls? ... household things
+	-> warning.  wreckage exibiting high temperatures, dangerous radiation.  platform movement will avoid.
+	(every warning is displayed for each new level as well, first one, then two, three, etc.)
+Level 2: Hydroponics -> (unstable) ... rescue plants, have a 'timer'  --> 'unstable' in groups looks nice, by the way
+	-> warning.  plasma surface experiencing turbulance.  platforms may be unstable.
+Level 3: Operations -> (undertow) ... 
+	-> warning.  strong undertow currents detected.  directional stability may be comprimised.
+Level 4: Engineering -> (hotspot)
+	-> warning.  frequent temperature anomolies.  'hot spots' may occur - proceed with caution.
+Level 5: Medical
+
+ship interior, where you can place the objects that you rescued?
+
+**/
+
 var debug;
 
 function modulo(n, p) {
@@ -13,7 +42,9 @@ window.addEventListener("DOMContentLoaded", function () {
 	var GLOBALS = {
 		scale: 4,
 		radius: 18,
-		offset: 36,
+		width: 18,
+		height: 16,
+		border: 18,
 		jumpSpeed: 750
 	};
 
@@ -28,7 +59,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	};
 	var directions = ["east", "southeast", "southwest", "west", "northwest", "northeast"];
 	var conditions = {
-		"space": function () { return world.keys.space; },
+		"space": function () { var r = world.keys.space; world.keys.space = false; return r;},
 		"esc": function () { return world.keys.escape; }
 	};
 
@@ -53,7 +84,10 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "hotspot.png", frames: 2, speed: 500},
 		{path: "undertow.png", frames: 4, speed: 800},
 		{path: "unstable.png", frames: 4, speed: 300},
-		{path: "scenes.js"}
+		{path: "scenes.js"},
+		{path: "collectable.png", frames: 2, speed: 650},
+		{path: "start.png", frames: 2, speed: 500},
+		{path: "cell.png"}
 	];
 
 	var World = {
@@ -110,13 +144,18 @@ window.addEventListener("DOMContentLoaded", function () {
 				this.begin();
 			}
 		},
+		reset: function () {
+			var i = this.cs;
+			this.paused = true;
+			this.scene = this.createScene(this.sceneInfo.scenes[i]);
+		},
 		begin: function () {
-			this.scenes = [], this.cs = 0;
-			var sceneJSON = this.sceneInfo.scenes;
-			for (var i = 0; i < sceneJSON.length; i++) {
-				console.log("hey");
-				this.createScene(sceneJSON[i]);
-			}
+			this.scenes = this.sceneInfo.scenes, this.cs = 0;
+			//var sceneJSON = this.sceneInfo.scenes;
+			//for (var i = 0; i < sceneJSON.length; i++) {
+			//	this.scenes.push(this.createScene(sceneJSON[i]));
+			//}
+			this.scene = this.createScene(this.scenes[this.cs]);
 			/*var s = Object.create(Scene).init();
 			var s2 = Object.create(Scene).init();
 			this.scenes.push(s);
@@ -125,18 +164,35 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.paused = true;
 			this.step();
 		},
+		doScene: function (n) {
+			this.cs = n;
+			this.scene = this.createScene(this.scenes[n]);
+		},
 		createScene: function (config) {
 			var s = Object.create(Scene).init(config.name);
+			s.type = config.type || "none";
 			for (var i = 0; i < config.entities.length; i++) {
 				var c = config.entities[i];
 				var e;
 				switch (c.type) {
 					case "text":
-						e = Object.create(Text).init(c.gridX, c.gridY, c.text, c.size);
+						e = Object.create(Text).init(c.gridX, c.gridY, c.text, c.format, c.speed, c.delay);
 						break;
 					case "character":
-						e = Object.create(Character).init(c.gridX, c.gridY, Resources.c1);
-						break;	
+						var start = Object.create(Entity).init(c.gridX, c.gridY, Resources.start);
+						start.offset = {x: 0, y: -11 * GLOBALS.height - 7};
+						start.type = "start";
+						s.entities.push(start);
+						s.start = {x: start.gridX, y: start.gridY};
+						e = Object.create(Character).init(c.gridX + 5, c.gridY - 10, Resources.c1);
+						e.jumping = GLOBALS.jumpSpeed;
+						e.direction = {x: -1, y: 2};
+						e.distance = 5;
+						s.character = e;
+						break;
+					case "collectable":
+						e = Object.create(Collectable).init(c.gridX, c.gridY, Resources.collectable);
+						break;
 				}
 				if (e) s.entities.push(e);
 			}
@@ -146,6 +202,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				switch(c.type) {
 					case "obstacle":
 						m = Object.create(Obstacle).init(c.gridX, c.gridY, Resources.o1);
+						m.frameDelay = Math.floor(Math.random() * m.maxFrameDelay);
 						break;
 					case "hotspot":
 						m = Object.create(HotSpot).init(c.gridX, c.gridY, Resources.hotspot);
@@ -161,13 +218,13 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 			for (var i = 0; i < config.exits.length; i++) {
 				var e = Object.create(Exit).init(config.exits[i].destination, conditions[config.exits[i].condition]);
-				s.exits.push(e);
+				s.entities.push(e);
 			}
-			debug = s;
-			this.scenes.push(s);
+			//debug = s;
+			return s;
 		},
 		save: function () {
-			var current = this.scenes[this.cs];
+			var current = this.scene;
 			var save = {name: current.name, map: []};
 			save.name = current.name;
 			for (y in current.map) {
@@ -183,48 +240,67 @@ window.addEventListener("DOMContentLoaded", function () {
 			var newTime = new Date();
 			var dt = newTime - this.time;
 			this.time = newTime;
-			this.scenes[this.cs].update(dt);
-			this.scenes[this.cs].draw(ctx);
-			this.drawCursor(ctx);
+			this.scene.update(dt);
+			this.scene.draw(ctx);
+			if (this.scene.type == "level") {
+				this.drawCursor(ctx);
+			}
 			var w = this;
 			window.requestAnimationFrame(function () {	w.step();  });
 		},
 		getAt: function (x, y) {
-			return this.scenes[this.cs].getAt(x,y);
+			return this.scene.getAt(x,y);
 		},
 		toGrid: function (x, y) {
-			var gridY = Math.round((y - GLOBALS.radius) / (Math.sin(Math.PI / 3) * 2 * GLOBALS.radius ));
+			var gridY = Math.round((y - GLOBALS.border) / (Math.sin(Math.PI / 3) * 2 * GLOBALS.height ));
 			return {
-				x: Math.round((x - (gridY * GLOBALS.radius + GLOBALS.radius)) / (GLOBALS.radius * 2)),
+				x: Math.round((x - (gridY * GLOBALS.width + GLOBALS.border)) / (GLOBALS.width * 2)),
 				y: gridY
 			}
 		},
 		remove: function (position) {
-			this.scenes[this.cs].remove(position);
+			this.scene.remove(position);
+		},
+		removeEntity: function (e) {
+			this.scene.removeEntity(e);
 		},
 		drawCursor: function (ctx) {
+			var m = this.toGrid(this.mouse.x, this.mouse.y);
 			if (this.mouse.down) {
-				var m = this.toGrid(this.mouse.x, this.mouse.y);
 				var p = this.getAt(m.x, m.y);
 				if (p && (p.type == "obstacle" || p.type == "platform")) return;
 				else {
 					ctx.globalAlpha = 0.5;
 					var dir = directions[this.mouse.angle];
-					var mx = m.x * GLOBALS.radius * 2 + m.y * GLOBALS.radius + GLOBALS.radius;
-					var my = Math.sin(Math.PI / 3) * 2 * GLOBALS.radius * m.y + GLOBALS.radius;
+					var mx = m.x * GLOBALS.width * 2 + m.y * GLOBALS.width + GLOBALS.border;
+					var my = Math.sin(Math.PI / 3) * 2 * GLOBALS.height * m.y + GLOBALS.border;
 					var w = Resources[dir].image.width * GLOBALS.scale, h = Resources[dir].image.height * GLOBALS.scale;
-			        ctx.drawImage(Resources[dir].image, mx - Math.round(w / 2), my - Math.round(h / 2), w, h);
+			        ctx.drawImage(Resources[dir].image, mx - Math.round(w / 2), Math.ceil(my - h / 2), w, h);
 			        ctx.globalAlpha = 1.0;
 		    	}
+			}
+			if (this.scene.start) {
+				ctx.font = "24px Teko";
+				ctx.textAlign = "center";
+				ctx.fillStyle = "black";
+				var mx = modulo(m.x - this.scene.start.x, 2);
+				var my = modulo(m.y - this.scene.start.y, 2);
+				ctx.fillText(mx + ", " + my, this.mouse.x, this.mouse.y);
 			}
 		},
 		addPlatform: function () {
 			var m = this.toGrid(this.mouse.x, this.mouse.y);
 			var dir = directions[this.mouse.angle];
-			this.scenes[this.cs].addPlatform(m, dir);
+			this.scene.addPlatform(m, dir);
+		},
+		addEntity: function (obj) {
+			this.scene.addEntity(obj);
+		},
+		addBG: function (obj) {
+			this.scene.addBG(obj);
 		},
 		add: function (obj) {
-			this.scenes[this.cs].add(obj);
+			this.scene.add(obj);
 		}
 	};
 
@@ -233,13 +309,18 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.name = name;
 			this.setupMap();
 			this.entities = [];
-			this.exits = [];
+			this.bg = [];
+			this.completed = false;
+			this.score;
 			return this;
 		},
 		draw: function (ctx) {
 			ctx.clearRect(0,0,canvas.width,canvas.height);
-			ctx.fillStyle = "#f0e848";
-			ctx.fillRect(0,0,canvas.width,canvas.height);
+			//ctx.fillStyle = "#f0e848";
+			//ctx.fillRect(0,0,canvas.width,canvas.height);
+			for (var i = 0; i < this.bg.length; i++) {
+				this.bg[i].draw(ctx);
+			}
 			for (y in this.map) {
 				for (x in this.map[y]) {
 					if (this.map[y][x]) {
@@ -247,11 +328,15 @@ window.addEventListener("DOMContentLoaded", function () {
 					}
 				}
 			}
-			for (var i = 0; i < this.entities.length; i++) {
-				this.entities[i].draw(ctx);
+			var e = this.entities.sort(function (a, b) { return a.z != b.z ? a.z - b.z : a.gridY - b.gridY; });
+			for (var i = 0; i < e.length; i++) {
+				e[i].draw(ctx);
 			}
 		},
 		update: function (dt) {
+			for (var i = 0; i < this.bg.length; i++) {
+				this.bg[i].update(dt);
+			}
 			for (y in this.map) {
 				for (x in this.map[y]) {
 					if (this.map[y][x]) {
@@ -261,17 +346,38 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 			for (var i = 0; i < this.entities.length; i++) {
 				this.entities[i].update(dt);
+				if (!this.entities[i] || !this.character) {}
+				else if (this.character.gridX == this.entities[i].gridX && this.character.gridY == this.entities[i].gridY) {				
+					if (this.entities[i].type == "collectable") {
+						this.entities.splice(i,1);
+					} else if (this.entities[i].type == "start") {
+						if (this.entities.filter(function (a) { return a.type == "collectable"; }).length <= 0) {
+							if (!this.completed) {
+								this.score = this.count("platform");
+								this.completed = true;
+								world.paused = true;
+								this.entities.push(Object.create(Exit).init((world.cs + 1) % world.scenes.length, conditions.space));
+								this.entities.push(Object.create(Text).init(297,360,this.score + " platforms - well done!  Press SPACE for next level.",{}));
+							}
+						}
+					}
+				}
 			}
-			// check exit points for scene
+			for (var i = 0; i < this.bg.length; i++) {
+				if (!this.bg[i].alive) {
+					this.bg.splice(i, 1);
+				}
+			}
+			/* check exit points for scene
 			for (var i = 0; i < this.exits.length; i++) {
 				this.exits[i].check();
-			}
+			}*/
 		},
 		setupMap: function () {
 			this.map = {};
-			for (var i = 0; i <= canvas.height / (2 * GLOBALS.radius); i++) {
+			for (var i = 0; i <= canvas.height / (2 * GLOBALS.height); i++) {
 				var row = {};
-				for (var j = -i; j <= canvas.width / (2 * GLOBALS.radius); j++) {
+				for (var j = -i; j <= canvas.width / (2 * GLOBALS.width); j++) {
 					row[j] = undefined;
 				}
 				this.map[i] = row;
@@ -282,6 +388,14 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		remove: function (position) {
 			if (this.map[position.y]) this.map[position.y][position.x] = undefined;
+		},
+		removeEntity: function (e) {
+			var i = this.entities.indexOf(e);
+			this.entities.splice(i, 1);
+		},
+		removeBH: function (obj) {
+			var i = this.entities.indexOf(e);
+			this.bg.splice(i, 1);
 		},
 		addPlatform: function (position, direction) {
 			if (this.map[position.y]) {
@@ -294,6 +408,12 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 			}
 		},
+		addEntity: function (obj) {
+			this.entities.push(obj);
+		},
+		addBG: function (obj) {
+			this.bg.push(obj);
+		},
 		add: function (obj) {
 			if (this.map[obj.gridY]) {
 				var m = this.map[obj.gridY][obj.gridX];
@@ -302,11 +422,23 @@ window.addEventListener("DOMContentLoaded", function () {
 					this.map[obj.gridY][obj.gridX] = obj;
 				}
 			}
+		},
+		count: function (type) {
+			var c = 0;
+			for (y in this.map) {
+				for (x in this.map[y]) {
+					if (this.map[y][x] && this.map[y][x].type == type)
+						c++;
+				}
+			}
+			return c;
 		}
 	};
 
 	var Entity = {
+		alive: true,
 		frame: 0,
+		z: 1,
 		delay: 0,
 		offset: {x: 0, y: 0},
 		direction: DIRECTION.none,
@@ -327,8 +459,8 @@ window.addEventListener("DOMContentLoaded", function () {
 				j = Math.sin(Math.PI * (GLOBALS.jumpSpeed - this.jumping) / GLOBALS.jumpSpeed) / 2;
 				oy -= j
 			}
-			return {x: ox * GLOBALS.radius * 2 + oy * GLOBALS.radius + GLOBALS.radius + this.offset.x,
-				y: Math.sin(Math.PI / 3) * 2 * GLOBALS.radius * oy + GLOBALS.radius + this.offset.y, scale: j/2 + 1} 
+			return {x: ox * GLOBALS.width * 2 + oy * GLOBALS.width + GLOBALS.border + this.offset.x,
+				y: Math.sin(Math.PI / 3) * 2 * GLOBALS.height * oy + GLOBALS.border + this.offset.y, scale: j/2 + 1} 
 		},
 //		drawY: function () {  },
 		draw: function (ctx) {
@@ -336,29 +468,35 @@ window.addEventListener("DOMContentLoaded", function () {
 			ctx.drawImage(this.sprite.image, 
         		this.frame * this.w / GLOBALS.scale, this.animation * this.h / GLOBALS.scale, 
         		this.w / GLOBALS.scale, this.h / GLOBALS.scale, 
-        		Math.round(o.x - o.scale * this.w / 2), Math.round(o.y - o.scale * this.h / 2), o.scale * this.w, o.scale * this.h);
+        		Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2), o.scale * this.w, o.scale * this.h);
 		},
-		update: function (dt) {
+		animate: function (dt) {
 			this.frameDelay -= dt;
 			if (this.frameDelay <= 0) {
 				this.frameDelay = this.maxFrameDelay;
 				this.frame = (this.frame + 1) % this.maxFrame;
 			}
+		},
+		update: function (dt) {
+			this.animate(dt);
 		}
 	};
 
 	var Exit = {
+		alive: true,
 		init: function (destination, condition) {
 			this.destination = destination;
 			this.condition = condition;
 			return this;
 		},
-		check: function () {
+		update: function (dt) {
 			if (this.condition()) {
 				world.paused = true;
-				world.cs = this.destination;
+				world.doScene(this.destination);
+				debug = world.scene;
 			}
-		}
+		},
+		draw: function (ctx) {}
 	}
 
 	var Platform = Object.create(Entity);
@@ -368,6 +506,14 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	var Obstacle = Object.create(Entity);
 	Obstacle.type = "obstacle";
+	Obstacle.spawned = false;
+	Obstacle.update = function (dt) {
+		this.animate(dt);
+		if (Math.random() < 0.01 && !this.spawned) {
+			//world.addBG(Object.create(Cell).init(this.gridX, this.gridY, Resources.cell));
+			this.spawned = true;
+		}
+	}
 
 	var Environment = Object.create(Entity);
 	Environment.type = 'environment';
@@ -396,18 +542,61 @@ window.addEventListener("DOMContentLoaded", function () {
 		world.add(u);
 	}
 
+	var Collectable = Object.create(Entity);
+	Collectable.type = "collectable";
+	Collectable.offset = {x: 0, y: -12};
+
+	var Cell = Object.create(Entity);
+	Cell.type = "none";
+	Cell.life = 1000;
+	Cell.spawned = false;
+	Cell.z = 0;
+	Cell.update = function (dt) {
+		this.life -= dt;
+		if (Math.random() < 0.018) {
+			var d = DIRECTION[directions[Math.floor(Math.random() * 6)]];
+			var o = Object.create(Cell).init(Number(this.gridX) + d.x, Number(this.gridY) + d.y, Resources.cell);
+			//console.log(this.gridX, o.gridX, this.gridY, o.gridY);
+			world.addBG(o);
+			this.spawned = true;
+		}
+		if (this.life < 0) {
+			this.alive = false;
+		}
+	}
+
 	var Text = Object.create(Entity);
 	Text.type = "text";
-	Text.init = function (x, y, text, size) {
-		this.size = size, this.gridX = x, this.gridY = y, this.text = text;
+	Text.init = function (x, y, text, format, speed, delay) {
+		this.x = x, this.y = y, this.text = text;
+		this.size = format.size || 24;
+		this.color = format.color || "black";
+		this.align = format.align || "center";
+		this.speed = speed ? speed : 0;
+		this.current = speed ? 0 : text.length;
+		this.counter = speed ? speed : 0;
+		this.delay = delay ? delay : 0;
 		return this;
 	};
-	Text.update = function (dt) {};
+	Text.update = function (dt) {
+		if (this.delay > 0) {
+			this.delay -= dt;
+			return;
+		}
+		if (this.counter > 0) {
+			this.counter -= dt;
+		} else {
+			if (this.speed) this.current = Math.min(this.current + 1, this.text.length);
+			this.counter = this.speed;
+		}
+
+	};
 	Text.draw = function (ctx) {
-		var p = this.getPosition();
-		ctx.fillStyle = "black";
-		ctx.font = this.size + "px Monospace";
-		ctx.fillText(this.text, p.x, p.y);
+		if (this.delay > 0) return;
+		ctx.textAlign = this.align;
+		ctx.fillStyle = this.color;
+		ctx.font = this.size + "px Teko";
+		ctx.fillText(this.text.substr(0,this.current), this.x, this.y);
 	};
 
 	var Character = Object.create(Entity);
@@ -415,11 +604,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	Character.jumping = 0;
 	Character.type = "character";
 	Character.update = function (dt) {
-		this.frameDelay -= dt;
-		if (this.frameDelay <= 0) {
-			this.frameDelay = this.maxFrameDelay;
-			this.frame = (this.frame + 1) % this.maxFrame;
-		}
+		this.animate(dt);
 		if (world.paused) return;
 		if (this.jumping > 0) {
 			this.jumping -= dt;
@@ -432,7 +617,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			var p = world.getAt(this.gridX, this.gridY);
 			if (!p || p.type == "obstacle") { 
 				this.jumping = GLOBALS.jumpSpeed;
-				setTimeout(function () { world.begin(); }, 100);
+				setTimeout(function () { world.reset(); }, 100);
 			}
 			else if (p.direction) {
 				var c = this;
@@ -447,7 +632,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 				if (d == 0 || p.type == "obstacle") {
 					this.jumping = GLOBALS.jumpSpeed;
-					setTimeout(function () { world.begin(); }, 100);
+					setTimeout(function () { world.reset(); }, 100);
 				} else {
 					this.direction = p.direction;
 					this.distance = d;
@@ -466,16 +651,21 @@ window.addEventListener("DOMContentLoaded", function () {
 	var world = Object.create(World).init();
 
 	canvas.addEventListener("mousedown", function (e) {
+		if (!world.scene || world.scene.type != "level") return;
 		world.mouse.down = true;
-		world.mouse.x = e.offsetX, world.mouse.y = e.offsetY;
 	});
 
 	canvas.addEventListener("mousemove", function (e) {
+		if (!world.scene || world.scene.type != "level") return;
 		var theta = Math.atan2(e.offsetY - world.mouse.y, e.offsetX - world.mouse.x);
 		world.mouse.angle = modulo(Math.round(theta / (Math.PI / 3)), 6);
+		if (!world.mouse.down) {
+			world.mouse.x = e.offsetX, world.mouse.y = e.offsetY;
+		}
 	});
 
 	canvas.addEventListener("mouseup", function (e) {
+		if (world.scene.type != "level") return;
 		world.mouse.down = false;
 		var m = world.toGrid(e.offsetX, e.offsetY);
 		var action = document.getElementById("action");
@@ -508,13 +698,39 @@ window.addEventListener("DOMContentLoaded", function () {
 	document.addEventListener("keydown", function (e) {
 		if (e.keyCode == 32) {
 			world.keys.space = true;
-			world.paused = !world.paused;
+			world.paused = !world.paused;			
+		}
+	});
+
+	document.addEventListener("keyup", function (e) {
+		if (e.keyCode == 32) {
+			world.keys.space = false;
 		}
 	});
 
 	document.getElementById("save").addEventListener("click", function () {
 		var js = world.save();
 		document.getElementById("json").value = js;
+	});
+
+	document.getElementById("clearPlatforms").addEventListener("click", function () {
+		var map = world.scene.map;
+		for (y in map) {
+			for (x in map[y]) {
+				if (map[y][x] && map[y][x].type == "platform") {
+					map[y][x] = undefined;
+				}
+			}
+		}
+	});
+
+	document.getElementById("clearAll").addEventListener("click", function () {
+		var map = world.scene.map;
+		for (y in map) {
+			for (x in map[y]) {
+				map[y][x] = undefined;
+			}
+		}
 	});
 
 });
