@@ -5,11 +5,24 @@
 			"type": "menu",
 			"map": {},
 			"entities": [
-				{"gridX":297,"gridY":198,"text":"Main Menu","type":"text", "speed": 100, "format": {"size":44}},
-				{"gridX":297,"gridY":256,"text":"Press SPACE to start","type":"text", "format": {}}
+				{"gridX":297,"gridY":198,"text":"Main Menu","type":"text", "speed": 100, "format": {"size":44}}
 			],
 			"exits": [
-				{"condition": "space", "destination": 1}
+				{"condition": "space", "destination": 2}
+			]
+		},
+		{
+			"name": "credits",
+			"type": "menu",
+			"map": {},
+			"entities": [
+				{"gridX":297,"gridY":60,"text":"Credits","type":"text", "speed": 100, "format": {"size": 44}},
+				{"gridX":297,"gridY":110,"text":"Developed By Benny Heller","type":"text", "speed": 100, "format": {}},
+				{"gridX":297,"gridY":136,"text":"Special thanks to JavaScript","type":"text", "speed": 100, "format": {}},
+				{"gridX":297,"gridY":162,"text":"Find me at @littlegustv on twitter","type":"text", "speed": 100, "format": {}}
+			],
+			"exits": [
+				{"condition": "space", "destination": 0}
 			]
 		},
 		{
@@ -58,15 +71,37 @@
 				}																	
 			],
 			"exits": [
-				{"condition": "space", "destination": 2}
+				{"condition": "space", "destination": 3}
 			]
 		},
 		{
-			"name": "engine room a",
+			"name": "stagemenu",
+			"type": "menu",
+			"map": {},
+			"entities": [
+				{"gridX":297,"gridY":60,"text":"Stages","type":"text", "speed": 100, "format": {"size": 44}}
+			],
+			"exits": [
+				{"condition": "space", "destination": 4}
+			]
+		},
+		{
+			"name":"engine room a",
+			"type":"level",
+			"stage": "recon",
+			"map":[{"gridX":"8","gridY":"2","type":"obstacle"},{"gridX":"7","gridY":"6","type":"obstacle"}],
+			"entities": [
+				{"gridX":4,"gridY":4,"type":"character"},
+				{"gridX":7,"gridY":4,"type":"collectable"}
+			],
+			"exits": []
+		},
+		{
+			"name": "engine room b",
 			"type": "level",
+			"stage": "recon",
 			"map":[{"gridX":"6","gridY":"3","type":"obstacle"},{"gridX":"3","gridY":"4","type":"obstacle"},{"gridX":"6","gridY":"4","type":"obstacle"},{"gridX":"9","gridY":"4","type":"obstacle"},{"gridX":"2","gridY":"5","type":"obstacle"},{"gridX":"9","gridY":"5","type":"obstacle"},{"gridX":"4","gridY":"6","type":"obstacle"},{"gridX":"8","gridY":"6","type":"obstacle"},{"gridX":"3","gridY":"7","type":"obstacle"},{"gridX":"5","gridY":"7","type":"obstacle"},{"gridX":"6","gridY":"7","type":"obstacle"}],
 			"entities": [
-				{"gridX":297,"gridY":320,"text":"Engine Room A","type":"text", "format": {}},
 				{"gridX":4,"gridY":4,"type":"character"},
 				{"gridX":7,"gridY":4,"type":"collectable"}
 			],

@@ -2,14 +2,11 @@
 
 todo: 
 in order to put off making puzzles:
-- level/stage menu
 - plasma animation
-- reset button
-- score
-- memory (localstorage?)
+- memory (localstorage?) -> remember levels completed - how much more?
 - make some puzzles, why not?
 
-touch controls, gamepad controls, mobile optimization, kongregate api
+touch controls, mobile optimization, kongregate api
 
 Level 0: Reconnaissance (tutorial)
 Level 1: Habitation -> rescue cats, fishbowls? ... household things
@@ -44,7 +41,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		radius: 18,
 		width: 18,
 		height: 16,
-		border: 18,
+		border: 24,
 		jumpSpeed: 750
 	};
 
@@ -87,10 +84,20 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "scenes.js"},
 		{path: "collectable.png", frames: 2, speed: 650},
 		{path: "start.png", frames: 2, speed: 500},
-		{path: "cell.png"}
+		{path: "cell.png"},
+		{path: "reset.png", frames: 2, speed: 500},
+		{path: "back.png", frames: 2, speed: 500}
 	];
 
 	var World = {
+		stages: {
+			recon: true,
+			habitation: false,
+			hydroponics: false,
+			operations: false,
+			engineering: false,
+			medical: false
+		},
 		mouse: {down: false, x: 0, y: 0, angle: 0},
 		keys: {space: false},
 		init: function () {
@@ -147,7 +154,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		reset: function () {
 			var i = this.cs;
 			this.paused = true;
-			this.scene = this.createScene(this.sceneInfo.scenes[i]);
+			this.scene = this.createScene(i);
 		},
 		begin: function () {
 			this.scenes = this.sceneInfo.scenes, this.cs = 0;
@@ -155,7 +162,14 @@ window.addEventListener("DOMContentLoaded", function () {
 			//for (var i = 0; i < sceneJSON.length; i++) {
 			//	this.scenes.push(this.createScene(sceneJSON[i]));
 			//}
-			this.scene = this.createScene(this.scenes[this.cs]);
+
+			/*
+				create and fill 'stages' here
+				 - or just use that to draw stages on stagemenu?  array filter, quick and simple
+
+			*/
+
+			this.scene = this.createScene(this.cs);
 			/*var s = Object.create(Scene).init();
 			var s2 = Object.create(Scene).init();
 			this.scenes.push(s);
@@ -165,10 +179,13 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.step();
 		},
 		doScene: function (n) {
-			this.cs = n;
-			this.scene = this.createScene(this.scenes[n]);
+			//this.cs = n;
+			this.scene = this.createScene(n);
+			//if (this.scene.type == "level") this.cs = n;
 		},
-		createScene: function (config) {
+		createScene: function (n) {
+			console.log(n);
+			var config = this.scenes[n];
 			var s = Object.create(Scene).init(config.name);
 			s.type = config.type || "none";
 			for (var i = 0; i < config.entities.length; i++) {
@@ -219,6 +236,70 @@ window.addEventListener("DOMContentLoaded", function () {
 			for (var i = 0; i < config.exits.length; i++) {
 				var e = Object.create(Exit).init(config.exits[i].destination, conditions[config.exits[i].condition]);
 				s.entities.push(e);
+			}
+			if (s.type == "level") {
+				var b = Object.create(Button).init( 0, 0, Resources.reset);
+				b.callback = function () {
+					world.reset();
+				};
+				s.buttons.push(b);
+				var b = Object.create(Button).init( 1, 0, Resources.back);
+				b.callback = function () {
+					world.doScene(0);
+				};
+				s.buttons.push(b);
+			}
+			if (s.name == "mainmenu") {
+				var t = Object.create(Text).init(0, 0,"-- New Game --",{color: "#000000"});
+				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 40,t);
+				tb.callback = function () {
+					world.doScene(2);
+				};
+				s.buttons.push(tb);
+			
+				var t = Object.create(Text).init(0, 0,"-- Continue --",{color: "#333333"});
+				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 68,t);
+				tb.callback = function () {
+					world.doScene(3);
+				};
+				s.buttons.push(tb);
+
+				var t = Object.create(Text).init(0, 0,"-- Credits --",{color: "#333333"});
+				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 96,t);
+				tb.callback = function () {
+					world.doScene(1);
+				};
+				s.buttons.push(tb);
+			}
+			if (s.name == "stagemenu") {
+				var y = 100;
+				for (stage in this.stages) {
+					if (this.stages[stage]) {
+						var title = Object.create(Text).init(canvas.width - GLOBALS.border, y, stage, {color: "#000000", align: "right"});
+						s.entities.push(title);
+						var levels = this.scenes.filter(function (a) { return a.stage == stage; });
+						for (var i = 0; i < levels.length; i++) {
+							var t = Object.create(Text).init(canvas.width / 2 + i * 20, y,  String(i), {color: "#000000", align: "left"});
+							var tb = Object.create(TextButton).init(canvas.width / 2 + i * 20, y, t);
+							var w = this.scenes.indexOf(levels[i]);
+							tb.destination = w;
+							tb.callback = function () {
+								world.doScene(this.destination);
+							};
+							s.buttons.push(tb);
+						}
+						y += 28;
+					} else {
+						var title = Object.create(Text).init(canvas.width - GLOBALS.border, y, stage, {color: "#333333", align: "right"});
+						s.entities.push(title);
+						var levels = this.scenes.filter(function (a) { return a.stage == stage; });
+						for (var i = 0; i < levels.length; i++) {
+							var t = Object.create(Text).init(canvas.width / 2 + i * 20, y,  String(i), {color: "#333333", align: "left"});
+							s.buttons.push(t);
+						}
+						y += 28;
+					}
+				}
 			}
 			//debug = s;
 			return s;
@@ -310,6 +391,8 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.setupMap();
 			this.entities = [];
 			this.bg = [];
+			this.buttons = [];
+			this.selected = 0;
 			this.completed = false;
 			this.score;
 			return this;
@@ -328,9 +411,12 @@ window.addEventListener("DOMContentLoaded", function () {
 					}
 				}
 			}
-			var e = this.entities.sort(function (a, b) { return a.z != b.z ? a.z - b.z : a.gridY - b.gridY; });
+			var e = this.entities.sort(function (a, b) { return a.z != b.z ? a.z - b.z : (a.getPosition().y - a.offset.y) - (b.getPosition().y - b.offset.y); });
 			for (var i = 0; i < e.length; i++) {
 				e[i].draw(ctx);
+			}
+			for (var i = 0; i < this.buttons.length; i++) {
+				this.buttons[i].draw(ctx);
 			}
 		},
 		update: function (dt) {
@@ -372,6 +458,20 @@ window.addEventListener("DOMContentLoaded", function () {
 			for (var i = 0; i < this.exits.length; i++) {
 				this.exits[i].check();
 			}*/
+		},
+		button: function (x, y) {
+			for (var i = 0; i < this.buttons.length; i++) {
+				if (this.buttons[i].check(x, y)) {
+					this.buttons[i].callback();
+					return true;
+				}
+			}
+			return false;
+		},
+		highlightButton: function (x, y) {
+			for (var i = 0; i < this.buttons.length; i++) {
+				this.buttons[i].highlight(this.buttons[i].check(x, y));
+			}
 		},
 		setupMap: function () {
 			this.map = {};
@@ -436,6 +536,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	};
 
 	var Entity = {
+		opacity: 1.0,
 		alive: true,
 		frame: 0,
 		z: 1,
@@ -464,6 +565,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 //		drawY: function () {  },
 		draw: function (ctx) {
+			ctx.globalAlpha = this.opacity;
 			var o = this.getPosition();
 			ctx.drawImage(this.sprite.image, 
         		this.frame * this.w / GLOBALS.scale, this.animation * this.h / GLOBALS.scale, 
@@ -482,21 +584,58 @@ window.addEventListener("DOMContentLoaded", function () {
 		}
 	};
 
-	var Exit = {
-		alive: true,
-		init: function (destination, condition) {
-			this.destination = destination;
-			this.condition = condition;
-			return this;
-		},
-		update: function (dt) {
-			if (this.condition()) {
-				world.paused = true;
-				world.doScene(this.destination);
-				debug = world.scene;
+	var Exit = Object.create(Entity);
+	Exit.init = function (destination, condition) {
+		this.destination = destination;
+		this.condition = condition;
+		return this;
+	};
+	Exit.update = function (dt) {
+		if (this.condition()) {
+			world.paused = true;
+			world.doScene(this.destination);
+			debug = world.scene;
+		}
+	};
+	Exit.draw = function (ctx) {
+	};
+
+	var Button = Object.create(Entity);
+	Button.type = "button";
+	Button.callback = function () {
+		console.log("no button callback function defined");
+	};
+	Button.check = function (x, y) {
+		var m = world.toGrid(x, y);
+		if (this.gridX == m.x && this.gridY == m.y) return true;
+	};
+	Button.highlight = function (toggle) {
+		if (toggle) this.frame = 1;
+		else this.frame = 0;
+	};
+
+	var TextButton = Object.create(Button);
+	TextButton.init = function (x, y, text) {
+		this.x = x; this.y = y; this.text = text;
+		this.text.draw(ctx);
+		this.text.x = this.x, this.text.y = this.y;
+		this.w = ctx.measureText(this.text.text).width + 10, this.h = this.text.size + 10;
+		return this;
+	}
+	TextButton.draw = function (ctx) {
+		this.text.draw(ctx);
+	};
+	TextButton.check = function (x, y) {
+		if (x > this.x - this.w / 2 && x < this.x + this.w / 2) {
+			if (y > this.y - this.h / 2 && y < this.y + this.h / 2) {
+				return true;
 			}
-		},
-		draw: function (ctx) {}
+		}
+		return false;
+	}
+	TextButton.highlight = function (toggle) {
+		if (toggle) this.text.color = "#CCCCCC";
+		else this.text.color = "#000000";
 	}
 
 	var Platform = Object.create(Entity);
@@ -552,6 +691,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	Cell.spawned = false;
 	Cell.z = 0;
 	Cell.update = function (dt) {
+		this.opacity = this.life / 1000;
 		this.life -= dt;
 		if (Math.random() < 0.018) {
 			var d = DIRECTION[directions[Math.floor(Math.random() * 6)]];
@@ -656,6 +796,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	});
 
 	canvas.addEventListener("mousemove", function (e) {
+		world.scene.highlightButton(e.offsetX, e.offsetY);
 		if (!world.scene || world.scene.type != "level") return;
 		var theta = Math.atan2(e.offsetY - world.mouse.y, e.offsetX - world.mouse.x);
 		world.mouse.angle = modulo(Math.round(theta / (Math.PI / 3)), 6);
@@ -665,9 +806,11 @@ window.addEventListener("DOMContentLoaded", function () {
 	});
 
 	canvas.addEventListener("mouseup", function (e) {
-		if (world.scene.type != "level") return;
-		world.mouse.down = false;
 		var m = world.toGrid(e.offsetX, e.offsetY);
+		world.mouse.down = false;
+		
+		if (world.scene.button(e.offsetX, e.offsetY)) { return; }
+		
 		var action = document.getElementById("action");
 		switch (action.value) {
 			case "platform":
