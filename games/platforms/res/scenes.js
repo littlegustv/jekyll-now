@@ -89,6 +89,7 @@
 			"name":"engine room a",
 			"type":"level",
 			"stage": "recon",
+			"max": 7,
 			"map":[{"gridX":"8","gridY":"2","type":"obstacle"},{"gridX":"7","gridY":"6","type":"obstacle"}],
 			"entities": [
 				{"gridX":4,"gridY":4,"type":"character"},
@@ -100,6 +101,7 @@
 			"name": "engine room b",
 			"type": "level",
 			"stage": "recon",
+			"max": 7,
 			"map":[{"gridX":"6","gridY":"3","type":"obstacle"},{"gridX":"3","gridY":"4","type":"obstacle"},{"gridX":"6","gridY":"4","type":"obstacle"},{"gridX":"9","gridY":"4","type":"obstacle"},{"gridX":"2","gridY":"5","type":"obstacle"},{"gridX":"9","gridY":"5","type":"obstacle"},{"gridX":"4","gridY":"6","type":"obstacle"},{"gridX":"8","gridY":"6","type":"obstacle"},{"gridX":"3","gridY":"7","type":"obstacle"},{"gridX":"5","gridY":"7","type":"obstacle"},{"gridX":"6","gridY":"7","type":"obstacle"}],
 			"entities": [
 				{"gridX":4,"gridY":4,"type":"character"},
@@ -108,6 +110,30 @@
 			"exits": [
 				{"condition": "esc", "destination": 0}
 			]
+		},
+		{
+			"name":"engine room a",
+			"type": "level",
+			"stage": "recon",
+			"max": 8,
+			"map":[{"gridX":"7","gridY":"2","type":"obstacle"},{"gridX":"6","gridY":"4","type":"obstacle"}],
+			"entities": [
+				{"gridX":4,"gridY":4,"type":"character"},
+				{"gridX":7,"gridY":4,"type":"collectable"}
+			],
+			"exits": []
+		},
+		{
+			"name":"engine room b",
+			"type": "level",
+			"stage": "recon",
+			"max": 11,
+			"map":[{"gridX":"3","gridY":"2","type":"obstacle"},{"gridX":"4","gridY":"2","type":"obstacle"},{"gridX":"6","gridY":"2","type":"obstacle"},{"gridX":"7","gridY":"2","type":"obstacle"},{"gridX":"4","gridY":"3","type":"obstacle"},{"gridX":"3","gridY":"5","type":"obstacle"},{"gridX":"3","gridY":"6","type":"obstacle"}],
+			"entities": [
+				{"gridX":4,"gridY":4,"type":"character"},
+				{"gridX":7,"gridY":4,"type":"collectable"}
+			],
+			"exits": []	
 		}
 	]
 }

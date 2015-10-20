@@ -1,0 +1,1 @@
+{"name":"engine room a","map":[{"gridX":"7","gridY":"2","type":"obstacle"},{"gridX":"6","gridY":"4","type":"obstacle"}]}
