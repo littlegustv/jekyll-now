@@ -6,7 +6,7 @@ in order to put off making puzzles:
 - memory (localstorage?) -> remember levels completed - how much more?
 - collectables show as completed levels, bg images for stages screen
 - make some puzzles, why not?
-- UNSTABLE is not a very useful mechanic, so far
+- UNSTABLE is not a very useful mechanic, so far ... maybe instead, obstacles that break apart after one 'hit'
 
 touch controls, mobile optimization, kongregate api
 
@@ -250,9 +250,11 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.buttons.push(b);
 				var b = Object.create(Button).init( 1, 0, Resources.back);
 				b.callback = function () {
-					world.doScene(0);
+					world.doScene(3);
 				};
 				s.buttons.push(b);
+				var t = Object.create(Text).init(canvas.width / 2, canvas.height - 40, s.name, {});
+				s.addEntity(t);
 			}
 			if (s.name == "mainmenu") {
 				var t = Object.create(Text).init(0, 0,"-- New Game --",{color: "#000000"});
@@ -312,7 +314,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		save: function () {
 			var current = this.scene;
-			var save = {name: current.name, map: []};
+			var save = {name: "default", type: "level", stage: "recon", max: 20, map: [], entities: [], exits: []};
 			save.name = current.name;
 			for (y in current.map) {
 				for (x in current.map[y]) {
@@ -448,8 +450,16 @@ window.addEventListener("DOMContentLoaded", function () {
 								this.completed = true;
 								world.scenes[this.uid].completed = true;
 								world.paused = true;
-								this.entities.push(Object.create(Exit).init((world.cs + 1) % world.scenes.length, conditions.space));
-								this.entities.push(Object.create(Text).init(297,360,"well done!  Press SPACE for next level.",{}));
+								var t = Object.create(Text).init(0,0,"Next...",{color: "#009900"});
+								var tb = Object.create(TextButton).init(canvas.width - 60, canvas.height - 40, t);
+								var n = this.uid + 1;
+								tb.callback = function () {
+									world.doScene(n);
+								};
+								this.buttons.push(tb);
+
+								//this.entities.push(Object.create(Exit).init((world.cs + 1) % world.scenes.length, conditions.space));
+								//this.entities.push(Object.create(Text).init(297,360,"well done!  Press SPACE for next level.",{}));
 							}
 						}
 					}
@@ -676,8 +686,6 @@ window.addEventListener("DOMContentLoaded", function () {
 		return this;
 	}
 	TextButton.draw = function (ctx) {
-		ctx.fillStyle = "red";
-		ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
 		this.text.draw(ctx);
 	};
 	TextButton.check = function (x, y) {
@@ -890,6 +898,10 @@ window.addEventListener("DOMContentLoaded", function () {
 				break;
 			case "remove":
 				world.remove(m);
+				break;
+			case "collectable":
+				var c = Object.create(Collectable).init(m.x, m.y, Resources.collectable);
+				world.addEntity(c);
 				break;
 		}
 	});

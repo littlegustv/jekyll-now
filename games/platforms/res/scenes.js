@@ -86,7 +86,43 @@
 			]
 		},
 		{
-			"name":"engine room a",
+			"name":"it started simple enough",
+			"type":"level",
+			"stage":"recon",
+			"max":2,
+			"map":[],
+			"entities":[
+				{"gridX":4,"gridY":5,"type":"character"},
+				{"gridX":6,"gridY":5,"type":"collectable"}
+			],
+			"exits":[]
+		},
+		{
+			"name":"and for a while the fallout was only an inconvenience",
+			"type":"level",
+			"stage":"recon",
+			"max":20,
+			"map":[{"gridX":"4","gridY":"6","type":"obstacle"}],
+			"entities":[
+				{"gridX":3,"gridY":6,"type":"character"},
+				{"gridX":5,"gridY":6,"type":"collectable"}
+			],
+			"exits":[]
+		},	
+		{
+			"name":"you can use obstacles to adjust your offest from your goal",
+			"type":"level",
+			"stage":"recon",
+			"max":20,
+			"map":[{"gridX":"2","gridY":"4","type":"obstacle"},{"gridX":"9","gridY":"4","type":"obstacle"}],
+			"entities":[
+				{"gridX":4,"gridY":4,"type":"character"},
+				{"gridX":7,"gridY":4,"type":"collectable"}
+			],
+			"exits":[]
+		},
+		{
+			"name":"it matters which angle/side you approach from",
 			"type":"level",
 			"stage": "recon",
 			"max": 7,
@@ -98,7 +134,7 @@
 			"exits": []
 		},
 		{
-			"name": "engine room b",
+			"name": "don't waste time going in the wrong direction",
 			"type": "level",
 			"stage": "recon",
 			"max": 7,
@@ -112,23 +148,85 @@
 			]
 		},
 		{
-			"name":"engine room a",
+			"name":"sometimes you have to reverse to go forward",
 			"type": "level",
 			"stage": "recon",
-			"max": 8,
-			"map":[{"gridX":"7","gridY":"2","type":"obstacle"},{"gridX":"6","gridY":"4","type":"obstacle"}],
+			"max": 11,
+			"map":[{"gridX":"3","gridY":"2","type":"obstacle"},{"gridX":"4","gridY":"2","type":"obstacle"},{"gridX":"6","gridY":"2","type":"obstacle"},{"gridX":"7","gridY":"2","type":"obstacle"},{"gridX":"4","gridY":"3","type":"obstacle"},{"gridX":"3","gridY":"5","type":"obstacle"},{"gridX":"3","gridY":"6","type":"obstacle"}],
 			"entities": [
 				{"gridX":4,"gridY":4,"type":"character"},
 				{"gridX":7,"gridY":4,"type":"collectable"}
 			],
-			"exits": []
+			"exits": []	
+		},
+		{
+			"name":"it might take longer, but sometimes you need space",
+			"type":"level",
+			"stage":"recon",
+			"max":20,
+			"map":[{"gridX":"4","gridY":"2","type":"obstacle"},{"gridX":"3","gridY":"3","type":"obstacle"},{"gridX":"5","gridY":"3","type":"obstacle"},{"gridX":"7","gridY":"3","type":"obstacle"},{"gridX":"9","gridY":"4","type":"obstacle"},{"gridX":"3","gridY":"5","type":"obstacle"},{"gridX":"4","gridY":"5","type":"obstacle"},{"gridX":"5","gridY":"5","type":"obstacle"},{"gridX":"6","gridY":"5","type":"obstacle"},{"gridX":"7","gridY":"5","type":"obstacle"},{"gridX":"8","gridY":"5","type":"obstacle"}],
+			"entities":[
+				{"gridX":4,"gridY":4,"type":"character"},
+				{"gridX":7,"gridY":4,"type":"collectable"}
+			],
+			"exits":[]
+		},
+		{
+			"name":"avoid the obvious",
+			"type":"level",
+			"stage":"recon",
+			"max":20,
+			"map":[{"gridX":"3","gridY":"1","type":"obstacle"},{"gridX":"7","gridY":"1","type":"obstacle"},{"gridX":"3","gridY":"2","type":"obstacle"},{"gridX":"6","gridY":"2","type":"obstacle"},{"gridX":"1","gridY":"4","type":"obstacle"},{"gridX":"2","gridY":"4","type":"obstacle"},{"gridX":"1","gridY":"6","type":"obstacle"},{"gridX":"4","gridY":"6","type":"obstacle"},{"gridX":"0","gridY":"7","type":"obstacle"},{"gridX":"4","gridY":"7","type":"obstacle"}],
+			"entities":[
+				{"gridX":4,"gridY":4,"type":"character"},
+				{"gridX":7,"gridY":4,"type":"collectable"}
+			],
+			"exits":[]
+		},
+		{
+			"name":"not sure about this one, to be honest",
+			"type":"level",
+			"stage":"recon",
+			"max":20,
+			"map":[{"gridX":"5","gridY":"1","type":"obstacle"},{"gridX":"6","gridY":"1","type":"obstacle"},{"gridX":"5","gridY":"2","type":"obstacle"},{"gridX":"7","gridY":"2","type":"obstacle"},{"gridX":"2","gridY":"3","type":"obstacle"},{"gridX":"1","gridY":"4","type":"obstacle"},{"gridX":"6","gridY":"4","type":"obstacle"},{"gridX":"1","gridY":"5","type":"obstacle"},{"gridX":"3","gridY":"6","type":"obstacle"},{"gridX":"5","gridY":"6","type":"obstacle"},{"gridX":"2","gridY":"7","type":"obstacle"},{"gridX":"3","gridY":"7","type":"obstacle"}],
+			"entities":[
+				{"gridX":4,"gridY":4,"type":"character"},
+				{"gridX":7,"gridY":4,"type":"collectable"}
+			],
+			"exits":[]
+		},
+		{
+			"name":"the order you approach things matters",
+			"type":"level",
+			"stage":"recon",
+			"max":10,
+			"map":[{"gridX":"7","gridY":"1","type":"obstacle"},{"gridX":"4","gridY":"2","type":"obstacle"},{"gridX":"7","gridY":"2","type":"obstacle"},{"gridX":"3","gridY":"3","type":"obstacle"},{"gridX":"7","gridY":"3","type":"obstacle"},{"gridX":"2","gridY":"4","type":"obstacle"},{"gridX":"7","gridY":"4","type":"obstacle"},{"gridX":"1","gridY":"5","type":"obstacle"},{"gridX":"9","gridY":"6","type":"obstacle"},{"gridX":"2","gridY":"7","type":"obstacle"},{"gridX":"8","gridY":"7","type":"obstacle"},{"gridX":"2","gridY":"8","type":"obstacle"},{"gridX":"7","gridY":"8","type":"obstacle"},{"gridX":"2","gridY":"9","type":"obstacle"},{"gridX":"6","gridY":"9","type":"obstacle"},{"gridX":"2","gridY":"10","type":"obstacle"}],
+			"entities":[
+				{"gridX":5,"gridY":5,"type":"character"},
+				{"gridX":8,"gridY":5,"type":"collectable"},
+				{"gridX":6,"gridY":8,"type":"collectable"}
+			],
+			"exits":[]
+		},
+		{
+			"name":"entrance is important",
+			"type":"level",
+			"stage":"recon",
+			"max":14,
+			"map":[{"gridX":"7","gridY":"2","type":"obstacle"},{"gridX":"8","gridY":"2","type":"obstacle"},{"gridX":"9","gridY":"2","type":"obstacle"},{"gridX":"6","gridY":"3","type":"obstacle"},{"gridX":"9","gridY":"3","type":"obstacle"},{"gridX":"1","gridY":"4","type":"obstacle"},{"gridX":"5","gridY":"4","type":"obstacle"},{"gridX":"9","gridY":"4","type":"obstacle"},{"gridX":"0","gridY":"5","type":"obstacle"},{"gridX":"5","gridY":"5","type":"obstacle"},{"gridX":"8","gridY":"5","type":"obstacle"},{"gridX":"0","gridY":"6","type":"obstacle"},{"gridX":"4","gridY":"6","type":"obstacle"},{"gridX":"6","gridY":"6","type":"obstacle"},{"gridX":"7","gridY":"6","type":"obstacle"},{"gridX":"5","gridY":"7","type":"obstacle"},{"gridX":"-1","gridY":"7","type":"obstacle"}],
+			"entities":[
+				{"gridX":4,"gridY":4,"type":"character"},
+				{"gridX":2,"gridY":5,"type":"collectable"},
+				{"gridX":7,"gridY":4,"type":"collectable"}
+			],
+			"exits":[]
 		},
 		{
 			"name":"engine room b",
 			"type": "level",
 			"stage": "recon",
-			"max": 11,
-			"map":[{"gridX":"3","gridY":"2","type":"obstacle"},{"gridX":"4","gridY":"2","type":"obstacle"},{"gridX":"6","gridY":"2","type":"obstacle"},{"gridX":"7","gridY":"2","type":"obstacle"},{"gridX":"4","gridY":"3","type":"obstacle"},{"gridX":"3","gridY":"5","type":"obstacle"},{"gridX":"3","gridY":"6","type":"obstacle"}],
+			"max": 20,
+			"map":[],
 			"entities": [
 				{"gridX":4,"gridY":4,"type":"character"},
 				{"gridX":7,"gridY":4,"type":"collectable"}
