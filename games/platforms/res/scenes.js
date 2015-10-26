@@ -5,7 +5,7 @@
 			"type": "menu",
 			"map": {},
 			"entities": [
-				{"gridX":297,"gridY":198,"text":"Main Menu","type":"text", "speed": 100, "format": {"size":44}}
+				{"gridX":240,"gridY":160,"text":"Main Menu","type":"text", "speed": 100, "format": {"size":44}}
 			]
 		},
 		{
@@ -13,10 +13,10 @@
 			"type": "menu",
 			"map": {},
 			"entities": [
-				{"gridX":297,"gridY":60,"text":"Credits","type":"text", "speed": 100, "format": {"size": 44}},
-				{"gridX":297,"gridY":110,"text":"Developed By Benny Heller","type":"text", "speed": 100, "format": {}},
-				{"gridX":297,"gridY":136,"text":"Special thanks to JavaScript","type":"text", "speed": 100, "format": {}},
-				{"gridX":297,"gridY":162,"text":"Find me at @littlegustv on twitter","type":"text", "speed": 100, "format": {}}
+				{"gridX":240,"gridY":60,"text":"Credits","type":"text", "speed": 100, "format": {"size": 44}},
+				{"gridX":240,"gridY":110,"text":"Developed By Benny Heller","type":"text", "speed": 100, "format": {}},
+				{"gridX":240,"gridY":136,"text":"Special thanks to JavaScript","type":"text", "speed": 100, "format": {}},
+				{"gridX":240,"gridY":162,"text":"Find me at @littlegustv on twitter","type":"text", "speed": 100, "format": {}}
 			]
 		},
 		{
@@ -24,7 +24,7 @@
 			"type": "menu",
 			"map": {},
 			"entities": [
-				{"gridX":297,"gridY":60,"text":"Stages","type":"text", "speed": 100, "format": {"size": 44}}
+				{"gridX":240,"gridY":60,"text":"Stages","type":"text", "speed": 100, "format": {"size": 44}}
 			]
 		},
 		{
