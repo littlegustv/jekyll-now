@@ -40,8 +40,6 @@ function modulo(n, p) {
 window.addEventListener("DOMContentLoaded", function () {
 
 	function mouseUp (e) {
-		if (world.mouse.cooldown > 0) return;
-		world.mouse.cooldown = 250;
 		if (e.changedTouches) console.log("end", e);
 		e.offsetX = e.offsetX || e.changedTouches[0].clientX;
 		e.offsetY = e.offsetY || e.changedTouches[0].clientY;
@@ -94,7 +92,6 @@ window.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function mouseDown (e) {
-		if (world.mouse.cooldown > 0) return;
 		e.offsetX = e.offsetX || e.changedTouches[0].clientX;
 		e.offsetY = e.offsetY || e.changedTouches[0].clientY;
 		world.mouse.x = e.offsetX, world.mouse.y = e.offsetY;
@@ -105,7 +102,6 @@ window.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function mouseMove (e) {
-		if (world.mouse.cooldown > 0) return;
 		if (e.changedTouches) console.log("moving", e);
 		e.offsetX = e.offsetX || e.changedTouches[0].clientX;
 		e.offsetY = e.offsetY || e.changedTouches[0].clientY;
@@ -123,6 +119,9 @@ window.addEventListener("DOMContentLoaded", function () {
 	var canvas = document.getElementById("mygame");
 	var ctx = canvas.getContext("2d");
 	ctx.imageSmoothingEnabled = false;
+	ctx.mozImageSmoothingEnabled = false;
+	ctx.webkitImageSmoothingEnabled = false;
+	ctx.msImageSmoothingEnabled = false;
 
 	var GLOBALS = {
 		scale: 4,
