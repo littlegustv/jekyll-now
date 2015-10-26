@@ -2,11 +2,12 @@
 
 todo: 
 in order to put off making puzzles:
-- plasma animation - NOT game of life, that looks terrible
 - memory (localstorage?) -> remember levels completed - how much more?
 - collectables show as completed levels, bg images for stages screen
 - make some puzzles, why not?
 - UNSTABLE is not a very useful mechanic, so far ... maybe instead, obstacles that break apart after one 'hit'
+
+- unstable/undertow happen with EACH jump, not just when you jump on them
 
 touch controls, mobile optimization, kongregate api
 
@@ -26,27 +27,114 @@ ship interior, where you can place the objects that you rescued?
 
 **/
 
+// debug variable
+
 var debug;
+
+// helper functions
 
 function modulo(n, p) {
 	return (n % p + p) % p;
 }
 
 window.addEventListener("DOMContentLoaded", function () {
+
+	function mouseUp (e) {
+		if (world.mouse.cooldown > 0) return;
+		world.mouse.cooldown = 250;
+		if (e.changedTouches) console.log("end", e);
+		e.offsetX = e.offsetX || e.changedTouches[0].clientX;
+		e.offsetY = e.offsetY || e.changedTouches[0].clientY;
+
+		var m = world.toGrid(e.offsetX, e.offsetY);
+		world.mouse.down = false;
+		
+		// check if button is at location
+
+		if (world.scene.button(e.offsetX, e.offsetY)) { return; }
+		
+		// right click
+
+		if (e.which === 3 || e.button === 2) {
+			world.remove(m, "platform");
+			return;
+		}
+
+		// DEBUG BEHAVIOR
+
+		var action = document.getElementById("action").value || "platform";
+		switch (action) {
+			case "platform":
+				world.addPlatform();
+				break;
+			case "obstacle":
+				var o = Object.create(Obstacle).init(m.x, m.y, Resources.o1);
+				world.add(o);
+				break;
+			case "hotspot":
+				var o = Object.create(HotSpot).init(m.x, m.y, Resources.hotspot);
+				world.add(o);
+				break;
+			case "undertow":
+				var o = Object.create(UnderTow).init(m.x, m.y, Resources.undertow);
+				world.add(o);
+				break;
+			case "unstable":
+				var o = Object.create(Unstable).init(m.x, m.y, Resources.unstable);
+				world.add(o);
+				break;
+			case "remove":
+				world.remove(m);
+				break;
+			case "collectable":
+				var c = Object.create(Collectable).init(m.x, m.y, Resources.collectable);
+				world.addEntity(c);
+				break;
+		}
+	}
+
+	function mouseDown (e) {
+		if (world.mouse.cooldown > 0) return;
+		e.offsetX = e.offsetX || e.changedTouches[0].clientX;
+		e.offsetY = e.offsetY || e.changedTouches[0].clientY;
+		world.mouse.x = e.offsetX, world.mouse.y = e.offsetY;
+
+		if (e.changedTouches) console.log("start", e);
+		if (!world.scene || world.scene.type != "level") return;
+		else world.mouse.down = true;
+	}
+
+	function mouseMove (e) {
+		if (world.mouse.cooldown > 0) return;
+		if (e.changedTouches) console.log("moving", e);
+		e.offsetX = e.offsetX || e.changedTouches[0].clientX;
+		e.offsetY = e.offsetY || e.changedTouches[0].clientY;
+
+		world.scene.highlightButton(e.offsetX, e.offsetY);
+		if (!world.scene || world.scene.type != "level") return;
+		var theta = Math.atan2(e.offsetY - world.mouse.y, e.offsetX - world.mouse.x);
+		world.mouse.angle = modulo(Math.round(theta / (Math.PI / 3)), 6);
+		//console.log(world.mouse);
+		if (!world.mouse.down) {
+			world.mouse.x = e.offsetX, world.mouse.y = e.offsetY;
+		}
+	}
+
 	var canvas = document.getElementById("mygame");
 	var ctx = canvas.getContext("2d");
 	ctx.imageSmoothingEnabled = false;
-	ctx.textAlign = "center";
 
 	var GLOBALS = {
 		scale: 4,
-		radius: 18,
 		width: 18,
 		height: 16,
 		border: 24,
 		jumpSpeed: 750
 	};
 
+	// keys
+	var directions = ["east", "southeast", "southwest", "west", "northwest", "northeast"];
+	// values
 	var DIRECTION = {
 		none: {x: 0, y: 0},
 		east: {x: 1, y: 0},
@@ -55,11 +143,6 @@ window.addEventListener("DOMContentLoaded", function () {
 		west: {x: -1, y: 0},
 		northwest: {x: 0, y: -1},
 		northeast: {x: 1, y: -1}
-	};
-	var directions = ["east", "southeast", "southwest", "west", "northwest", "northeast"];
-	var conditions = {
-		"space": function () { var r = world.keys.space; world.keys.space = false; return r;},
-		"esc": function () { return world.keys.escape; }
 	};
 
 	function getDirectionName(d) {
@@ -86,22 +169,22 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "scenes.js"},
 		{path: "collectable.png", frames: 2, speed: 650},
 		{path: "start.png", frames: 2, speed: 500},
-		{path: "cell.png"},
+		{path: "cell.png", frames: 5, speed: 1500},
 		{path: "reset.png", frames: 2, speed: 500},
-		{path: "back.png", frames: 2, speed: 500}
+		{path: "back.png", frames: 2, speed: 500},
+		{path: "play.png", frames: 2, speed: 500}
 	];
 
 	var World = {
+		// for locking/unlocking stages on completion
 		stages: {
-			recon: true,
-			habitation: false,
+			habitation: true,
 			hydroponics: true,
 			operations: false,
 			engineering: false,
 			medical: false
 		},
-		mouse: {down: false, x: 0, y: 0, angle: 0},
-		keys: {space: false},
+		mouse: {down: false, x: 0, y: 0, angle: 0, cooldown: 0},
 		init: function () {
 			this.paused = true;
 			this.loadResources();
@@ -150,6 +233,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		progressBar: function () {
 			this.resourceLoadCount += 1;
 			if (this.resourceLoadCount >= this.resourceCount) {
+				this.addEventListeners();
 				this.begin();
 			}
 		},
@@ -158,7 +242,50 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.paused = true;
 			this.scene = this.createScene(i);
 		},
+		addEventListeners: function () {
+			canvas.addEventListener("contextmenu", function (e) {
+				e.preventDefault();
+				return false;
+			});
+			canvas.addEventListener("mousedown", mouseDown);
+			canvas.addEventListener("mousemove", mouseMove);
+			canvas.addEventListener("mouseup", mouseUp);
+
+			canvas.addEventListener("touchstart", mouseDown);
+			canvas.addEventListener("touchmove", mouseMove);
+			canvas.addEventListener("touchend", mouseUp);		
+
+		},
+		loadBG: function () {
+			this.bg = {};
+			for (var i = -2; i <= 2 + canvas.height / (2 * GLOBALS.height); i++) {
+				var row = {};
+				for (var j = -i; j <= canvas.width / (2 * GLOBALS.width); j++) {
+					var o = Object.create(Cell).init(j, i, Resources.cell);
+					o.frame = Math.floor(Math.random() * Resources.cell.frames);
+					o.maxFrameDelay = Math.floor(Math.random() * 500 + 3000);
+					o.frameDelay = Math.floor(Math.random() * o.maxFrameDelay);//row[j].maxFrameDelay;
+					row[j] = o;
+				}
+				this.bg[i] = row;
+			}
+		},
+		updateBG: function (dt) {
+			for (y in this.bg) {
+				for (x in this.bg[y]) {
+					this.bg[y][x].update(dt);
+				}
+			}
+		},
+		drawBG: function (ctx) {
+			for (y in this.bg) {
+				for (x in this.bg[y]) {
+					this.bg[y][x].draw(ctx);
+				}
+			}
+		},
 		begin: function () {
+			this.loadBG();
 			this.scenes = this.sceneInfo.scenes, this.cs = 0;
 			//var sceneJSON = this.sceneInfo.scenes;
 			//for (var i = 0; i < sceneJSON.length; i++) {
@@ -183,7 +310,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		doScene: function (n) {
 			//this.cs = n;
 			this.scene = this.createScene(n);
-			debug = this.scene;
+			//debug = this.scene;
 			if (this.scene.type == "level") this.cs = n;
 		},
 		createScene: function (n) {
@@ -211,6 +338,7 @@ window.addEventListener("DOMContentLoaded", function () {
 						e.direction = {x: -1, y: 2};
 						e.distance = 5;
 						s.character = e;
+						debug = e;
 						break;
 					case "collectable":
 						e = Object.create(Collectable).init(c.gridX, c.gridY, Resources.collectable);
@@ -238,11 +366,13 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 				if (m) s.map[c.gridY][c.gridX] = m;
 			}
+			/*
 			for (var i = 0; i < config.exits.length; i++) {
 				var e = Object.create(Exit).init(config.exits[i].destination, conditions[config.exits[i].condition]);
 				s.entities.push(e);
-			}
+			}*/
 			if (s.type == "level") {
+				// ADD LEVEL BUTTONS: reset, back, play
 				var b = Object.create(Button).init( 0, 0, Resources.reset);
 				b.callback = function () {
 					world.reset();
@@ -250,28 +380,34 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.buttons.push(b);
 				var b = Object.create(Button).init( 1, 0, Resources.back);
 				b.callback = function () {
-					world.doScene(3);
+					world.doScene(2);
+				};
+				s.buttons.push(b);
+				var b = Object.create(Button).init( 2, 0, Resources.play);
+				b.callback = function () {
+					console.log("yeah!!!", this);
+					world.paused = !world.paused;
 				};
 				s.buttons.push(b);
 				var t = Object.create(Text).init(canvas.width / 2, canvas.height - 40, s.name, {});
 				s.addEntity(t);
 			}
 			if (s.name == "mainmenu") {
-				var t = Object.create(Text).init(0, 0,"-- New Game --",{color: "#000000"});
+				var t = Object.create(Text).init(0, 0,"-- New Game --",{});
 				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 40,t);
 				tb.callback = function () {
 					world.doScene(2);
 				};
 				s.buttons.push(tb);
 			
-				var t = Object.create(Text).init(0, 0,"-- Continue --",{color: "#333333"});
+				var t = Object.create(Text).init(0, 0,"-- Continue --",{});
 				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 68,t);
 				tb.callback = function () {
-					world.doScene(3);
+					world.doScene(2);
 				};
 				s.buttons.push(tb);
 
-				var t = Object.create(Text).init(0, 0,"-- Credits --",{color: "#333333"});
+				var t = Object.create(Text).init(0, 0,"-- Credits --",{});
 				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 96,t);
 				tb.callback = function () {
 					world.doScene(1);
@@ -286,8 +422,8 @@ window.addEventListener("DOMContentLoaded", function () {
 						s.entities.push(title);
 						var levels = this.scenes.filter(function (a) { return a.stage == stage; });
 						for (var i = 0; i < levels.length; i++) {
-							var t = Object.create(Text).init(canvas.width / 2 + i * 20, y,  String(i), {align: "left"});
-							var tb = Object.create(TextButton).init(canvas.width / 2 + i * 20, y, t);
+							var t = Object.create(Text).init(0, 0,  String(i), {align: "left"});
+							var tb = Object.create(TextButton).init(GLOBALS.border + i * 25, y, t);
 							var w = this.scenes.indexOf(levels[i]);
 							tb.destination = w;
 							tb.callback = function () {
@@ -329,6 +465,14 @@ window.addEventListener("DOMContentLoaded", function () {
 			var newTime = new Date();
 			var dt = newTime - this.time;
 			this.time = newTime;
+
+			this.mouse.cooldown -= dt;
+
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+
+			this.updateBG(dt);
+			this.drawBG(ctx);
+			
 			this.scene.update(dt);
 			this.scene.draw(ctx);
 			if (this.scene.type == "level") {
@@ -405,13 +549,9 @@ window.addEventListener("DOMContentLoaded", function () {
 			return this;
 		},
 		draw: function (ctx) {
-			ctx.clearRect(0,0,canvas.width,canvas.height);
 			//ctx.fillStyle = "#f0e848";
 			//ctx.fillRect(0,0,canvas.width,canvas.height);
 			//console.log(this.bg.length);
-			for (var i = 0; i < this.bg.length; i++) {
-				this.bg[i].draw(ctx);
-			}
 			for (y in this.map) {
 				for (x in this.map[y]) {
 					if (this.map[y][x]) {
@@ -435,9 +575,6 @@ window.addEventListener("DOMContentLoaded", function () {
 					}
 				}
 			}
-
-			if (this.spawn <= 0) this.spawn = 5000;
-
 			for (var i = 0; i < this.entities.length; i++) {
 				this.entities[i].update(dt);
 				if (!this.entities[i] || !this.character) {}
@@ -450,7 +587,7 @@ window.addEventListener("DOMContentLoaded", function () {
 								this.completed = true;
 								world.scenes[this.uid].completed = true;
 								world.paused = true;
-								var t = Object.create(Text).init(0,0,"Next...",{color: "#009900"});
+								var t = Object.create(Text).init(0,0,"Next...",{});
 								var tb = Object.create(TextButton).init(canvas.width - 60, canvas.height - 40, t);
 								var n = this.uid + 1;
 								tb.callback = function () {
@@ -470,6 +607,15 @@ window.addEventListener("DOMContentLoaded", function () {
 			for (var i = 0; i < this.exits.length; i++) {
 				this.exits[i].check();
 			}*/
+		},
+		doMap: function (type, fn) {
+			for (y in this.map) {
+				for (x in this.map[y]) {
+					if (this.map[y][x] && this.map[y][x].special == type) {
+						this.map[y][x][fn]();
+					}
+				}
+			}
 		},
 		button: function (x, y) {
 			for (var i = 0; i < this.buttons.length; i++) {
@@ -516,7 +662,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		setupMap: function () {
 			this.map = {};
-			for (var i = 0; i <= canvas.height / (2 * GLOBALS.height); i++) {
+			for (var i = -2; i <= 2 + canvas.height / (2 * GLOBALS.height); i++) {
 				var row = {};
 				for (var j = -i; j <= canvas.width / (2 * GLOBALS.width); j++) {
 					row[j] = undefined;
@@ -529,13 +675,21 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		remove: function (position, type) {
 			if (this.map[position.y]) {
+				var o = undefined;
+				if (this.map[position.y][position.x]) {
+					switch (this.map[position.y][position.x].special) {
+						case "undertow":
+							o = Object.create(UnderTow).init(position.x, position.y, Resources.undertow);
+							break;
+					}
+				}
 				if (type)
 				{
 					if (this.map[position.y][position.x] && this.map[position.y][position.x].type == type)
-						this.map[position.y][position.x] = undefined;
+						this.map[position.y][position.x] = o;
 				}
 				else {
-					this.map[position.y][position.x] = undefined;
+					this.map[position.y][position.x] = o;
 				}
 			}
 		},
@@ -565,7 +719,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				if (this.nPlatforms() >= this.max) return;
 				else {
 					var p = Object.create(Platform).init(position.x, position.y, Resources[direction], DIRECTION[direction]);
-					if (m && m.callback) { p.onJump = m.callback; }
+					if (m && m.callback) { p.onJump = m.callback; p.special = m.type; }
 					this.map[position.y][position.x] = p;
 				}
 			}
@@ -679,13 +833,15 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	var TextButton = Object.create(Button);
 	TextButton.init = function (x, y, text) {
-		this.x = x; this.y = y; this.text = text;
+		this.x = x; this.y = y - 8; this.text = text;
 		this.text.draw(ctx);
-		this.text.x = this.x, this.text.y = this.y + 6;
+		this.text.x = x, this.text.y = y;
 		this.w = ctx.measureText(this.text.text).width + 10, this.h = this.text.size + 4;
 		return this;
 	}
 	TextButton.draw = function (ctx) {
+		//ctx.fillStyle = "red";
+		//ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
 		this.text.draw(ctx);
 	};
 	TextButton.check = function (x, y) {
@@ -746,16 +902,6 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	var Cell = Object.create(Entity);
 	Cell.type = "cell";
-	Cell.z = 0;
-	Cell.alive = true;
-	Cell.update = function (dt) {
-		//this.opacity = Math.sin(Math.PI * this.life / this.maxLife);
-		//this.life -= dt;
-		var neighbors = world.scene.getNeighbors(this.gridX, this.gridY);
-		if (neighbors <= 2) this.alive = false;
-		else if (neighbors > 4) this.alive = false;
-
-	}
 
 	var Text = Object.create(Entity);
 	Text.type = "text";
@@ -830,7 +976,12 @@ window.addEventListener("DOMContentLoaded", function () {
 					this.distance = d;
 					this.jumping = GLOBALS.jumpSpeed;
 					this.animation = directions.indexOf(getDirectionName(this.direction));
-					p.onJump();
+					world.scene.doMap("undertow", "onJump");
+
+					if (p.type == "hotspot") {
+						p.onJump();
+					}
+
 					//this.animation = 
 	//				setTimeout(function () { c.gridX += p.direction.x * d, c.gridY += p.direction.y * d; c.jumping = false;}, 500);
 				}
@@ -842,70 +993,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	var world = Object.create(World).init();
 
-	canvas.addEventListener("contextmenu", function (e) {
-		e.preventDefault();
-		return false;
-	});
-
-	canvas.addEventListener("mousedown", function (e) {
-		if (!world.scene || world.scene.type != "level") return;
-		world.mouse.down = true;
-	});
-
-	canvas.addEventListener("mousemove", function (e) {
-		world.scene.highlightButton(e.offsetX, e.offsetY);
-		if (!world.scene || world.scene.type != "level") return;
-		var theta = Math.atan2(e.offsetY - world.mouse.y, e.offsetX - world.mouse.x);
-		world.mouse.angle = modulo(Math.round(theta / (Math.PI / 3)), 6);
-		if (!world.mouse.down) {
-			world.mouse.x = e.offsetX, world.mouse.y = e.offsetY;
-		}
-	});
-
-	canvas.addEventListener("mouseup", function (e) {
-		var m = world.toGrid(e.offsetX, e.offsetY);
-		world.mouse.down = false;
-		
-		if (world.scene.button(e.offsetX, e.offsetY)) { return; }
-		
-		if (e.which === 3 || e.button === 2) {
-			world.remove(m, "platform");
-			return;
-		}
-
-		// else
-
-		var action = document.getElementById("action");
-		switch (action.value) {
-			case "platform":
-				world.addPlatform();
-				break;
-			case "obstacle":
-				var o = Object.create(Obstacle).init(m.x, m.y, Resources.o1);
-				world.add(o);
-				break;
-			case "hotspot":
-				var o = Object.create(HotSpot).init(m.x, m.y, Resources.hotspot);
-				world.add(o);
-				break;
-			case "undertow":
-				var o = Object.create(UnderTow).init(m.x, m.y, Resources.undertow);
-				world.add(o);
-				break;
-			case "unstable":
-				var o = Object.create(Unstable).init(m.x, m.y, Resources.unstable);
-				world.add(o);
-				break;
-			case "remove":
-				world.remove(m);
-				break;
-			case "collectable":
-				var c = Object.create(Collectable).init(m.x, m.y, Resources.collectable);
-				world.addEntity(c);
-				break;
-		}
-	});
-
+/*
 	document.addEventListener("keydown", function (e) {
 		if (e.keyCode == 32) {
 			world.keys.space = true;
@@ -918,7 +1006,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			world.keys.space = false;
 		}
 	});
-
+*/
 	document.getElementById("save").addEventListener("click", function () {
 		var js = world.save();
 		document.getElementById("json").value = js;

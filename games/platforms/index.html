@@ -1,5 +1,7 @@
 <html>
 	<head>
+		<meta name="viewport" content="initial-scale=1">
+		<meta name="apple-mobile-web-app-capable" content="yes">
 		<script src='./js/source.js'></script>
 		<style>
 			@font-face {
@@ -7,6 +9,9 @@
 			  font-style: normal;
 			  font-weight: 600;
 			  src: url(./res/Teko-Regular.ttf) format('truetype');
+			}
+			body {
+				margin: 0px;
 			}
 			#debug {
 				display: block;
@@ -25,9 +30,9 @@
 		</style>
 	</head>
 	<body>
-		<canvas id='mygame' height=396 width=594 style='border: 1px solid black; background: #e9a419;'></canvas>
+		<canvas id='mygame' height=320 width=480 style='background: #df5900;'></canvas>
 		<div style='font-family: Teko; height: 0px; width: 0px; overflow: hidden;'>Loading Fonts</div>
-		<div id='debug' style='display: block;'>
+		<div id='debug' style='display: none;'>
 			<select id='action'>
 				<option value='platform'>Platform</option>
 				<option value='obstacle'>Obstacle</option>
