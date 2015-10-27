@@ -199,7 +199,18 @@
 			"name":"when you have to choose",
 			"type":"level",
 			"stage":"hydroponics",
-			"max":16,"map":[{"gridX":"4","gridY":"6","type":"undertow"},{"gridX":"2","gridY":"8","type":"obstacle"},{"gridX":"1","gridY":"9","type":"obstacle"},{"gridX":"2","gridY":"9","type":"obstacle"},{"gridX":"1","gridY":"10","type":"obstacle"},{"gridX":"1","gridY":"11","type":"obstacle"},{"gridX":"1","gridY":"12","type":"obstacle"},{"gridX":"2","gridY":"12","type":"obstacle"},{"gridX":"1","gridY":"13","type":"obstacle"}],
+			"max":16,
+			"map":[
+				{"gridX":"4","gridY":"6","type":"undertow"},
+				{"gridX":"2","gridY":"8","type":"obstacle"},
+				{"gridX":"1","gridY":"9","type":"obstacle"},
+				{"gridX":"2","gridY":"9","type":"obstacle"},
+				{"gridX":"1","gridY":"10","type":"obstacle"},
+				{"gridX":"1","gridY":"11","type":"obstacle"},
+				{"gridX":"1","gridY":"12","type":"obstacle"},
+				{"gridX":"2","gridY":"12","type":"obstacle"},
+				{"gridX":"1","gridY":"13","type":"obstacle"}
+			],
 			"entities":[
 				{"gridX":4,"gridY":4,"type":"character"},
 				{"gridX":2,"gridY":10,"type":"collectable"},

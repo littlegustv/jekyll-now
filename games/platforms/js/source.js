@@ -2,7 +2,6 @@
 
 todo: 
 in order to put off making puzzles:
-- memory (localstorage?) -> remember levels completed - how much more?
 - collectables show as completed levels, bg images for stages screen
 - make some puzzles, why not?
 - UNSTABLE is not a very useful mechanic, so far ... maybe instead, obstacles that break apart after one 'hit'
@@ -40,10 +39,10 @@ function modulo(n, p) {
 window.addEventListener("DOMContentLoaded", function () {
 
 	function mouseUp (e) {
-		if (e.changedTouches) console.log("end", e);
-		e.offsetX = e.offsetX || e.changedTouches[0].clientX;
-		e.offsetY = e.offsetY || e.changedTouches[0].clientY;
-
+		if (e.changedTouches) {
+			e.offsetX = e.offsetX || e.changedTouches[0].clientX;
+			e.offsetY = e.offsetY || e.changedTouches[0].clientY;
+		}
 		var m = world.toGrid(e.offsetX, e.offsetY);
 		world.mouse.down = false;
 		
@@ -92,8 +91,10 @@ window.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function mouseDown (e) {
-		e.offsetX = e.offsetX || e.changedTouches[0].clientX;
-		e.offsetY = e.offsetY || e.changedTouches[0].clientY;
+		if (e.changedTouches) {
+			e.offsetX = e.offsetX || e.changedTouches[0].clientX;
+			e.offsetY = e.offsetY || e.changedTouches[0].clientY;
+		}
 		world.mouse.x = e.offsetX, world.mouse.y = e.offsetY;
 
 		if (e.changedTouches) console.log("start", e);
@@ -102,10 +103,10 @@ window.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function mouseMove (e) {
-		if (e.changedTouches) console.log("moving", e);
-		e.offsetX = e.offsetX || e.changedTouches[0].clientX;
-		e.offsetY = e.offsetY || e.changedTouches[0].clientY;
-
+		if (e.changedTouches) {
+			e.offsetX = e.offsetX || e.changedTouches[0].clientX;
+			e.offsetY = e.offsetY || e.changedTouches[0].clientY;
+		}
 		world.scene.highlightButton(e.offsetX, e.offsetY);
 		if (!world.scene || world.scene.type != "level") return;
 		var theta = Math.atan2(e.offsetY - world.mouse.y, e.offsetX - world.mouse.x);
@@ -171,7 +172,8 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "cell.png", frames: 5, speed: 1500},
 		{path: "reset.png", frames: 2, speed: 500},
 		{path: "back.png", frames: 2, speed: 500},
-		{path: "play.png", frames: 2, speed: 500}
+		{path: "play.png", frames: 2, speed: 500},
+		{path: "menu.png", frames: 2, speed: 500}
 	];
 
 	var World = {
@@ -254,6 +256,40 @@ window.addEventListener("DOMContentLoaded", function () {
 			canvas.addEventListener("touchmove", mouseMove);
 			canvas.addEventListener("touchend", mouseUp);		
 
+		},
+		setupStorage: function () {
+			if(typeof(Storage) !== "undefined") {
+			    return true;
+			} else {
+				console.log("storage not available, no saving possible");
+				return false;
+			}
+		},
+		save: function () {
+			if (this.setupStorage()) {
+				var saveData = {};
+				for (var i = 0; i < this.scenes.length; i++) {
+					if (this.scenes[i].score) {
+						saveData[i] = this.scenes[i].score;
+					}
+				}
+				saveData = JSON.stringify(saveData);
+				localStorage.setItem("platformSaveData", saveData);
+			}
+		},
+		load: function () {
+			if (this.setupStorage()) {
+				var loadData = localStorage.platformSaveData;
+				if (loadData) {
+					loadData = JSON.parse(loadData);
+					for (i in loadData) {
+						var n = Number(i);
+						if (this.scenes[n]) {
+							this.scenes[n].score = Number(loadData[i]);
+						}
+					}
+				}
+			}
 		},
 		loadBG: function () {
 			this.bg = {};
@@ -363,7 +399,10 @@ window.addEventListener("DOMContentLoaded", function () {
 						m = Object.create(Unstable).init(c.gridX, c.gridY, Resources.unstable);
 						break;
 				}
-				if (m) s.map[c.gridY][c.gridX] = m;
+				if (m) {
+					if (!s.map[c.gridY]) s.map[c.gridY] = {};
+					s.map[c.gridY][c.gridX] = m;
+				}
 			}
 			/*
 			for (var i = 0; i < config.exits.length; i++) {
@@ -377,14 +416,13 @@ window.addEventListener("DOMContentLoaded", function () {
 					world.reset();
 				};
 				s.buttons.push(b);
-				var b = Object.create(Button).init( 1, 0, Resources.back);
+				var b = Object.create(Button).init( 11, 0, Resources.back);
 				b.callback = function () {
 					world.doScene(2);
 				};
 				s.buttons.push(b);
-				var b = Object.create(Button).init( 2, 0, Resources.play);
+				var b = Object.create(Button).init( 1, 0, Resources.play);
 				b.callback = function () {
-					console.log("yeah!!!", this);
 					world.paused = !world.paused;
 				};
 				s.buttons.push(b);
@@ -402,6 +440,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				var t = Object.create(Text).init(0, 0,"-- Continue --",{});
 				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 68,t);
 				tb.callback = function () {
+					world.load();
 					world.doScene(2);
 				};
 				s.buttons.push(tb);
@@ -412,6 +451,12 @@ window.addEventListener("DOMContentLoaded", function () {
 					world.doScene(1);
 				};
 				s.buttons.push(tb);
+			} else {
+				var b = Object.create(Button).init(12, 0, Resources.menu);
+				b.callback = function () {
+					world.doScene(0);
+				}
+				s.buttons.push(b);
 			}
 			if (s.name == "stagemenu") {
 				var y = 100;
@@ -429,6 +474,10 @@ window.addEventListener("DOMContentLoaded", function () {
 								world.doScene(this.destination);
 							};
 							s.buttons.push(tb);
+							if (levels[i].score) {
+								var t = Object.create(Text).init(GLOBALS.border + i * 25, y, String(levels[i].score), {color: "red"});
+								s.entities.push(t);
+							}
 							//console.log(tb);
 						}
 						y += 28;
@@ -447,7 +496,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			//debug = s;
 			return s;
 		},
-		save: function () {
+		toText: function () {
 			var current = this.scene;
 			var save = {name: "default", type: "level", stage: "recon", max: 20, map: [], entities: [], exits: []};
 			save.name = current.name;
@@ -544,7 +593,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.bg = [];
 			this.buttons = [];
 			this.selected = 0;
-			this.completed = false;
+			this.score;
 			return this;
 		},
 		draw: function (ctx) {
@@ -584,7 +633,7 @@ window.addEventListener("DOMContentLoaded", function () {
 						if (this.entities.filter(function (a) { return a.type == "collectable"; }).length <= 0) {
 							if (!this.completed) {
 								this.completed = true;
-								world.scenes[this.uid].completed = true;
+								world.scenes[this.uid].score = world.scene.count("platform");
 								world.paused = true;
 								var t = Object.create(Text).init(0,0,"Next...",{});
 								var tb = Object.create(TextButton).init(canvas.width - 60, canvas.height - 40, t);
@@ -593,10 +642,11 @@ window.addEventListener("DOMContentLoaded", function () {
 									world.doScene(n);
 								};
 								this.buttons.push(tb);
-
+								world.save();
+							}
 								//this.entities.push(Object.create(Exit).init((world.cs + 1) % world.scenes.length, conditions.space));
 								//this.entities.push(Object.create(Text).init(297,360,"well done!  Press SPACE for next level.",{}));
-							}
+							
 						}
 					}
 				}
@@ -852,8 +902,8 @@ window.addEventListener("DOMContentLoaded", function () {
 		return false;
 	}
 	TextButton.highlight = function (toggle) {
-		if (toggle) this.text.color = "#CCCCCC";
-		else this.text.color = "#000000";
+		if (toggle) this.text.color = "#f4f0e8";
+		else this.text.color = "#18140c";
 	}
 
 	var Platform = Object.create(Entity);
@@ -907,7 +957,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	Text.init = function (x, y, text, format, speed, delay) {
 		this.x = x, this.y = y, this.text = text;
 		this.size = format.size || 24;
-		this.color = format.color || "black";
+		this.color = format.color || "#18140c";
 		this.align = format.align || "center";
 		this.speed = speed ? speed : 0;
 		this.current = speed ? 0 : text.length;
@@ -1007,7 +1057,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	});
 */
 	document.getElementById("save").addEventListener("click", function () {
-		var js = world.save();
+		var js = world.toText();
 		document.getElementById("json").value = js;
 	});
 
