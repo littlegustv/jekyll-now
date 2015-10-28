@@ -24,7 +24,7 @@
 			"type": "menu",
 			"map": {},
 			"entities": [
-				{"gridX":240,"gridY":60,"text":"Stages","type":"text", "speed": 100, "format": {"size": 44}}
+				{"gridX":8,"gridY":32,"text":"Stages","type":"text", "speed": 100, "format": {"size": 32, "align": "left"}}
 			]
 		},
 		{
@@ -151,17 +151,6 @@
 			]
 		},
 		{
-			"name":"engine room b",
-			"type": "level",
-			"stage": "habitation",
-			"max": 20,
-			"map":[],
-			"entities": [
-				{"gridX":4,"gridY":4,"type":"character"},
-				{"gridX":7,"gridY":4,"type":"collectable"}
-			]	
-		},
-		{
 			"name":"when repetition is unavoidable",
 			"type":"level",
 			"stage":"hydroponics",
@@ -216,6 +205,17 @@
 				{"gridX":2,"gridY":10,"type":"collectable"},
 				{"gridX":-1,"gridY":11,"type":"collectable"}
 			]
+		},
+		{
+			"name":"blank",
+			"type": "level",
+			"stage": "hydroponics",
+			"max": 20,
+			"map":[],
+			"entities": [
+				{"gridX":4,"gridY":4,"type":"character"},
+				{"gridX":7,"gridY":4,"type":"collectable"}
+			]	
 		}
 	]
 }

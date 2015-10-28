@@ -21,6 +21,7 @@ Level 3: Operations -> (undertow) ...
 Level 4: Engineering -> (hotspot)
 	-> warning.  frequent temperature anomolies.  'hot spots' may occur - proceed with caution.
 Level 5: Medical
+	-> collectibles are 'specimen' -> they move each time you jump
 
 ship interior, where you can place the objects that you rescued?
 
@@ -84,7 +85,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				world.remove(m);
 				break;
 			case "collectable":
-				var c = Object.create(Collectable).init(m.x, m.y, Resources.collectable);
+				var c = Object.create(Collectable).init(m.x, m.y, Resources[world.scene.stage]);
 				world.addEntity(c);
 				break;
 		}
@@ -167,7 +168,8 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "undertow.png", frames: 4, speed: 800},
 		{path: "unstable.png", frames: 4, speed: 300},
 		{path: "scenes.js"},
-		{path: "collectable.png", frames: 2, speed: 650},
+		{path: "habitation.png", frames: 2, speed: 650, animations: 2},
+		{path: "hydroponics.png", frames: 2, speed: 650, animations: 3},
 		{path: "start.png", frames: 2, speed: 500},
 		{path: "cell.png", frames: 5, speed: 1500},
 		{path: "reset.png", frames: 2, speed: 500},
@@ -181,9 +183,9 @@ window.addEventListener("DOMContentLoaded", function () {
 		stages: {
 			habitation: true,
 			hydroponics: true,
-			operations: false,
-			engineering: false,
-			medical: false
+			operations: true,
+			engineering: true,
+			medical: true
 		},
 		mouse: {down: false, x: 0, y: 0, angle: 0, cooldown: 0},
 		init: function () {
@@ -355,6 +357,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			s.uid = n;
 			s.type = config.type || "none";
 			s.max = config.max || 0;
+			s.stage = config.stage || "none";
 			for (var i = 0; i < config.entities.length; i++) {
 				var c = config.entities[i];
 				var e;
@@ -376,7 +379,8 @@ window.addEventListener("DOMContentLoaded", function () {
 						debug = e;
 						break;
 					case "collectable":
-						e = Object.create(Collectable).init(c.gridX, c.gridY, Resources.collectable);
+						e = Object.create(Collectable).init(c.gridX, c.gridY, Resources[s.stage]);
+						e.animation = s.uid % e.sprite.animations;
 						break;
 				}
 				if (e) s.entities.push(e);
@@ -459,35 +463,39 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.buttons.push(b);
 			}
 			if (s.name == "stagemenu") {
-				var y = 100;
+				var y = GLOBALS.border + 32;
+				var j = 0;
 				for (stage in this.stages) {
 					if (this.stages[stage]) {
-						var title = Object.create(Text).init(canvas.width - GLOBALS.border, y, stage, {color: "#000000", align: "right"});
+						var title = Object.create(Text).init(canvas.width / 2, y, stage, {color: "#000000", align: "center"});
 						s.entities.push(title);
 						var levels = this.scenes.filter(function (a) { return a.stage == stage; });
 						for (var i = 0; i < levels.length; i++) {
-							var t = Object.create(Text).init(0, 0,  String(i), {align: "left"});
-							var tb = Object.create(TextButton).init(GLOBALS.border + i * 25, y, t);
 							var w = this.scenes.indexOf(levels[i]);
+							var tb = Object.create(Button).init(i - j, 2 * j + 2, Resources[stage]);
+							tb.animation = w % tb.sprite.animations;
 							tb.destination = w;
 							tb.callback = function () {
 								world.doScene(this.destination);
 							};
 							s.buttons.push(tb);
 							if (levels[i].score) {
-								var t = Object.create(Text).init(GLOBALS.border + i * 25, y, String(levels[i].score), {color: "red"});
-								s.entities.push(t);
+//								var t = Object.create(Text).init(GLOBALS.border + i * 25, y, String(levels[i].score), {color: "red"});
+//								s.entities.push(t);
+							} else {
+								tb.opacity = 0.3;
 							}
 							//console.log(tb);
 						}
-						y += 28;
+						j += 1;
+						y += 56;
 					} else {
 						var title = Object.create(Text).init(canvas.width - GLOBALS.border, y, stage, {color: "#333333", align: "right"});
 						s.entities.push(title);
 						var levels = this.scenes.filter(function (a) { return a.stage == stage; });
 						for (var i = 0; i < levels.length; i++) {
 							var t = Object.create(Text).init(canvas.width / 2 + i * 20, y,  String(i), {color: "#333333", align: "left"});
-							s.buttons.push(t);
+							s.entities.push(t);
 						}
 						y += 28;
 					}
