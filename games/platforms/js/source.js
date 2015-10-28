@@ -450,8 +450,7 @@ CLASS DEFINITIONS
 				s.buttons.push(b);
 			}
 			if (s.name == "stagemenu") {
-				var y = GLOBALS.border + 32;
-				var j = 0;
+				var y = GLOBALS.border + 32, j = 0;
 				for (stage in this.stages) {
 					if (this.stages[stage]) {
 						var title = Object.create(Text).init(canvas.width / 2, y, stage, {color: "#000000", align: "center"});
@@ -466,13 +465,12 @@ CLASS DEFINITIONS
 								world.doScene(this.destination);
 							};
 							s.buttons.push(tb);
-							if (levels[i].score) {
+							if (levels[i].score) { // over/under par and by how much
 //								var t = Object.create(Text).init(GLOBALS.border + i * 25, y, String(levels[i].score), {color: "red"});
 //								s.entities.push(t);
 							} else {
 								tb.opacity = 0.3;
 							}
-							//console.log(tb);
 						}
 						j += 1;
 						y += 56;
@@ -490,7 +488,6 @@ CLASS DEFINITIONS
 					}
 				}
 			}
-			//debug = s;
 			return s;
 		},
 		toText: function () {
@@ -546,6 +543,10 @@ CLASS DEFINITIONS
 			var m = this.toGrid(this.mouse.x, this.mouse.y);
 			if (this.mouse.down) {
 				var p = this.getAt(m.x, m.y);
+				for (var i = 0; i < this.scene.buttons.length; i++) {
+					if (this.scene.buttons[i].check(this.mouse.x, this.mouse.y)) return;
+				}
+			
 				if (p && (p.type == "obstacle" || p.type == "platform")) return;
 				else {
 					ctx.globalAlpha = 0.5;
@@ -594,9 +595,6 @@ CLASS DEFINITIONS
 			return this;
 		},
 		draw: function (ctx) {
-			//ctx.fillStyle = "#f0e848";
-			//ctx.fillRect(0,0,canvas.width,canvas.height);
-			//console.log(this.bg.length);
 			for (y in this.map) {
 				for (x in this.map[y]) {
 					if (this.map[y][x]) {
@@ -645,11 +643,6 @@ CLASS DEFINITIONS
 					}
 				}
 			}
-
-			/* check exit points for scene
-			for (var i = 0; i < this.exits.length; i++) {
-				this.exits[i].check();
-			}*/
 		},
 		doMap: function (type, fn) {
 			for (y in this.map) {
@@ -705,6 +698,7 @@ CLASS DEFINITIONS
 			if (this.map[position.y]) {
 				var o = undefined;
 				if (this.map[position.y][position.x]) {
+					// re-add removed platform's underlying characteristic... thing
 					switch (this.map[position.y][position.x].special) {
 						case "undertow":
 							o = Object.create(UnderTow).init(position.x, position.y, Resources.undertow);
@@ -725,26 +719,11 @@ CLASS DEFINITIONS
 			var i = this.entities.indexOf(e);
 			this.entities.splice(i, 1);
 		},
-		removeBH: function (obj) {
-			var i = this.entities.indexOf(e);
-			this.bg.splice(i, 1);
-		},
-		nPlatforms: function () {
-			var n = 0;
-			for (y in this.map) {
-				for (x in this.map[y]) {
-					if (this.map[y][x] && this.map[y][x].type == "platform") {
-						n += 1;
-					}
-				}
-			}
-			return n;
-		},
 		addPlatform: function (position, direction) {
 			if (this.map[position.y]) {
 				var m = this.map[position.y][position.x];
 				if (m && (m.type == "obstacle" || m.type == "platform")) return;
-				if (this.nPlatforms() >= this.max) return;
+				if (this.count("platform") >= this.max) return;
 				else {
 					var p = Object.create(Platform).init(position.x, position.y, Resources[direction], DIRECTION[direction]);
 					if (m && m.callback) { p.onJump = m.callback; p.special = m.type; }
@@ -779,11 +758,7 @@ CLASS DEFINITIONS
 		}
 	};
 
-/**
-
-DEFAULT GAME OBJECT, draw, update, animate methods
-
-**/
+/**		DEFAULT GAME OBJECT, draw, update, animate methods		**/
 
 	var Entity = {
 		opacity: 1.0,
@@ -813,7 +788,6 @@ DEFAULT GAME OBJECT, draw, update, animate methods
 			return {x: ox * GLOBALS.width * 2 + oy * GLOBALS.width + GLOBALS.border + this.offset.x,
 				y: Math.sin(Math.PI / 3) * 2 * GLOBALS.height * oy + GLOBALS.border + this.offset.y, scale: j/2 + 1} 
 		},
-//		drawY: function () {  },
 		draw: function (ctx) {
 			ctx.globalAlpha = this.opacity;
 			var o = this.getPosition();
@@ -1000,27 +974,16 @@ DEFAULT GAME OBJECT, draw, update, animate methods
 					if (p.type == "hotspot") {
 						p.onJump();
 					}
-
-					//this.animation = 
-	//				setTimeout(function () { c.gridX += p.direction.x * d, c.gridY += p.direction.y * d; c.jumping = false;}, 500);
 				}
 			}
 		}
 	};
 
-/** 
-
-GAME OBJECT INSTANCES 
-
-**/
+/** 		GAME OBJECT INSTANCES 			**/
 
 	var world = Object.create(World).init();
 
-/**
-
-DEBUG EVENT LISTENERS
-
-**/
+/**			DEBUG EVENT LISTENERS 			**/
 
 	document.getElementById("save").addEventListener("click", function () {
 		var js = world.toText();
