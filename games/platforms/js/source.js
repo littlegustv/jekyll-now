@@ -120,6 +120,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	var canvas = document.getElementById("mygame");
 	var ctx = canvas.getContext("2d");
+
 	ctx.imageSmoothingEnabled = false;
 	ctx.mozImageSmoothingEnabled = false;
 	ctx.webkitImageSmoothingEnabled = false;
@@ -177,6 +178,13 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "play.png", frames: 2, speed: 500},
 		{path: "menu.png", frames: 2, speed: 500}
 	];
+
+
+/**
+
+CLASS DEFINITIONS
+
+**/
 
 	var World = {
 		// for locking/unlocking stages on completion
@@ -324,34 +332,18 @@ window.addEventListener("DOMContentLoaded", function () {
 		begin: function () {
 			this.loadBG();
 			this.scenes = this.sceneInfo.scenes, this.cs = 0;
-			//var sceneJSON = this.sceneInfo.scenes;
-			//for (var i = 0; i < sceneJSON.length; i++) {
-			//	this.scenes.push(this.createScene(sceneJSON[i]));
-			//}
-
-			/*
-				create and fill 'stages' here
-				 - or just use that to draw stages on stagemenu?  array filter, quick and simple
-
-			*/
 
 			this.scene = this.createScene(this.cs);
-			/*var s = Object.create(Scene).init();
-			var s2 = Object.create(Scene).init();
-			this.scenes.push(s);
-			this.scenes.push(s2);*/
-			this.time = new Date();
+
 			this.paused = true;
+			this.time = new Date();
 			this.step();
 		},
 		doScene: function (n) {
-			//this.cs = n;
 			this.scene = this.createScene(n);
-			//debug = this.scene;
 			if (this.scene.type == "level") this.cs = n;
 		},
 		createScene: function (n) {
-			//console.log(n);
 			var config = this.scenes[n];
 			var s = Object.create(Scene).init(config.name);
 			s.uid = n;
@@ -408,11 +400,6 @@ window.addEventListener("DOMContentLoaded", function () {
 					s.map[c.gridY][c.gridX] = m;
 				}
 			}
-			/*
-			for (var i = 0; i < config.exits.length; i++) {
-				var e = Object.create(Exit).init(config.exits[i].destination, conditions[config.exits[i].condition]);
-				s.entities.push(e);
-			}*/
 			if (s.type == "level") {
 				// ADD LEVEL BUTTONS: reset, back, play
 				var b = Object.create(Button).init( 0, 0, Resources.reset);
@@ -489,7 +476,9 @@ window.addEventListener("DOMContentLoaded", function () {
 						}
 						j += 1;
 						y += 56;
-					} else {
+					} 
+// locked levels / stages --> add
+					else {
 						var title = Object.create(Text).init(canvas.width - GLOBALS.border, y, stage, {color: "#333333", align: "right"});
 						s.entities.push(title);
 						var levels = this.scenes.filter(function (a) { return a.stage == stage; });
@@ -652,9 +641,6 @@ window.addEventListener("DOMContentLoaded", function () {
 								this.buttons.push(tb);
 								world.save();
 							}
-								//this.entities.push(Object.create(Exit).init((world.cs + 1) % world.scenes.length, conditions.space));
-								//this.entities.push(Object.create(Text).init(297,360,"well done!  Press SPACE for next level.",{}));
-							
 						}
 					}
 				}
@@ -701,21 +687,6 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 			}
 			return n;
-		},
-		spawnCells: function () {
-			for (y in this.map) {
-				for (x in this.map[y]) {
-					if (this.map[y][x]) {}
-					else {
-						var n = this.getNeighbors(Number(x), Number(y));
-						if (n == 2) {
-							var cell = Object.create(Cell).init(x, y, Resources.cell);
-							this.map[y][x] = cell;
-							//this.addBG(cell);
-						}
-					}
-				}
-			}
 		},
 		setupMap: function () {
 			this.map = {};
@@ -808,6 +779,12 @@ window.addEventListener("DOMContentLoaded", function () {
 		}
 	};
 
+/**
+
+DEFAULT GAME OBJECT, draw, update, animate methods
+
+**/
+
 	var Entity = {
 		opacity: 1.0,
 		alive: true,
@@ -858,22 +835,6 @@ window.addEventListener("DOMContentLoaded", function () {
 		}
 	};
 
-	var Exit = Object.create(Entity);
-	Exit.init = function (destination, condition) {
-		this.destination = destination;
-		this.condition = condition;
-		return this;
-	};
-	Exit.update = function (dt) {
-		if (this.condition()) {
-			world.paused = true;
-			world.doScene(this.destination);
-			//debug = world.scene;
-		}
-	};
-	Exit.draw = function (ctx) {
-	};
-
 	var Button = Object.create(Entity);
 	Button.type = "button";
 	Button.callback = function () {
@@ -897,6 +858,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		return this;
 	}
 	TextButton.draw = function (ctx) {
+		// uncomment to show hitbox
 		//ctx.fillStyle = "red";
 		//ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
 		this.text.draw(ctx);
@@ -1046,24 +1008,20 @@ window.addEventListener("DOMContentLoaded", function () {
 		}
 	};
 
-	/* GAME OBJECT INSTANCES */
+/** 
+
+GAME OBJECT INSTANCES 
+
+**/
 
 	var world = Object.create(World).init();
 
-/*
-	document.addEventListener("keydown", function (e) {
-		if (e.keyCode == 32) {
-			world.keys.space = true;
-			world.paused = !world.paused;			
-		}
-	});
+/**
 
-	document.addEventListener("keyup", function (e) {
-		if (e.keyCode == 32) {
-			world.keys.space = false;
-		}
-	});
-*/
+DEBUG EVENT LISTENERS
+
+**/
+
 	document.getElementById("save").addEventListener("click", function () {
 		var js = world.toText();
 		document.getElementById("json").value = js;
@@ -1090,4 +1048,5 @@ window.addEventListener("DOMContentLoaded", function () {
 	});
 
 	document.addEventListener("visibilitychange", function () { world.time = new Date(); });
+
 });
