@@ -2,15 +2,11 @@
 
 todo: 
 in order to put off making puzzles:
-- collectables show as completed levels, bg images for stages screen
 - make some puzzles, why not?
-- UNSTABLE is not a very useful mechanic, so far ... maybe instead, obstacles that break apart after one 'hit'
-
-- unstable/undertow happen with EACH jump, not just when you jump on them
-
+- LOCK/UNLOCK levels/stages
+- music, sound effects, cut scenes (?), art
 touch controls, mobile optimization, kongregate api
 
-Level 0: Reconnaissance (tutorial)
 Level 1: Habitation -> rescue cats, fishbowls? ... household things
 	-> warning.  wreckage exibiting high temperatures, dangerous radiation.  platform movement will avoid.
 	(every warning is displayed for each new level as well, first one, then two, three, etc.)
@@ -21,17 +17,11 @@ Level 3: Operations -> (undertow) ...
 Level 4: Engineering -> (hotspot)
 	-> warning.  frequent temperature anomolies.  'hot spots' may occur - proceed with caution.
 Level 5: Medical
+	-> warning.  many of the specimen are loose.
 	-> collectibles are 'specimen' -> they move each time you jump
-
-ship interior, where you can place the objects that you rescued?
-
 **/
 
-// debug variable
-
 var debug;
-
-// helper functions
 
 function modulo(n, p) {
 	return (n % p + p) % p;
@@ -54,8 +44,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		// right click
 
 		if (e.which === 3 || e.button === 2) {
-			world.remove(m, "platform");
-			return;
+			world.remove(m, "platform"); return;
 		}
 
 		// DEBUG BEHAVIOR
@@ -112,7 +101,6 @@ window.addEventListener("DOMContentLoaded", function () {
 		if (!world.scene || world.scene.type != "level") return;
 		var theta = Math.atan2(e.offsetY - world.mouse.y, e.offsetX - world.mouse.x);
 		world.mouse.angle = modulo(Math.round(theta / (Math.PI / 3)), 6);
-		//console.log(world.mouse);
 		if (!world.mouse.down) {
 			world.mouse.x = e.offsetX, world.mouse.y = e.offsetY;
 		}
@@ -134,9 +122,8 @@ window.addEventListener("DOMContentLoaded", function () {
 		jumpSpeed: 750
 	};
 
-	// keys
 	var directions = ["east", "southeast", "southwest", "west", "northwest", "northeast"];
-	// values
+	var STAGES = ["habitation", "hydroponics", "operations", "engineering", "medical"];
 	var DIRECTION = {
 		none: {x: 0, y: 0},
 		east: {x: 1, y: 0},
@@ -169,31 +156,28 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "undertow.png", frames: 4, speed: 800},
 		{path: "unstable.png", frames: 4, speed: 300},
 		{path: "scenes.js"},
-		{path: "habitation.png", frames: 2, speed: 650, animations: 2},
+		{path: "habitation.png", frames: 2, speed: 650, animations: 5},
 		{path: "hydroponics.png", frames: 2, speed: 650, animations: 3},
+		{path: "operations.png", frames: 2, speed: 650, animations: 1},
 		{path: "start.png", frames: 2, speed: 500},
 		{path: "cell.png", frames: 5, speed: 1500},
 		{path: "reset.png", frames: 2, speed: 500},
 		{path: "back.png", frames: 2, speed: 500},
 		{path: "play.png", frames: 2, speed: 500},
-		{path: "menu.png", frames: 2, speed: 500}
+		{path: "menu.png", frames: 2, speed: 500},
+		{path: "lock.png"}
 	];
 
 
-/**
-
-CLASS DEFINITIONS
-
-**/
+/**			CLASS DEFINITIONS			**/
 
 	var World = {
-		// for locking/unlocking stages on completion
 		stages: {
-			habitation: true,
-			hydroponics: true,
-			operations: true,
-			engineering: true,
-			medical: true
+			habitation: 0,
+			hydroponics: 0,
+			operations: 0,
+			engineering: 0,
+			medical: 0
 		},
 		mouse: {down: false, x: 0, y: 0, angle: 0, cooldown: 0},
 		init: function () {
@@ -329,10 +313,36 @@ CLASS DEFINITIONS
 				}
 			}
 		},
+		stageUnlock: function () {
+			for (var i = 0; i < this.scenes.length; i++) {
+				if (this.scenes[i].max) {
+					this.stages[this.scenes[i].stage] += this.scenes[i].max;
+				}
+			}
+		},
+		stageComplete: function (stage) {
+			if (! this.stages[stage]) return true;
+			for (var i = 0; i < this.scenes.length; i++) {
+				if (this.scenes[i].stage == stage) {
+					if (!this.scenes[i].score) return false;
+				}
+			}
+			return true;
+		},
+		stageScore: function (stage) {
+			var s = 0;
+			for (var i = 0; i < this.scenes.length; i++) {
+				if (STAGES.indexOf(this.scenes[i].stage) <= STAGES.indexOf(stage)) {
+					s += this.scenes[i].score || 0;
+				}
+			}
+			console.log(s);
+			return s;
+		},
 		begin: function () {
 			this.loadBG();
 			this.scenes = this.sceneInfo.scenes, this.cs = 0;
-
+			this.stageUnlock();
 			this.scene = this.createScene(this.cs);
 
 			this.paused = true;
@@ -419,6 +429,14 @@ CLASS DEFINITIONS
 				s.buttons.push(b);
 				var t = Object.create(Text).init(canvas.width / 2, canvas.height - 40, s.name, {});
 				s.addEntity(t);
+
+				var p = Object.create(Platform).init(6, 0, Resources.east);
+				p.z = -1;
+				s.addEntity(p);
+
+				var t2 = Object.create(Text).init(canvas.width / 2 + GLOBALS.width * 1.5, GLOBALS.border + GLOBALS.height / 2, s.name, {align: "left"});
+				s.addEntity(t2);
+				s.par = t2;
 			}
 			if (s.name == "mainmenu") {
 				var t = Object.create(Text).init(0, 0,"-- New Game --",{});
@@ -451,41 +469,36 @@ CLASS DEFINITIONS
 			}
 			if (s.name == "stagemenu") {
 				var y = GLOBALS.border + 32, j = 0;
+				console.log(this.stages, this.stageScore());
 				for (stage in this.stages) {
-					if (this.stages[stage]) {
-						var title = Object.create(Text).init(canvas.width / 2, y, stage, {color: "#000000", align: "center"});
-						s.entities.push(title);
-						var levels = this.scenes.filter(function (a) { return a.stage == stage; });
-						for (var i = 0; i < levels.length; i++) {
-							var w = this.scenes.indexOf(levels[i]);
-							var tb = Object.create(Button).init(i - j, 2 * j + 2, Resources[stage]);
-							tb.animation = w % tb.sprite.animations;
-							tb.destination = w;
+					var title = Object.create(Text).init(canvas.width / 2, y, stage, {color: "#000000", align: "center"});
+					s.entities.push(title);
+					var sc = STAGES[STAGES.indexOf(stage) - 1];
+					console.log(sc);
+					var levels = this.scenes.filter(function (a) { return a.stage == stage; });
+					for (var i = 0; i < levels.length; i++) {
+						var w = this.scenes.indexOf(levels[i]);
+						var tb = Object.create(Button).init(i - j, 2 * j + 2, Resources[stage]);
+						tb.animation = w % tb.sprite.animations;
+						tb.destination = w;
+						if (!sc || (this.stageScore(sc) <= this.stages[sc] && this.stageComplete(sc))) {
 							tb.callback = function () {
 								world.doScene(this.destination);
 							};
-							s.buttons.push(tb);
-							if (levels[i].score) { // over/under par and by how much
-//								var t = Object.create(Text).init(GLOBALS.border + i * 25, y, String(levels[i].score), {color: "red"});
-//								s.entities.push(t);
-							} else {
+							if (!levels[i].score) {
 								tb.opacity = 0.3;
 							}
 						}
-						j += 1;
-						y += 56;
-					} 
-// locked levels / stages --> add
-					else {
-						var title = Object.create(Text).init(canvas.width - GLOBALS.border, y, stage, {color: "#333333", align: "right"});
-						s.entities.push(title);
-						var levels = this.scenes.filter(function (a) { return a.stage == stage; });
-						for (var i = 0; i < levels.length; i++) {
-							var t = Object.create(Text).init(canvas.width / 2 + i * 20, y,  String(i), {color: "#333333", align: "left"});
-							s.entities.push(t);
+						else {
+							tb.callback = function () {};
+							var lock = Object.create(Entity).init(i - j, 2 * j + 2, Resources.lock);
+							s.entities.push(lock);
 						}
-						y += 28;
+						s.buttons.push(tb);
+
 					}
+					j += 1;
+					y += 56;
 				}
 			}
 			return s;
@@ -603,11 +616,11 @@ CLASS DEFINITIONS
 				}
 			}
 			var e = this.entities.sort(function (a, b) { return a.z != b.z ? a.z - b.z : (a.getPosition().y - a.offset.y) - (b.getPosition().y - b.offset.y); });
-			for (var i = 0; i < e.length; i++) {
-				e[i].draw(ctx);
-			}
 			for (var i = 0; i < this.buttons.length; i++) {
 				this.buttons[i].draw(ctx);
+			}
+			for (var i = 0; i < e.length; i++) {
+				e[i].draw(ctx);
 			}
 		},
 		update: function (dt) {
@@ -642,6 +655,9 @@ CLASS DEFINITIONS
 						}
 					}
 				}
+			}
+			if (this.type == "level") {
+				this.par.text = "x" + String(this.max - this.count("platform"));
 			}
 		},
 		doMap: function (type, fn) {
@@ -722,8 +738,9 @@ CLASS DEFINITIONS
 		addPlatform: function (position, direction) {
 			if (this.map[position.y]) {
 				var m = this.map[position.y][position.x];
+				if (this.type != "level") return;
 				if (m && (m.type == "obstacle" || m.type == "platform")) return;
-				if (this.count("platform") >= this.max) return;
+				//if (this.count("platform") >= this.max) return;
 				else {
 					var p = Object.create(Platform).init(position.x, position.y, Resources[direction], DIRECTION[direction]);
 					if (m && m.callback) { p.onJump = m.callback; p.special = m.type; }
