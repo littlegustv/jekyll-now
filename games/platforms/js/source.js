@@ -109,6 +109,9 @@ window.addEventListener("DOMContentLoaded", function () {
 	var canvas = document.getElementById("mygame");
 	var ctx = canvas.getContext("2d");
 
+	ctx.globalCompositeOperation = "multiply";
+	//debug = ctx;
+
 	ctx.imageSmoothingEnabled = false;
 	ctx.mozImageSmoothingEnabled = false;
 	ctx.webkitImageSmoothingEnabled = false;
@@ -122,7 +125,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		jumpSpeed: 750
 	};
 
-	var directions = ["east", "southeast", "southwest", "west", "northwest", "northeast"];
+	var directions = ["east", "southeast", "southwest", "west", "northwest", "northeast", "none"];
 	var STAGES = ["habitation", "hydroponics", "operations", "engineering", "medical"];
 	var DIRECTION = {
 		none: {x: 0, y: 0},
@@ -145,6 +148,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	var Resources = {};
 	var resourceInfo = [
 		{path: "c1.png", frames: 2, speed: 400, animations: 6},
+		{path: "character.png", frames: 2, speed: 400, animations: 6},
 		{path: "east.png"},
 		{path: "southeast.png"},
 		{path: "southwest.png"},
@@ -158,7 +162,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "scenes.js"},
 		{path: "habitation.png", frames: 2, speed: 650, animations: 5},
 		{path: "hydroponics.png", frames: 2, speed: 650, animations: 3},
-		{path: "operations.png", frames: 2, speed: 650, animations: 1},
+		{path: "operations.png", frames: 2, speed: 650, animations: 5},
 		{path: "start.png", frames: 2, speed: 500},
 		{path: "cell.png", frames: 5, speed: 1500},
 		{path: "reset.png", frames: 2, speed: 500},
@@ -316,7 +320,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		stageUnlock: function () {
 			for (var i = 0; i < this.scenes.length; i++) {
 				if (this.scenes[i].max) {
-					this.stages[this.scenes[i].stage] += this.scenes[i].max;
+					this.stages[this.scenes[i].stage] += this.scenes[i].max + 1000;
 				}
 			}
 		},
@@ -370,19 +374,21 @@ window.addEventListener("DOMContentLoaded", function () {
 					case "character":
 						var start = Object.create(Entity).init(c.gridX, c.gridY, Resources.start);
 						start.offset = {x: 0, y: -11 * GLOBALS.height - 7};
+						start.blend = "hard-light";
 						start.type = "start";
 						s.entities.push(start);
 						s.start = {x: start.gridX, y: start.gridY};
-						e = Object.create(Character).init(c.gridX + 5, c.gridY - 10, Resources.c1);
+						e = Object.create(Character).init(c.gridX + 5, c.gridY - 10, Resources.character);
 						e.jumping = GLOBALS.jumpSpeed;
 						e.direction = {x: -1, y: 2};
 						e.distance = 5;
 						s.character = e;
-						debug = e;
+						//debug = e;
 						break;
 					case "collectable":
 						e = Object.create(Collectable).init(c.gridX, c.gridY, Resources[s.stage]);
 						e.animation = s.uid % e.sprite.animations;
+						debug = e;
 						break;
 				}
 				if (e) s.entities.push(e);
@@ -505,7 +511,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		toText: function () {
 			var current = this.scene;
-			var save = {name: "default", type: "level", stage: "recon", max: 20, map: [], entities: [], exits: []};
+			var save = {name: "default", type: "level", stage: "recon", max: 20, map: [], entities: []};
 			save.name = current.name;
 			for (y in current.map) {
 				for (x in current.map[y]) {
@@ -719,6 +725,9 @@ window.addEventListener("DOMContentLoaded", function () {
 						case "undertow":
 							o = Object.create(UnderTow).init(position.x, position.y, Resources.undertow);
 							break;
+						case "hotspot":
+							o = Object.create(HotSpot).init(position.x, position.y, Resources.hotspot);
+							break;
 					}
 				}
 				if (type)
@@ -807,12 +816,22 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		draw: function (ctx) {
 			ctx.globalAlpha = this.opacity;
+			ctx.globalCompositeOperation = this.blend || "normal";
 			var o = this.getPosition();
 			ctx.drawImage(this.sprite.image, 
         		this.frame * this.w / GLOBALS.scale, this.animation * this.h / GLOBALS.scale, 
         		this.w / GLOBALS.scale, this.h / GLOBALS.scale, 
-        		Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2), o.scale * this.w, o.scale * this.h);
+        		Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2), Math.round(o.scale * this.w), Math.round(o.scale * this.h));
 			ctx.globalAlpha = 1;
+			ctx.globalCompositeOperation = "normal";
+
+			if (this.special) {
+				ctx.drawImage(Resources[this.special].image, 
+    	    		this.frame * this.w / GLOBALS.scale, this.animation * this.h / GLOBALS.scale, 
+        			this.w / GLOBALS.scale, this.h / GLOBALS.scale, 
+        			Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2), o.scale * this.w, o.scale * this.h);				
+			}
+
 		},
 		animate: function (dt) {
 			this.frameDelay -= dt;
@@ -948,7 +967,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	};
 
 	var Character = Object.create(Entity);
-	Character.offset = {x: 0, y: -12};
+	Character.offset = {x: 0, y: -16};
 	Character.jumping = 0;
 	Character.type = "character";
 	Character.update = function (dt) {
@@ -988,7 +1007,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					this.animation = directions.indexOf(getDirectionName(this.direction));
 					world.scene.doMap("undertow", "onJump");
 
-					if (p.type == "hotspot") {
+					if (p.special == "hotspot") {
 						p.onJump();
 					}
 				}

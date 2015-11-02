@@ -285,6 +285,39 @@
 				{"gridX":1,"gridY":4,"type":"collectable"}				
 			]
 		},
+		{	
+			"name":"learning",
+			"type":"level",
+			"stage":"operations",
+			"max":7,
+			"map":[{"gridX":"6","gridY":"4","type":"hotspot"},{"gridX":"3","gridY":"6","type":"hotspot"}],
+			"entities":[
+				{"gridX":4,"gridY":4,"type":"character"},
+				{"gridX":7,"gridY":4,"type":"collectable"}
+			]
+		},
+		{
+			"name":"they can be obstacles as well",
+			"type":"level",
+			"stage":"operations",
+			"max":6,
+			"map":[{"gridX":"7","gridY":"3","type":"obstacle"},{"gridX":"2","gridY":"4","type":"obstacle"},{"gridX":"6","gridY":"4","type":"hotspot"},{"gridX":"9","gridY":"4","type":"obstacle"},{"gridX":"6","gridY":"5","type":"obstacle"}],
+			"entities":[
+				{"gridX":4,"gridY":4,"type":"character"},
+				{"gridX":7,"gridY":4,"type":"collectable"}
+			]
+		},
+		{
+			"name":"make your own level",
+			"type":"level",
+			"stage":"operations",
+			"max":13,
+"map":[{"gridX":"3","gridY":"2","type":"obstacle"},{"gridX":"4","gridY":"2","type":"hotspot"},{"gridX":"6","gridY":"2","type":"hotspot"},{"gridX":"2","gridY":"3","type":"obstacle"},{"gridX":"4","gridY":"3","type":"hotspot"},{"gridX":"6","gridY":"3","type":"hotspot"},{"gridX":"1","gridY":"4","type":"obstacle"},{"gridX":"0","gridY":"5","type":"obstacle"},{"gridX":"3","gridY":"6","type":"hotspot"},{"gridX":"-1","gridY":"6","type":"obstacle"}],
+			"entities":[
+				{"gridX":4,"gridY":4,"type":"character"},
+				{"gridX":7,"gridY":4,"type":"collectable"}
+			]
+		},
 		{
 			"name":"blank",
 			"type": "level",
