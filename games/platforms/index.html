@@ -3,23 +3,33 @@
 		<meta name="viewport" content="initial-scale=1">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<script src='./js/source.js'></script>
+		<!--<link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>-->
 		<style>
-			@font-face {
+/*			@font-face {
 			  font-family: 'Teko';
 			  font-style: normal;
 			  font-weight: 600;
 			  src: url(./res/Teko-Regular.ttf) format('truetype');
+			}*/
+			@font-face {
+			  font-family: 'VT323';
+			  font-style: normal;
+			  font-weight: 400;
+			  src: local('VT323'), local('VT323-Regular'), url(./res/VT323-Regular.woff2) format('woff2');
+			  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
 			}
 			body {
 				margin: 0px;
 			}
 			canvas {
-			  image-rendering: optimizeSpeed;             /* Older versions of FF          */
-			  image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
-			  image-rendering: -webkit-optimize-contrast; /* Safari                        */
-			  image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
-			  image-rendering: pixelated;                 /* Awesome future-browsers       */
-			  -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
+				background: url("./res/splash.png");
+				background-size: cover;
+				image-rendering: optimizeSpeed;             /* Older versions of FF          */
+				image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
+				image-rendering: -webkit-optimize-contrast; /* Safari                        */
+				image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
+				image-rendering: pixelated;                 /* Awesome future-browsers       */
+				-ms-interpolation-mode: nearest-neighbor;   /* IE                            */
 			}
 			#debug {
 				display: block;
@@ -38,8 +48,8 @@
 		</style>
 	</head>
 	<body>
-		<canvas id='mygame' height=320 width=480 style='background: #df5900;'></canvas>
-		<div style='font-family: Teko; height: 0px; width: 0px; overflow: hidden;'>Loading Fonts</div>
+		<canvas id='mygame' height=320 width=480></canvas>
+		<div style='font-family: VT323; height: 0px; width: 0px; overflow: hidden;'>Loading Fonts</div>
 		<div id='debug'>
 			<select id='action'>
 				<option value='platform'>Platform</option>

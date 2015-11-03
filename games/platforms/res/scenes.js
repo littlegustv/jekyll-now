@@ -190,20 +190,20 @@
 			"stage":"hydroponics",
 			"max":16,
 			"map":[
-				{"gridX":"4","gridY":"6","type":"undertow"},
-				{"gridX":"2","gridY":"8","type":"obstacle"},
+				{"gridX":"4","gridY":"3","type":"undertow"},
+				{"gridX":"2","gridY":"5","type":"obstacle"},
+				{"gridX":"1","gridY":"6","type":"obstacle"},
+				{"gridX":"2","gridY":"6","type":"obstacle"},
+				{"gridX":"1","gridY":"7","type":"obstacle"},
+				{"gridX":"1","gridY":"8","type":"obstacle"},
 				{"gridX":"1","gridY":"9","type":"obstacle"},
 				{"gridX":"2","gridY":"9","type":"obstacle"},
-				{"gridX":"1","gridY":"10","type":"obstacle"},
-				{"gridX":"1","gridY":"11","type":"obstacle"},
-				{"gridX":"1","gridY":"12","type":"obstacle"},
-				{"gridX":"2","gridY":"12","type":"obstacle"},
-				{"gridX":"1","gridY":"13","type":"obstacle"}
+				{"gridX":"1","gridY":"10","type":"obstacle"}
 			],
 			"entities":[
-				{"gridX":4,"gridY":4,"type":"character"},
-				{"gridX":2,"gridY":10,"type":"collectable"},
-				{"gridX":-1,"gridY":11,"type":"collectable"}
+				{"gridX":4,"gridY":1,"type":"character"},
+				{"gridX":2,"gridY":7,"type":"collectable"},
+				{"gridX":-1,"gridY":8,"type":"collectable"}
 			]
 		},
 		{
@@ -311,7 +311,7 @@
 			"name":"make your own level",
 			"type":"level",
 			"stage":"operations",
-			"max":13,
+			"max":10,
 "map":[{"gridX":"3","gridY":"2","type":"obstacle"},{"gridX":"4","gridY":"2","type":"hotspot"},{"gridX":"6","gridY":"2","type":"hotspot"},{"gridX":"2","gridY":"3","type":"obstacle"},{"gridX":"4","gridY":"3","type":"hotspot"},{"gridX":"6","gridY":"3","type":"hotspot"},{"gridX":"1","gridY":"4","type":"obstacle"},{"gridX":"0","gridY":"5","type":"obstacle"},{"gridX":"3","gridY":"6","type":"hotspot"},{"gridX":"-1","gridY":"6","type":"obstacle"}],
 			"entities":[
 				{"gridX":4,"gridY":4,"type":"character"},

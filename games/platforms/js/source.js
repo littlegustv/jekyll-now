@@ -109,7 +109,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	var canvas = document.getElementById("mygame");
 	var ctx = canvas.getContext("2d");
 
-	ctx.globalCompositeOperation = "multiply";
+//	ctx.globalCompositeOperation = "multiply";
 	//debug = ctx;
 
 	ctx.imageSmoothingEnabled = false;
@@ -147,8 +147,11 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	var Resources = {};
 	var resourceInfo = [
+		{path: "splash.png"},
 		{path: "c1.png", frames: 2, speed: 400, animations: 6},
-		{path: "character.png", frames: 2, speed: 400, animations: 6},
+		{path: "platform.png", frames: 2, speed: 1000},
+		{path: "directions.png", frames: 2, speed: 1000, animations: 6},
+		{path: "character.png", frames: 3, speed: 300, animations: 6},
 		{path: "east.png"},
 		{path: "southeast.png"},
 		{path: "southwest.png"},
@@ -234,7 +237,13 @@ window.addEventListener("DOMContentLoaded", function () {
 			if (this.resourceLoadCount >= this.resourceCount) {
 				this.addEventListeners();
 				this.begin();
+			} else if (Resources.splash) {
+				ctx.drawImage(Resources.splash.image, 0, 0, canvas.width, canvas.height);
 			}
+			ctx.fillStyle = "#f4f0e8";
+			ctx.fillRect(GLOBALS.border, canvas.height - GLOBALS.border * 3, 240, GLOBALS.border * 2);
+			ctx.fillStyle = "black";
+			ctx.fillRect(GLOBALS.border, canvas.height - GLOBALS.border * 3, 240 * this.resourceLoadCount / this.resourceCount, 2 * GLOBALS.border);
 		},
 		reset: function () {
 			var i = this.cs;
@@ -295,6 +304,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				var row = {};
 				for (var j = -i; j <= canvas.width / (2 * GLOBALS.width); j++) {
 					var o = Object.create(Cell).init(j, i, Resources.cell);
+					//o.blend = "overlay";
 					o.frame = Math.floor(Math.random() * Resources.cell.frames);
 					o.maxFrameDelay = Math.floor(Math.random() * 500 + 3000);
 					o.frameDelay = Math.floor(Math.random() * o.maxFrameDelay);//row[j].maxFrameDelay;
@@ -374,7 +384,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					case "character":
 						var start = Object.create(Entity).init(c.gridX, c.gridY, Resources.start);
 						start.offset = {x: 0, y: -11 * GLOBALS.height - 7};
-						start.blend = "hard-light";
+						//start.blend = "hard-light";
 						start.type = "start";
 						s.entities.push(start);
 						s.start = {x: start.gridX, y: start.gridY};
@@ -433,7 +443,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					world.paused = !world.paused;
 				};
 				s.buttons.push(b);
-				var t = Object.create(Text).init(canvas.width / 2, canvas.height - 40, s.name, {});
+				var t = Object.create(Text).init(canvas.width / 2, canvas.height - GLOBALS.height, s.name, {});
 				s.addEntity(t);
 
 				var p = Object.create(Platform).init(6, 0, Resources.east);
@@ -533,12 +543,16 @@ window.addEventListener("DOMContentLoaded", function () {
 
 			this.updateBG(dt);
 			this.drawBG(ctx);
-			
+
 			this.scene.update(dt);
 			this.scene.draw(ctx);
 			if (this.scene.type == "level") {
 				this.drawCursor(ctx);
 			}
+
+			ctx.globalCompositeOperation = "overlay";
+			ctx.fillStyle = "#ff7607";
+			ctx.fillRect(0,0,canvas.width,canvas.height);
 			var w = this;
 			window.requestAnimationFrame(function () {	w.step();  });
 		},
@@ -568,17 +582,22 @@ window.addEventListener("DOMContentLoaded", function () {
 			
 				if (p && (p.type == "obstacle" || p.type == "platform")) return;
 				else {
-					ctx.globalAlpha = 0.5;
 					var dir = directions[this.mouse.angle];
-					var mx = m.x * GLOBALS.width * 2 + m.y * GLOBALS.width + GLOBALS.border;
-					var my = Math.sin(Math.PI / 3) * 2 * GLOBALS.height * m.y + GLOBALS.border;
-					var w = Resources[dir].image.width * GLOBALS.scale, h = Resources[dir].image.height * GLOBALS.scale;
-			        ctx.drawImage(Resources[dir].image, mx - Math.round(w / 2), Math.ceil(my - h / 2), w, h);
-			        ctx.globalAlpha = 1.0;
+					/*var mx = m.x * GLOBALS.width * 2 + m.y * GLOBALS.width + GLOBALS.border;
+					var my = Math.sin(Math.PI / 3) * 2 * GLOBALS.height * m.y + GLOBALS.border - 8;
+					var w = 9 * GLOBALS.scale, h = 9 * GLOBALS.scale;
+			        ctx.drawImage(Resources.platform.image, 0, w / GLOBALS.scale, w / GLOBALS.scale, h / GLOBALS.scale, mx - Math.round(w / 2), Math.ceil(my - h / 2), w, h);
+			        ctx.drawImage(Resources.directions.image, 0, this.mouse.angle * h / GLOBALS.scale, w / GLOBALS.scale, h / GLOBALS.scale, mx - Math.round(w / 2), Math.ceil(my - h / 2), w, h);
+			        ctx.globalAlpha = 1.0;*/
+			        var cursor = Object.create(Platform).init(m.x, m.y, Resources.platform);
+			        cursor.direction = DIRECTION[directions[this.mouse.angle]];
+			        cursor.opacity = 0.5;
+			        cursor.draw(ctx);
+
 		    	}
 			}
 			if (this.scene.start) {
-				ctx.font = "24px Teko";
+				ctx.font = "24px VT323";
 				ctx.textAlign = "center";
 				ctx.fillStyle = "black";
 				var mx = modulo(m.x - this.scene.start.x, 2);
@@ -647,6 +666,7 @@ window.addEventListener("DOMContentLoaded", function () {
 						if (this.entities.filter(function (a) { return a.type == "collectable"; }).length <= 0) {
 							if (!this.completed) {
 								this.completed = true;
+								this.character.animation = 1, this.character.frame = 0;
 								world.scenes[this.uid].score = world.scene.count("platform");
 								world.paused = true;
 								var t = Object.create(Text).init(0,0,"Next...",{});
@@ -751,7 +771,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				if (m && (m.type == "obstacle" || m.type == "platform")) return;
 				//if (this.count("platform") >= this.max) return;
 				else {
-					var p = Object.create(Platform).init(position.x, position.y, Resources[direction], DIRECTION[direction]);
+					var p = Object.create(Platform).init(position.x, position.y, Resources.platform, DIRECTION[direction]);
 					if (m && m.callback) { p.onJump = m.callback; p.special = m.type; }
 					this.map[position.y][position.x] = p;
 				}
@@ -890,6 +910,23 @@ window.addEventListener("DOMContentLoaded", function () {
 	Platform.type = "platform";
 	Platform.distance = 2;
 	Platform.onJump = function () {};
+	Platform.draw = function (ctx) {
+		var o = this.getPosition();
+		ctx.drawImage(this.sprite.image, 
+    		this.frame * this.w / GLOBALS.scale, this.animation * this.h / GLOBALS.scale, 
+    		this.w / GLOBALS.scale, this.h / GLOBALS.scale, 
+    		Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2), Math.round(o.scale * this.w), Math.round(o.scale * this.h));
+		ctx.drawImage(Resources.directions.image,
+    		this.frame * this.w / GLOBALS.scale,  directions.indexOf(getDirectionName(this.direction)) * this.h / GLOBALS.scale, 
+    		this.w / GLOBALS.scale, this.h / GLOBALS.scale, 
+    		Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2), Math.round(o.scale * this.w), Math.round(o.scale * this.h));		
+		if (this.special) {
+			ctx.drawImage(Resources[this.special].image, 
+	    		this.frame * this.w / GLOBALS.scale, this.animation * this.h / GLOBALS.scale, 
+    			this.w / GLOBALS.scale, this.h / GLOBALS.scale, 
+    			Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2), o.scale * this.w, o.scale * this.h);				
+		}
+	};
 
 	var Obstacle = Object.create(Entity);
 	Obstacle.type = "obstacle";
@@ -906,7 +943,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	UnderTow.callback = function () {
 		var d = (directions.indexOf(getDirectionName(this.direction)) + 1) % 6;
 		this.direction = DIRECTION[directions[d]];
-		this.sprite = Resources[directions[d]];
+		//this.sprite = Resources[directions[d]];
 	}
 
 	var HotSpot = Object.create(Environment);
@@ -962,7 +999,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		if (this.delay > 0) return;
 		ctx.textAlign = this.align;
 		ctx.fillStyle = this.color;
-		ctx.font = this.size + "px Teko";
+		ctx.font = "900 " + this.size + "px VT323";
 		ctx.fillText(this.text.substr(0,this.current), this.x, this.y);
 	};
 
@@ -971,8 +1008,8 @@ window.addEventListener("DOMContentLoaded", function () {
 	Character.jumping = 0;
 	Character.type = "character";
 	Character.update = function (dt) {
-		this.animate(dt);
 		if (world.paused) return;
+		this.animate(dt);
 		if (this.jumping > 0) {
 			this.jumping -= dt;
 		}
