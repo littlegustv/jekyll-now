@@ -319,9 +319,809 @@
 			]
 		},
 		{
-			"name":"blank",
+			"name": "reduce what you need",
 			"type": "level",
 			"stage": "operations",
+			"max": 10,
+			"map": [
+				{
+					"gridX": "9",
+					"gridY": "0",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "4",
+					"gridY": "2",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "7",
+					"gridY": "2",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "7",
+					"gridY": "3",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "5",
+					"gridY": "4",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "4",
+					"gridY": "5",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "3",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "1",
+					"gridY": "8",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "-1",
+					"gridY": "10",
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "plan how to start and how to stop",
+			"type": "level",
+			"stage": "operations",
+			"max": 9,
+			"map": [
+				{
+					"gridX": "4",
+					"gridY": "1",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "4",
+					"gridY": "2",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "5",
+					"gridY": "2",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "6",
+					"gridY": "2",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "3",
+					"gridY": "3",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "6",
+					"gridY": "3",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "1",
+					"gridY": "4",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "2",
+					"gridY": "4",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "3",
+					"gridY": "4",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "6",
+					"gridY": "4",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "2",
+					"gridY": "5",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "5",
+					"gridY": "5",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "2",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "3",
+					"gridY": "6",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "4",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "1",
+					"gridY": "7",
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "trapdoor",
+			"type": "level",
+			"stage": "operations",
+			"max": 14,
+			"map": [
+				{
+					"gridX": "10",
+					"gridY": "0",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "9",
+					"gridY": "1",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "8",
+					"gridY": "2",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "7",
+					"gridY": "3",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "6",
+					"gridY": "4",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "5",
+					"gridY": "5",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "8",
+					"gridY": "5",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "5",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "6",
+					"gridY": "6",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "7",
+					"gridY": "6",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "4",
+					"gridY": "7",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "3",
+					"gridY": "8",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "2",
+					"gridY": "9",
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "3-point turn",
+			"type": "level",
+			"stage": "operations",
+			"max": 10,
+			"map": [
+				{
+					"gridX": "8",
+					"gridY": "0",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "7",
+					"gridY": "1",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "6",
+					"gridY": "2",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "7",
+					"gridY": "2",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "5",
+					"gridY": "3",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "6",
+					"gridY": "3",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "7",
+					"gridY": "3",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "8",
+					"gridY": "3",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "9",
+					"gridY": "3",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "10",
+					"gridY": "3",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "2",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "3",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "4",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "5",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "6",
+					"gridY": "5",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "7",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "5",
+					"gridY": "6",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "6",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "5",
+					"gridY": "7",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "4",
+					"gridY": "8",
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "approach with care",
+			"type": "level",
+			"stage": "operations",
+			"max": 17,
+			"map": [
+				{
+					"gridX": "8",
+					"gridY": "0",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "7",
+					"gridY": "1",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "8",
+					"gridY": "1",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "7",
+					"gridY": "2",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "8",
+					"gridY": "2",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "6",
+					"gridY": "3",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "7",
+					"gridY": "3",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "5",
+					"gridY": "4",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "6",
+					"gridY": "4",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "-2",
+					"gridY": "4",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "-1",
+					"gridY": "4",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "4",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "-2",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "-1",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "0",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "1",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "2",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "3",
+					"gridY": "6",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "4",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "-2",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "0",
+					"gridY": "7",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "2",
+					"gridY": "7",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "3",
+					"gridY": "7",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "-1",
+					"gridY": "7",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "0",
+					"gridY": "8",
+					"type": "hotspot"
+				}
+			],
+			"entities": [
+				{
+					"gridX":4,
+					"gridY":4,
+					"type": "character"
+				},
+				{
+					"gridX": 5,
+					"gridY": 5,
+					"type": "collectable"
+				},
+				{
+					"gridX": 1,
+					"gridY": 7,
+					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "el nino",
+			"type": "level",
+			"stage": "operations",
+			"max": 8,
+			"map": [
+				{
+					"gridX": "8",
+					"gridY": "0",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "8",
+					"gridY": "1",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "6",
+					"gridY": "2",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "7",
+					"gridY": "2",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "5",
+					"gridY": "3",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "6",
+					"gridY": "3",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "7",
+					"gridY": "3",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "5",
+					"gridY": "4",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "6",
+					"gridY": "4",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "4",
+					"gridY": "5",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "5",
+					"gridY": "5",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "6",
+					"gridY": "5",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "4",
+					"gridY": "6",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "6",
+					"gridY": "5",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "5",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "5",
+					"gridY": "7",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "4",
+					"gridY": "8",
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "center cannot hold",
+			"type": "level",
+			"stage": "operations",
+			"max": 20,
+			"map": [
+				{
+					"gridX": "1",
+					"gridY": "4",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "10",
+					"gridY": "4",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "1",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "5",
+					"gridY": "5",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "9",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "1",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "2",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "3",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "4",
+					"gridY": "6",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "5",
+					"gridY": "6",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "6",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "7",
+					"gridY": "6",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "8",
+					"gridY": "6",
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "rethinking what you know",
+			"type": "level",
+			"stage": "operations",
+			"max": 11,
+			"map": [
+				{
+					"gridX": "3",
+					"gridY": "3",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "4",
+					"gridY": "3",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "5",
+					"gridY": "3",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "6",
+					"gridY": "3",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "7",
+					"gridY": "3",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "8",
+					"gridY": "3",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "9",
+					"gridY": "3",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "2",
+					"gridY": "4",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "9",
+					"gridY": "4",
+					"type": "hotspot"
+				},
+				{
+					"gridX": "2",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "3",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "5",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "6",
+					"gridY": "5",
+					"type": "obstacle"
+				},
+				{
+					"gridX": "8",
+					"gridY": "5",
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name":"blank",
+			"type": "level",
+			"stage": "medical",
 			"max": 20,
 			"map":[],
 			"entities": [

@@ -1,5 +1,7 @@
 /**
 
+bugs: new game, hotspot removes platform from score,
+
 todo: 
 in order to put off making puzzles:
 - make some puzzles, why not?
@@ -55,7 +57,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				world.addPlatform();
 				break;
 			case "obstacle":
-				var o = Object.create(Obstacle).init(m.x, m.y, Resources.o1);
+				var o = Object.create(Obstacle).init(m.x, m.y, Resources.obstacle);
 				world.add(o);
 				break;
 			case "hotspot":
@@ -148,17 +150,10 @@ window.addEventListener("DOMContentLoaded", function () {
 	var Resources = {};
 	var resourceInfo = [
 		{path: "splash.png"},
-		{path: "c1.png", frames: 2, speed: 400, animations: 6},
 		{path: "platform.png", frames: 2, speed: 1000},
 		{path: "directions.png", frames: 2, speed: 1000, animations: 6},
 		{path: "character.png", frames: 3, speed: 300, animations: 6},
-		{path: "east.png"},
-		{path: "southeast.png"},
-		{path: "southwest.png"},
-		{path: "west.png"},
-		{path: "northwest.png"},
-		{path: "northeast.png"},
-		{path: "o1.png", frames: 2, speed: 1000},
+		{path: "obstacle.png", frames: 2, speed: 1000},
 		{path: "hotspot.png", frames: 2, speed: 500},
 		{path: "undertow.png", frames: 4, speed: 800},
 		{path: "unstable.png", frames: 4, speed: 300},
@@ -166,6 +161,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "habitation.png", frames: 2, speed: 650, animations: 5},
 		{path: "hydroponics.png", frames: 2, speed: 650, animations: 3},
 		{path: "operations.png", frames: 2, speed: 650, animations: 5},
+		{path: "medical.png", frames: 2, speed: 650, animations: 1},
 		{path: "start.png", frames: 2, speed: 500},
 		{path: "cell.png", frames: 5, speed: 1500},
 		{path: "reset.png", frames: 2, speed: 500},
@@ -183,7 +179,6 @@ window.addEventListener("DOMContentLoaded", function () {
 			habitation: 0,
 			hydroponics: 0,
 			operations: 0,
-			engineering: 0,
 			medical: 0
 		},
 		mouse: {down: false, x: 0, y: 0, angle: 0, cooldown: 0},
@@ -408,7 +403,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				var m;
 				switch(c.type) {
 					case "obstacle":
-						m = Object.create(Obstacle).init(c.gridX, c.gridY, Resources.o1);
+						m = Object.create(Obstacle).init(c.gridX, c.gridY, Resources.obstacle);
 						m.frameDelay = Math.floor(Math.random() * m.maxFrameDelay);
 						break;
 					case "hotspot":
@@ -427,6 +422,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 			}
 			if (s.type == "level") {
+				console.log(s.name);
 				// ADD LEVEL BUTTONS: reset, back, play
 				var b = Object.create(Button).init( 0, 0, Resources.reset);
 				b.callback = function () {
@@ -446,7 +442,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				var t = Object.create(Text).init(canvas.width / 2, canvas.height - GLOBALS.height, s.name, {});
 				s.addEntity(t);
 
-				var p = Object.create(Platform).init(6, 0, Resources.east);
+				var p = Object.create(Platform).init(6, 0, Resources.platform);
 				p.z = -1;
 				s.addEntity(p);
 
@@ -490,19 +486,18 @@ window.addEventListener("DOMContentLoaded", function () {
 					var title = Object.create(Text).init(canvas.width / 2, y, stage, {color: "#000000", align: "center"});
 					s.entities.push(title);
 					var sc = STAGES[STAGES.indexOf(stage) - 1];
-					console.log(sc);
 					var levels = this.scenes.filter(function (a) { return a.stage == stage; });
 					for (var i = 0; i < levels.length; i++) {
 						var w = this.scenes.indexOf(levels[i]);
 						var tb = Object.create(Button).init(i - j, 2 * j + 2, Resources[stage]);
 						tb.animation = w % tb.sprite.animations;
 						tb.destination = w;
-						if (!sc || (this.stageScore(sc) <= this.stages[sc] && this.stageComplete(sc))) {
+						if (true) {//(!sc || (this.stageScore(sc) <= this.stages[sc] && this.stageComplete(sc))) {
 							tb.callback = function () {
 								world.doScene(this.destination);
 							};
 							if (!levels[i].score) {
-								tb.opacity = 0.3;
+								tb.opacity = 0.8;
 							}
 						}
 						else {
@@ -521,16 +516,20 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		toText: function () {
 			var current = this.scene;
-			var save = {name: "default", type: "level", stage: "recon", max: 20, map: [], entities: []};
+			var save = {name: "default", type: "level", stage: this.scene.stage, max: 20, map: [], entities: []};
 			save.name = current.name;
 			for (y in current.map) {
 				for (x in current.map[y]) {
-					if (current.map[y][x] != undefined) {
+					if (current.map[y][x] != undefined && current.map[y][x].type != "platform") {
 						save.map.push({gridX: x, gridY: y, type: current.map[y][x].type});
 					}
 				}
 			}
-			return JSON.stringify(save);
+			for (var i = 0; i < current.entities.length; i++) {
+				if (current.entities[i].type != "start" && current.entities[i].type != "text") 
+					save.entities.push({gridX: current.entities[i].gridX, gridY: current.entities[i].gridY, type: current.entities[i].type})
+			}
+			return JSON.stringify(save, null, '\t');
 		},
 		step: function () {
 			var newTime = new Date();
@@ -640,10 +639,10 @@ window.addEventListener("DOMContentLoaded", function () {
 					}
 				}
 			}
-			var e = this.entities.sort(function (a, b) { return a.z != b.z ? a.z - b.z : (a.getPosition().y - a.offset.y) - (b.getPosition().y - b.offset.y); });
 			for (var i = 0; i < this.buttons.length; i++) {
 				this.buttons[i].draw(ctx);
 			}
+			var e = this.entities.sort(function (a, b) { return a.z != b.z ? a.z - b.z : (a.getPosition().y - a.offset.y) - (b.getPosition().y - b.offset.y); });
 			for (var i = 0; i < e.length; i++) {
 				e[i].draw(ctx);
 			}
@@ -950,7 +949,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	HotSpot.type = "hotspot";
 	HotSpot.callback = function () {
 		world.remove({x: this.gridX, y: this.gridY});
-		var o = Object.create(Obstacle).init(this.gridX, this.gridY, Resources.o1);
+		var o = Object.create(Obstacle).init(this.gridX, this.gridY, Resources.obstacle);
 		world.add(o);
 	}
 
