@@ -3,12 +3,10 @@ layout: post
 title: Was Undertale supposed to make me despise everyone, everywhere?
 tags: video-game characters behavior morality philosophy
 ---
-
-###Was Undertale supposed to make me despise everyone, everywhere?
+![Image here](http://static.giantbomb.com/uploads/original/28/281548/2785613-screen+shot+2015-09-25+at+11.23.09+am.png "Undertale")
 
 The game is full of jokes, and there are humorous moments and also moments which are certainly meant to be funny to someone else.  But the game is fundamentally much more serious than that, though again not in the way that seems to be intended.  It’s a story based on characters and choices - based heavily on those, to the exclusion of almost everything else.  Characters live, die, and adapt to your decisions, and there is not necessarily any going back.  All well and good.  It’s just a shame every character is so thoroughly dislikeable.
 
-![Image here](http://static.giantbomb.com/uploads/original/28/281548/2785613-screen+shot+2015-09-25+at+11.23.09+am.png "Undertale")
 
 How so?  Their personalities, mostly.  From the most fleeting of meetings to the most involved, the characters you encounter are shallow, self-centered, single-minded, and incredibly invasive and aggressive.  Or at least they were to me, the pacifist.  In a game all about consequence, I can’t help but wonder about the consequences that seem to be lacking for those around me - or perhaps there is a reason that monsters have been bound below the earth?
 
