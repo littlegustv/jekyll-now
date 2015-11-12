@@ -35,21 +35,7 @@
 				{
 					"gridX": 240,
 					"gridY": 110,
-					"text": "Developed By Benny Heller",
-					"type": "text",
-					"format": {}
-				},
-				{
-					"gridX": 240,
-					"gridY": 136,
-					"text": "Special thanks to JavaScript",
-					"type": "text",
-					"format": {}
-				},
-				{
-					"gridX": 240,
-					"gridY": 162,
-					"text": "Find me at @littlegustv on twitter",
+					"text": "developed by Benny Heller",
 					"type": "text",
 					"format": {}
 				}
@@ -74,7 +60,7 @@
 			]
 		},
 		{
-			"name": "it started simple enough",
+			"name": "simple enough",
 			"type": "level",
 			"stage": "habitation",
 			"max": 2,
@@ -89,11 +75,58 @@
 					"gridX": 6,
 					"gridY": 5,
 					"type": "collectable"
+				},
+				{
+					"gridX": 240,
+					"gridY": 164,
+					"text": "Click to place a platform here >>",
+					"type": "text",
+					"speed": 50,
+					"format": {
+						"size": 16,
+						"align": "right"
+					}
+				},
+				{
+					"gridX": 64,
+					"gridY": 64,
+					"text": "^ Click this button to run the level",
+					"type": "text",
+					"speed": 50,
+					"delay": 2000,
+					"format": {
+						"size": 16,
+						"align": "left"
+					}
+				},
+				{
+					"gridX": 244,
+					"gridY": 244,
+					"text": "Use the platforms to get to the object and back.",
+					"type": "text",
+					"speed": 50,
+					"delay": 4000,
+					"format": {
+						"size": 16,
+						"align": "center"
+					}
+				},
+				{
+					"gridX": 244,
+					"gridY": 260,
+					"text": "Right-click to remove a platform.",
+					"type": "text",
+					"speed": 50,
+					"delay": 7000,
+					"format": {
+						"size": 16,
+						"align": "center"
+					}
 				}
 			]
 		},
 		{
-			"name": "and for a while the fallout was only an inconvenience",
+			"name": "an inconvenience",
 			"type": "level",
 			"stage": "habitation",
 			"max": 4,
@@ -114,11 +147,23 @@
 					"gridX": 5,
 					"gridY": 6,
 					"type": "collectable"
+				},
+				{
+					"gridX": 244,
+					"gridY": 244,
+					"text": "You can't go over obstacles.  Find a way around.",
+					"type": "text",
+					"speed": 50,
+					"delay": 100,
+					"format": {
+						"size": 16,
+						"align": "center"
+					}
 				}
 			]
 		},
 		{
-			"name": "you can use obstacles to adjust your offest from your goal",
+			"name": "all lined up",
 			"type": "level",
 			"stage": "habitation",
 			"max": 6,
@@ -144,11 +189,35 @@
 					"gridX": 7,
 					"gridY": 4,
 					"type": "collectable"
+				},
+				{
+					"gridX": 244,
+					"gridY": 180,
+					"text": "Normally you jump two spaces.",
+					"type": "text",
+					"speed": 50,
+					"delay": 100,
+					"format": {
+						"size": 16,
+						"align": "center"
+					}
+				},
+				{
+					"gridX": 244,
+					"gridY": 200,
+					"text": "If there is an obstacle in the way, you will only jump one space.",
+					"type": "text",
+					"speed": 50,
+					"delay": 2000,
+					"format": {
+						"size": 16,
+						"align": "center"
+					}
 				}
 			]
 		},
 		{
-			"name": "it matters which angle/side you approach from",
+			"name": "direction is important",
 			"type": "level",
 			"stage": "habitation",
 			"max": 7,
@@ -799,6 +868,30 @@
 					"gridX": 6,
 					"gridY": 6,
 					"type": "collectable"
+				},
+				{
+					"gridX": 244,
+					"gridY": 244,
+					"text": "Where there's a strong undertow, platforms behave differently.",
+					"type": "text",
+					"speed": 50,
+					"delay": 100,
+					"format": {
+						"size": 16,
+						"align": "center"
+					}
+				},
+				{
+					"gridX": 244,
+					"gridY": 270,
+					"text": "Each time you jump, the platform turns.",
+					"type": "text",
+					"speed": 50,
+					"delay": 4000,
+					"format": {
+						"size": 16,
+						"align": "center"
+					}
 				}
 			]
 		},
@@ -1574,6 +1667,18 @@
 					"gridX": 7,
 					"gridY": 4,
 					"type": "collectable"
+				},
+				{
+					"gridX": 244,
+					"gridY": 244,
+					"text": "If a platform is on a 'hotspot', it can only be jumped on once.",
+					"type": "text",
+					"speed": 50,
+					"delay": 100,
+					"format": {
+						"size": 16,
+						"align": "center"
+					}
 				}
 			]
 		},
@@ -2508,6 +2613,18 @@
 					"gridX": 6,
 					"gridY": 4,
 					"type": "specimen"
+				},
+				{
+					"gridX": 244,
+					"gridY": 244,
+					"text": "Specimen move when you do.",
+					"type": "text",
+					"speed": 50,
+					"delay": 100,
+					"format": {
+						"size": 16,
+						"align": "center"
+					}
 				}
 			]
 		},

@@ -24,9 +24,21 @@ Level 5: Medical
 **/
 
 var debug;
+var audioContext;
 
 function modulo(n, p) {
 	return (n % p + p) % p;
+}
+
+function playSound(buffer)
+{
+	var source = audioContext.createBufferSource();
+	source.buffer = buffer;
+	
+	source.connect(audioContext.destination);
+	source.start(0);
+	
+	return source;
 }
 
 window.addEventListener("DOMContentLoaded", function () {
@@ -116,6 +128,8 @@ window.addEventListener("DOMContentLoaded", function () {
 	var canvas = document.getElementById("mygame");
 	var ctx = canvas.getContext("2d");
 
+	audioContext = new AudioContext();
+
 //	ctx.globalCompositeOperation = "multiply";
 	//debug = ctx;
 
@@ -175,7 +189,17 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "menu.png", frames: 2, speed: 500},
 		{path: "lock.png"},
 		{path: "temp.png", frames: 4, speed: 300, animations: 2},
-		{path: "soundtrack.ogg", streaming: true}
+		{path: "s_none.ogg"},
+		{path: "s_habitation.ogg"},
+		{path: "s_hydroponics.ogg"},
+		{path: "s_operations.ogg"},
+		{path: "s_medical.ogg"},
+		{path: "jump.ogg"},
+		{path: "complete.ogg"},
+		{path: "addplatform.ogg"},
+		{path: "remove.ogg"},
+		{path: "select.ogg"},
+		{path: "fall.ogg"}
 	];
 
 
@@ -212,27 +236,49 @@ window.addEventListener("DOMContentLoaded", function () {
 					}
 				}
 				else if (ext == ".ogg") {
+					this.loadOGG(res, name);
+					/*
 					Resources[name] = {sound: new Audio("res/" + res, streaming=false)};
 					w.progressBar();
 					Resources[name].sound.onload = function () {
 						console.log("loaded sound");
-					}
+					}*/
 				}
 				else if (ext == ".js") {
-					var request = new XMLHttpRequest();
-					request.open("GET", "res/" + res, true);
-					request.onload = function () {
-						try {
-							w.sceneInfo = JSON.parse(request.response);
-							w.progressBar();
-						}
-						catch (e) {
-							console.log("Error in JSON file load:", e);
-						}
-					};
-					request.send();
+					this.loadJSON(res, name);
 				}
 			}
+		},
+		loadOGG: function (res, name) {
+			var w = this;
+			var request = new XMLHttpRequest();
+			request.open('GET', "res/" + res, true);
+			request.responseType = 'arraybuffer';
+
+			request.onload = function() {
+				console.log("ogg", request);
+				audioContext.decodeAudioData(request.response, function(b) {
+					Resources[name] = {buffer: b, play: false};
+					w.progressBar();
+				}, function () {console.log("ERROR");});
+			};
+			request.send();
+		},
+		loadJSON: function (res, name) {
+			var w = this;
+			var request = new XMLHttpRequest();
+			request.open("GET", "res/" + res, true);
+			request.onload = function () {
+				console.log("js", request);
+				try {
+					w.sceneInfo = JSON.parse(request.response);
+					w.progressBar();
+				}
+				catch (e) {
+					console.log("Error in JSON file load:", e);
+				}
+			};
+			request.send();
 		},
 		progressBar: function () {
 			this.resourceLoadCount += 1;
@@ -355,6 +401,10 @@ window.addEventListener("DOMContentLoaded", function () {
 			console.log(s);
 			return s;
 		},
+		musicLoop: function () {
+			var b = playSound(Resources["s_" + world.scene.stage].buffer);
+			b.onended = this.musicLoop;
+		},
 		begin: function () {
 			this.loadBG();
 			this.scenes = this.sceneInfo.scenes, this.cs = 0;
@@ -363,10 +413,12 @@ window.addEventListener("DOMContentLoaded", function () {
 
 			this.paused = true;
 			this.time = new Date();
-			Resources.soundtrack.sound.play();
-			Resources.soundtrack.sound.volume = 0.5;
-			Resources.soundtrack.sound.onended = function () { Resources.soundtrack.sound.play(); };
-			debug = Resources.soundtrack.sound;
+			var w = this;
+			this.musicLoop();
+//			Resources.soundtrack.sound.play();
+//			Resources.soundtrack.sound.volume = 0.5;
+//			Resources.soundtrack.sound.onended = function () { Resources.soundtrack.sound.play(); };
+//			debug = Resources.soundtrack.sound;
 			this.step();
 		},
 		doScene: function (n) {
@@ -501,7 +553,17 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 				s.buttons.push(b);
 			}
-			if (s.name == "stagemenu") {
+			if (s.name == "credits") {
+				var t = Object.create(Text).init(0, 0, "@littlegustv", {});
+				var b = Object.create(TextButton).init(240, 136, t);
+				b.callback = function () { window.open("http://www.twitter.com/littlegustv", "_blank"); };
+				s.buttons.push(b);
+				var t = Object.create(Text).init(0, 0, "littlegustv.github.io", {});
+				var b = Object.create(TextButton).init(240, 162, t);
+				b.callback = function () { window.open("https://littlegustv.github.io", "_blank"); };
+				s.buttons.push(b);
+			}
+			else if (s.name == "stagemenu") {
 				var y = GLOBALS.border + 32, j = 0;
 				console.log(this.stages, this.stageScore());
 				for (stage in this.stages) {
@@ -571,9 +633,9 @@ window.addEventListener("DOMContentLoaded", function () {
 				this.drawCursor(ctx);
 			}
 
-			ctx.globalCompositeOperation = "overlay";
-			ctx.fillStyle = "#ff7607";
-			ctx.fillRect(0,0,canvas.width,canvas.height);
+			//ctx.globalCompositeOperation = "overlay";
+			//ctx.fillStyle = "#ff7607";
+			//ctx.fillRect(0,0,canvas.width,canvas.height);
 			var w = this;
 			window.requestAnimationFrame(function () {	w.step();  });
 		},
@@ -617,6 +679,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 		    	}
 			}
+			/*
 			if (this.scene.start) {
 				ctx.font = "24px VT323";
 				ctx.textAlign = "center";
@@ -624,10 +687,11 @@ window.addEventListener("DOMContentLoaded", function () {
 				var mx = modulo(m.x - this.scene.start.x, 2);
 				var my = modulo(m.y - this.scene.start.y, 2);
 				ctx.fillText(mx + ", " + my, this.mouse.x, this.mouse.y);
-			}
+			}*/
 		},
 		addPlatform: function () {
 			var m = this.toGrid(this.mouse.x, this.mouse.y);
+			console.log(this.mouse.x, this.mouse.y);
 			var dir = directions[this.mouse.angle];
 			this.scene.addPlatform(m, dir);
 		},
@@ -684,6 +748,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					if (this.entities[i].type == "start") {
 						if (this.entities.filter(function (a) { return a.type == "collectable"; }).length <= 0) {
 							if (!this.completed) {
+								playSound(Resources.complete.buffer);
 								this.completed = true;
 								this.character.animation = 1, this.character.frame = 0;
 								world.scenes[this.uid].score = world.scene.count("platform");
@@ -717,6 +782,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		button: function (x, y) {
 			for (var i = 0; i < this.buttons.length; i++) {
 				if (this.buttons[i].check(x, y)) {
+					playSound(Resources.select.buffer);
 					this.buttons[i].callback();
 					return true;
 				}
@@ -780,6 +846,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 				if (type)
 				{
+					playSound(Resources.remove.buffer);
 					if (this.map[position.y][position.x] && this.map[position.y][position.x].type == type)
 						this.map[position.y][position.x] = o;
 				}
@@ -799,6 +866,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				if (m && (m.type == "obstacle" || m.type == "platform")) return;
 				//if (this.count("platform") >= this.max) return;
 				else {
+					playSound(Resources.addplatform.buffer);
 					var p = Object.create(Platform).init(position.x, position.y, Resources.platform, DIRECTION[direction]);
 					if (m && m.callback) { p.onJump = m.callback; p.special = m.type; }
 					this.map[position.y][position.x] = p;
@@ -1063,6 +1131,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			var p = world.getAt(this.gridX, this.gridY);
 			if (!p || p.type == "obstacle") { 
 				this.jumping = GLOBALS.jumpSpeed;
+				playSound(Resources.fall.buffer);
 				setTimeout(function () { world.reset(); }, 100);
 			}
 			else if (p.direction) {
@@ -1078,8 +1147,10 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 				if (d == 0 || p.type == "obstacle") {
 					this.jumping = GLOBALS.jumpSpeed;
+					playSound(Resources.fall.buffer);
 					setTimeout(function () { world.reset(); }, 100);
 				} else {
+					playSound(Resources.jump.buffer);
 					this.direction = p.direction;
 					this.distance = d;
 					this.jumping = GLOBALS.jumpSpeed;
