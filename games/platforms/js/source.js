@@ -181,7 +181,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "habitation.png", frames: 2, speed: 650, animations: 11},
 		{path: "hydroponics.png", frames: 2, speed: 650, animations: 11},
 		{path: "operations.png", frames: 2, speed: 650, animations: 11},
-		{path: "medical.png", frames: 2, speed: 650, animations: 1},
+		{path: "medical.png", frames: 2, speed: 650, animations: 11},
 		{path: "start.png", frames: 2, speed: 500},
 		{path: "cell.png", frames: 5, speed: 1500},
 		{path: "reset.png", frames: 2, speed: 500},
@@ -463,8 +463,7 @@ window.addEventListener("DOMContentLoaded", function () {
 						break;
 					case "specimen":
 						e = Object.create(Specimen).init(c.gridX, c.gridY, Resources[s.stage]);
-						//e.distance = 2;
-						console.log("specimen", e.distance, e.direction);
+						e.animation = s.uid % e.sprite.animations;
 						e.direction = DIRECTION.east;
 						break;
 				}

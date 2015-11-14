@@ -3021,6 +3021,48 @@
 					"type": "character"
 				}
 			]
+		},
+		{
+			"name": "blank",
+			"type": "level",
+			"stage": "medical",
+			"max": 20,
+			"map": [],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				}
+			]
+		},
+		{
+			"name": "blank",
+			"type": "level",
+			"stage": "medical",
+			"max": 20,
+			"map": [],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				}
+			]
+		},
+		{
+			"name": "blank",
+			"type": "level",
+			"stage": "medical",
+			"max": 20,
+			"map": [],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				}
+			]
 		}
 	]
 }
