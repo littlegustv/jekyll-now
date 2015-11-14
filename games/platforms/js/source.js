@@ -171,15 +171,16 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "splash.png"},
 		{path: "platform.png", frames: 2, speed: 1000},
 		{path: "directions.png", frames: 2, speed: 1000, animations: 6},
-		{path: "character.png", frames: 3, speed: 300, animations: 6},
+		{path: "character.png", frames: 3, speed: 250, animations: 6},
 		{path: "obstacle.png", frames: 2, speed: 1000},
 		{path: "hotspot.png", frames: 2, speed: 500},
 		{path: "undertow.png", frames: 4, speed: 800},
 		{path: "unstable.png", frames: 4, speed: 300},
 		{path: "scenes.js"},
-		{path: "habitation.png", frames: 2, speed: 650, animations: 5},
-		{path: "hydroponics.png", frames: 2, speed: 650, animations: 3},
-		{path: "operations.png", frames: 2, speed: 650, animations: 5},
+		{path: "empty.png", frames: 2, speed: 1000},
+		{path: "habitation.png", frames: 2, speed: 650, animations: 11},
+		{path: "hydroponics.png", frames: 2, speed: 650, animations: 11},
+		{path: "operations.png", frames: 2, speed: 650, animations: 11},
 		{path: "medical.png", frames: 2, speed: 650, animations: 1},
 		{path: "start.png", frames: 2, speed: 500},
 		{path: "cell.png", frames: 5, speed: 1500},
@@ -188,7 +189,8 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "play.png", frames: 2, speed: 500},
 		{path: "menu.png", frames: 2, speed: 500},
 		{path: "lock.png"},
-		{path: "temp.png", frames: 4, speed: 300, animations: 2},
+		{path: "blank.png"},
+		{path: "temp.png", frames: 4, speed: 300, animations: 6},
 		{path: "s_none.ogg"},
 		{path: "s_habitation.ogg"},
 		{path: "s_hydroponics.ogg"},
@@ -402,8 +404,9 @@ window.addEventListener("DOMContentLoaded", function () {
 			return s;
 		},
 		musicLoop: function () {
-			var b = playSound(Resources["s_" + world.scene.stage].buffer);
-			b.onended = this.musicLoop;
+			//console.log(Resources["s_" + world.scene.stage].buffer, "s_" + world.scene.stage);
+			world.soundtrack = playSound(Resources["s_" + world.scene.stage].buffer);
+			world.soundtrack.onended = world.musicLoop;
 		},
 		begin: function () {
 			this.loadBG();
@@ -542,7 +545,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				};
 				s.buttons.push(tb);
 
-				var e = Object.create(Entity).init(3,3,Resources.temp);
+				var e = Object.create(Entity).init(3,3,Resources.character);
 				e.animation = 1;
 				s.entities.push(e);
 
@@ -573,23 +576,24 @@ window.addEventListener("DOMContentLoaded", function () {
 					var levels = this.scenes.filter(function (a) { return a.stage == stage; });
 					for (var i = 0; i < levels.length; i++) {
 						var w = this.scenes.indexOf(levels[i]);
-						var tb = Object.create(Button).init(i - j, 2 * j + 2, Resources[stage]);
-						tb.animation = w % tb.sprite.animations;
-						tb.destination = w;
-						if (true) {//(!sc || (this.stageScore(sc) <= this.stages[sc] && this.stageComplete(sc))) {
+						if (!sc || this.stageComplete(sc)) {
+							var tb;
+							if (!levels[i].score) {
+								tb = Object.create(Button).init(i - j, 2 * j + 2, Resources.empty);
+							} else {
+								tb = Object.create(Button).init(i - j, 2 * j + 2, Resources[stage]);
+								tb.animation = w % tb.sprite.animations;
+							}
+							tb.destination = w;
 							tb.callback = function () {
 								world.doScene(this.destination);
 							};
-							if (!levels[i].score) {
-								tb.opacity = 0.8;
-							}
+							s.buttons.push(tb);
 						}
 						else {
-							tb.callback = function () {};
 							var lock = Object.create(Entity).init(i - j, 2 * j + 2, Resources.lock);
 							s.entities.push(lock);
 						}
-						s.buttons.push(tb);
 
 					}
 					j += 1;
@@ -676,7 +680,10 @@ window.addEventListener("DOMContentLoaded", function () {
 			        cursor.direction = DIRECTION[directions[this.mouse.angle]];
 			        cursor.opacity = 0.5;
 			        cursor.draw(ctx);
-
+			        var d1 = Object.create(Entity).init(m.x + cursor.direction.x, m.y + cursor.direction.y, Resources.blank);
+			        d1.draw(ctx);
+					var d2 = Object.create(Entity).init(m.x + 2 * cursor.direction.x, m.y + 2 * cursor.direction.y, Resources.blank);
+			        d2.draw(ctx);			       
 		    	}
 			}
 			/*
@@ -1214,6 +1221,14 @@ window.addEventListener("DOMContentLoaded", function () {
 		}
 	});
 
-	document.addEventListener("visibilitychange", function () { world.time = new Date(); });
+	document.addEventListener("visibilitychange", function (e) { 
+		if (document.visibilityState == "hidden") {
+			world.soundtrack.playbackRate.value = 0;
+		}
+		else {
+			world.soundtrack.playbackRate.value = 1;
+		}
+		world.time = new Date(); 
+	});
 
 });

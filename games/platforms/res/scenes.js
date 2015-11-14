@@ -974,7 +974,7 @@
 			"name": "keep track of how many jumps",
 			"type": "level",
 			"stage": "hydroponics",
-			"max": 10,
+			"max": 9,
 			"map": [
 				{
 					"gridX": 6,
@@ -1329,7 +1329,7 @@
 			"name": "doubled",
 			"type": "level",
 			"stage": "hydroponics",
-			"max": 11,
+			"max": 8,
 			"map": [
 				{
 					"gridX": 6,
@@ -1369,6 +1369,11 @@
 				{
 					"gridX": 3,
 					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 8,
 					"type": "obstacle"
 				}
 			],
