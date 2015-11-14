@@ -147,7 +147,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	};
 
 	var directions = ["east", "southeast", "southwest", "west", "northwest", "northeast", "none"];
-	var STAGES = ["habitation", "hydroponics", "operations", "engineering", "medical"];
+	var STAGES = ["habitation", "hydroponics", "operations", "medical"];
 	var DIRECTION = {
 		none: {x: 0, y: 0},
 		east: {x: 1, y: 0},
