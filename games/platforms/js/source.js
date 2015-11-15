@@ -143,7 +143,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		width: 18,
 		height: 16,
 		border: 24,
-		jumpSpeed: 750
+		jumpSpeed: 1000
 	};
 
 	var directions = ["east", "southeast", "southwest", "west", "northwest", "northeast", "none"];
@@ -189,16 +189,16 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "play.png", frames: 2, speed: 500},
 		{path: "menu.png", frames: 2, speed: 500},
 		{path: "lock.png"},
+		{path: "mute.png", frames: 2, speed: 500, animations: 2},
 		{path: "blank.png"},
 		{path: "temp.png", frames: 4, speed: 300, animations: 6},
-		{path: "s_none.ogg"},
-		{path: "s_habitation.ogg"},
+		{path: "soundtrack.ogg"},
+	/*	{path: "s_habitation.ogg"},
 		{path: "s_hydroponics.ogg"},
 		{path: "s_operations.ogg"},
-		{path: "s_medical.ogg"},
+		{path: "s_medical.ogg"},*/
 		{path: "jump.ogg"},
 		{path: "complete.ogg"},
-		{path: "addplatform.ogg"},
 		{path: "remove.ogg"},
 		{path: "select.ogg"},
 		{path: "fall.ogg"}
@@ -405,8 +405,9 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		musicLoop: function () {
 			//console.log(Resources["s_" + world.scene.stage].buffer, "s_" + world.scene.stage);
-			world.soundtrack = playSound(Resources["s_" + world.scene.stage].buffer);
+			world.soundtrack = playSound(Resources.soundtrack.buffer);
 			world.soundtrack.onended = world.musicLoop;
+			debug = world.soundtrack;
 		},
 		begin: function () {
 			this.loadBG();
@@ -543,10 +544,23 @@ window.addEventListener("DOMContentLoaded", function () {
 					world.doScene(1);
 				};
 				s.buttons.push(tb);
-
+/*
 				var e = Object.create(Entity).init(3,3,Resources.character);
 				e.animation = 1;
-				s.entities.push(e);
+				s.entities.push(e);*/
+
+				var mute = Object.create(Button).init(0, 0, Resources.mute);
+				mute.animation = audioContext.state == "suspended" ? 1 : 0;
+				mute.callback = function () {
+					if (this.animation == 0) {
+						audioContext.suspend();
+						this.animation = 1;
+					} else {
+						audioContext.resume();
+						this.animation = 0;
+					}
+				}
+				s.buttons.push(mute);
 
 			} else {
 				var b = Object.create(Button).init(12, 0, Resources.menu);
@@ -872,7 +886,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				if (m && (m.type == "obstacle" || m.type == "platform")) return;
 				//if (this.count("platform") >= this.max) return;
 				else {
-					playSound(Resources.addplatform.buffer);
+					playSound(Resources.select.buffer);
 					var p = Object.create(Platform).init(position.x, position.y, Resources.platform, DIRECTION[direction]);
 					if (m && m.callback) { p.onJump = m.callback; p.special = m.type; }
 					this.map[position.y][position.x] = p;
