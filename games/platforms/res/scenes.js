@@ -8,7 +8,7 @@
 				{
 					"gridX": 240,
 					"gridY": 160,
-					"text": "Operation: Eos",
+					"text": "The Myth Of Eos",
 					"type": "text",
 					"speed": 100,
 					"format": {
