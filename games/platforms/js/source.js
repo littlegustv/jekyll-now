@@ -291,9 +291,9 @@ window.addEventListener("DOMContentLoaded", function () {
 				ctx.drawImage(Resources.splash.image, 0, 0, canvas.width, canvas.height);
 			}
 			ctx.fillStyle = "#f4f0e8";
-			ctx.fillRect(GLOBALS.border, canvas.height - GLOBALS.border * 3, 240, GLOBALS.border * 2);
+			ctx.fillRect(GLOBALS.border * 0.75, canvas.height - GLOBALS.border * 2, 240, GLOBALS.border);
 			ctx.fillStyle = "black";
-			ctx.fillRect(GLOBALS.border, canvas.height - GLOBALS.border * 3, 240 * this.resourceLoadCount / this.resourceCount, 2 * GLOBALS.border);
+			ctx.fillRect(GLOBALS.border * 0.75, canvas.height - GLOBALS.border * 2, 240 * this.resourceLoadCount / this.resourceCount, GLOBALS.border);
 		},
 		reset: function () {
 			var i = this.cs;
