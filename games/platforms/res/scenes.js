@@ -8,7 +8,7 @@
 				{
 					"gridX": 240,
 					"gridY": 160,
-					"text": "Main Menu",
+					"text": "Operation: Eos",
 					"type": "text",
 					"speed": 100,
 					"format": {
@@ -56,6 +56,37 @@
 						"size": 32,
 						"align": "left"
 					}
+				}
+			]
+		},
+		{
+			"name": "habitation",
+			"type": "cutscene",
+			"stage": "habitation",
+			"map": {},
+			"entities": [
+				{
+					"gridX": 8,
+					"gridY": 100,
+					"text": "Warning: Ship temperature exceeds safety levels.",
+					"type": "text",
+					"speed": 25,
+					"format": {
+						"align": "left",
+						"size": 18
+					}
+				},
+				{
+					"gridX": 8,
+					"gridY": 120,
+					"text": "Multiple systems unresponsive.",
+					"type": "text",
+					"speed": 25,
+					"delay": 2700,
+					"format": {
+						"align": "left",
+						"size": 18
+					}					
 				}
 			]
 		},
@@ -813,6 +844,37 @@
 					"gridX": 7,
 					"gridY": 4,
 					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "hydroponics",
+			"type": "cutscene",
+			"stage": "hydroponics",
+			"map": {},
+			"entities": [
+				{
+					"gridX": 8,
+					"gridY": 100,
+					"text": "Warning: Turbulent currents detected.",
+					"type": "text",
+					"speed": 25,
+					"format": {
+						"align": "left",
+						"size": 18
+					}
+				},
+				{
+					"gridX": 8,
+					"gridY": 120,
+					"text": "Be aware of strong undertow.",
+					"type": "text",
+					"speed": 25,
+					"delay": 2700,
+					"format": {
+						"align": "left",
+						"size": 18
+					}					
 				}
 			]
 		},
@@ -1642,6 +1704,37 @@
 					"gridX": 1,
 					"gridY": 4,
 					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "operations",
+			"type": "cutscene",
+			"stage": "operations",
+			"map": {},
+			"entities": [
+				{
+					"gridX": 8,
+					"gridY": 100,
+					"text": "Warning: Surface contains areas of exceptional heat.",
+					"type": "text",
+					"speed": 25,
+					"format": {
+						"align": "left",
+						"size": 18
+					}
+				},
+				{
+					"gridX": 8,
+					"gridY": 120,
+					"text": "May affect platform behavior.",
+					"type": "text",
+					"speed": 25,
+					"delay": 2700,
+					"format": {
+						"align": "left",
+						"size": 18
+					}					
 				}
 			]
 		},
@@ -2599,6 +2692,37 @@
 					"gridX": 7,
 					"gridY": 4,
 					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "medical",
+			"type": "cutscene",
+			"stage": "medical",
+			"map": {},
+			"entities": [
+				{
+					"gridX": 8,
+					"gridY": 100,
+					"text": "Warning: Live specimen loose.",
+					"type": "text",
+					"speed": 25,
+					"format": {
+						"align": "left",
+						"size": 18
+					}
+				},
+				{
+					"gridX": 8,
+					"gridY": 120,
+					"text": "Approach with caution.",
+					"type": "text",
+					"speed": 25,
+					"delay": 2700,
+					"format": {
+						"align": "left",
+						"size": 18
+					}					
 				}
 			]
 		},

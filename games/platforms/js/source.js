@@ -171,7 +171,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "splash.png"},
 		{path: "platform.png", frames: 2, speed: 1000},
 		{path: "directions.png", frames: 2, speed: 1000, animations: 6},
-		{path: "character.png", frames: 3, speed: 250, animations: 6},
+		{path: "character.png", frames: 2, speed: 500, animations: 6},
 		{path: "obstacle.png", frames: 2, speed: 1000},
 		{path: "hotspot.png", frames: 2, speed: 500},
 		{path: "undertow.png", frames: 4, speed: 800},
@@ -191,7 +191,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "lock.png"},
 		{path: "mute.png", frames: 2, speed: 500, animations: 2},
 		{path: "blank.png"},
-		{path: "temp.png", frames: 4, speed: 300, animations: 6},
+		{path: "temp.png", frames: 2, speed: 500, animations: 6},
 		{path: "soundtrack.ogg"},
 	/*	{path: "s_habitation.ogg"},
 		{path: "s_hydroponics.ogg"},
@@ -493,6 +493,13 @@ window.addEventListener("DOMContentLoaded", function () {
 					s.map[c.gridY][c.gridX] = m;
 				}
 			}
+			if (s.type == "cutscene") {
+				var t = Object.create(Text).init(0, 0, "<Continue>", {align: "center", size: 18});
+				var skip = Object.create(TextButton).init(canvas.width / 2, canvas.height - 24, t);
+				var n = s.uid + 1;
+				skip.callback = function () { world.doScene(n) };
+				s.buttons.push(skip);
+			}
 			if (s.type == "level") {
 				console.log(s.name);
 				// ADD LEVEL BUTTONS: reset, back, play
@@ -523,14 +530,14 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.par = t2;
 			}
 			if (s.name == "mainmenu") {
-				var t = Object.create(Text).init(0, 0,"-- New Game --",{});
+				var t = Object.create(Text).init(0, 0,"<New Game>",{});
 				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 40,t);
 				tb.callback = function () {
-					world.doScene(2);
+					world.doScene(3);
 				};
 				s.buttons.push(tb);
 			
-				var t = Object.create(Text).init(0, 0,"-- Continue --",{});
+				var t = Object.create(Text).init(0, 0,"<Continue>",{});
 				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 68,t);
 				tb.callback = function () {
 					world.load();
@@ -538,15 +545,15 @@ window.addEventListener("DOMContentLoaded", function () {
 				};
 				s.buttons.push(tb);
 
-				var t = Object.create(Text).init(0, 0,"-- Credits --",{});
+				var t = Object.create(Text).init(0, 0,"<Credits>",{});
 				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 96,t);
 				tb.callback = function () {
 					world.doScene(1);
 				};
 				s.buttons.push(tb);
 /*
-				var e = Object.create(Entity).init(3,3,Resources.character);
-				e.animation = 1;
+				var e = Object.create(Entity).init(3,3,Resources.temp);
+				e.animation = 0;
 				s.entities.push(e);*/
 
 				var mute = Object.create(Button).init(0, 0, Resources.mute);
@@ -562,7 +569,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 				s.buttons.push(mute);
 
-			} else {
+			} else if (s.type != "cutscene") {
 				var b = Object.create(Button).init(12, 0, Resources.menu);
 				b.callback = function () {
 					world.doScene(0);
@@ -581,12 +588,11 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 			else if (s.name == "stagemenu") {
 				var y = GLOBALS.border + 32, j = 0;
-				console.log(this.stages, this.stageScore());
 				for (stage in this.stages) {
 					var title = Object.create(Text).init(canvas.width / 2, y, stage, {color: "#000000", align: "center"});
 					s.entities.push(title);
 					var sc = STAGES[STAGES.indexOf(stage) - 1];
-					var levels = this.scenes.filter(function (a) { return a.stage == stage; });
+					var levels = this.scenes.filter(function (a) { return a.stage == stage && a.type == "level"; });
 					for (var i = 0; i < levels.length; i++) {
 						var w = this.scenes.indexOf(levels[i]);
 						if (!sc || this.stageComplete(sc)) {
@@ -745,12 +751,12 @@ window.addEventListener("DOMContentLoaded", function () {
 					}
 				}
 			}
-			for (var i = 0; i < this.buttons.length; i++) {
-				this.buttons[i].draw(ctx);
-			}
 			var e = this.entities.sort(function (a, b) { return a.z != b.z ? a.z - b.z : (a.getPosition().y - a.offset.y) - (b.getPosition().y - b.offset.y); });
 			for (var i = 0; i < e.length; i++) {
 				e[i].draw(ctx);
+			}
+			for (var i = 0; i < this.buttons.length; i++) {
+				this.buttons[i].draw(ctx);
 			}
 		},
 		update: function (dt) {
@@ -773,8 +779,8 @@ window.addEventListener("DOMContentLoaded", function () {
 								this.character.animation = 1, this.character.frame = 0;
 								world.scenes[this.uid].score = world.scene.count("platform");
 								world.paused = true;
-								var t = Object.create(Text).init(0,0,"Next...",{});
-								var tb = Object.create(TextButton).init(canvas.width - 60, canvas.height - 40, t);
+								var t = Object.create(Text).init(0,0,"<Next>",{size: 60});
+								var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2, t);
 								var n = this.uid + 1;
 								tb.callback = function () {
 									world.doScene(n);
@@ -1123,6 +1129,15 @@ window.addEventListener("DOMContentLoaded", function () {
 	Character.offset = {x: 0, y: -16};
 	Character.jumping = 0;
 	Character.type = "character";
+	Character.fall = function () {
+		this.jumping = GLOBALS.jumpSpeed;
+		playSound(Resources.fall.buffer);
+     	canvas.style.webkitFilter = "invert(100%)";
+		setTimeout(function () { 
+   			canvas.style.webkitFilter = "invert(0%)";
+			world.reset(); 
+		}, 100);
+	}
 	Character.update = function (dt) {
 		if (world.paused) return;
 		this.animate(dt);
@@ -1150,9 +1165,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 			var p = world.getAt(this.gridX, this.gridY);
 			if (!p || p.type == "obstacle") { 
-				this.jumping = GLOBALS.jumpSpeed;
-				playSound(Resources.fall.buffer);
-				setTimeout(function () { world.reset(); }, 100);
+				this.fall();
 			}
 			else if (p.direction) {
 				var c = this;
@@ -1166,9 +1179,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					}
 				}
 				if (d == 0 || p.type == "obstacle") {
-					this.jumping = GLOBALS.jumpSpeed;
-					playSound(Resources.fall.buffer);
-					setTimeout(function () { world.reset(); }, 100);
+					this.fall();
 				} else {
 					playSound(Resources.jump.buffer);
 					this.direction = p.direction;
@@ -1236,10 +1247,10 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	document.addEventListener("visibilitychange", function (e) { 
 		if (document.visibilityState == "hidden") {
-			world.soundtrack.playbackRate.value = 0;
+			audioContext.suspend();
 		}
 		else {
-			world.soundtrack.playbackRate.value = 1;
+			audioContext.resume();
 		}
 		world.time = new Date(); 
 	});
