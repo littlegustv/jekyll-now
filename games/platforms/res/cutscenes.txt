@@ -1,0 +1,68 @@
+Habitation:
+
+Solar Probe Eos -- Serial Number 844aB-2
+Black Box Recording
+
+10-31-2067-0124791 System Failure
+ERROR: Multiple systems unresponsive
+Running diagnostic  .  .  .
+Habitation --- Offline, possible hull breach
+Hydroponics -- Chamber integrity compromised, material unacounted for
+Operations --- System components missing, bridge functioning offline
+Medical ------ Specimen count unavailable, all systems down
+
+Pilot Log - Addendum: Beginning reconnaissance and recovery mission
+Priority is restoring life support to habitation module.
+
+Hydroponics:
+
+Solar Probe Eos -- Serial Number 844aB-2
+Black Box Recording
+
+10-31-2067-1587239 Life Support Restored
+ERROR: Multiple systems unresponsive
+Running diagnostic  .  .  .
+Hydroponics -- Chamber integrity compromised, material unacounted for
+Operations --- System components missing, bridge functioning offline
+Medical ------ Specimen count unavailable, all systems down
+
+Pilot Log - Addendum: Solar surface near hydroponics module experiencing turbulence
+Unclear how recovery operation will be affected.
+
+Operations:
+
+Solar Probe Eos -- Serial Number 844aB-2
+Black Box Recording
+
+11-01-2067-00002133 Hydroponic Growth Resumed
+ERROR: Multiple systems unresponsive
+Running diagnostic  .  .  .
+Operations --- Bridge functioning offline
+Medical ------ Specimen count unavailable
+
+Pilot Log - Addendum: Unusually high temperature
+No time for repetition.
+
+Medical:
+
+Solar Probe Eos -- Serial Number 844aB-2
+Black Box Recording
+
+10-31-2067-00542332 Bridge Control Now Functional
+ERROR: System unresponsive
+Running diagnostic  .  .  .
+Medical ------ Specimen count unavailable
+
+Pilot Log - Addendum: Live targets add new layer of risk
+
+Final:
+
+Solar Probe Eos -- Serial Number 844aB-2
+Black Box Recording
+
+10-31-2067-45000032 All systems restored
+Running diagnostic  .  .  .
+No errors detected.
+
+Pilot Log - Addendum: Course set for home.
+Goodbye  .  .   .

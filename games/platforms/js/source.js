@@ -1,5 +1,4 @@
 /**
-
 bugs: new game, hotspot removes platform from score,
 
 todo: 
@@ -21,6 +20,7 @@ Level 4: Engineering -> (hotspot)
 Level 5: Medical
 	-> warning.  many of the specimen are loose.
 	-> collectibles are 'specimen' -> they move each time you jump
+
 **/
 
 var debug;
@@ -108,6 +108,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 		if (e.changedTouches) console.log("start", e);
 		if (!world.scene || world.scene.type != "level") return;
+		else if (e.which === 3 || e.button === 2) {}
 		else world.mouse.down = true;
 	}
 
@@ -174,7 +175,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "character.png", frames: 2, speed: 500, animations: 6},
 		{path: "obstacle.png", frames: 2, speed: 1000},
 		{path: "hotspot.png", frames: 2, speed: 500},
-		{path: "undertow.png", frames: 4, speed: 800},
+		{path: "undertow.png", frames: 4, speed: 200},
 		{path: "unstable.png", frames: 4, speed: 300},
 		{path: "scenes.js"},
 		{path: "empty.png", frames: 2, speed: 1000},
@@ -188,6 +189,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "back.png", frames: 2, speed: 500},
 		{path: "play.png", frames: 2, speed: 500},
 		{path: "menu.png", frames: 2, speed: 500},
+		{path: "spark.png", frames: 3, speed: 200},
 		{path: "lock.png"},
 		{path: "mute.png", frames: 2, speed: 500, animations: 2},
 		{path: "blank.png"},
@@ -387,7 +389,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		stageComplete: function (stage) {
 			if (! this.stages[stage]) return true;
 			for (var i = 0; i < this.scenes.length; i++) {
-				if (this.scenes[i].stage == stage) {
+				if (this.scenes[i].stage == stage && this.scenes[i].type == "level") {
 					if (!this.scenes[i].score) return false;
 				}
 			}
@@ -440,8 +442,21 @@ window.addEventListener("DOMContentLoaded", function () {
 				var c = config.entities[i];
 				var e;
 				switch (c.type) {
+					case "textblock":
+						var lines = c.text.split("\n");
+						var start = {x: c.gridX, y: c.gridY};
+						var delay = 0;
+						for (var i = 0; i < lines.length; i++) {
+							console.log(lines[i], i, lines.length);
+							var t = Object.create(Text).init(start.x, start.y, lines[i], c.format, c.speed, delay);
+							delay += c.speed * (lines[i].length) + c.pause;
+							s.entities.push(t);
+							start.y += c.format.size + 4;
+						}
+						break;
 					case "text":
 						e = Object.create(Text).init(c.gridX, c.gridY, c.text, c.format, c.speed, c.delay);
+						e.z = -1;
 						break;
 					case "character":
 						var start = Object.create(Entity).init(c.gridX, c.gridY, Resources.start);
@@ -487,6 +502,10 @@ window.addEventListener("DOMContentLoaded", function () {
 					case "unstable":
 						m = Object.create(Unstable).init(c.gridX, c.gridY, Resources.unstable);
 						break;
+					case "platform":
+						m  = Object.create(Platform).init(c.gridX, c.gridY, Resources.platform);
+						m.direction = DIRECTION[c.direction];
+						break;
 				}
 				if (m) {
 					if (!s.map[c.gridY]) s.map[c.gridY] = {};
@@ -495,8 +514,8 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 			if (s.type == "cutscene") {
 				var t = Object.create(Text).init(0, 0, "<Continue>", {align: "center", size: 18});
-				var skip = Object.create(TextButton).init(canvas.width / 2, canvas.height - 24, t);
-				var n = s.uid + 1;
+				var skip = Object.create(TextButton).init(canvas.width / 2, canvas.height - 8, t);
+				var n = (s.uid + 1) % world.scenes.length;
 				skip.callback = function () { world.doScene(n) };
 				s.buttons.push(skip);
 			}
@@ -521,11 +540,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				var t = Object.create(Text).init(canvas.width / 2, canvas.height - GLOBALS.height, s.name, {});
 				s.addEntity(t);
 
-				var p = Object.create(Platform).init(6, 0, Resources.platform);
-				p.z = -1;
-				s.addEntity(p);
-
-				var t2 = Object.create(Text).init(canvas.width / 2 + GLOBALS.width * 1.5, GLOBALS.border + GLOBALS.height / 2, s.name, {align: "left"});
+				var t2 = Object.create(Text).init(canvas.width / 2, GLOBALS.border + GLOBALS.height / 2, s.name, {align: "center"});
 				s.addEntity(t2);
 				s.par = t2;
 			}
@@ -781,7 +796,7 @@ window.addEventListener("DOMContentLoaded", function () {
 								world.paused = true;
 								var t = Object.create(Text).init(0,0,"<Next>",{size: 60});
 								var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2, t);
-								var n = this.uid + 1;
+								var n = (this.uid + 1) % world.scenes.length;
 								tb.callback = function () {
 									world.doScene(n);
 								};
@@ -793,7 +808,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 			}
 			if (this.type == "level") {
-				this.par.text = "x" + String(this.max - this.count("platform"));
+				this.par.text = String(this.count("platform")) + "/" + String(this.max) + " platforms.";
 			}
 		},
 		doMap: function (type, fn) {
@@ -966,12 +981,11 @@ window.addEventListener("DOMContentLoaded", function () {
         		Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2), Math.round(o.scale * this.w), Math.round(o.scale * this.h));
 			ctx.globalAlpha = 1;
 			ctx.globalCompositeOperation = "normal";
-
 			if (this.special) {
 				ctx.drawImage(Resources[this.special].image, 
     	    		this.frame * this.w / GLOBALS.scale, this.animation * this.h / GLOBALS.scale, 
         			this.w / GLOBALS.scale, this.h / GLOBALS.scale, 
-        			Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2), o.scale * this.w, o.scale * this.h);				
+        			Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2) - 12, o.scale * this.w, o.scale * this.h);				
 			}
 
 		},
@@ -1041,14 +1055,15 @@ window.addEventListener("DOMContentLoaded", function () {
 		ctx.drawImage(Resources.directions.image,
     		this.frame * this.w / GLOBALS.scale,  directions.indexOf(getDirectionName(this.direction)) * this.h / GLOBALS.scale, 
     		this.w / GLOBALS.scale, this.h / GLOBALS.scale, 
-    		Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2), Math.round(o.scale * this.w), Math.round(o.scale * this.h));		
+    		Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2) + this.frame * GLOBALS.scale, Math.round(o.scale * this.w), Math.round(o.scale * this.h));		
 		if (this.special) {
 			ctx.drawImage(Resources[this.special].image, 
 	    		this.frame * this.w / GLOBALS.scale, this.animation * this.h / GLOBALS.scale, 
     			this.w / GLOBALS.scale, this.h / GLOBALS.scale, 
-    			Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2), o.scale * this.w, o.scale * this.h);				
+    			Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2) + this.frame * GLOBALS.scale, o.scale * this.w, o.scale * this.h);				
 		}
 	};
+	Platform.update = function (dt) {};
 
 	var Obstacle = Object.create(Entity);
 	Obstacle.type = "obstacle";
@@ -1181,6 +1196,29 @@ window.addEventListener("DOMContentLoaded", function () {
 				if (d == 0 || p.type == "obstacle") {
 					this.fall();
 				} else {
+					/* onjump */
+					var o = p.getPosition();
+					/*
+					var PlatformParticle = Object.create(ParticleEffect).init(o.x,o.y,10, Resources.spark, 
+						function (n) { this.gridX += Math.cos(n) * GLOBALS.width; this.gridY += Math.sin(n) * GLOBALS.height; this.angle = modulo(n, Math.PI * 2);}, 
+						function (dt) {
+							this.animate(dt);
+							this.health -= dt;
+							this.opacity = this.health / 1000;
+
+							this.gridY += -4 * ((this.health / 1000) * 10 - 5) * dt / 100;
+
+							if ( this.angle > Math.PI / 2 && this.angle < 3 * Math.PI / 2) { 
+								this.gridX -= dt / 100;
+							}
+							else { 
+								this.gridX += dt / 100;
+							};
+						} );
+					world.addEntity(PlatformParticle);
+					*/
+					p.frame = 1;
+					setTimeout( function () { p.frame = 0; }, 500);
 					playSound(Resources.jump.buffer);
 					this.direction = p.direction;
 					this.distance = d;
@@ -1214,6 +1252,43 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.direction = DIRECTION[directions[d]];
 		}
 	}
+
+ 	var ParticleEffect = Object.create(Entity);
+    ParticleEffect.update = function (dt) {
+    	for (var i = 0; i < this.particles.length; i++) {
+    		this.particles[i].update(dt);
+    	}
+    	for (var i = 0; i < this.particles.length; i++) {
+    		if (this.particles[i].health <= 0) {
+    			this.particles.splice(i, 1);
+    		}
+    	}
+    	if (this.particles.length <= 0) { world.removeEntity(this)};
+    };
+    ParticleEffect.draw = function (ctx) {
+    	for (var i = 0; i < this.particles.length; i++) {
+    		this.particles[i].draw(ctx);
+    	}
+    };
+    ParticleEffect.init = function (x, y, pnum, sprite, psetup, pupdate) {
+    	this.gridX = x, this.gridY = y, this.particles = [];
+    	for (var i = 0; i < pnum; i++) {
+    		var p = Object.create(Particle).init(x, y, sprite);
+    		p.setup = psetup, p.update = pupdate;
+    		p.setup(2 * Math.PI * i / pnum);
+    		this.particles.push(p);
+    	}
+    	return this;
+    };
+    ParticleEffect.getPosition = function () { return {x: this.gridX, y: this.gridY, scale: 1}};
+
+    var Particle = Object.create(Entity);
+    Particle.health = 1000;
+    Particle.scale = 1;
+    Particle.type = "particle";
+    Particle.getPosition = function () { return {x: this.gridX, y: this.gridY, scale: 1}};
+    //Particle.draw = function (ctx) { ctx.fillRect(this.gridX, this.gridY, 3, 3); };
+
 /** 		GAME OBJECT INSTANCES 			**/
 
 	var world = Object.create(World).init();

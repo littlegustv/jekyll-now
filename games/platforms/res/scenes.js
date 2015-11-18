@@ -67,26 +67,15 @@
 			"entities": [
 				{
 					"gridX": 8,
-					"gridY": 100,
-					"text": "Warning: Ship temperature exceeds safety levels.",
-					"type": "text",
+					"gridY": 24,
+					"text": "Solar Probe Eos -- Serial Number 844aB-2\nBlack Box Recording\n\n10-31-2067-0124791 System Failure\nERROR: Multiple systems unresponsive\nRunning diagnostic  .  .  .\nHabitation --- Offline, possible hull breach\nHydroponics -- Chamber integrity compromised\nOperations --- Bridge functioning offline\nMedical ------ Specimen count unavailable\n\nPilot Log - Addendum: Beginning recovery mission\nPriority is restoring life support to habitation module.",
+					"type": "textblock",
 					"speed": 25,
+					"pause": 750,
 					"format": {
 						"align": "left",
 						"size": 18
 					}
-				},
-				{
-					"gridX": 8,
-					"gridY": 120,
-					"text": "Multiple systems unresponsive.",
-					"type": "text",
-					"speed": 25,
-					"delay": 2700,
-					"format": {
-						"align": "left",
-						"size": 18
-					}					
 				}
 			]
 		},
@@ -95,7 +84,20 @@
 			"type": "level",
 			"stage": "habitation",
 			"max": 2,
-			"map": [],
+			"map": [
+				{
+					"gridX": 4,
+					"gridY": 5,
+					"type": "platform",
+					"direction": "east"
+				},
+				{
+					"gridX": 6,
+					"gridY": 5,
+					"type": "platform",
+					"direction": "west"
+				}								
+			],
 			"entities": [
 				{
 					"gridX": 4,
@@ -108,50 +110,15 @@
 					"type": "collectable"
 				},
 				{
-					"gridX": 240,
-					"gridY": 164,
-					"text": "Click to place a platform here >>",
-					"type": "text",
-					"speed": 50,
-					"format": {
-						"size": 16,
-						"align": "right"
-					}
-				},
-				{
 					"gridX": 64,
 					"gridY": 64,
-					"text": "^ Click this button to run the level",
+					"text": "^ Click PLAY to begin mission.",
 					"type": "text",
 					"speed": 50,
-					"delay": 2000,
+					"delay": 0,
 					"format": {
-						"size": 16,
+						"size": 24,
 						"align": "left"
-					}
-				},
-				{
-					"gridX": 244,
-					"gridY": 244,
-					"text": "Use the platforms to get to the object and back.",
-					"type": "text",
-					"speed": 50,
-					"delay": 4000,
-					"format": {
-						"size": 16,
-						"align": "center"
-					}
-				},
-				{
-					"gridX": 244,
-					"gridY": 260,
-					"text": "Right-click to remove a platform.",
-					"type": "text",
-					"speed": 50,
-					"delay": 7000,
-					"format": {
-						"size": 16,
-						"align": "center"
 					}
 				}
 			]
@@ -181,13 +148,13 @@
 				},
 				{
 					"gridX": 244,
-					"gridY": 244,
-					"text": "You can't go over obstacles.  Find a way around.",
+					"gridY": 96,
+					"text": "Create a path AROUND the obstacle, and back again.",
 					"type": "text",
 					"speed": 50,
 					"delay": 100,
 					"format": {
-						"size": 16,
+						"size": 22,
 						"align": "center"
 					}
 				}
@@ -238,13 +205,25 @@
 					"gridY": 200,
 					"text": "If there is an obstacle in the way, you will only jump one space.",
 					"type": "text",
-					"speed": 50,
+					"speed": 25,
 					"delay": 2000,
 					"format": {
 						"size": 16,
 						"align": "center"
 					}
-				}
+				},
+				{
+					"gridX": 244,
+					"gridY": 240,
+					"text": "Use this to your advantage.",
+					"type": "text",
+					"speed": 50,
+					"delay": 5000,
+					"format": {
+						"size": 24,
+						"align": "center"
+					}
+				}				
 			]
 		},
 		{
@@ -855,26 +834,15 @@
 			"entities": [
 				{
 					"gridX": 8,
-					"gridY": 100,
-					"text": "Warning: Turbulent currents detected.",
-					"type": "text",
+					"gridY": 24,
+					"text": "Solar Probe Eos -- Serial Number 844aB-2\nBlack Box Recording\n\n10-31-2067-1587239 Life Support Restored\nERROR: Multiple systems unresponsive\nRunning diagnostic  .  .  .\nHydroponics -- Chamber integrity compromised\nOperations --- Bridge functioning offline\nMedical ------ Specimen count unavailable\n\nPilot Log - Addendum: Surface turbulence expected\nUnclear how recovery operation will be affected.",
+					"type": "textblock",
 					"speed": 25,
+					"pause": 1000,
 					"format": {
 						"align": "left",
 						"size": 18
 					}
-				},
-				{
-					"gridX": 8,
-					"gridY": 120,
-					"text": "Be aware of strong undertow.",
-					"type": "text",
-					"speed": 25,
-					"delay": 2700,
-					"format": {
-						"align": "left",
-						"size": 18
-					}					
 				}
 			]
 		},
@@ -1321,7 +1289,7 @@
 			"name": "not always so complicated ... should be earlier",
 			"type": "level",
 			"stage": "hydroponics",
-			"max": 7,
+			"max": 8,
 			"map": [
 				{
 					"gridX": 4,
@@ -1715,26 +1683,15 @@
 			"entities": [
 				{
 					"gridX": 8,
-					"gridY": 100,
-					"text": "Warning: Surface contains areas of exceptional heat.",
-					"type": "text",
+					"gridY": 24,
+					"text": "Solar Probe Eos -- Serial Number 844aB-2\nBlack Box Recording\n\n11-01-2067-00002133 Hydroponic Growth Resumed\nERROR: Multiple systems unresponsive\nRunning diagnostic  .  .  .\nOperations --- Bridge functioning offline\nMedical ------ Specimen count unavailable\n\nPilot Log - Addendum: Unusually high temperature\nNo time for repetition.",
+					"type": "textblock",
 					"speed": 25,
+					"pause": 1000,
 					"format": {
 						"align": "left",
 						"size": 18
 					}
-				},
-				{
-					"gridX": 8,
-					"gridY": 120,
-					"text": "May affect platform behavior.",
-					"type": "text",
-					"speed": 25,
-					"delay": 2700,
-					"format": {
-						"align": "left",
-						"size": 18
-					}					
 				}
 			]
 		},
@@ -2269,7 +2226,7 @@
 			"name": "approach with care",
 			"type": "level",
 			"stage": "operations",
-			"max": 17,
+			"max": 15,
 			"map": [
 				{
 					"gridX": 8,
@@ -2703,26 +2660,15 @@
 			"entities": [
 				{
 					"gridX": 8,
-					"gridY": 100,
-					"text": "Warning: Live specimen loose.",
-					"type": "text",
+					"gridY": 24,
+					"text": "Solar Probe Eos -- Serial Number 844aB-2\nBlack Box Recording\n\n10-31-2067-00542332 Bridge Control Now Functional\nERROR: System unresponsive\nRunning diagnostic  .  .  .\nMedical ------ Specimen count unavailable\n\nPilot Log - Addendum: Live targets add new layer of risk",
+					"type": "textblock",
 					"speed": 25,
+					"pause": 1000,
 					"format": {
 						"align": "left",
 						"size": 18
 					}
-				},
-				{
-					"gridX": 8,
-					"gridY": 120,
-					"text": "Approach with caution.",
-					"type": "text",
-					"speed": 25,
-					"delay": 2700,
-					"format": {
-						"align": "left",
-						"size": 18
-					}					
 				}
 			]
 		},
@@ -3133,60 +3079,309 @@
 			]
 		},
 		{
-			"name": "blank",
+			"name": "patience",
 			"type": "level",
 			"stage": "medical",
-			"max": 20,
-			"map": [],
+			"max": 13,
+			"map": [
+				{
+					"gridX": 4,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 1,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 0,
+					"gridY": 8,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 8,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 9,
+					"type": "obstacle"
+				},
+				{
+					"gridX": -1,
+					"gridY": 9,
+					"type": "obstacle"
+				}
+			],
 			"entities": [
 				{
 					"gridX": 4,
 					"gridY": 4,
 					"type": "character"
+				},
+				{
+					"gridX": 4,
+					"gridY": 7,
+					"type": "specimen"
+				},
+				{
+					"gridX": 1,
+					"gridY": 7,
+					"type": "specimen"
 				}
 			]
 		},
 		{
-			"name": "blank",
+			"name": "snail shell",
 			"type": "level",
 			"stage": "medical",
-			"max": 20,
-			"map": [],
+			"max": 11,
+			"map": [
+				{
+					"gridX": 6,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 7,
+					"type": "obstacle"
+				}
+			],
 			"entities": [
 				{
 					"gridX": 4,
 					"gridY": 4,
 					"type": "character"
+				},
+				{
+					"gridX": 5,
+					"gridY": 3,
+					"type": "specimen"
+				},
+				{
+					"gridX": 6,
+					"gridY": 4,
+					"type": "specimen"
+				},
+				{
+					"gridX": 5,
+					"gridY": 5,
+					"type": "specimen"
 				}
 			]
 		},
 		{
-			"name": "blank",
+			"name": "triangulation",
 			"type": "level",
 			"stage": "medical",
-			"max": 20,
-			"map": [],
+			"max": 11,
+			"map": [
+				{
+					"gridX": 2,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 8,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 1,
+					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 7,
+					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 8,
+					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 7,
+					"type": "obstacle"
+				}
+			],
 			"entities": [
 				{
 					"gridX": 4,
 					"gridY": 4,
 					"type": "character"
+				},
+				{
+					"gridX": 5,
+					"gridY": 2,
+					"type": "specimen"
+				},
+				{
+					"gridX": 2,
+					"gridY": 5,
+					"type": "specimen"
+				},
+				{
+					"gridX": 5,
+					"gridY": 5,
+					"type": "specimen"
 				}
 			]
 		},
 		{
-			"name": "blank",
+			"name": "all of them",
 			"type": "level",
 			"stage": "medical",
-			"max": 20,
-			"map": [],
+			"max": 13,
+			"map": [
+				{
+					"gridX": 4,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 7,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 8,
+					"type": "obstacle"
+				}
+			],
 			"entities": [
 				{
 					"gridX": 4,
 					"gridY": 4,
 					"type": "character"
+				},
+				{
+					"gridX": 4,
+					"gridY": 5,
+					"type": "specimen"
+				},
+				{
+					"gridX": 5,
+					"gridY": 5,
+					"type": "specimen"
+				},
+				{
+					"gridX": 4,
+					"gridY": 6,
+					"type": "specimen"
+				},
+				{
+					"gridX": 3,
+					"gridY": 6,
+					"type": "specimen"
 				}
 			]
+		},
+		{
+			"name": "the end",
+			"type": "cutscene",
+			"stage": "end",
+			"map": {},
+			"entities": [
+				{
+					"gridX": 8,
+					"gridY": 24,
+					"text": "Solar Probe Eos -- Serial Number 844aB-2\nBlack Box Recording\n\n10-31-2067-45000032 All systems restored\nRunning diagnostic  .  .  .\nNo errors detected.\n\nPilot Log - Addendum: Course set for home.\nGoodbye  .  .   .",
+					"type": "textblock",
+					"speed": 25,
+					"pause": 1000,
+					"format": {
+						"align": "left",
+						"size": 18
+					}
+				}
+			]			
 		}
 	]
 }
