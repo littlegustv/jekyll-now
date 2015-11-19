@@ -55,6 +55,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 		if (world.scene.button(e.offsetX, e.offsetY)) { return; }
 		
+		if (!world.paused) return;
 		// right click
 
 		if (e.which === 3 || e.button === 2) {
@@ -203,6 +204,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "complete.ogg"},
 		{path: "remove.ogg"},
 		{path: "select.ogg"},
+		{path: "collect.ogg"},
 		{path: "fall.ogg"}
 	];
 
@@ -534,7 +536,8 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.buttons.push(b);
 				var b = Object.create(Button).init( 1, 0, Resources.play);
 				b.callback = function () {
-					world.paused = !world.paused;
+					world.paused = false;
+					world.scene.platformsUsed = world.scene.count("platform");
 				};
 				s.buttons.push(b);
 				var t = Object.create(Text).init(canvas.width / 2, canvas.height - GLOBALS.height, s.name, {});
@@ -545,33 +548,34 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.par = t2;
 			}
 			if (s.name == "mainmenu") {
-				var t = Object.create(Text).init(0, 0,"<New Game>",{});
-				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 40,t);
-				tb.callback = function () {
-					world.doScene(3);
-				};
-				s.buttons.push(tb);
-			
 				var t = Object.create(Text).init(0, 0,"<Continue>",{});
-				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 68,t);
+				var tb = Object.create(TextButton).init(canvas.width - 128,canvas.height / 2 - 12,t);
 				tb.callback = function () {
 					world.load();
 					world.doScene(2);
 				};
 				s.buttons.push(tb);
+			
+				var t = Object.create(Text).init(0, 0,"<New Game>",{});
+				var tb = Object.create(TextButton).init(canvas.width - 128, canvas.height / 2 + 16,t);
+				tb.callback = function () {
+					world.doScene(3);
+				};
+				s.buttons.push(tb);
 
 				var t = Object.create(Text).init(0, 0,"<Credits>",{});
-				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 96,t);
+				var tb = Object.create(TextButton).init(canvas.width - 128,canvas.height / 2 + 44,t);
 				tb.callback = function () {
 					world.doScene(1);
 				};
 				s.buttons.push(tb);
+				console.log(tb.x, tb.gridX);
 /*
 				var e = Object.create(Entity).init(3,3,Resources.temp);
 				e.animation = 0;
 				s.entities.push(e);*/
 
-				var mute = Object.create(Button).init(0, 0, Resources.mute);
+				var mute = Object.create(Button).init(12, 0, Resources.mute);
 				mute.animation = audioContext.state == "suspended" ? 1 : 0;
 				mute.callback = function () {
 					if (this.animation == 0) {
@@ -604,7 +608,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			else if (s.name == "stagemenu") {
 				var y = GLOBALS.border + 32, j = 0;
 				for (stage in this.stages) {
-					var title = Object.create(Text).init(canvas.width / 2, y, stage, {color: "#000000", align: "center"});
+					var title = Object.create(Text).init(canvas.width / 2, y, stage, {color: "#000000", align: "center", size: 18});
 					s.entities.push(title);
 					var sc = STAGES[STAGES.indexOf(stage) - 1];
 					var levels = this.scenes.filter(function (a) { return a.stage == stage && a.type == "level"; });
@@ -617,12 +621,25 @@ window.addEventListener("DOMContentLoaded", function () {
 							} else {
 								tb = Object.create(Button).init(i - j, 2 * j + 2, Resources[stage]);
 								tb.animation = w % tb.sprite.animations;
+								if (levels[i].score <= levels[i].max) {
+									var pos = tb.getPosition();
+									var t = Object.create(Text).init(pos.x, pos.y + 10, String.fromCharCode(9733), {size: 32, color: "gold"});
+									var perfect = Object.create(TextButton).init(pos.x, pos.y + 10, t);
+									perfect.callback = function () {};
+								} else {
+									var overPar = levels[i].score - levels[i].max;
+									var pos = tb.getPosition();
+									var t = Object.create(Text).init(pos.x, pos.y + 10, "+" + String(overPar), {size: 32, color: "gold"});
+									var perfect = Object.create(TextButton).init(pos.x, pos.y + 10, t);
+									perfect.callback = function () {};
+								}
 							}
 							tb.destination = w;
 							tb.callback = function () {
 								world.doScene(this.destination);
 							};
 							s.buttons.push(tb);
+							if (perfect) s.buttons.push(perfect);
 						}
 						else {
 							var lock = Object.create(Entity).init(i - j, 2 * j + 2, Resources.lock);
@@ -633,6 +650,13 @@ window.addEventListener("DOMContentLoaded", function () {
 					j += 1;
 					y += 56;
 				}
+				var score = 0, max = 0;
+				for (var i = 0; i < this.scenes.length; i++) {
+					if (this.scenes[i].type == 'level' && this.scenes[i].score) {
+						score += this.scenes[i].score, max += this.scenes[i].max;
+					}
+				}
+				s.entities.push(Object.create(Text).init(244,canvas.height - 20,String(score) + " / " + String(max) + " platforms used",{color: "black"}));
 			}
 			return s;
 		},
@@ -792,11 +816,15 @@ window.addEventListener("DOMContentLoaded", function () {
 								playSound(Resources.complete.buffer);
 								this.completed = true;
 								this.character.animation = 1, this.character.frame = 0;
-								world.scenes[this.uid].score = world.scene.count("platform");
 								world.paused = true;
+								world.scenes[this.uid].score = this.platformsUsed;
 								var t = Object.create(Text).init(0,0,"<Next>",{size: 60});
 								var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2, t);
 								var n = (this.uid + 1) % world.scenes.length;
+								if (world.scenes[this.uid].score <= this.max) {
+									var t2 = Object.create(Text).init(canvas.width / 2, canvas.height / 2 + 60, "Perfect!", {size: 72, color: "gold"}, 10, 300);
+									this.entities.push(t2);
+								}
 								tb.callback = function () {
 									world.doScene(n);
 								};
@@ -807,8 +835,9 @@ window.addEventListener("DOMContentLoaded", function () {
 					}
 				}
 			}
-			if (this.type == "level") {
-				this.par.text = String(this.count("platform")) + "/" + String(this.max) + " platforms.";
+			if (this.type == "level" && world.paused) {
+				this.par.text = String(this.count("platform")) + "/" + String(this.max) + " platforms";
+				this.par.current = this.par.text.length;
 			}
 		},
 		doMap: function (type, fn) {
@@ -1021,6 +1050,8 @@ window.addEventListener("DOMContentLoaded", function () {
 		this.text.draw(ctx);
 		this.text.x = x, this.text.y = y;
 		this.w = ctx.measureText(this.text.text).width + 10, this.h = this.text.size + 4;
+		this.x = this.x - (this.text.align == "right") * this.w / 2 + (this.text.align == "left") * this.w / 2;
+		this.color = this.text.color;
 		return this;
 	}
 	TextButton.draw = function (ctx) {
@@ -1039,7 +1070,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	}
 	TextButton.highlight = function (toggle) {
 		if (toggle) this.text.color = "#f4f0e8";
-		else this.text.color = "#18140c";
+		else this.text.color = this.color;
 	}
 
 	var Platform = Object.create(Entity);
@@ -1136,7 +1167,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		if (this.delay > 0) return;
 		ctx.textAlign = this.align;
 		ctx.fillStyle = this.color;
-		ctx.font = "900 " + this.size + "px VT323";
+		ctx.font = "900 " + this.size + "px Arial";
 		ctx.fillText(this.text.substr(0,this.current), this.x, this.y);
 	};
 
@@ -1174,6 +1205,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				if (e[i].type == "collectable") { 
 					if (Math.abs(ep.x - tp.x) < 10 && Math.abs(ep.y - tp.y) < 10) {
 						world.removeEntity(e[i]);
+						playSound(Resources.collect.buffer);
 					}
 				}
 			}

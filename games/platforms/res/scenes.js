@@ -6,13 +6,15 @@
 			"map": {},
 			"entities": [
 				{
-					"gridX": 240,
-					"gridY": 160,
-					"text": "The Myth Of Eos",
-					"type": "text",
-					"speed": 100,
+					"gridX": 16,
+					"gridY": 64,
+					"text": "The\nMyth\nOf\nIcarus",
+					"type": "textblock",
+					"speed": 50,
+					"pause": 100,
 					"format": {
-						"size": 44
+						"size": 72,
+						"align": "left"
 					}
 				}
 			]
@@ -68,7 +70,7 @@
 				{
 					"gridX": 8,
 					"gridY": 24,
-					"text": "Solar Probe Eos -- Serial Number 844aB-2\nBlack Box Recording\n\n10-31-2067-0124791 System Failure\nERROR: Multiple systems unresponsive\nRunning diagnostic  .  .  .\nHabitation --- Offline, possible hull breach\nHydroponics -- Chamber integrity compromised\nOperations --- Bridge functioning offline\nMedical ------ Specimen count unavailable\n\nPilot Log - Addendum: Beginning recovery mission\nPriority is restoring life support to habitation module.",
+					"text": "I woke in the wreckage",
 					"type": "textblock",
 					"speed": 25,
 					"pause": 750,
@@ -110,14 +112,12 @@
 					"type": "collectable"
 				},
 				{
-					"gridX": 64,
-					"gridY": 64,
-					"text": "^ Click PLAY to begin mission.",
+					"gridX": 48,
+					"gridY": 56,
+					"text": "^ click PLAY to run mission",
 					"type": "text",
-					"speed": 50,
-					"delay": 0,
 					"format": {
-						"size": 24,
+						"size": 18,
 						"align": "left"
 					}
 				}
@@ -147,19 +147,79 @@
 					"type": "collectable"
 				},
 				{
-					"gridX": 244,
-					"gridY": 96,
-					"text": "Create a path AROUND the obstacle, and back again.",
+					"gridX": 24,
+					"gridY": 100,
+					"text": " - click to add a new platform",
 					"type": "text",
-					"speed": 50,
-					"delay": 100,
 					"format": {
-						"size": 22,
-						"align": "center"
+						"size": 18,
+						"align": "left"
+					}
+				},
+				{
+					"gridX": 24,
+					"gridY": 120,
+					"text": " - hold & drag mouse to change direction",
+					"type": "text",
+					"format": {
+						"size": 18,
+						"align": "left"
+					}
+				},
+				{
+					"gridX": 24,
+					"gridY": 140,
+					"text": " - avoid the obstacle",
+					"type": "text",
+					"format": {
+						"size": 18,
+						"align": "left"
 					}
 				}
 			]
 		},
+		{
+			"name": "remove what's in the way",
+			"type": "level",
+			"stage": "habitation",
+			"max": 3,
+			"map": [
+				{
+					"gridX": 2,
+					"gridY": 5,
+					"type": "platform",
+					"direction": "east"
+				},
+				{
+					"gridX": 4,
+					"gridY": 5,
+					"type": "platform",
+					"direction": "southwest"
+				}								
+			],
+			"entities": [
+				{
+					"gridX": 2,
+					"gridY": 5,
+					"type": "character"
+				},
+				{
+					"gridX": 4,
+					"gridY": 3,
+					"type": "collectable"
+				},
+				{
+					"gridX": 24,
+					"gridY": 240,
+					"text": " - right-click to remove a platform",
+					"type": "text",
+					"format": {
+						"size": 18,
+						"align": "left"
+					}
+				}
+			]
+		},		
 		{
 			"name": "all lined up",
 			"type": "level",

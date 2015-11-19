@@ -1,3 +1,6 @@
+					"text": "Solar Probe Eos -- Serial Number 844aB-2\nBlack Box Recording\n\n10-31-2067-0124791 System Failure\nERROR: Multiple systems unresponsive\nRunning diagnostic  .  .  .\nHabitation --- Offline, possible hull breach\nHydroponics -- Chamber integrity compromised\nOperations --- Bridge functioning offline\nMedical ------ Specimen count unavailable\n\nPilot Log - Addendum: Beginning recovery mission\nPriority is restoring life support to habitation module.",
+
+
 Habitation:
 
 Solar Probe Eos -- Serial Number 844aB-2
