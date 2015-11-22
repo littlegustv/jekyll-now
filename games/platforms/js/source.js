@@ -287,17 +287,20 @@ window.addEventListener("DOMContentLoaded", function () {
 			request.send();
 		},
 		progressBar: function () {
+			ctx.clearRect(0,0,canvas.width,canvas.height);
 			this.resourceLoadCount += 1;
 			if (this.resourceLoadCount >= this.resourceCount) {
 				this.addEventListeners();
 				this.begin();
-			} else if (Resources.splash) {
-				ctx.drawImage(Resources.splash.image, 0, 0, canvas.width, canvas.height);
 			}
-			ctx.fillStyle = "#f4f0e8";
-			ctx.fillRect(GLOBALS.border * 0.75, canvas.height - GLOBALS.border * 2, 240, GLOBALS.border);
+			//ctx.fillStyle = "#f4f0e8";
+			//ctx.fillRect(GLOBALS.border * 0.75, canvas.height - GLOBALS.border * 2, 240, GLOBALS.border);
 			ctx.fillStyle = "black";
-			ctx.fillRect(GLOBALS.border * 0.75, canvas.height - GLOBALS.border * 2, 240 * this.resourceLoadCount / this.resourceCount, GLOBALS.border);
+			ctx.fillRect(0, 0, canvas.width * this.resourceLoadCount / this.resourceCount, canvas.height);
+			ctx.fillStyle = "white";
+			ctx.font = "900 64px Arial";
+			ctx.textAlign = "center";
+			ctx.fillText("loading...", canvas.width / 2, canvas.height / 2);
 		},
 		reset: function () {
 			var i = this.cs;
@@ -353,6 +356,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 		},
 		loadBG: function () {
+			/*
 			this.bg = {};
 			for (var i = -2; i <= 2 + canvas.height / (2 * GLOBALS.height); i++) {
 				var row = {};
@@ -365,7 +369,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					row[j] = o;
 				}
 				this.bg[i] = row;
-			}
+			}*/
 		},
 		updateBG: function (dt) {
 			for (y in this.bg) {
@@ -1056,8 +1060,8 @@ window.addEventListener("DOMContentLoaded", function () {
 	}
 	TextButton.draw = function (ctx) {
 		// uncomment to show hitbox
-		//ctx.fillStyle = "red";
-		//ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+		/*ctx.fillStyle = "rgba(255,255,255,0.3)";
+		ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);*/
 		this.text.draw(ctx);
 	};
 	TextButton.check = function (x, y) {

@@ -70,7 +70,7 @@
 				{
 					"gridX": 8,
 					"gridY": 24,
-					"text": "I woke in the wreckage",
+					"text": "I woke in the wreckage, it was all gone.\n",
 					"type": "textblock",
 					"speed": 25,
 					"pause": 750,
@@ -317,7 +317,7 @@
 			]
 		},
 		{
-			"name": "don't waste time going in the wrong direction",
+			"name": "don't waste time",
 			"type": "level",
 			"stage": "habitation",
 			"max": 7,
