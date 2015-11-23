@@ -62,24 +62,24 @@
 			]
 		},
 		{
-			"name": "habitation",
+			"name": "how it began",
 			"type": "cutscene",
-			"stage": "habitation",
+			"stage": "start",
 			"map": {},
 			"entities": [
 				{
 					"gridX": 8,
 					"gridY": 24,
-					"text": "I woke in the wreckage, it was all gone.\n",
+					"text": "The ship is called Icarus.\nIt flew too close to the sun.\n\nThe pieces are scattered, we can't rebuild.\n\nThis is a humiliating way to go.\n\nHelp us, please.",
 					"type": "textblock",
 					"speed": 25,
-					"pause": 750,
+					"pause": 1000,
 					"format": {
 						"align": "left",
 						"size": 18
 					}
 				}
-			]
+			]			
 		},
 		{
 			"name": "simple enough",
@@ -118,9 +118,22 @@
 					"type": "text",
 					"format": {
 						"size": 18,
-						"align": "left"
+						"align": "left",
+						"color": "#0000DD"
+					}
+				},
+				{
+					"gridX": 240,
+					"gridY": 240,
+					"text": "Collect the object and get back to the start",
+					"type": "text",
+					"format": {
+						"size": 18,
+						"align": "center",
+						"color": "#0000DD"
 					}
 				}
+
 			]
 		},
 		{
@@ -153,7 +166,8 @@
 					"type": "text",
 					"format": {
 						"size": 18,
-						"align": "left"
+						"align": "left",
+						"color": "#0000DD"
 					}
 				},
 				{
@@ -163,7 +177,8 @@
 					"type": "text",
 					"format": {
 						"size": 18,
-						"align": "left"
+						"align": "left",
+						"color": "#0000DD"
 					}
 				},
 				{
@@ -173,7 +188,8 @@
 					"type": "text",
 					"format": {
 						"size": 18,
-						"align": "left"
+						"align": "left",
+						"color": "#0000DD"
 					}
 				}
 			]
@@ -215,7 +231,8 @@
 					"type": "text",
 					"format": {
 						"size": 18,
-						"align": "left"
+						"align": "left",
+						"color": "#0000DD"
 					}
 				}
 			]
@@ -251,37 +268,13 @@
 				{
 					"gridX": 244,
 					"gridY": 180,
-					"text": "Normally you jump two spaces.",
-					"type": "text",
-					"speed": 50,
-					"delay": 100,
+					"text": "Normally you jump two spaces.\nIf there is an obstacle in the way,\nyou will only jump one space.\n\nUse this to your advantage.",
+					"type": "textblock",
+					"pause": 1000,					
 					"format": {
 						"size": 16,
-						"align": "center"
-					}
-				},
-				{
-					"gridX": 244,
-					"gridY": 200,
-					"text": "If there is an obstacle in the way, you will only jump one space.",
-					"type": "text",
-					"speed": 25,
-					"delay": 2000,
-					"format": {
-						"size": 16,
-						"align": "center"
-					}
-				},
-				{
-					"gridX": 244,
-					"gridY": 240,
-					"text": "Use this to your advantage.",
-					"type": "text",
-					"speed": 50,
-					"delay": 5000,
-					"format": {
-						"size": 24,
-						"align": "center"
+						"align": "center",
+						"color": "#0000DD"
 					}
 				}				
 			]
@@ -392,7 +385,7 @@
 			]
 		},
 		{
-			"name": "sometimes you have to reverse to go forward",
+			"name": "reverse to go forward",
 			"type": "level",
 			"stage": "habitation",
 			"max": 8,
@@ -447,7 +440,7 @@
 			]
 		},
 		{
-			"name": "it might take longer, but sometimes you need space",
+			"name": "you need space",
 			"type": "level",
 			"stage": "habitation",
 			"max": 8,
@@ -592,90 +585,10 @@
 			]
 		},
 		{
-			"name": "not sure about this one, to be honest",
+			"name": "order can be key",
 			"type": "level",
 			"stage": "habitation",
-			"max": 10,
-			"map": [
-				{
-					"gridX": 5,
-					"gridY": 1,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 6,
-					"gridY": 1,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 5,
-					"gridY": 2,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 7,
-					"gridY": 2,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 2,
-					"gridY": 3,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 1,
-					"gridY": 4,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 6,
-					"gridY": 4,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 1,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 3,
-					"gridY": 6,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 5,
-					"gridY": 6,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 2,
-					"gridY": 7,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 3,
-					"gridY": 7,
-					"type": "obstacle"
-				}
-			],
-			"entities": [
-				{
-					"gridX": 4,
-					"gridY": 4,
-					"type": "character"
-				},
-				{
-					"gridX": 7,
-					"gridY": 4,
-					"type": "collectable"
-				}
-			]
-		},
-		{
-			"name": "the order you approach things matters",
-			"type": "level",
-			"stage": "habitation",
-			"max": 10,
+			"max": 9,
 			"map": [
 				{
 					"gridX": 7,
@@ -771,13 +684,13 @@
 				},
 				{
 					"gridX": 6,
-					"gridY": 8,
+					"gridY": 6,
 					"type": "collectable"
 				}
 			]
 		},
 		{
-			"name": "entrance is important",
+			"name": "make a good entrance",
 			"type": "level",
 			"stage": "habitation",
 			"max": 14,
@@ -875,34 +788,14 @@
 					"type": "character"
 				},
 				{
-					"gridX": 2,
-					"gridY": 5,
+					"gridX": 0,
+					"gridY": 7,
 					"type": "collectable"
 				},
 				{
 					"gridX": 7,
 					"gridY": 4,
 					"type": "collectable"
-				}
-			]
-		},
-		{
-			"name": "hydroponics",
-			"type": "cutscene",
-			"stage": "hydroponics",
-			"map": {},
-			"entities": [
-				{
-					"gridX": 8,
-					"gridY": 24,
-					"text": "Solar Probe Eos -- Serial Number 844aB-2\nBlack Box Recording\n\n10-31-2067-1587239 Life Support Restored\nERROR: Multiple systems unresponsive\nRunning diagnostic  .  .  .\nHydroponics -- Chamber integrity compromised\nOperations --- Bridge functioning offline\nMedical ------ Specimen count unavailable\n\nPilot Log - Addendum: Surface turbulence expected\nUnclear how recovery operation will be affected.",
-					"type": "textblock",
-					"speed": 25,
-					"pause": 1000,
-					"format": {
-						"align": "left",
-						"size": 18
-					}
 				}
 			]
 		},
@@ -962,25 +855,13 @@
 				{
 					"gridX": 244,
 					"gridY": 244,
-					"text": "Where there's a strong undertow, platforms behave differently.",
-					"type": "text",
-					"speed": 50,
-					"delay": 100,
+					"text": "An undertow will turn a platform\neach time you jump.",
+					"type": "textblock",
+					"pause": 1000,
 					"format": {
 						"size": 16,
-						"align": "center"
-					}
-				},
-				{
-					"gridX": 244,
-					"gridY": 270,
-					"text": "Each time you jump, the platform turns.",
-					"type": "text",
-					"speed": 50,
-					"delay": 4000,
-					"format": {
-						"size": 16,
-						"align": "center"
+						"align": "center",
+						"color": "#0000DD"
 					}
 				}
 			]
@@ -1061,10 +942,10 @@
 			]
 		},
 		{
-			"name": "keep track of how many jumps",
+			"name": "when you keep track",
 			"type": "level",
 			"stage": "hydroponics",
-			"max": 9,
+			"max": 8,
 			"map": [
 				{
 					"gridX": 6,
@@ -1182,13 +1063,8 @@
 					"type": "obstacle"
 				},
 				{
-					"gridX": 2,
-					"gridY": 9,
-					"type": "obstacle"
-				},
-				{
 					"gridX": 1,
-					"gridY": "10",
+					"gridY": 10,
 					"type": "obstacle"
 				}
 			],
@@ -1266,10 +1142,80 @@
 			]
 		},
 		{
+			"name": "early days",
+			"type": "level",
+			"stage": "hydroponics",
+			"max": 8,
+			"map": [
+				{
+					"gridX": 4,
+					"gridY": 0,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 4,
+					"type": "undertow"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 0,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 6,
+					"type": "undertow"
+				},
+				{
+					"gridX": 4,
+					"gridY": 7,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 2,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 5,
+					"gridY": 4,
+					"type": "collectable"
+				}
+			]
+		},
+		{
 			"name": "the go-around",
 			"type": "level",
 			"stage": "hydroponics",
-			"max": 16,
+			"max": 15,
 			"map": [
 				{
 					"gridX": 3,
@@ -1346,76 +1292,6 @@
 			]
 		},
 		{
-			"name": "not always so complicated ... should be earlier",
-			"type": "level",
-			"stage": "hydroponics",
-			"max": 8,
-			"map": [
-				{
-					"gridX": 4,
-					"gridY": 0,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 4,
-					"gridY": 2,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 4,
-					"gridY": 3,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 4,
-					"gridY": 4,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 6,
-					"gridY": 4,
-					"type": "undertow"
-				},
-				{
-					"gridX": 7,
-					"gridY": 4,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 4,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 0,
-					"gridY": 6,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 2,
-					"gridY": 6,
-					"type": "undertow"
-				},
-				{
-					"gridX": 4,
-					"gridY": 7,
-					"type": "obstacle"
-				}
-			],
-			"entities": [
-				{
-					"gridX": 2,
-					"gridY": 4,
-					"type": "character"
-				},
-				{
-					"gridX": 5,
-					"gridY": 4,
-					"type": "collectable"
-				}
-			]
-		},
-		{
 			"name": "doubled",
 			"type": "level",
 			"stage": "hydroponics",
@@ -1481,7 +1357,7 @@
 			]
 		},
 		{
-			"name": "clue in planted",
+			"name": "clue inplant",
 			"type": "level",
 			"stage": "hydroponics",
 			"max": 17,
@@ -1659,7 +1535,7 @@
 			"name": "simpler than it looks",
 			"type": "level",
 			"stage": "hydroponics",
-			"max": 20,
+			"max": 9,
 			"map": [
 				{
 					"gridX": 5,
@@ -1736,27 +1612,7 @@
 			]
 		},
 		{
-			"name": "operations",
-			"type": "cutscene",
-			"stage": "operations",
-			"map": {},
-			"entities": [
-				{
-					"gridX": 8,
-					"gridY": 24,
-					"text": "Solar Probe Eos -- Serial Number 844aB-2\nBlack Box Recording\n\n11-01-2067-00002133 Hydroponic Growth Resumed\nERROR: Multiple systems unresponsive\nRunning diagnostic  .  .  .\nOperations --- Bridge functioning offline\nMedical ------ Specimen count unavailable\n\nPilot Log - Addendum: Unusually high temperature\nNo time for repetition.",
-					"type": "textblock",
-					"speed": 25,
-					"pause": 1000,
-					"format": {
-						"align": "left",
-						"size": 18
-					}
-				}
-			]
-		},
-		{
-			"name": "learning",
+			"name": "can you learn?",
 			"type": "level",
 			"stage": "operations",
 			"max": 7,
@@ -1786,19 +1642,19 @@
 				{
 					"gridX": 244,
 					"gridY": 244,
-					"text": "If a platform is on a 'hotspot', it can only be jumped on once.",
-					"type": "text",
-					"speed": 50,
-					"delay": 100,
+					"text": "If a platform is on a 'hotspot'\nit can only be jumped on once.\nAfter that it becomes an\nObstacle.",
+					"type": "textblock",
+					"pause": 1000,
 					"format": {
 						"size": 16,
-						"align": "center"
+						"align": "center",
+						"color": "#0000DD"
 					}
 				}
 			]
 		},
 		{
-			"name": "they can be obstacles as well",
+			"name": "can you get in the way?",
 			"type": "level",
 			"stage": "operations",
 			"max": 6,
@@ -1843,7 +1699,7 @@
 			]
 		},
 		{
-			"name": "make your own level",
+			"name": "can you make your own?",
 			"type": "level",
 			"stage": "operations",
 			"max": 10,
@@ -1913,7 +1769,7 @@
 			]
 		},
 		{
-			"name": "reduce what you need",
+			"name": "can you reduce?",
 			"type": "level",
 			"stage": "operations",
 			"max": 10,
@@ -1978,7 +1834,7 @@
 			]
 		},
 		{
-			"name": "plan how to start and how to stop",
+			"name": "can you plan to start and stop?",
 			"type": "level",
 			"stage": "operations",
 			"max": 9,
@@ -2713,26 +2569,6 @@
 			]
 		},
 		{
-			"name": "medical",
-			"type": "cutscene",
-			"stage": "medical",
-			"map": {},
-			"entities": [
-				{
-					"gridX": 8,
-					"gridY": 24,
-					"text": "Solar Probe Eos -- Serial Number 844aB-2\nBlack Box Recording\n\n10-31-2067-00542332 Bridge Control Now Functional\nERROR: System unresponsive\nRunning diagnostic  .  .  .\nMedical ------ Specimen count unavailable\n\nPilot Log - Addendum: Live targets add new layer of risk",
-					"type": "textblock",
-					"speed": 25,
-					"pause": 1000,
-					"format": {
-						"align": "left",
-						"size": 18
-					}
-				}
-			]
-		},
-		{
 			"name": "it'll come to you",
 			"type": "level",
 			"stage": "medical",
@@ -2758,7 +2594,8 @@
 					"delay": 100,
 					"format": {
 						"size": 16,
-						"align": "center"
+						"align": "center",
+						"color": "#0000DD"
 					}
 				}
 			]
@@ -3422,26 +3259,6 @@
 					"type": "specimen"
 				}
 			]
-		},
-		{
-			"name": "the end",
-			"type": "cutscene",
-			"stage": "end",
-			"map": {},
-			"entities": [
-				{
-					"gridX": 8,
-					"gridY": 24,
-					"text": "Solar Probe Eos -- Serial Number 844aB-2\nBlack Box Recording\n\n10-31-2067-45000032 All systems restored\nRunning diagnostic  .  .  .\nNo errors detected.\n\nPilot Log - Addendum: Course set for home.\nGoodbye  .  .   .",
-					"type": "textblock",
-					"speed": 25,
-					"pause": 1000,
-					"format": {
-						"align": "left",
-						"size": 18
-					}
-				}
-			]			
 		}
 	]
 }

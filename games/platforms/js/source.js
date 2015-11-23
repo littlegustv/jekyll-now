@@ -1,25 +1,5 @@
 /**
-bugs: new game, hotspot removes platform from score,
-
-todo: 
-in order to put off making puzzles:
-- make some puzzles, why not?
-- LOCK/UNLOCK levels/stages
-- music, sound effects, cut scenes (?), art
-touch controls, mobile optimization, kongregate api
-
-Level 1: Habitation -> rescue cats, fishbowls? ... household things
-	-> warning.  wreckage exibiting high temperatures, dangerous radiation.  platform movement will avoid.
-	(every warning is displayed for each new level as well, first one, then two, three, etc.)
-Level 2: Hydroponics -> (unstable) ... rescue plants, have a 'timer'  --> 'unstable' in groups looks nice, by the way
-	-> warning.  plasma surface experiencing turbulance.  platforms may be unstable.
-Level 3: Operations -> (undertow) ... 
-	-> warning.  strong undertow currents detected.  directional stability may be comprimised.
-Level 4: Engineering -> (hotspot)
-	-> warning.  frequent temperature anomolies.  'hot spots' may occur - proceed with caution.
-Level 5: Medical
-	-> warning.  many of the specimen are loose.
-	-> collectibles are 'specimen' -> they move each time you jump
+bugs: new game
 
 **/
 
@@ -188,6 +168,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "cell.png", frames: 5, speed: 1500},
 		{path: "reset.png", frames: 2, speed: 500},
 		{path: "back.png", frames: 2, speed: 500},
+		{path: "help.png", frames: 2, speed: 500},
 		{path: "play.png", frames: 2, speed: 500},
 		{path: "menu.png", frames: 2, speed: 500},
 		{path: "spark.png", frames: 3, speed: 200},
@@ -196,10 +177,6 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "blank.png"},
 		{path: "temp.png", frames: 2, speed: 500, animations: 6},
 		{path: "soundtrack.ogg"},
-	/*	{path: "s_habitation.ogg"},
-		{path: "s_hydroponics.ogg"},
-		{path: "s_operations.ogg"},
-		{path: "s_medical.ogg"},*/
 		{path: "jump.ogg"},
 		{path: "complete.ogg"},
 		{path: "remove.ogg"},
@@ -356,7 +333,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 		},
 		loadBG: function () {
-			/*
+			
 			this.bg = {};
 			for (var i = -2; i <= 2 + canvas.height / (2 * GLOBALS.height); i++) {
 				var row = {};
@@ -364,12 +341,12 @@ window.addEventListener("DOMContentLoaded", function () {
 					var o = Object.create(Cell).init(j, i, Resources.cell);
 					//o.blend = "overlay";
 					o.frame = Math.floor(Math.random() * Resources.cell.frames);
-					o.maxFrameDelay = Math.floor(Math.random() * 500 + 3000);
-					o.frameDelay = Math.floor(Math.random() * o.maxFrameDelay);//row[j].maxFrameDelay;
+					o.maxFrameDelay = Math.floor(Math.random() * 4) * 500 + 2000;
+					o.frameDelay = Math.floor(Math.random() * 4) * 250;//row[j].maxFrameDelay;
 					row[j] = o;
 				}
 				this.bg[i] = row;
-			}*/
+			}
 		},
 		updateBG: function (dt) {
 			for (y in this.bg) {
@@ -452,10 +429,9 @@ window.addEventListener("DOMContentLoaded", function () {
 						var lines = c.text.split("\n");
 						var start = {x: c.gridX, y: c.gridY};
 						var delay = 0;
-						for (var i = 0; i < lines.length; i++) {
-							console.log(lines[i], i, lines.length);
-							var t = Object.create(Text).init(start.x, start.y, lines[i], c.format, c.speed, delay);
-							delay += c.speed * (lines[i].length) + c.pause;
+						for (var j = 0; j < lines.length; j++) {
+							var t = Object.create(Text).init(start.x, start.y, lines[j], c.format, c.speed, delay);
+							delay += c.speed * (lines[j].length) + c.pause;
 							s.entities.push(t);
 							start.y += c.format.size + 4;
 						}
@@ -489,7 +465,7 @@ window.addEventListener("DOMContentLoaded", function () {
 						e.direction = DIRECTION.east;
 						break;
 				}
-				if (e) s.entities.push(e);
+				if (e) {s.entities.push(e);}
 			}
 			for (var i = 0; i < config.map.length; i++) {
 				var c = config.map[i];
@@ -526,13 +502,20 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.buttons.push(skip);
 			}
 			if (s.type == "level") {
-				console.log(s.name);
+
 				// ADD LEVEL BUTTONS: reset, back, play
 				var b = Object.create(Button).init( 0, 0, Resources.reset);
 				b.callback = function () {
 					world.reset();
 				};
 				s.buttons.push(b);
+
+				var b = Object.create(Button).init( 10, 0, Resources.help);
+				b.callback = function () {
+					console.log("help!?");
+				};
+				s.buttons.push(b);
+
 				var b = Object.create(Button).init( 11, 0, Resources.back);
 				b.callback = function () {
 					world.doScene(2);
@@ -633,7 +616,7 @@ window.addEventListener("DOMContentLoaded", function () {
 								} else {
 									var overPar = levels[i].score - levels[i].max;
 									var pos = tb.getPosition();
-									var t = Object.create(Text).init(pos.x, pos.y + 10, "+" + String(overPar), {size: 32, color: "gold"});
+									var t = Object.create(Text).init(pos.x, pos.y + 10, "+" + String(overPar), {size: 32, color: "blue"});
 									var perfect = Object.create(TextButton).init(pos.x, pos.y + 10, t);
 									perfect.callback = function () {};
 								}
