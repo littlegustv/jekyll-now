@@ -39,45 +39,14 @@ window.addEventListener("DOMContentLoaded", function () {
 		// right click
 
 		if (e.which === 3 || e.button === 2) {
+			playSound(Resources.remove.buffer);
 			world.remove(m, "platform"); return;
 		}
 
 		// DEBUG BEHAVIOR
 
 		var action = document.getElementById("action").value || "platform";
-		switch (action) {
-			case "platform":
-				world.addPlatform();
-				break;
-			case "obstacle":
-				var o = Object.create(Obstacle).init(m.x, m.y, Resources.obstacle);
-				world.add(o);
-				break;
-			case "hotspot":
-				var o = Object.create(HotSpot).init(m.x, m.y, Resources.hotspot);
-				world.add(o);
-				break;
-			case "undertow":
-				var o = Object.create(UnderTow).init(m.x, m.y, Resources.undertow);
-				world.add(o);
-				break;
-			case "unstable":
-				var o = Object.create(Unstable).init(m.x, m.y, Resources.unstable);
-				world.add(o);
-				break;
-			case "remove":
-				world.remove(m);
-				break;
-			case "collectable":
-				var c = Object.create(Collectable).init(m.x, m.y, Resources[world.scene.stage]);
-				world.addEntity(c);
-				break;
-			case "specimen":
-				var s = Object.create(Specimen).init(m.x, m.y, Resources[world.scene.stage]);
-				s.direction = DIRECTION.east;
-				world.addEntity(s);
-				break;
-		}
+		world.create(m, action);
 	}
 
 	function mouseDown (e) {
@@ -176,7 +145,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "mute.png", frames: 2, speed: 500, animations: 2},
 		{path: "blank.png"},
 		{path: "temp.png", frames: 2, speed: 500, animations: 6},
-		{path: "soundtrack.ogg"},
+		//{path: "soundtrack.ogg"},
 		{path: "jump.ogg"},
 		{path: "complete.ogg"},
 		{path: "remove.ogg"},
@@ -199,6 +168,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		init: function () {
 			this.paused = true;
 			this.loadResources();
+			this.last = {};
 			return this;
 		},
 		loadResources: function () {
@@ -283,6 +253,54 @@ window.addEventListener("DOMContentLoaded", function () {
 			var i = this.cs;
 			this.paused = true;
 			this.scene = this.createScene(i);
+		},
+		create: function (m, action) {
+			switch (action) {
+				case "platform":
+					this.addPlatform(m);
+					break;
+				case "obstacle":
+					var o = Object.create(Obstacle).init(m.x, m.y, Resources.obstacle);
+					this.add(o);
+					break;
+				case "hotspot":
+					var o = Object.create(HotSpot).init(m.x, m.y, Resources.hotspot);
+					this.add(o);
+					break;
+				case "undertow":
+					var o = Object.create(UnderTow).init(m.x, m.y, Resources.undertow);
+					this.add(o);
+					break;
+				case "unstable":
+					var o = Object.create(Unstable).init(m.x, m.y, Resources.unstable);
+					this.add(o);
+					break;
+				case "remove":
+					this.remove(m);
+					break;
+				case "collectable":
+					var c = Object.create(Collectable).init(m.x, m.y, Resources[this.scene.stage]);
+					this.addEntity(c);
+					break;
+				case "specimen":
+					var s = Object.create(Specimen).init(m.x, m.y, Resources[this.scene.stage]);
+					s.direction = DIRECTION.east;
+					this.addEntity(s);
+					break;
+			}
+		},
+		undo: function () {
+			if (this.last && this.last.action) {
+				switch (this.last.action) {
+					case "add":
+						this.remove({x: this.last.x, y: this.last.y}, this.last.type);
+						break;
+					case "remove":
+						//this.mouse.x = this.last.x, this.mouse.y = this.last.y, this.mouse.angle = this.last.direction;
+						this.create({x: this.last.x, y: this.last.y, direction: this.last.direction}, this.last.type);
+						break;
+				}
+			}
 		},
 		addEventListeners: function () {
 			canvas.addEventListener("contextmenu", function (e) {
@@ -403,7 +421,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.paused = true;
 			this.time = new Date();
 			var w = this;
-			this.musicLoop();
+			//this.musicLoop();
 //			Resources.soundtrack.sound.play();
 //			Resources.soundtrack.sound.volume = 0.5;
 //			Resources.soundtrack.sound.onended = function () { Resources.soundtrack.sound.play(); };
@@ -505,23 +523,28 @@ window.addEventListener("DOMContentLoaded", function () {
 
 				// ADD LEVEL BUTTONS: reset, back, play
 				var b = Object.create(Button).init( 0, 0, Resources.reset);
+				b.name = "retry";
 				b.callback = function () {
 					world.reset();
 				};
 				s.buttons.push(b);
 
 				var b = Object.create(Button).init( 10, 0, Resources.help);
+				b.name = "walkthrough";
 				b.callback = function () {
 					console.log("help!?");
 				};
 				s.buttons.push(b);
 
 				var b = Object.create(Button).init( 11, 0, Resources.back);
+				b.name = "undo";
 				b.callback = function () {
-					world.doScene(2);
+					world.undo();
 				};
 				s.buttons.push(b);
+
 				var b = Object.create(Button).init( 1, 0, Resources.play);
+				b.name = "run";
 				b.callback = function () {
 					world.paused = false;
 					world.scene.platformsUsed = world.scene.count("platform");
@@ -563,6 +586,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.entities.push(e);*/
 
 				var mute = Object.create(Button).init(12, 0, Resources.mute);
+				mute.name = "mute";
 				mute.animation = audioContext.state == "suspended" ? 1 : 0;
 				mute.callback = function () {
 					if (this.animation == 0) {
@@ -577,9 +601,11 @@ window.addEventListener("DOMContentLoaded", function () {
 
 			} else if (s.type != "cutscene") {
 				var b = Object.create(Button).init(12, 0, Resources.menu);
-				b.callback = function () {
-					world.doScene(0);
-				}
+				b.name = "menu";
+				if (s.type == "level")
+					b.callback = function () {	world.doScene(2); };
+				else
+					b.callback = function () {	world.doScene(0); };		
 				s.buttons.push(b);
 			}
 			if (s.name == "credits") {
@@ -699,7 +725,14 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 		},
 		remove: function (position, type) {
-			this.scene.remove(position, type);
+			var obj = this.scene.remove(position, type);
+			if (obj) {
+				this.last = {
+					action: "remove",
+					type: type,
+					x: position.x, y: position.y, direction: getDirectionName(obj.direction)
+				}
+			}
 		},
 		removeEntity: function (e) {
 			this.scene.removeEntity(e);
@@ -741,11 +774,27 @@ window.addEventListener("DOMContentLoaded", function () {
 				ctx.fillText(mx + ", " + my, this.mouse.x, this.mouse.y);
 			}*/
 		},
-		addPlatform: function () {
-			var m = this.toGrid(this.mouse.x, this.mouse.y);
-			console.log(this.mouse.x, this.mouse.y);
-			var dir = directions[this.mouse.angle];
-			this.scene.addPlatform(m, dir);
+		addPlatform: function (m) {
+			//var 
+			//console.log(this.mouse.x, this.mouse.y);
+			console.log(m, "yo");
+			var dir;
+			if (!m.direction) {
+				dir = directions[this.mouse.angle];
+				m = this.toGrid(this.mouse.x, this.mouse.y);
+			}
+			else {
+				dir = m.direction;
+			}
+			//if (!m.direction) dir = directions[this.mouse.angle];
+			//else dir = m.direction;
+			if (this.scene.addPlatform(m, dir)) {
+				this.last = {
+					action: "add",
+					type: "platform",
+					x: m.x, y: m.y, direction: dir
+				};
+			}
 		},
 		addEntity: function (obj) {
 			this.scene.addEntity(obj);
@@ -891,6 +940,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			if (this.map[position.y]) {
 				var o = undefined;
 				if (this.map[position.y][position.x]) {
+					var r = this.map[position.y][position.x];
 					// re-add removed platform's underlying characteristic... thing
 					switch (this.map[position.y][position.x].special) {
 						case "undertow":
@@ -900,17 +950,19 @@ window.addEventListener("DOMContentLoaded", function () {
 							o = Object.create(HotSpot).init(position.x, position.y, Resources.hotspot);
 							break;
 					}
-				}
-				if (type)
-				{
-					playSound(Resources.remove.buffer);
-					if (this.map[position.y][position.x] && this.map[position.y][position.x].type == type)
+					if (type)
+					{
+						if (this.map[position.y][position.x] && this.map[position.y][position.x].type == type)
+							this.map[position.y][position.x] = o;
+						else return false;
+					}
+					else {
 						this.map[position.y][position.x] = o;
-				}
-				else {
-					this.map[position.y][position.x] = o;
+					}
+					return r;
 				}
 			}
+			return false;
 		},
 		removeEntity: function (e) {
 			var i = this.entities.indexOf(e);
@@ -919,16 +971,18 @@ window.addEventListener("DOMContentLoaded", function () {
 		addPlatform: function (position, direction) {
 			if (this.map[position.y]) {
 				var m = this.map[position.y][position.x];
-				if (this.type != "level") return;
-				if (m && (m.type == "obstacle" || m.type == "platform")) return;
+				if (this.type != "level") return false;
+				if (m && (m.type == "obstacle" || m.type == "platform")) return false;
 				//if (this.count("platform") >= this.max) return;
 				else {
 					playSound(Resources.select.buffer);
 					var p = Object.create(Platform).init(position.x, position.y, Resources.platform, DIRECTION[direction]);
 					if (m && m.callback) { p.onJump = m.callback; p.special = m.type; }
 					this.map[position.y][position.x] = p;
+					return true;
 				}
 			}
+			return false;
 		},
 		addEntity: function (obj) {
 			this.entities.push(obj);
@@ -1019,6 +1073,16 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	var Button = Object.create(Entity);
 	Button.type = "button";
+	Button.drawButton = Entity.draw;
+	Button.draw = function (ctx) {
+		this.drawButton(ctx);
+		if (this.frame == 1 && this.name) {
+			var p = this.getPosition();
+			ctx.font = "900 14px Arial";
+			ctx.fillStyle = "black";
+			ctx.fillText(this.name, p.x, p.y + 24);
+		}
+	}
 	Button.callback = function () {
 		console.log("no button callback function defined");
 	};
