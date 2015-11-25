@@ -62,26 +62,6 @@
 			]
 		},
 		{
-			"name": "how it began",
-			"type": "cutscene",
-			"stage": "start",
-			"map": {},
-			"entities": [
-				{
-					"gridX": 8,
-					"gridY": 24,
-					"text": "The ship is called Icarus.\nIt flew too close to the sun.\n\nThe pieces are scattered, we can't rebuild.\n\nThis is a humiliating way to go.\n\nHelp us, please.",
-					"type": "textblock",
-					"speed": 25,
-					"pause": 1000,
-					"format": {
-						"align": "left",
-						"size": 18
-					}
-				}
-			]			
-		},
-		{
 			"name": "simple enough",
 			"type": "level",
 			"stage": "habitation",
@@ -198,7 +178,7 @@
 			"name": "remove what's in the way",
 			"type": "level",
 			"stage": "habitation",
-			"max": 3,
+			"max": 2,
 			"map": [
 				{
 					"gridX": 2,
@@ -244,30 +224,30 @@
 			"max": 6,
 			"map": [
 				{
-					"gridX": 2,
-					"gridY": 4,
+					"gridX":0,
+					"gridY":4,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 9,
-					"gridY": 4,
+					"gridX":7,
+					"gridY":4,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 4,
-					"gridY": 4,
+					"gridX":2,
+					"gridY":4,
 					"type": "character"
 				},
 				{
-					"gridX": 7,
-					"gridY": 4,
+					"gridX":5,
+					"gridY":4,
 					"type": "collectable"
 				},
 				{
-					"gridX": 244,
-					"gridY": 180,
+					"gridX":244,
+					"gridY":180,
 					"text": "Normally you jump two spaces.\nIf there is an obstacle in the way,\nyou will only jump one space.\n\nUse this to your advantage.",
 					"type": "textblock",
 					"pause": 1000,					
@@ -286,25 +266,25 @@
 			"max": 7,
 			"map": [
 				{
-					"gridX": 8,
-					"gridY": 2,
+					"gridX":5,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 7,
-					"gridY": 6,
+					"gridX":4,
+					"gridY":7,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 4,
-					"gridY": 4,
+					"gridX":1,
+					"gridY":5,
 					"type": "character"
 				},
 				{
-					"gridX": 7,
-					"gridY": 4,
+					"gridX":4,
+					"gridY":5,
 					"type": "collectable"
 				}
 			]
@@ -316,70 +296,70 @@
 			"max": 7,
 			"map": [
 				{
-					"gridX": 6,
-					"gridY": 3,
+					"gridX":4,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
-					"gridY": 4,
+					"gridX":1,
+					"gridY":4,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 4,
+					"gridX":4,
+					"gridY":4,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 9,
-					"gridY": 4,
+					"gridX":7,
+					"gridY":4,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 2,
-					"gridY": 5,
+					"gridX":0,
+					"gridY":5,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 9,
-					"gridY": 5,
+					"gridX":7,
+					"gridY":5,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
-					"gridY": 6,
+					"gridX":2,
+					"gridY":6,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 8,
-					"gridY": 6,
+					"gridX":6,
+					"gridY":6,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
-					"gridY": 7,
+					"gridX":1,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 5,
-					"gridY": 7,
+					"gridX":3,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 7,
+					"gridX":4,
+					"gridY":7,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 4,
-					"gridY": 4,
+					"gridX":2,
+					"gridY":4,
 					"type": "character"
 				},
 				{
-					"gridX": 7,
-					"gridY": 4,
+					"gridX":5,
+					"gridY":4,
 					"type": "collectable"
 				}
 			]
@@ -391,50 +371,50 @@
 			"max": 8,
 			"map": [
 				{
-					"gridX": 3,
-					"gridY": 2,
+					"gridX":2,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
-					"gridY": 2,
+					"gridX":3,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 2,
+					"gridX":5,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 7,
-					"gridY": 2,
+					"gridX":6,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
-					"gridY": 3,
+					"gridX":3,
+					"gridY":4,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
-					"gridY": 5,
+					"gridX":2,
+					"gridY":6,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
-					"gridY": 6,
+					"gridX":2,
+					"gridY":7,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 4,
-					"gridY": 4,
+					"gridX":3,
+					"gridY":5,
 					"type": "character"
 				},
 				{
-					"gridX": 7,
-					"gridY": 4,
+					"gridX":6,
+					"gridY":5,
 					"type": "collectable"
 				}
 			]
@@ -446,70 +426,70 @@
 			"max": 8,
 			"map": [
 				{
-					"gridX": 4,
-					"gridY": 2,
+					"gridX":0,
+					"gridY":4,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
-					"gridY": 3,
+					"gridX":-1,
+					"gridY":5,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 5,
-					"gridY": 3,
+					"gridX":1,
+					"gridY":5,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 7,
-					"gridY": 3,
+					"gridX":3,
+					"gridY":5,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 9,
-					"gridY": 4,
+					"gridX":5,
+					"gridY":6,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
-					"gridY": 5,
+					"gridX":-1,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
-					"gridY": 5,
+					"gridX":0,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 5,
-					"gridY": 5,
+					"gridX":1,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 5,
+					"gridX":2,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 7,
-					"gridY": 5,
+					"gridX":3,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 8,
-					"gridY": 5,
+					"gridX":4,
+					"gridY":7,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 4,
-					"gridY": 4,
+					"gridX":0,
+					"gridY":6,
 					"type": "character"
 				},
 				{
-					"gridX": 7,
-					"gridY": 4,
+					"gridX":3,
+					"gridY":6,
 					"type": "collectable"
 				}
 			]
@@ -521,65 +501,65 @@
 			"max": 8,
 			"map": [
 				{
-					"gridX": 3,
-					"gridY": 1,
+					"gridX":2,
+					"gridY":2,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 7,
-					"gridY": 1,
+					"gridX":6,
+					"gridY":2,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
-					"gridY": 2,
+					"gridX":2,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 2,
+					"gridX":5,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 1,
-					"gridY": 4,
+					"gridX":0,
+					"gridY":5,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 2,
-					"gridY": 4,
+					"gridX":1,
+					"gridY":5,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 1,
-					"gridY": 6,
+					"gridX":0,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
-					"gridY": 6,
+					"gridX":3,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 0,
-					"gridY": 7,
+					"gridX":-1,
+					"gridY":8,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
-					"gridY": 7,
+					"gridX":3,
+					"gridY":8,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 4,
-					"gridY": 4,
+					"gridX":3,
+					"gridY":5,
 					"type": "character"
 				},
 				{
-					"gridX": 7,
-					"gridY": 4,
+					"gridX":6,
+					"gridY":5,
 					"type": "collectable"
 				}
 			]
@@ -591,100 +571,95 @@
 			"max": 9,
 			"map": [
 				{
-					"gridX": 7,
-					"gridY": 1,
+					"gridX":5,
+					"gridY":1,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
-					"gridY": 2,
+					"gridX":2,
+					"gridY":2,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 7,
-					"gridY": 2,
+					"gridX":5,
+					"gridY":2,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
-					"gridY": 3,
+					"gridX":1,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 7,
-					"gridY": 3,
+					"gridX":5,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 2,
-					"gridY": 4,
+					"gridX":0,
+					"gridY":4,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 7,
-					"gridY": 4,
+					"gridX":5,
+					"gridY":4,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 1,
-					"gridY": 5,
+					"gridX":-1,
+					"gridY":5,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 9,
-					"gridY": 6,
+					"gridX":7,
+					"gridY":6,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 2,
-					"gridY": 7,
+					"gridX":0,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 8,
-					"gridY": 7,
+					"gridX":6,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 2,
-					"gridY": 8,
+					"gridX":0,
+					"gridY":8,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 7,
-					"gridY": 8,
+					"gridX":5,
+					"gridY":8,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 2,
-					"gridY": 9,
+					"gridX":0,
+					"gridY":9,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 9,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 2,
-					"gridY": "10",
+					"gridX":4,
+					"gridY":9,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 5,
-					"gridY": 5,
+					"gridX":3,
+					"gridY":5,
 					"type": "character"
 				},
 				{
-					"gridX": 8,
-					"gridY": 5,
+					"gridX":6,
+					"gridY":5,
 					"type": "collectable"
 				},
 				{
-					"gridX": 6,
-					"gridY": 6,
+					"gridX":4,
+					"gridY":6,
 					"type": "collectable"
 				}
 			]
@@ -806,55 +781,55 @@
 			"max": 6,
 			"map": [
 				{
-					"gridX": 7,
-					"gridY": 2,
+					"gridX":5,
+					"gridY":2,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 8,
-					"gridY": 3,
+					"gridX":6,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 4,
+					"gridX":4,
+					"gridY":4,
 					"type": "undertow"
 				},
 				{
-					"gridX": 4,
-					"gridY": 5,
+					"gridX":2,
+					"gridY":5,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 7,
-					"gridY": 5,
+					"gridX":5,
+					"gridY":5,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 5,
-					"gridY": 6,
+					"gridX":3,
+					"gridY":6,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 4,
-					"gridY": 4,
+					"gridX":2,
+					"gridY":4,
 					"type": "character"
 				},
 				{
-					"gridX": 8,
-					"gridY": 4,
+					"gridX":6,
+					"gridY":4,
 					"type": "collectable"
 				},
 				{
-					"gridX": 6,
-					"gridY": 6,
+					"gridX":4,
+					"gridY":6,
 					"type": "collectable"
 				},
 				{
-					"gridX": 244,
-					"gridY": 244,
+					"gridX":242,
+					"gridY":244,
 					"text": "An undertow will turn a platform\neach time you jump.",
 					"type": "textblock",
 					"pause": 1000,
@@ -873,70 +848,70 @@
 			"max": 9,
 			"map": [
 				{
-					"gridX": 7,
-					"gridY": 0,
+					"gridX":4,
+					"gridY":1,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 7,
-					"gridY": 1,
+					"gridX":4,
+					"gridY":2,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 2,
+					"gridX":3,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 5,
-					"gridY": 3,
+					"gridX":2,
+					"gridY":4,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 3,
+					"gridX":3,
+					"gridY":4,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 4,
+					"gridX":3,
+					"gridY":5,
 					"type": "undertow"
 				},
 				{
-					"gridX": 4,
-					"gridY": 5,
+					"gridX":1,
+					"gridY":6,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
-					"gridY": 6,
+					"gridX":1,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
-					"gridY": 7,
+					"gridX":1,
+					"gridY":8,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 5,
-					"gridY": 7,
+					"gridX":2,
+					"gridY":8,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 5,
-					"gridY": 8,
+					"gridX":2,
+					"gridY":9,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 4,
-					"gridY": 4,
+					"gridX":1,
+					"gridY":5,
 					"type": "character"
 				},
 				{
-					"gridX": 7,
-					"gridY": 4,
+					"gridX":4,
+					"gridY":5,
 					"type": "collectable"
 				}
 			]
@@ -948,75 +923,75 @@
 			"max": 8,
 			"map": [
 				{
-					"gridX": 6,
-					"gridY": 0,
+					"gridX":5,
+					"gridY":1,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 1,
+					"gridX":5,
+					"gridY":2,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 2,
+					"gridX":5,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 7,
-					"gridY": 2,
+					"gridX":6,
+					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 5,
-					"gridY": 3,
+					"gridX":4,
+					"gridY":4,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 4,
+					"gridX":5,
+					"gridY":5,
 					"type": "undertow"
 				},
 				{
 					"gridX": "10",
-					"gridY": 4,
+					"gridY":5,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
-					"gridY": 5,
+					"gridX":3,
+					"gridY":6,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
-					"gridY": 6,
+					"gridX":3,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
-					"gridY": 7,
+					"gridX":2,
+					"gridY":8,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
-					"gridY": 7,
+					"gridX":3,
+					"gridY":8,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
-					"gridY": 8,
+					"gridX":2,
+					"gridY":9,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 4,
-					"gridY": 4,
+					"gridX":3,
+					"gridY":5,
 					"type": "character"
 				},
 				{
-					"gridX": 7,
-					"gridY": 4,
+					"gridX":6,
+					"gridY":5,
 					"type": "collectable"
 				}
 			]
@@ -1028,60 +1003,55 @@
 			"max": 16,
 			"map": [
 				{
-					"gridX": 4,
-					"gridY": 3,
+					"gridX":6,
+					"gridY":3,
 					"type": "undertow"
 				},
 				{
-					"gridX": 2,
-					"gridY": 5,
+					"gridX":4,
+					"gridY":5,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 1,
-					"gridY": 6,
+					"gridX":3,
+					"gridY":6,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 2,
-					"gridY": 6,
+					"gridX":4,
+					"gridY":6,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 1,
-					"gridY": 7,
+					"gridX":3,
+					"gridY":7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 1,
-					"gridY": 8,
+					"gridX":3,
+					"gridY":8,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 1,
-					"gridY": 9,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 1,
-					"gridY": 10,
+					"gridX":3,
+					"gridY":9,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 4,
-					"gridY": 1,
+					"gridX":6,
+					"gridY":1,
 					"type": "character"
 				},
 				{
-					"gridX": 2,
-					"gridY": 7,
+					"gridX":4,
+					"gridY":7,
 					"type": "collectable"
 				},
 				{
 					"gridX": -1,
-					"gridY": 8,
+					"gridY":8,
 					"type": "collectable"
 				}
 			]
@@ -1641,8 +1611,8 @@
 				},
 				{
 					"gridX": 244,
-					"gridY": 244,
-					"text": "If a platform is on a 'hotspot'\nit can only be jumped on once.\nAfter that it becomes an\nObstacle.",
+					"gridY": 224,
+					"text": "If a platform is on a 'hotspot'\nit can only be jumped on once.\nAfter that it becomes an Obstacle.",
 					"type": "textblock",
 					"pause": 1000,
 					"format": {
@@ -2979,7 +2949,7 @@
 			"name": "patience",
 			"type": "level",
 			"stage": "medical",
-			"max": 13,
+			"max": 10,
 			"map": [
 				{
 					"gridX": 4,

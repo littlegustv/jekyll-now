@@ -456,7 +456,7 @@ window.addEventListener("DOMContentLoaded", function () {
 						break;
 					case "text":
 						e = Object.create(Text).init(c.gridX, c.gridY, c.text, c.format, c.speed, c.delay);
-						e.z = -1;
+						e.z = -10;
 						break;
 					case "character":
 						var start = Object.create(Entity).init(c.gridX, c.gridY, Resources.start);
@@ -550,10 +550,10 @@ window.addEventListener("DOMContentLoaded", function () {
 					world.scene.platformsUsed = world.scene.count("platform");
 				};
 				s.buttons.push(b);
-				var t = Object.create(Text).init(canvas.width / 2, canvas.height - GLOBALS.height, s.name, {});
+				var t = Object.create(Text).init(canvas.width / 2, canvas.height - GLOBALS.height / 2, s.name, {});
 				s.addEntity(t);
 
-				var t2 = Object.create(Text).init(canvas.width / 2, GLOBALS.border + GLOBALS.height / 2, s.name, {align: "center"});
+				var t2 = Object.create(Text).init(canvas.width / 2, GLOBALS.border, s.name, {align: "center"});
 				s.addEntity(t2);
 				s.par = t2;
 			}
@@ -739,6 +739,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		drawCursor: function (ctx) {
 			var m = this.toGrid(this.mouse.x, this.mouse.y);
+			if (m.y <= 0 || m.y >= 10) return;
 			if (this.mouse.down) {
 				var p = this.getAt(m.x, m.y);
 				for (var i = 0; i < this.scene.buttons.length; i++) {
@@ -786,6 +787,8 @@ window.addEventListener("DOMContentLoaded", function () {
 			else {
 				dir = m.direction;
 			}
+
+			if (m.y <= 0 || m.y >= 10) return;
 			//if (!m.direction) dir = directions[this.mouse.angle];
 			//else dir = m.direction;
 			if (this.scene.addPlatform(m, dir)) {
@@ -819,6 +822,11 @@ window.addEventListener("DOMContentLoaded", function () {
 			return this;
 		},
 		draw: function (ctx) {
+			if (this.type == "level") {
+				ctx.fillStyle = "rgba(255,255,255,0.4)";
+				ctx.fillRect(0,0,canvas.width,32);
+				ctx.fillRect(0,canvas.height-28,canvas.width,canvas.height);
+			}
 			for (y in this.map) {
 				for (x in this.map[y]) {
 					if (this.map[y][x]) {
@@ -1190,6 +1198,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	var Text = Object.create(Entity);
 	Text.type = "text";
+	Text.z = -1;
 	Text.init = function (x, y, text, format, speed, delay) {
 		this.x = x, this.y = y, this.text = text;
 		this.size = format.size || 24;
