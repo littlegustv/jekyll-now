@@ -145,7 +145,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "mute.png", frames: 2, speed: 500, animations: 2},
 		{path: "blank.png"},
 		{path: "temp.png", frames: 2, speed: 500, animations: 6},
-		//{path: "soundtrack.ogg"},
+		{path: "soundtrack.ogg"},
 		{path: "jump.ogg"},
 		{path: "complete.ogg"},
 		{path: "remove.ogg"},
@@ -421,7 +421,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.paused = true;
 			this.time = new Date();
 			var w = this;
-			//this.musicLoop();
+			this.musicLoop();
 //			Resources.soundtrack.sound.play();
 //			Resources.soundtrack.sound.volume = 0.5;
 //			Resources.soundtrack.sound.onended = function () { Resources.soundtrack.sound.play(); };
