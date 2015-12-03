@@ -1675,11 +1675,6 @@
 			"max": 10,
 			"map": [
 				{
-					"gridX": 3,
-					"gridY": 2,
-					"type": "obstacle"
-				},
-				{
 					"gridX": 4,
 					"gridY": 2,
 					"type": "hotspot"
@@ -1690,11 +1685,6 @@
 					"type": "hotspot"
 				},
 				{
-					"gridX": 2,
-					"gridY": 3,
-					"type": "obstacle"
-				},
-				{
 					"gridX": 4,
 					"gridY": 3,
 					"type": "hotspot"
@@ -1703,26 +1693,6 @@
 					"gridX": 6,
 					"gridY": 3,
 					"type": "hotspot"
-				},
-				{
-					"gridX": 1,
-					"gridY": 4,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 0,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 3,
-					"gridY": 6,
-					"type": "hotspot"
-				},
-				{
-					"gridX": "-1",
-					"gridY": 6,
-					"type": "obstacle"
 				}
 			],
 			"entities": [
@@ -1744,11 +1714,6 @@
 			"stage": "operations",
 			"max": 10,
 			"map": [
-				{
-					"gridX": 9,
-					"gridY": 0,
-					"type": "obstacle"
-				},
 				{
 					"gridX": 4,
 					"gridY": 2,
@@ -1782,11 +1747,6 @@
 				{
 					"gridX": 1,
 					"gridY": 8,
-					"type": "obstacle"
-				},
-				{
-					"gridX": "-1",
-					"gridY": "10",
 					"type": "obstacle"
 				}
 			],

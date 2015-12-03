@@ -1,33 +1,44 @@
-/**
-bugs: new game
-
-**/
 
 var debug;
 var audioContext;
+var AudioContext = window.AudioContext || window.webkitAudioContext;
 
 function modulo(n, p) {
 	return (n % p + p) % p;
 }
 
-function playSound(buffer)
+function playSound(sound)
 {
-	var source = audioContext.createBufferSource();
-	source.buffer = buffer;
-	
-	source.connect(audioContext.destination);
-	source.start(0);
-	
-	return source;
+	if (AudioContext) {
+
+		var buffer = sound.buffer;
+		var source = audioContext.createBufferSource();
+		source.buffer = buffer;
+		
+		source.connect(audioContext.destination);
+		source.start(0);
+		
+		return source;
+	} else {
+		if (window.muted) {
+			return;
+		}
+		else {
+			sound.play();
+			debug = sound;
+			return sound;
+		}
+	}
 }
 
 window.addEventListener("DOMContentLoaded", function () {
 
 	function mouseUp (e) {
-		if (e.changedTouches) {
-			e.offsetX = e.offsetX || e.changedTouches[0].clientX;
-			e.offsetY = e.offsetY || e.changedTouches[0].clientY;
-		}
+		//console.log(e);
+		//if (e.changedTouches) {
+			e.offsetX = e.offsetX || e.clientX;//e.changedTouches[0].clientX;
+			e.offsetY = e.offsetY || e.clientY;//e.changedTouches[0].clientY;
+		//}
 		var m = world.toGrid(e.offsetX, e.offsetY);
 		world.mouse.down = false;
 		
@@ -39,7 +50,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		// right click
 
 		if (e.which === 3 || e.button === 2) {
-			playSound(Resources.remove.buffer);
+			playSound(Resources.remove);
 			world.remove(m, "platform"); return;
 		}
 
@@ -50,10 +61,11 @@ window.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function mouseDown (e) {
-		if (e.changedTouches) {
-			e.offsetX = e.offsetX || e.changedTouches[0].clientX;
-			e.offsetY = e.offsetY || e.changedTouches[0].clientY;
-		}
+		//console.log(e);
+		//if (e.changedTouches) {
+			e.offsetX = e.offsetX || e.clientX;//e.changedTouches[0].clientX;
+			e.offsetY = e.offsetY || e.clientY;//e.changedTouches[0].clientY;
+		//}
 		world.mouse.x = e.offsetX, world.mouse.y = e.offsetY;
 
 		if (e.changedTouches) console.log("start", e);
@@ -63,10 +75,10 @@ window.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function mouseMove (e) {
-		if (e.changedTouches) {
-			e.offsetX = e.offsetX || e.changedTouches[0].clientX;
-			e.offsetY = e.offsetY || e.changedTouches[0].clientY;
-		}
+		//if (e.changedTouches) {
+			e.offsetX = e.offsetX || e.clientX;//e.changedTouches[0].clientX;
+			e.offsetY = e.offsetY || e.clientY;//e.changedTouches[0].clientY;
+		//}
 		world.scene.highlightButton(e.offsetX, e.offsetY);
 		if (!world.scene || world.scene.type != "level") return;
 		var theta = Math.atan2(e.offsetY - world.mouse.y, e.offsetX - world.mouse.x);
@@ -79,8 +91,9 @@ window.addEventListener("DOMContentLoaded", function () {
 	var canvas = document.getElementById("mygame");
 	var ctx = canvas.getContext("2d");
 
-	audioContext = new AudioContext();
-
+	if (AudioContext) {
+		audioContext = new AudioContext();
+	}
 //	ctx.globalCompositeOperation = "multiply";
 	//debug = ctx;
 
@@ -120,6 +133,8 @@ window.addEventListener("DOMContentLoaded", function () {
 	var Resources = {};
 	var resourceInfo = [
 		{path: "splash.png"},
+		{path: "bottomBar.png"},
+		{path: "topBar.png"},
 		{path: "platform.png", frames: 2, speed: 1000},
 		{path: "directions.png", frames: 2, speed: 1000, animations: 6},
 		{path: "character.png", frames: 2, speed: 500, animations: 6},
@@ -204,12 +219,17 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		loadOGG: function (res, name) {
 			var w = this;
+			if (!AudioContext) {
+				Resources[name] = new Audio("res/" + res, streaming=false);
+				//Resources[name].src = "res/" + res;
+				w.progressBar();
+				return;
+			}
 			var request = new XMLHttpRequest();
 			request.open('GET', "res/" + res, true);
 			request.responseType = 'arraybuffer';
 
 			request.onload = function() {
-				console.log("ogg", request);
 				audioContext.decodeAudioData(request.response, function(b) {
 					Resources[name] = {buffer: b, play: false};
 					w.progressBar();
@@ -290,6 +310,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 		},
 		undo: function () {
+			if (!this.paused || this.scene.completed) return;
 			if (this.last && this.last.action) {
 				switch (this.last.action) {
 					case "add":
@@ -322,6 +343,12 @@ window.addEventListener("DOMContentLoaded", function () {
 			} else {
 				console.log("storage not available, no saving possible");
 				return false;
+			}
+		},
+		clear: function () {
+			for (var i = 0; i < this.scenes.length; i++) {
+				this.scenes[i].score = undefined;
+				this.scenes[i].completed = false;
 			}
 		},
 		save: function () {
@@ -408,7 +435,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		musicLoop: function () {
 			//console.log(Resources["s_" + world.scene.stage].buffer, "s_" + world.scene.stage);
-			world.soundtrack = playSound(Resources.soundtrack.buffer);
+			world.soundtrack = playSound(Resources.soundtrack);
 			world.soundtrack.onended = world.musicLoop;
 			debug = world.soundtrack;
 		},
@@ -421,7 +448,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.paused = true;
 			this.time = new Date();
 			var w = this;
-			this.musicLoop();
+			if (AudioContext) this.musicLoop();
 //			Resources.soundtrack.sound.play();
 //			Resources.soundtrack.sound.volume = 0.5;
 //			Resources.soundtrack.sound.onended = function () { Resources.soundtrack.sound.play(); };
@@ -429,6 +456,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.step();
 		},
 		doScene: function (n) {
+			this.paused = true;
 			this.scene = this.createScene(n);
 			if (this.scene.type == "level") this.cs = n;
 		},
@@ -441,7 +469,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			s.stage = config.stage || "none";
 			for (var i = 0; i < config.entities.length; i++) {
 				var c = config.entities[i];
-				var e;
+				var e = undefined;
 				switch (c.type) {
 					case "textblock":
 						var lines = c.text.split("\n");
@@ -522,28 +550,28 @@ window.addEventListener("DOMContentLoaded", function () {
 			if (s.type == "level") {
 
 				// ADD LEVEL BUTTONS: reset, back, play
-				var b = Object.create(Button).init( 0, 0, Resources.reset);
+				var b = Object.create(Button).init( 1, 0, Resources.reset);
 				b.name = "retry";
 				b.callback = function () {
 					world.reset();
 				};
 				s.buttons.push(b);
 
-				var b = Object.create(Button).init( 10, 0, Resources.help);
+				var b = Object.create(Button).init( 11, 0, Resources.help);
 				b.name = "walkthrough";
 				b.callback = function () {
 					console.log("help!?");
 				};
 				s.buttons.push(b);
 
-				var b = Object.create(Button).init( 11, 0, Resources.back);
+				var b = Object.create(Button).init( 2, 0, Resources.back);
 				b.name = "undo";
 				b.callback = function () {
 					world.undo();
 				};
 				s.buttons.push(b);
 
-				var b = Object.create(Button).init( 1, 0, Resources.play);
+				var b = Object.create(Button).init( 0, 0, Resources.play);
 				b.name = "run";
 				b.callback = function () {
 					world.paused = false;
@@ -569,6 +597,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				var t = Object.create(Text).init(0, 0,"<New Game>",{});
 				var tb = Object.create(TextButton).init(canvas.width - 128, canvas.height / 2 + 16,t);
 				tb.callback = function () {
+					world.clear();
 					world.doScene(3);
 				};
 				s.buttons.push(tb);
@@ -587,15 +616,24 @@ window.addEventListener("DOMContentLoaded", function () {
 
 				var mute = Object.create(Button).init(12, 0, Resources.mute);
 				mute.name = "mute";
-				mute.animation = audioContext.state == "suspended" ? 1 : 0;
-				mute.callback = function () {
-					if (this.animation == 0) {
-						audioContext.suspend();
-						this.animation = 1;
-					} else {
-						audioContext.resume();
-						this.animation = 0;
+				if (AudioContext) {
+					mute.animation = audioContext.state == "suspended" ? 1 : 0;
+					mute.callback = function () {
+						if (this.animation == 0) {
+							audioContext.suspend();
+							this.animation = 1;
+						} else {
+							audioContext.resume();
+							this.animation = 0;
+						}
 					}
+				}
+				else {
+					mute.animation = window.muted ? 1 : 0;
+					mute.callback = function () {
+						window.muted = !window.muted;
+						mute.animation = window.muted ? 1 : 0;
+					};
 				}
 				s.buttons.push(mute);
 
@@ -740,6 +778,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		drawCursor: function (ctx) {
 			var m = this.toGrid(this.mouse.x, this.mouse.y);
 			if (m.y <= 0 || m.y >= 10) return;
+			if (!world.paused || world.scene.completed) return;
 			if (this.mouse.down) {
 				var p = this.getAt(m.x, m.y);
 				for (var i = 0; i < this.scene.buttons.length; i++) {
@@ -778,7 +817,6 @@ window.addEventListener("DOMContentLoaded", function () {
 		addPlatform: function (m) {
 			//var 
 			//console.log(this.mouse.x, this.mouse.y);
-			console.log(m, "yo");
 			var dir;
 			if (!m.direction) {
 				dir = directions[this.mouse.angle];
@@ -823,9 +861,11 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		draw: function (ctx) {
 			if (this.type == "level") {
-				ctx.fillStyle = "rgba(255,255,255,0.4)";
-				ctx.fillRect(0,0,canvas.width,32);
-				ctx.fillRect(0,canvas.height-28,canvas.width,canvas.height);
+				ctx.drawImage(Resources.bottomBar.image, 0, canvas.height - 36, canvas.width, Resources.bottomBar.image.height * GLOBALS.scale);
+				ctx.drawImage(Resources.topBar.image, 0, -8, canvas.width, Resources.bottomBar.image.height * GLOBALS.scale);
+				//ctx.fillStyle = "rgba(255,255,255,0.4)";
+				//ctx.fillRect(0,0,canvas.width,32);
+				//ctx.fillRect(0,canvas.height-28,canvas.width,canvas.height);
 			}
 			for (y in this.map) {
 				for (x in this.map[y]) {
@@ -857,29 +897,37 @@ window.addEventListener("DOMContentLoaded", function () {
 					if (this.entities[i].type == "start") {
 						if (this.entities.filter(function (a) { return a.type == "collectable"; }).length <= 0) {
 							if (!this.completed) {
-								playSound(Resources.complete.buffer);
+								playSound(Resources.complete);
 								this.completed = true;
 								this.character.animation = 1, this.character.frame = 0;
 								world.paused = true;
 								world.scenes[this.uid].score = this.platformsUsed;
-								var t = Object.create(Text).init(0,0,"<Next>",{size: 60});
-								var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2, t);
 								var n = (this.uid + 1) % world.scenes.length;
+								if (world.scenes[n].stage != this.stage && !world.stageComplete(this.stage)) {
+									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2, "<Locked>", {size: 60});
+									t.z = 20;
+									this.entities.push(t);
+								}
+								else {
+									var t = Object.create(Text).init(0,0,"<Next>",{size: 60});
+									var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2, t);
+									tb.callback = function () {
+										world.doScene(n);
+									};
+									this.buttons.push(tb);
+
+								}
 								if (world.scenes[this.uid].score <= this.max) {
 									var t2 = Object.create(Text).init(canvas.width / 2, canvas.height / 2 + 60, "Perfect!", {size: 72, color: "gold"}, 10, 300);
 									this.entities.push(t2);
 								}
-								tb.callback = function () {
-									world.doScene(n);
-								};
-								this.buttons.push(tb);
 								world.save();
 							}
 						}
 					}
 				}
 			}
-			if (this.type == "level" && world.paused) {
+			if (this.type == "level" && world.paused && !world.scene.completed) {
 				this.par.text = String(this.count("platform")) + "/" + String(this.max) + " platforms";
 				this.par.current = this.par.text.length;
 			}
@@ -896,7 +944,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		button: function (x, y) {
 			for (var i = 0; i < this.buttons.length; i++) {
 				if (this.buttons[i].check(x, y)) {
-					playSound(Resources.select.buffer);
+					playSound(Resources.select);
 					this.buttons[i].callback();
 					return true;
 				}
@@ -977,13 +1025,14 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.entities.splice(i, 1);
 		},
 		addPlatform: function (position, direction) {
+			if (this.completed) return;
 			if (this.map[position.y]) {
 				var m = this.map[position.y][position.x];
 				if (this.type != "level") return false;
 				if (m && (m.type == "obstacle" || m.type == "platform")) return false;
 				//if (this.count("platform") >= this.max) return;
 				else {
-					playSound(Resources.select.buffer);
+					playSound(Resources.select);
 					var p = Object.create(Platform).init(position.x, position.y, Resources.platform, DIRECTION[direction]);
 					if (m && m.callback) { p.onJump = m.callback; p.special = m.type; }
 					this.map[position.y][position.x] = p;
@@ -1237,7 +1286,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	Character.type = "character";
 	Character.fall = function () {
 		this.jumping = GLOBALS.jumpSpeed;
-		playSound(Resources.fall.buffer);
+		playSound(Resources.fall);
      	canvas.style.webkitFilter = "invert(100%)";
 		setTimeout(function () { 
    			canvas.style.webkitFilter = "invert(0%)";
@@ -1264,8 +1313,10 @@ window.addEventListener("DOMContentLoaded", function () {
 				var ep = e[i].getPosition(), tp = this.getPosition();
 				if (e[i].type == "collectable") { 
 					if (Math.abs(ep.x - tp.x) < 10 && Math.abs(ep.y - tp.y) < 10) {
+						console.log(e[i], ep.x, tp.x, ep.y, tp.y);
 						world.removeEntity(e[i]);
-						playSound(Resources.collect.buffer);
+						playSound(Resources.collect);
+						break;
 					}
 				}
 			}
@@ -1311,7 +1362,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					*/
 					p.frame = 1;
 					setTimeout( function () { p.frame = 0; }, 500);
-					playSound(Resources.jump.buffer);
+					playSound(Resources.jump);
 					this.direction = p.direction;
 					this.distance = d;
 					this.jumping = GLOBALS.jumpSpeed;
@@ -1384,6 +1435,7 @@ window.addEventListener("DOMContentLoaded", function () {
 /** 		GAME OBJECT INSTANCES 			**/
 
 	var world = Object.create(World).init();
+	window.muted = false;
 
 /**			DEBUG EVENT LISTENERS 			**/
 
@@ -1414,10 +1466,12 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	document.addEventListener("visibilitychange", function (e) { 
 		if (document.visibilityState == "hidden") {
-			audioContext.suspend();
+			if (AudioContext) audioContext.suspend();
+			else window.muted = true;
 		}
 		else {
-			audioContext.resume();
+			if (AudioContext) audioContext.resume();
+			else window.muted = false;
 		}
 		world.time = new Date(); 
 	});
