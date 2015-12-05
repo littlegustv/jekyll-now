@@ -6,15 +6,15 @@
 			"map": {},
 			"entities": [
 				{
-					"gridX": 16,
+					"gridX": 240,
 					"gridY": 64,
-					"text": "The\nMyth\nOf\nIcarus",
+					"text": "the floor is the\nSURFACE of the SUN",
 					"type": "textblock",
-					"speed": 50,
+					"speed": 25,
 					"pause": 100,
 					"format": {
-						"size": 72,
-						"align": "left"
+						"size": 32,
+						"align": "center"
 					}
 				}
 			]
@@ -62,6 +62,26 @@
 			]
 		},
 		{
+			"name": "habitation cutscene",
+			"type": "cutscene",
+			"stage": "habitation",
+			"map": [],
+			"entities": [
+				{
+					"gridX": 24,
+					"gridY": 24,
+					"text": ">>     .  .  .  I've dropped some things  .  .  .\n>>     .  .  .  on the surface on the sun.\n\n>>     .  .  .  just bear with me  .  .  .\n\n>>     I have a plan.",
+					"type": "textblock",
+					"speed": 40,
+					"pause": 1000,
+					"format": {
+						"size": 16,
+						"align": "left"
+					}
+				}
+			]
+		},
+		{
 			"name": "simple enough",
 			"type": "level",
 			"stage": "habitation",
@@ -92,25 +112,15 @@
 					"type": "collectable"
 				},
 				{
-					"gridX": 48,
-					"gridY": 56,
-					"text": "^ click PLAY to run mission",
-					"type": "text",
+					"gridX": 24,
+					"gridY": 216,
+					"text": ">>     I've put down platforms to land on.\n>>     And there's a path to the object, and back.\n>>     Just press 'run' to send me down.",
+					"type": "textblock",
+					"speed": 40,
+					"pause": 1000,
 					"format": {
-						"size": 18,
-						"align": "left",
-						"color": "#0000DD"
-					}
-				},
-				{
-					"gridX": 240,
-					"gridY": 240,
-					"text": "Collect the object and get back to the start",
-					"type": "text",
-					"format": {
-						"size": 18,
-						"align": "center",
-						"color": "#0000DD"
+						"size": 16,
+						"align": "left"
 					}
 				}
 
@@ -124,52 +134,31 @@
 			"map": [
 				{
 					"gridX": 4,
-					"gridY": 6,
+					"gridY": 4,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
 					"gridX": 3,
-					"gridY": 6,
+					"gridY": 4,
 					"type": "character"
 				},
 				{
 					"gridX": 5,
-					"gridY": 6,
+					"gridY": 4,
 					"type": "collectable"
 				},
 				{
 					"gridX": 24,
-					"gridY": 100,
-					"text": " - click to add a new platform",
-					"type": "text",
+					"gridY": 192,
+					"text": ">>     Can you place the platforms this time?\n>>     Just CLICK and hold  .  .  .\n\n>>     Move the MOUSE to change direction.\n>>     Make sure the path gets there and back.",
+					"type": "textblock",
+					"speed": 40,
+					"pause": 1000,
 					"format": {
-						"size": 18,
-						"align": "left",
-						"color": "#0000DD"
-					}
-				},
-				{
-					"gridX": 24,
-					"gridY": 120,
-					"text": " - hold & drag mouse to change direction",
-					"type": "text",
-					"format": {
-						"size": 18,
-						"align": "left",
-						"color": "#0000DD"
-					}
-				},
-				{
-					"gridX": 24,
-					"gridY": 140,
-					"text": " - avoid the obstacle",
-					"type": "text",
-					"format": {
-						"size": 18,
-						"align": "left",
-						"color": "#0000DD"
+						"size": 16,
+						"align": "left"
 					}
 				}
 			]
@@ -206,13 +195,14 @@
 				},
 				{
 					"gridX": 24,
-					"gridY": 240,
-					"text": " - right-click to remove a platform",
-					"type": "text",
+					"gridY": 216,
+					"text": ">>     I already placed a couple platforms  .  .  .\n>>     But they're in the wrong place.\n>>     RIGHT-CLICK to remove any platform",
+					"type": "textblock",
+					"speed": 40,
+					"pause": 1000,
 					"format": {
-						"size": 18,
-						"align": "left",
-						"color": "#0000DD"
+						"size": 16,
+						"align": "left"
 					}
 				}
 			]
@@ -246,17 +236,17 @@
 					"type": "collectable"
 				},
 				{
-					"gridX":244,
-					"gridY":180,
-					"text": "Normally you jump two spaces.\nIf there is an obstacle in the way,\nyou will only jump one space.\n\nUse this to your advantage.",
+					"gridX": 24,
+					"gridY": 192,
+					"text": ">>     The platform will move me two spaces.\n>>     But if there is an obstacle in the way -\n>>     - it will only move me one space.\n\n>>     You can use this to adjust my movement.",
 					"type": "textblock",
-					"pause": 1000,					
+					"speed": 40,
+					"pause": 1000,
 					"format": {
 						"size": 16,
-						"align": "center",
-						"color": "#0000DD"
+						"align": "left"
 					}
-				}				
+				}			
 			]
 		},
 		{
@@ -830,7 +820,7 @@
 				{
 					"gridX":242,
 					"gridY":244,
-					"text": "An undertow will turn a platform\neach time you jump.",
+					"text": "An undertow will turn a platform\neach time I jump.",
 					"type": "textblock",
 					"pause": 1000,
 					"format": {

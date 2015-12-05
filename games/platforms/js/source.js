@@ -476,14 +476,14 @@ window.addEventListener("DOMContentLoaded", function () {
 						var start = {x: c.gridX, y: c.gridY};
 						var delay = 0;
 						for (var j = 0; j < lines.length; j++) {
-							var t = Object.create(Text).init(start.x, start.y, lines[j], c.format, c.speed, delay);
+							var t = Object.create(Text).init(start.x, start.y, lines[j], c.format, c.speed, delay, c.duration);
 							delay += c.speed * (lines[j].length) + c.pause;
 							s.entities.push(t);
 							start.y += c.format.size + 4;
 						}
 						break;
 					case "text":
-						e = Object.create(Text).init(c.gridX, c.gridY, c.text, c.format, c.speed, c.delay);
+						e = Object.create(Text).init(c.gridX, c.gridY, c.text, c.format, c.speed, c.delay, c.duration);
 						e.z = -10;
 						break;
 					case "character":
@@ -587,7 +587,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 			if (s.name == "mainmenu") {
 				var t = Object.create(Text).init(0, 0,"<Continue>",{});
-				var tb = Object.create(TextButton).init(canvas.width - 128,canvas.height / 2 - 12,t);
+				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 16,t);
 				tb.callback = function () {
 					world.load();
 					world.doScene(2);
@@ -595,7 +595,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.buttons.push(tb);
 			
 				var t = Object.create(Text).init(0, 0,"<New Game>",{});
-				var tb = Object.create(TextButton).init(canvas.width - 128, canvas.height / 2 + 16,t);
+				var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2 + 44,t);
 				tb.callback = function () {
 					world.clear();
 					world.doScene(3);
@@ -603,7 +603,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.buttons.push(tb);
 
 				var t = Object.create(Text).init(0, 0,"<Credits>",{});
-				var tb = Object.create(TextButton).init(canvas.width - 128,canvas.height / 2 + 44,t);
+				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 72,t);
 				tb.callback = function () {
 					world.doScene(1);
 				};
@@ -1248,7 +1248,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	var Text = Object.create(Entity);
 	Text.type = "text";
 	Text.z = -1;
-	Text.init = function (x, y, text, format, speed, delay) {
+	Text.init = function (x, y, text, format, speed, delay, duration) {
 		this.x = x, this.y = y, this.text = text;
 		this.size = format.size || 24;
 		this.color = format.color || "#18140c";
@@ -1257,12 +1257,16 @@ window.addEventListener("DOMContentLoaded", function () {
 		this.current = speed ? 0 : text.length;
 		this.counter = speed ? speed : 0;
 		this.delay = delay ? delay : 0;
+		this.duration = duration || 0;
 		return this;
 	};
 	Text.update = function (dt) {
 		if (this.delay > 0) {
 			this.delay -= dt;
 			return;
+		}
+		if (this.duration > 0) {
+			this.duration -= dt;
 		}
 		if (this.counter > 0) {
 			this.counter -= dt;
@@ -1274,6 +1278,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	};
 	Text.draw = function (ctx) {
 		if (this.delay > 0) return;
+		if (this.duration < 0) return;
 		ctx.textAlign = this.align;
 		ctx.fillStyle = this.color;
 		ctx.font = "900 " + this.size + "px Arial";
