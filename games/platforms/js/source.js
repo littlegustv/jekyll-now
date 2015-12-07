@@ -160,7 +160,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "mute.png", frames: 2, speed: 500, animations: 2},
 		{path: "blank.png"},
 		{path: "temp.png", frames: 2, speed: 500, animations: 6},
-		{path: "soundtrack.ogg"},
+		//{path: "soundtrack.ogg"},
 		{path: "jump.ogg"},
 		{path: "complete.ogg"},
 		{path: "remove.ogg"},
@@ -304,7 +304,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					break;
 				case "specimen":
 					var s = Object.create(Specimen).init(m.x, m.y, Resources[this.scene.stage]);
-					s.direction = DIRECTION.east;
+					s.direction = DIRECTION[m.direction || "east"];
 					this.addEntity(s);
 					break;
 			}
@@ -448,7 +448,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.paused = true;
 			this.time = new Date();
 			var w = this;
-			if (AudioContext) this.musicLoop();
+			if (AudioContext && Resources.soundtrack) this.musicLoop();
 //			Resources.soundtrack.sound.play();
 //			Resources.soundtrack.sound.volume = 0.5;
 //			Resources.soundtrack.sound.onended = function () { Resources.soundtrack.sound.play(); };
@@ -508,7 +508,8 @@ window.addEventListener("DOMContentLoaded", function () {
 					case "specimen":
 						e = Object.create(Specimen).init(c.gridX, c.gridY, Resources[s.stage]);
 						e.animation = s.uid % e.sprite.animations;
-						e.direction = DIRECTION.east;
+						e.direction = DIRECTION[c.direction || "east"];
+						console.log(e.direction);
 						break;
 				}
 				if (e) {s.entities.push(e);}
@@ -1290,6 +1291,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	Character.jumping = 0;
 	Character.type = "character";
 	Character.fall = function () {
+		if (this.gridX == world.scene.start.x && this.gridY == world.scene.start.y && world.scene.entities.filter(function (e) { return e.type == "collectable"; }).length == 0) return;
 		this.jumping = GLOBALS.jumpSpeed;
 		playSound(Resources.fall);
      	canvas.style.webkitFilter = "invert(100%)";
@@ -1314,14 +1316,15 @@ window.addEventListener("DOMContentLoaded", function () {
 
 			var e = world.scene.entities;
 
-			for (var i = 0; i < e.length; i++) {
-				var ep = e[i].getPosition(), tp = this.getPosition();
-				if (e[i].type == "collectable") { 
-					if (Math.abs(ep.x - tp.x) < 10 && Math.abs(ep.y - tp.y) < 10) {
-						console.log(e[i], ep.x, tp.x, ep.y, tp.y);
-						world.removeEntity(e[i]);
-						playSound(Resources.collect);
-						break;
+			if (this.type != "collectable") {
+				for (var i = 0; i < e.length; i++) {
+					var ep = e[i].getPosition(), tp = this.getPosition();
+					if (e[i].type == "collectable") { 
+						if (Math.abs(ep.x - tp.x) < 10 && Math.abs(ep.y - tp.y) < 10) {
+							world.removeEntity(e[i]);
+							playSound(Resources.collect);
+							break;
+						}
 					}
 				}
 			}
@@ -1371,7 +1374,9 @@ window.addEventListener("DOMContentLoaded", function () {
 					this.direction = p.direction;
 					this.distance = d;
 					this.jumping = GLOBALS.jumpSpeed;
-					this.animation = directions.indexOf(getDirectionName(this.direction));
+					if (this.type != "collectable") {
+						this.animation = directions.indexOf(getDirectionName(this.direction));
+					}
 					world.scene.doMap("undertow", "onJump");
 
 					if (p.special == "hotspot") {
@@ -1385,8 +1390,9 @@ window.addEventListener("DOMContentLoaded", function () {
 	var Specimen = Object.create(Character);
 	Specimen.type = "collectable";
 	Specimen.jumping = GLOBALS.jumpSpeed;
-	Specimen.distance = 2;
+	Specimen.distance = 1;
 	Specimen.update = function (dt) {
+		if (!this.next) this.next = Object.create(Entity).init(this.gridX + this.distance * this.direction.x, this.gridY + this.distance * this.direction.y, Resources.blank);
 		this.animate(dt);
 		if (world.paused) return;
 		if (this.jumping > 0) {
@@ -1396,10 +1402,23 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.jumping = GLOBALS.jumpSpeed;
 			this.gridX += this.distance * this.direction.x;
 			this.gridY += this.distance * this.direction.y;
-			var d = (directions.indexOf(getDirectionName(this.direction)) + 2) % 6;
-			this.direction = DIRECTION[directions[d]];
+			//var d = (directions.indexOf(getDirectionName(this.direction)) + 2) % 6;
+			//this.direction = DIRECTION[directions[d]];
+		}
+		this.next.gridX = this.gridX + this.distance * this.direction.x;
+		this.next.gridY = this.gridY + this.distance * this.direction.y;
+		if (this.gridX + this.gridY > 14 || this.gridX + this.gridY < -1) {
+			world.reset();
+		} else if (this.gridY < 1 || this.gridY > 10) {
+			world.reset();
 		}
 	}
+	Specimen.drawS = Entity.draw;
+	Specimen.draw = function (ctx) {
+		if (this.next) this.next.draw(ctx);
+		this.drawS(ctx);
+	}
+
 
  	var ParticleEffect = Object.create(Entity);
     ParticleEffect.update = function (dt) {

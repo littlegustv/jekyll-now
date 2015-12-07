@@ -555,7 +555,7 @@
 			]
 		},
 		{
-			"name": "order can be key",
+			"name": "establish order",
 			"type": "level",
 			"stage": "habitation",
 			"max": 9,
@@ -658,7 +658,7 @@
 			"name": "make a good entrance",
 			"type": "level",
 			"stage": "habitation",
-			"max": 14,
+			"max": 15,
 			"map": [
 				{
 					"gridX": 7,
@@ -835,7 +835,7 @@
 			"name": "when space is tight",
 			"type": "level",
 			"stage": "hydroponics",
-			"max": 9,
+			"max": 8,
 			"map": [
 				{
 					"gridX":4,
@@ -1665,14 +1665,24 @@
 			"max": 10,
 			"map": [
 				{
+					"gridX": 3,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
 					"gridX": 4,
 					"gridY": 2,
 					"type": "hotspot"
 				},
 				{
-					"gridX": 6,
+					"gridX": 5,
 					"gridY": 2,
 					"type": "hotspot"
+				},
+				{
+					"gridX": 2,
+					"gridY": 3,
+					"type": "obstacle"
 				},
 				{
 					"gridX": 4,
@@ -1680,9 +1690,24 @@
 					"type": "hotspot"
 				},
 				{
-					"gridX": 6,
+					"gridX": 9,
 					"gridY": 3,
-					"type": "hotspot"
+					"type": "obstacle"
+				},
+				{
+					"gridX": 10,
+					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 7,
+					"type": "obstacle"
 				}
 			],
 			"entities": [
@@ -2209,7 +2234,7 @@
 			]
 		},
 		{
-			"name": "el nino",
+			"name": "bow and arrow",
 			"type": "level",
 			"stage": "operations",
 			"max": 8,
@@ -2225,6 +2250,11 @@
 					"type": "obstacle"
 				},
 				{
+					"gridX": 5,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
 					"gridX": 6,
 					"gridY": 2,
 					"type": "hotspot"
@@ -2235,33 +2265,8 @@
 					"type": "obstacle"
 				},
 				{
-					"gridX": 5,
-					"gridY": 3,
-					"type": "hotspot"
-				},
-				{
 					"gridX": 6,
 					"gridY": 3,
-					"type": "hotspot"
-				},
-				{
-					"gridX": 7,
-					"gridY": 3,
-					"type": "hotspot"
-				},
-				{
-					"gridX": 5,
-					"gridY": 4,
-					"type": "hotspot"
-				},
-				{
-					"gridX": 6,
-					"gridY": 4,
-					"type": "hotspot"
-				},
-				{
-					"gridX": 4,
-					"gridY": 5,
 					"type": "hotspot"
 				},
 				{
@@ -2270,18 +2275,13 @@
 					"type": "hotspot"
 				},
 				{
-					"gridX": 6,
-					"gridY": 5,
-					"type": "hotspot"
+					"gridX": 3,
+					"gridY": 6,
+					"type": "obstacle"
 				},
 				{
 					"gridX": 4,
 					"gridY": 6,
-					"type": "hotspot"
-				},
-				{
-					"gridX": 6,
-					"gridY": 5,
 					"type": "hotspot"
 				},
 				{
@@ -2314,74 +2314,64 @@
 			]
 		},
 		{
-			"name": "center cannot hold",
+			"name": "'heist'",
 			"type": "level",
 			"stage": "operations",
-			"max": 20,
+			"max": 14,
 			"map": [
 				{
-					"gridX": 1,
-					"gridY": 4,
-					"type": "obstacle"
-				},
-				{
-					"gridX": "10",
-					"gridY": 4,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 1,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 5,
-					"gridY": 5,
-					"type": "hotspot"
-				},
-				{
-					"gridX": 9,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 1,
-					"gridY": 6,
+					"gridX": 3,
+					"gridY": 1,
 					"type": "obstacle"
 				},
 				{
 					"gridX": 2,
-					"gridY": 6,
+					"gridY": 2,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
-					"gridY": 6,
+					"gridX": 1,
+					"gridY": 3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
-					"gridY": 6,
+					"gridX": 0,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 1,
+					"gridY": 4,
 					"type": "hotspot"
 				},
 				{
-					"gridX": 5,
-					"gridY": 6,
+					"gridX": 0,
+					"gridY": 5,
 					"type": "hotspot"
 				},
 				{
-					"gridX": 6,
+					"gridX": 1,
+					"gridY": 5,
+					"type": "hotspot"
+				},
+				{
+					"gridX": 0,
 					"gridY": 6,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 7,
-					"gridY": 6,
+					"gridX": 0,
+					"gridY": 7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 8,
-					"gridY": 6,
+					"gridX": 0,
+					"gridY": 8,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 0,
+					"gridY": 9,
 					"type": "obstacle"
 				}
 			],
@@ -2392,86 +2382,61 @@
 					"type": "character"
 				},
 				{
-					"gridX": 7,
-					"gridY": 4,
+					"gridX": -2,
+					"gridY": 7,
 					"type": "collectable"
 				}
 			]
 		},
 		{
-			"name": "rethinking what you know",
+			"name": "propeller",
 			"type": "level",
 			"stage": "operations",
-			"max": 11,
+			"max": 12,
 			"map": [
 				{
-					"gridX": 3,
+					"gridX": 6,
+					"gridY": 1,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
 					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 4,
+					"type": "hotspot"
+				},
+				{
+					"gridX": 6,
+					"gridY": 4,
+					"type": "hotspot"
+				},
+				{
+					"gridX": 6,
+					"gridY": 5,
 					"type": "obstacle"
 				},
 				{
 					"gridX": 4,
-					"gridY": 3,
+					"gridY": 6,
 					"type": "obstacle"
 				},
 				{
 					"gridX": 5,
-					"gridY": 3,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 6,
-					"gridY": 3,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 7,
-					"gridY": 3,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 8,
-					"gridY": 3,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 9,
-					"gridY": 3,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 2,
-					"gridY": 4,
-					"type": "hotspot"
-				},
-				{
-					"gridX": 9,
-					"gridY": 4,
-					"type": "hotspot"
-				},
-				{
-					"gridX": 2,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 3,
-					"gridY": 5,
+					"gridY": 6,
 					"type": "obstacle"
 				},
 				{
 					"gridX": 5,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 6,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 8,
-					"gridY": 5,
+					"gridY": 7,
 					"type": "obstacle"
 				}
 			],
@@ -2492,17 +2457,18 @@
 			"name": "it'll come to you",
 			"type": "level",
 			"stage": "medical",
-			"max": 2,
+			"max": 3,
 			"map": [],
 			"entities": [
 				{
-					"gridX": 4,
+					"gridX": 3,
 					"gridY": 4,
 					"type": "character"
 				},
 				{
-					"gridX": 6,
+					"gridX": 5,
 					"gridY": 4,
+					"direction": "east",
 					"type": "specimen"
 				},
 				{
@@ -2521,23 +2487,33 @@
 			]
 		},
 		{
-			"name": "wait for it",
+			"name": "teaching",
 			"type": "level",
 			"stage": "medical",
-			"max": 7,
+			"max": 9,
 			"map": [
 				{
-					"gridX": 4,
-					"gridY": 1,
+					"gridX": 7,
+					"gridY": 2,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 2,
+					"gridX": 8,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 9,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
 					"gridY": 3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 4,
+					"gridX": 9,
 					"gridY": 3,
 					"type": "obstacle"
 				},
@@ -2547,13 +2523,89 @@
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
+					"gridX": 9,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 8,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 7,
 					"gridY": 6,
 					"type": "obstacle"
 				},
 				{
 					"gridX": 5,
+					"gridY": 7,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"direction": "west",
+					"type": "specimen"
+				}
+			]
+		},
+		{
+			"name": "wait for it",
+			"type": "level",
+			"stage": "medical",
+			"max": 7,
+			"map": [
+				{
+					"gridX": 3,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 8,
 					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 8,
 					"type": "obstacle"
 				}
 			],
@@ -2574,36 +2626,36 @@
 			"name": "meet you halfway",
 			"type": "level",
 			"stage": "medical",
-			"max": 10,
+			"max": 7,
 			"map": [
 				{
-					"gridX": 3,
+					"gridX": 7,
+					"gridY": 1,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 7,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
 					"gridY": 3,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 2,
-					"gridY": 4,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 6,
-					"gridY": 4,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 2,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 6,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
 					"gridX": 5,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
 					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 7,
 					"type": "obstacle"
 				}
 			],
@@ -2624,7 +2676,7 @@
 			"name": "what stays the same, changes",
 			"type": "level",
 			"stage": "medical",
-			"max": 7,
+			"max": 6,
 			"map": [
 				{
 					"gridX": 4,
@@ -2699,7 +2751,7 @@
 			"name": "understanding cycles",
 			"type": "level",
 			"stage": "medical",
-			"max": 11,
+			"max": 10,
 			"map": [
 				{
 					"gridX": 4,
