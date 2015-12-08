@@ -36,8 +36,8 @@ window.addEventListener("DOMContentLoaded", function () {
 	function mouseUp (e) {
 		//console.log(e);
 		//if (e.changedTouches) {
-			e.offsetX = e.offsetX || e.clientX;//e.changedTouches[0].clientX;
-			e.offsetY = e.offsetY || e.clientY;//e.changedTouches[0].clientY;
+		e.offsetX = e.offsetX || e.clientX;//e.changedTouches[0].clientX;
+		e.offsetY = e.offsetY || e.clientY;//e.changedTouches[0].clientY;
 		//}
 		var m = world.toGrid(e.offsetX, e.offsetY);
 		world.mouse.down = false;
@@ -47,11 +47,14 @@ window.addEventListener("DOMContentLoaded", function () {
 		if (world.scene.button(e.offsetX, e.offsetY)) { return; }
 		
 		if (!world.paused) return;
-		// right click
 
+		// right click
 		if (e.which === 3 || e.button === 2) {
-			playSound(Resources.remove);
-			world.remove(m, "platform"); return;
+			
+			if (world.remove(m, "platform")) { 
+				playSound(Resources.remove);
+				return;
+			}
 		}
 
 		// DEBUG BEHAVIOR
@@ -303,8 +306,10 @@ window.addEventListener("DOMContentLoaded", function () {
 					this.addEntity(c);
 					break;
 				case "specimen":
+					var m = this.toGrid(this.mouse.x, this.mouse.y);
 					var s = Object.create(Specimen).init(m.x, m.y, Resources[this.scene.stage]);
-					s.direction = DIRECTION[m.direction || "east"];
+					s.direction = DIRECTION[directions[this.mouse.angle] || "east"];
+					console.log(s.direction, directions[this.mouse.angle], this.mouse);
 					this.addEntity(s);
 					break;
 			}
@@ -724,7 +729,13 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 			}
 			for (var i = 0; i < current.entities.length; i++) {
-				if (current.entities[i].type != "start" && current.entities[i].type != "text" && current.entities[i].type != "platform") 
+				if (current.entities[i].type == "collectable" && current.entities[i].distance > 0) {
+					save.entities.push({gridX: current.entities[i].gridX, gridY: current.entities[i].gridY, type: "specimen", direction: getDirectionName(current.entities[i].direction)})
+				}
+				else if (current.entities[i].type == "character") {
+					save.entities.push({gridX: current.entities[i].gridX - 5, gridY: current.entities[i].gridY + 10, type: current.entities[i].type})
+				}
+				else if (current.entities[i].type != "start" && current.entities[i].type != "text" && current.entities[i].type != "platform") 
 					save.entities.push({gridX: current.entities[i].gridX, gridY: current.entities[i].gridY, type: current.entities[i].type})
 			}
 			return JSON.stringify(save, null, '\t');
@@ -771,7 +782,9 @@ window.addEventListener("DOMContentLoaded", function () {
 					type: type,
 					x: position.x, y: position.y, direction: getDirectionName(obj.direction)
 				}
+				return true;
 			}
+			return false;
 		},
 		removeEntity: function (e) {
 			this.scene.removeEntity(e);
@@ -1319,11 +1332,11 @@ window.addEventListener("DOMContentLoaded", function () {
 			if (this.type != "collectable") {
 				for (var i = 0; i < e.length; i++) {
 					var ep = e[i].getPosition(), tp = this.getPosition();
-					if (e[i].type == "collectable") { 
-						if (Math.abs(ep.x - tp.x) < 10 && Math.abs(ep.y - tp.y) < 10) {
+					if (Math.abs(ep.x - tp.x) < 10 && Math.abs(ep.y - tp.y) < 10) {
+						if (e[i].type == "collectable") { 
 							world.removeEntity(e[i]);
 							playSound(Resources.collect);
-							break;
+							return;
 						}
 					}
 				}
