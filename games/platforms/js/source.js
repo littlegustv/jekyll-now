@@ -225,10 +225,10 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		loadOGG: function (res, name) {
 			// cant play ogg, load mp3
-			console.log("NEW");
 			if (this.audioType.length <= 0) {
 				res.replace("ogg", "mp3");
 			}
+			console.log("NEW", res);
 			var w = this;
 			if (!AudioContext) {
 				Resources[name] = new Audio("res/" + res, streaming=false);
