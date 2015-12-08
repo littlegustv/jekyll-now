@@ -366,6 +366,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 		},
 		save: function () {
+			console.log("saving");
 			if (this.setupStorage()) {
 				var saveData = {};
 				for (var i = 0; i < this.scenes.length; i++) {
@@ -376,10 +377,13 @@ window.addEventListener("DOMContentLoaded", function () {
 				saveData = JSON.stringify(saveData);
 				localStorage.setItem("platformSaveData", saveData);
 			}
+			this.newGame = false;
 		},
 		load: function () {
+			this.newGame = true;
 			if (this.setupStorage()) {
 				var loadData = localStorage.platformSaveData;
+				console.log("here...", loadData);
 				if (loadData) {
 					loadData = JSON.parse(loadData);
 					for (i in loadData) {
@@ -388,6 +392,7 @@ window.addEventListener("DOMContentLoaded", function () {
 							this.scenes[n].score = Number(loadData[i]);
 						}
 					}
+					this.newGame = false;
 				}
 			}
 		},
@@ -457,6 +462,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.loadBG();
 			this.scenes = this.sceneInfo.scenes, this.cs = 0;
 			this.stageUnlock();
+			this.load();
 			this.scene = this.createScene(this.cs);
 
 			this.paused = true;
@@ -601,13 +607,18 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.par = t2;
 			}
 			if (s.name == "mainmenu") {
-				var t = Object.create(Text).init(0, 0,"<Continue>",{});
-				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 16,t);
-				tb.callback = function () {
+
+				var t = Object.create(Text).init(canvas.width / 2,canvas.height / 2 + 16,"<Continue>",{color: world.newGame ? "#333333" : "black"});
+				if (!world.newGame) {
 					world.load();
-					world.doScene(2);
-				};
-				s.buttons.push(tb);
+					var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 16,t);
+					tb.callback = function () {
+						world.doScene(2);
+					};
+					s.buttons.push(tb);
+				} else {
+					s.entities.push(t);
+				}
 			
 				var t = Object.create(Text).init(0, 0,"<New Game>",{});
 				var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2 + 44,t);
