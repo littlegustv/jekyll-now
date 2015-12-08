@@ -194,6 +194,10 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.resourceCount = resourceInfo.length;
 			var w = this;
 
+			var a = new Audio();
+			this.audioType = a.canPlayType("audio/ogg");
+			console.log(this.audioType, a.canPlayType("audio/mp3"), "AUDIO");
+
 			for (var i = 0; i < resourceInfo.length; i++ ) {
 				var res = resourceInfo[i].path;
 				var e = res.indexOf(".");
@@ -236,7 +240,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				audioContext.decodeAudioData(request.response, function(b) {
 					Resources[name] = {buffer: b, play: false};
 					w.progressBar();
-				}, function (e) {console.log("ERROR with decoding audio", e.err);});
+				}, function () {console.log("ERROR with decoding audio");});
 			};
 			request.send();
 		},
