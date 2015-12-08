@@ -236,7 +236,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				audioContext.decodeAudioData(request.response, function(b) {
 					Resources[name] = {buffer: b, play: false};
 					w.progressBar();
-				}, function () {console.log("ERROR");});
+				}, function (e) {console.log("ERROR", e);});
 			};
 			request.send();
 		},
