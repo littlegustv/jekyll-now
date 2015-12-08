@@ -226,7 +226,8 @@ window.addEventListener("DOMContentLoaded", function () {
 		loadOGG: function (res, name) {
 			// cant play ogg, load mp3
 			if (this.audioType.length <= 0) {
-				res.replace("ogg", "mp3");
+				res = res.replace("ogg", "mp3");
+				console.log("replaced?");
 			}
 			console.log("NEW", res);
 			var w = this;
