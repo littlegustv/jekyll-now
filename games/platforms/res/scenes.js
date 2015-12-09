@@ -436,11 +436,6 @@
 					"type": "obstacle"
 				},
 				{
-					"gridX":-2,
-					"gridY":6,
-					"type": "obstacle"
-				},
-				{
 					"gridX":5,
 					"gridY":6,
 					"type": "obstacle"
@@ -2305,9 +2300,6 @@
 					"gridX": 7,
 					"gridY": 4,
 					"type": "collectable"
-				}
-			]
-		},
 		{
 			"name": "approach with care",
 			"type": "level",
@@ -2455,6 +2447,9 @@
 					"gridX": 1,
 					"gridY": 7,
 					"type": "collectable"
+				}
+			]
+		},
 				}
 			]
 		},
