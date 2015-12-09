@@ -249,8 +249,8 @@ window.addEventListener("DOMContentLoaded", function () {
 			request.onload = function() {
 				audioContext.decodeAudioData(request.response, function(b) {
 					Resources[name] = {buffer: b, play: false};
-					if (name == "soundtrack") {
-						if (AudioContext && Resources.soundtrack) w.musicLoop();
+					if (name == "soundtrack" || name == "soundtrackFast") {
+						if (AudioContext && Resources.soundtrack && name == "soundtrack") w.musicLoop();
 					} else {
 						w.progressBar();
 					}
