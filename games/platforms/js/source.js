@@ -162,7 +162,8 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "mute.png", frames: 2, speed: 500, animations: 2},
 		{path: "blank.png"},
 		{path: "temp.png", frames: 2, speed: 500, animations: 6},
-		//{path: "soundtrack.ogg"},
+		{path: "soundtrack.ogg"},
+		{path: "soundtrackFast.ogg"},
 		{path: "jump.ogg"},
 		{path: "complete.ogg"},
 		{path: "remove.ogg"},
@@ -175,6 +176,7 @@ window.addEventListener("DOMContentLoaded", function () {
 /**			CLASS DEFINITIONS			**/
 
 	var World = {
+		speed: 0,
 		stages: {
 			habitation: 0,
 			hydroponics: 0,
@@ -225,6 +227,9 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		loadOGG: function (res, name) {
 			// cant play ogg, load mp3
+			if (name == "soundtrack" || name == "soundtrackFast") {
+				this.progressBar();
+			}
 			if (this.audioType.length <= 0) {
 				res = res.replace("ogg", "mp3");
 				console.log("replaced?");
@@ -244,7 +249,11 @@ window.addEventListener("DOMContentLoaded", function () {
 			request.onload = function() {
 				audioContext.decodeAudioData(request.response, function(b) {
 					Resources[name] = {buffer: b, play: false};
-					w.progressBar();
+					if (name == "soundtrack") {
+						if (AudioContext && Resources.soundtrack) w.musicLoop();
+					} else {
+						w.progressBar();
+					}
 				}, function () {console.log("ERROR with decoding audio");});
 			};
 			request.send();
@@ -454,9 +463,15 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		musicLoop: function () {
 			//console.log(Resources["s_" + world.scene.stage].buffer, "s_" + world.scene.stage);
-			world.soundtrack = playSound(Resources.soundtrack);
+			if (world.speed <= 2) {
+				world.soundtrack = playSound(Resources.soundtrack);
+			}
+			else {
+				world.speed -= 2;
+				world.soundtrack = playSound(Resources.soundtrackFast);
+			}
 			world.soundtrack.onended = world.musicLoop;
-			debug = world.soundtrack;
+//			debug = world.soundtrack;
 		},
 		begin: function () {
 			this.loadBG();
@@ -468,7 +483,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.paused = true;
 			this.time = new Date();
 			var w = this;
-			if (AudioContext && Resources.soundtrack) this.musicLoop();
+			
 //			Resources.soundtrack.sound.play();
 //			Resources.soundtrack.sound.volume = 0.5;
 //			Resources.soundtrack.sound.onended = function () { Resources.soundtrack.sound.play(); };
@@ -606,9 +621,12 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.addEntity(t2);
 				s.par = t2;
 			}
+			if (s.name == "endscene") {
+
+			}
 			if (s.name == "mainmenu") {
 
-				var t = Object.create(Text).init(canvas.width / 2,canvas.height / 2 + 16,"<Continue>",{color: world.newGame ? "#333333" : "black"});
+				var t = Object.create(Text).init(canvas.width / 2,canvas.height / 2 + 16,"<Continue>", world.newGame ? {color: "#333333"}:{} );
 				if (!world.newGame) {
 					world.load();
 					var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 16,t);
@@ -932,14 +950,18 @@ window.addEventListener("DOMContentLoaded", function () {
 						if (this.entities.filter(function (a) { return a.type == "collectable"; }).length <= 0) {
 							if (!this.completed) {
 								playSound(Resources.complete);
+								world.speed += 1;
 								this.completed = true;
 								this.character.animation = 1, this.character.frame = 0;
 								world.paused = true;
 								world.scenes[this.uid].score = this.platformsUsed;
 								var n = (this.uid + 1) % world.scenes.length;
 								if (world.scenes[n].stage != this.stage && !world.stageComplete(this.stage)) {
-									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2, "<Locked>", {size: 60});
+									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2, "<Next>", {size: 60});
 									t.z = 20;
+									this.entities.push(t);
+									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2 - 16, "Complete all levels to unlock next stage!", {size: 20, color: "#EEEEEE"});
+									t.z = 21;
 									this.entities.push(t);
 								}
 								else {

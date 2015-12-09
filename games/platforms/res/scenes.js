@@ -70,7 +70,7 @@
 				{
 					"gridX": 24,
 					"gridY": 24,
-					"text": ">>     .  .  .  I've dropped some things  .  .  .\n>>     .  .  .  on the surface on the sun.\n\n>>     .  .  .  just bear with me  .  .  .\n\n>>     I have a plan.",
+					"text": ">< Starship Icarus IJ93.2 Mainframe Computer ><\n\n>>     <Access granted, what is your query?>\n\n>>     .  .  .  I've dropped some things - \n>>     -- on the surface on the sun.\n\n>>     - just bear with me  .  .  .\n\n>>     I have a plan.",
 					"type": "textblock",
 					"speed": 40,
 					"pause": 1000,
@@ -114,7 +114,7 @@
 				{
 					"gridX": 24,
 					"gridY": 216,
-					"text": ">>     I've put down platforms to land on.\n>>     And there's a path to the object, and back.\n>>     Just press 'run' to send me down.",
+					"text": ">>     I've put down platforms to land on - \n>>     - making a path TO the object, and BACK.\n\n>>     Just press 'RUN' to send me down.",
 					"type": "textblock",
 					"speed": 40,
 					"pause": 1000,
@@ -133,26 +133,26 @@
 			"max": 4,
 			"map": [
 				{
-					"gridX": 4,
+					"gridX": 8,
 					"gridY": 4,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 3,
+					"gridX": 7,
 					"gridY": 4,
 					"type": "character"
 				},
 				{
-					"gridX": 5,
+					"gridX": 9,
 					"gridY": 4,
 					"type": "collectable"
 				},
 				{
 					"gridX": 24,
 					"gridY": 192,
-					"text": ">>     Can you place the platforms this time?\n>>     Just CLICK and hold  .  .  .\n\n>>     Move the MOUSE to change direction.\n>>     Make sure the path gets there and back.",
+					"text": ">>     That's an OBSTACLE.\n>>     Can you make me a path around it?\n\n>>     Just CLICK and HOLD\n>>     Move the MOUSE to change direction.",
 					"type": "textblock",
 					"speed": 40,
 					"pause": 1000,
@@ -196,7 +196,7 @@
 				{
 					"gridX": 24,
 					"gridY": 216,
-					"text": ">>     I already placed a couple platforms  .  .  .\n>>     But they're in the wrong place.\n>>     RIGHT-CLICK to remove any platform",
+					"text": ">>     I already placed a couple platforms  .  .  .\n>>     But they're in the wrong place.\n\n>>     RIGHT-CLICK to remove any platform",
 					"type": "textblock",
 					"speed": 40,
 					"pause": 1000,
@@ -238,7 +238,7 @@
 				{
 					"gridX": 24,
 					"gridY": 192,
-					"text": ">>     The platform will move me two spaces.\n>>     But if there is an obstacle in the way -\n>>     - it will only move me one space.\n\n>>     You can use this to adjust my movement.",
+					"text": ">>     A platform will move me TWO spaces.\n>>     But if there is an obstacle in the way -\n>>     - it will only move me ONE space.\n\n>>     You can use this to adjust my movement.",
 					"type": "textblock",
 					"speed": 40,
 					"pause": 1000,
@@ -818,91 +818,16 @@
 					"type": "collectable"
 				},
 				{
-					"gridX":242,
+					"gridX":24,
 					"gridY":244,
-					"text": "An undertow will turn a platform\neach time I jump.",
+					"text": ">>     Watch out for the undertow, ok?\n>>     It'll turn a platform each time I jump.",
 					"type": "textblock",
 					"pause": 1000,
+					"speed": 40,
 					"format": {
 						"size": 16,
-						"align": "center",
-						"color": "#0000DD"
+						"align": "left"
 					}
-				}
-			]
-		},
-		{
-			"name": "when space is tight",
-			"type": "level",
-			"stage": "hydroponics",
-			"max": 8,
-			"map": [
-				{
-					"gridX":4,
-					"gridY":1,
-					"type": "obstacle"
-				},
-				{
-					"gridX":4,
-					"gridY":2,
-					"type": "obstacle"
-				},
-				{
-					"gridX":3,
-					"gridY":3,
-					"type": "obstacle"
-				},
-				{
-					"gridX":2,
-					"gridY":4,
-					"type": "obstacle"
-				},
-				{
-					"gridX":3,
-					"gridY":4,
-					"type": "obstacle"
-				},
-				{
-					"gridX":3,
-					"gridY":5,
-					"type": "undertow"
-				},
-				{
-					"gridX":1,
-					"gridY":6,
-					"type": "obstacle"
-				},
-				{
-					"gridX":1,
-					"gridY":7,
-					"type": "obstacle"
-				},
-				{
-					"gridX":1,
-					"gridY":8,
-					"type": "obstacle"
-				},
-				{
-					"gridX":2,
-					"gridY":8,
-					"type": "obstacle"
-				},
-				{
-					"gridX":2,
-					"gridY":9,
-					"type": "obstacle"
-				}
-			],
-			"entities": [
-				{
-					"gridX":1,
-					"gridY":5,
-					"type": "character"
-				},
-				{
-					"gridX":4,
-					"gridY":5,
-					"type": "collectable"
 				}
 			]
 		},
@@ -987,122 +912,7 @@
 			]
 		},
 		{
-			"name": "when you have to choose",
-			"type": "level",
-			"stage": "hydroponics",
-			"max": 16,
-			"map": [
-				{
-					"gridX":6,
-					"gridY":3,
-					"type": "undertow"
-				},
-				{
-					"gridX":4,
-					"gridY":5,
-					"type": "obstacle"
-				},
-				{
-					"gridX":3,
-					"gridY":6,
-					"type": "obstacle"
-				},
-				{
-					"gridX":4,
-					"gridY":6,
-					"type": "obstacle"
-				},
-				{
-					"gridX":3,
-					"gridY":7,
-					"type": "obstacle"
-				},
-				{
-					"gridX":3,
-					"gridY":8,
-					"type": "obstacle"
-				},
-				{
-					"gridX":3,
-					"gridY":9,
-					"type": "obstacle"
-				}
-			],
-			"entities": [
-				{
-					"gridX":6,
-					"gridY":1,
-					"type": "character"
-				},
-				{
-					"gridX":4,
-					"gridY":7,
-					"type": "collectable"
-				},
-				{
-					"gridX": -1,
-					"gridY":8,
-					"type": "collectable"
-				}
-			]
-		},
-		{
-			"name": "there and back again",
-			"type": "level",
-			"stage": "hydroponics",
-			"max": 9,
-			"map": [
-				{
-					"gridX": 2,
-					"gridY": 3,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 5,
-					"gridY": 4,
-					"type": "undertow"
-				},
-				{
-					"gridX": 2,
-					"gridY": 6,
-					"type": "undertow"
-				},
-				{
-					"gridX": 4,
-					"gridY": 6,
-					"type": "obstacle"
-				},
-				{
-					"gridX": "-1",
-					"gridY": 6,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 0,
-					"gridY": 8,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 2,
-					"gridY": 8,
-					"type": "obstacle"
-				}
-			],
-			"entities": [
-				{
-					"gridX": 4,
-					"gridY": 4,
-					"type": "character"
-				},
-				{
-					"gridX": 7,
-					"gridY": 4,
-					"type": "collectable"
-				}
-			]
-		},
-		{
-			"name": "early days",
+			"name": "when it's early days",
 			"type": "level",
 			"stage": "hydroponics",
 			"max": 8,
@@ -1172,87 +982,137 @@
 			]
 		},
 		{
-			"name": "the go-around",
+			"name": "when we're back again",
 			"type": "level",
 			"stage": "hydroponics",
-			"max": 15,
+			"max": 9,
 			"map": [
 				{
-					"gridX": 3,
-					"gridY": 5,
-					"type": "undertow"
-				},
-				{
-					"gridX": 4,
-					"gridY": 2,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 7,
-					"gridY": 2,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 3,
-					"gridY": 3,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 6,
-					"gridY": 3,
-					"type": "obstacle"
-				},
-				{
 					"gridX": 2,
-					"gridY": 4,
+					"gridY": 3,
 					"type": "obstacle"
 				},
 				{
 					"gridX": 5,
 					"gridY": 4,
-					"type": "obstacle"
+					"type": "undertow"
 				},
 				{
-					"gridX": 3,
+					"gridX": 2,
+					"gridY": 6,
+					"type": "undertow"
+				},
+				{
+					"gridX": 4,
 					"gridY": 6,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 1,
-					"gridY": 7,
+					"gridX": "-1",
+					"gridY": 6,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
-					"gridY": 7,
+					"gridX": 0,
+					"gridY": 8,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
+					"gridX": 2,
 					"gridY": 8,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 5,
-					"gridY": 5,
+					"gridX": 4,
+					"gridY": 4,
 					"type": "character"
 				},
 				{
-					"gridX": 8,
-					"gridY": 5,
-					"type": "collectable"
-				},
-				{
-					"gridX": 0,
-					"gridY": 8,
+					"gridX": 7,
+					"gridY": 4,
 					"type": "collectable"
 				}
 			]
 		},
 		{
-			"name": "doubled",
+			"name": "when space is tight",
+			"type": "level",
+			"stage": "hydroponics",
+			"max": 8,
+			"map": [
+				{
+					"gridX":4,
+					"gridY":1,
+					"type": "obstacle"
+				},
+				{
+					"gridX":4,
+					"gridY":2,
+					"type": "obstacle"
+				},
+				{
+					"gridX":3,
+					"gridY":3,
+					"type": "obstacle"
+				},
+				{
+					"gridX":2,
+					"gridY":4,
+					"type": "obstacle"
+				},
+				{
+					"gridX":3,
+					"gridY":4,
+					"type": "obstacle"
+				},
+				{
+					"gridX":3,
+					"gridY":5,
+					"type": "undertow"
+				},
+				{
+					"gridX":1,
+					"gridY":6,
+					"type": "obstacle"
+				},
+				{
+					"gridX":1,
+					"gridY":7,
+					"type": "obstacle"
+				},
+				{
+					"gridX":1,
+					"gridY":8,
+					"type": "obstacle"
+				},
+				{
+					"gridX":2,
+					"gridY":8,
+					"type": "obstacle"
+				},
+				{
+					"gridX":2,
+					"gridY":9,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX":1,
+					"gridY":5,
+					"type": "character"
+				},
+				{
+					"gridX":4,
+					"gridY":5,
+					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "when it's doubled",
 			"type": "level",
 			"stage": "hydroponics",
 			"max": 8,
@@ -1317,7 +1177,162 @@
 			]
 		},
 		{
-			"name": "clue inplant",
+			"name": "when you coordinate",
+			"type": "level",
+			"stage": "hydroponics",
+			"max": 11,
+			"map": [
+				{
+					"gridX": 7,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 4,
+					"type": "undertow"
+				},
+				{
+					"gridX": 6,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 8,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 6,
+					"type": "undertow"
+				},
+				{
+					"gridX": 5,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 8,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 8,
+					"gridY": 7,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "when it isn't as complicated",
+			"type": "level",
+			"stage": "hydroponics",
+			"max": 9,
+			"map": [
+				{
+					"gridX": 5,
+					"gridY": 1,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 1,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 2,
+					"type": "undertow"
+				},
+				{
+					"gridX": 6,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 4,
+					"type": "undertow"
+				},
+				{
+					"gridX": 5,
+					"gridY": 4,
+					"type": "undertow"
+				},
+				{
+					"gridX": 2,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 1,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 6,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "collectable"
+				},
+				{
+					"gridX": 1,
+					"gridY": 4,
+					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "when you follow the lead",
 			"type": "level",
 			"stage": "hydroponics",
 			"max": 17,
@@ -1417,14 +1432,89 @@
 			]
 		},
 		{
-			"name": "coordination",
+			"name": "when you have to choose",
 			"type": "level",
 			"stage": "hydroponics",
-			"max": 11,
+			"max": 16,
 			"map": [
+				{
+					"gridX":6,
+					"gridY":3,
+					"type": "undertow"
+				},
+				{
+					"gridX":4,
+					"gridY":5,
+					"type": "obstacle"
+				},
+				{
+					"gridX":3,
+					"gridY":6,
+					"type": "obstacle"
+				},
+				{
+					"gridX":4,
+					"gridY":6,
+					"type": "obstacle"
+				},
+				{
+					"gridX":3,
+					"gridY":7,
+					"type": "obstacle"
+				},
+				{
+					"gridX":3,
+					"gridY":8,
+					"type": "obstacle"
+				},
+				{
+					"gridX":3,
+					"gridY":9,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX":6,
+					"gridY":1,
+					"type": "character"
+				},
+				{
+					"gridX":4,
+					"gridY":7,
+					"type": "collectable"
+				},
+				{
+					"gridX": -1,
+					"gridY":8,
+					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "when it goes around",
+			"type": "level",
+			"stage": "hydroponics",
+			"max": 15,
+			"map": [
+				{
+					"gridX": 3,
+					"gridY": 5,
+					"type": "undertow"
+				},
+				{
+					"gridX": 4,
+					"gridY": 2,
+					"type": "obstacle"
+				},
 				{
 					"gridX": 7,
 					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 3,
 					"type": "obstacle"
 				},
 				{
@@ -1433,140 +1523,50 @@
 					"type": "obstacle"
 				},
 				{
-					"gridX": 5,
+					"gridX": 2,
 					"gridY": 4,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 6,
-					"gridY": 4,
-					"type": "undertow"
-				},
-				{
-					"gridX": 6,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 8,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 4,
-					"gridY": 6,
-					"type": "undertow"
-				},
-				{
 					"gridX": 5,
-					"gridY": 6,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 8,
-					"gridY": 6,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 4,
-					"gridY": 7,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 8,
-					"gridY": 7,
-					"type": "obstacle"
-				}
-			],
-			"entities": [
-				{
-					"gridX": 4,
 					"gridY": 4,
-					"type": "character"
-				},
-				{
-					"gridX": 7,
-					"gridY": 4,
-					"type": "collectable"
-				}
-			]
-		},
-		{
-			"name": "simpler than it looks",
-			"type": "level",
-			"stage": "hydroponics",
-			"max": 9,
-			"map": [
-				{
-					"gridX": 5,
-					"gridY": 1,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 6,
-					"gridY": 1,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 4,
-					"gridY": 2,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 5,
-					"gridY": 2,
-					"type": "undertow"
-				},
-				{
-					"gridX": 6,
-					"gridY": 2,
 					"type": "obstacle"
 				},
 				{
 					"gridX": 3,
-					"gridY": 4,
-					"type": "undertow"
-				},
-				{
-					"gridX": 5,
-					"gridY": 4,
-					"type": "undertow"
-				},
-				{
-					"gridX": 2,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 5,
-					"gridY": 5,
+					"gridY": 6,
 					"type": "obstacle"
 				},
 				{
 					"gridX": 1,
-					"gridY": 6,
+					"gridY": 7,
 					"type": "obstacle"
 				},
 				{
-					"gridX": 5,
-					"gridY": 6,
+					"gridX": 3,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 8,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX": 4,
-					"gridY": 4,
+					"gridX": 5,
+					"gridY": 5,
 					"type": "character"
 				},
 				{
-					"gridX": 7,
-					"gridY": 4,
+					"gridX": 8,
+					"gridY": 5,
 					"type": "collectable"
 				},
 				{
-					"gridX": 1,
-					"gridY": 4,
+					"gridX": 0,
+					"gridY": 8,
 					"type": "collectable"
 				}
 			]
@@ -1600,15 +1600,15 @@
 					"type": "collectable"
 				},
 				{
-					"gridX": 244,
+					"gridX": 24,
 					"gridY": 224,
-					"text": "If a platform is on a 'hotspot'\nit can only be jumped on once.\nAfter that it becomes an Obstacle.",
+					"text": ">>     I call those 'hotspots'.\n>>     A platform on one of those will --\n>>     - become an obstacle after one jump.",
 					"type": "textblock",
 					"pause": 1000,
+					"speed": 40,
 					"format": {
 						"size": 16,
-						"align": "center",
-						"color": "#0000DD"
+						"align": "left"
 					}
 				}
 			]
@@ -2084,156 +2084,6 @@
 			]
 		},
 		{
-			"name": "approach with care",
-			"type": "level",
-			"stage": "operations",
-			"max": 15,
-			"map": [
-				{
-					"gridX": 8,
-					"gridY": 0,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 7,
-					"gridY": 1,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 8,
-					"gridY": 1,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 7,
-					"gridY": 2,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 8,
-					"gridY": 2,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 6,
-					"gridY": 3,
-					"type": "hotspot"
-				},
-				{
-					"gridX": 7,
-					"gridY": 3,
-					"type": "hotspot"
-				},
-				{
-					"gridX": 5,
-					"gridY": 4,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 6,
-					"gridY": 4,
-					"type": "obstacle"
-				},
-				{
-					"gridX": "-2",
-					"gridY": 4,
-					"type": "obstacle"
-				},
-				{
-					"gridX": "-1",
-					"gridY": 4,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 4,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": "-2",
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": "-1",
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 0,
-					"gridY": 6,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 1,
-					"gridY": 6,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 2,
-					"gridY": 6,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 3,
-					"gridY": 6,
-					"type": "hotspot"
-				},
-				{
-					"gridX": 4,
-					"gridY": 6,
-					"type": "obstacle"
-				},
-				{
-					"gridX": "-2",
-					"gridY": 6,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 0,
-					"gridY": 7,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 2,
-					"gridY": 7,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 3,
-					"gridY": 7,
-					"type": "hotspot"
-				},
-				{
-					"gridX": "-1",
-					"gridY": 7,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 0,
-					"gridY": 8,
-					"type": "hotspot"
-				}
-			],
-			"entities": [
-				{
-					"gridX": 4,
-					"gridY": 4,
-					"type": "character"
-				},
-				{
-					"gridX": 5,
-					"gridY": 5,
-					"type": "collectable"
-				},
-				{
-					"gridX": 1,
-					"gridY": 7,
-					"type": "collectable"
-				}
-			]
-		},
-		{
 			"name": "bow and arrow",
 			"type": "level",
 			"stage": "operations",
@@ -2454,16 +2304,205 @@
 			]
 		},
 		{
-			"name": "blank",
+			"name": "approach with care",
 			"type": "level",
-			"stage": "medical",
-			"max": 3,
-			"map": [],
+			"stage": "operations",
+			"max": 15,
+			"map": [
+				{
+					"gridX": 8,
+					"gridY": 0,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 7,
+					"gridY": 1,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 8,
+					"gridY": 1,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 7,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 8,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 3,
+					"type": "hotspot"
+				},
+				{
+					"gridX": 7,
+					"gridY": 3,
+					"type": "hotspot"
+				},
+				{
+					"gridX": 5,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": "-2",
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": "-1",
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 4,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": "-2",
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": "-1",
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 0,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 1,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 6,
+					"type": "hotspot"
+				},
+				{
+					"gridX": 4,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": "-2",
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 0,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 7,
+					"type": "hotspot"
+				},
+				{
+					"gridX": "-1",
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 0,
+					"gridY": 8,
+					"type": "hotspot"
+				}
+			],
 			"entities": [
 				{
 					"gridX": 4,
 					"gridY": 4,
 					"type": "character"
+				},
+				{
+					"gridX": 5,
+					"gridY": 5,
+					"type": "collectable"
+				},
+				{
+					"gridX": 1,
+					"gridY": 7,
+					"type": "collectable"
+				}
+			]
+		},
+		{
+			"name": "interception",
+			"type": "level",
+			"stage": "medical",
+			"max": 6,
+			"map": [
+				{
+					"gridX": 3,
+					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 5,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 5,
+					"gridY": 3,
+					"type": "character"
+				},
+				{
+					"gridX": 2,
+					"gridY": 7,
+					"type": "specimen",
+					"direction": "northeast"
+				},
+				{
+					"gridX": 24,
+					"gridY": 256,
+					"text": ">>     Be careful with the specimen please -\n>>     - -  they  . . . move . . .\n",
+					"type": "textblock",
+					"speed": 40,
+					"pause": 1000,
+					"format": {
+						"size": 16,
+						"align": "left"
+					}
 				}
 			]
 		},
@@ -2579,14 +2618,24 @@
 			]
 		},
 		{
-			"name": "blank",
+			"name": "rush",
 			"type": "level",
 			"stage": "medical",
-			"max": 20,
+			"max": 10,
 			"map": [
 				{
-					"gridX": 5,
-					"gridY": 4,
+					"gridX": 3,
+					"gridY": 2,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 1,
+					"gridY": 5,
 					"type": "obstacle"
 				},
 				{
@@ -2595,17 +2644,131 @@
 					"type": "obstacle"
 				},
 				{
-					"gridX": 3,
+					"gridX": 1,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 0,
+					"gridY": 8,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 0,
+					"gridY": 9,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 0,
+					"gridY": 3,
+					"type": "specimen",
+					"direction": "east"
+				},
+				{
+					"gridX": -2,
 					"gridY": 5,
+					"type": "specimen",
+					"direction": "east"
+				},
+				{
+					"gridX": -2,
+					"gridY": 7,
+					"type": "specimen",
+					"direction": "east"
+				}
+			]
+		},
+		{
+			"name": "scattershot",
+			"type": "level",
+			"stage": "medical",
+			"max": 12,
+			"map": [
+				{
+					"gridX": 5,
+					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 4,
 					"type": "obstacle"
 				},
 				{
 					"gridX": 6,
-					"gridY": 5,
+					"gridY": 4,
 					"type": "obstacle"
 				},
 				{
 					"gridX": 4,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 7,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 2,
+					"type": "character"
+				},
+				{
+					"gridX": 3,
+					"gridY": 2,
+					"type": "specimen",
+					"direction": "southeast"
+				}
+			]
+		},
+		{
+			"name": "inside out",
+			"type": "level",
+			"stage": "medical",
+			"max": 12,
+			"map": [
+				{
+					"gridX": 1,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 1,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
 					"gridY": 6,
 					"type": "obstacle"
 				},
@@ -2615,27 +2778,28 @@
 					"type": "obstacle"
 				},
 				{
-					"gridX": 5,
+					"gridX": 2,
 					"gridY": 7,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 5,
-					"gridY": 8,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
 					"gridX": 4,
-					"gridY": 3,
+					"gridY": 4,
 					"type": "character"
 				},
 				{
-					"gridX": 3,
-					"gridY": 3,
+					"gridX": 2,
+					"gridY": 2,
 					"type": "specimen",
 					"direction": "southeast"
+				},
+				{
+					"gridX": -3,
+					"gridY": 8,
+					"type": "specimen",
+					"direction": "northeast"
 				}
 			]
 		},
@@ -2698,69 +2862,6 @@
 					"gridY": 5,
 					"type": "specimen",
 					"direction": "west"
-				}
-			]
-		},
-		{
-			"name": "blank",
-			"type": "level",
-			"stage": "medical",
-			"max": 14,
-			"map": [
-				{
-					"gridX": 6,
-					"gridY": 5,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 5,
-					"gridY": 6,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 1,
-					"gridY": 7,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 2,
-					"gridY": 7,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 5,
-					"gridY": 7,
-					"type": "obstacle"
-				},
-				{
-					"gridX": 2,
-					"gridY": 8,
-					"type": "obstacle"
-				}
-			],
-			"entities": [
-				{
-					"gridX": 4,
-					"gridY": 4,
-					"type": "character"
-				},
-				{
-					"gridX": 3,
-					"gridY": 1,
-					"type": "specimen",
-					"direction": "southeast"
-				},
-				{
-					"gridX": 8,
-					"gridY": 1,
-					"type": "specimen",
-					"direction": "southwest"
-				},
-				{
-					"gridX": -1,
-					"gridY": 5,
-					"type": "specimen",
-					"direction": "east"
 				}
 			]
 		},
@@ -2865,6 +2966,231 @@
 					"direction": "northwest"
 				}
 			]
+		},
+		{
+			"name": "convergence",
+			"type": "level",
+			"stage": "medical",
+			"max": 14,
+			"map": [
+				{
+					"gridX": 6,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 1,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 2,
+					"gridY": 8,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 3,
+					"gridY": 1,
+					"type": "specimen",
+					"direction": "southeast"
+				},
+				{
+					"gridX": 8,
+					"gridY": 1,
+					"type": "specimen",
+					"direction": "southwest"
+				},
+				{
+					"gridX": -1,
+					"gridY": 5,
+					"type": "specimen",
+					"direction": "east"
+				}
+			]
+		},
+		{
+			"name": "rain",
+			"type": "level",
+			"stage": "medical",
+			"max": 12,
+			"map": [
+				{
+					"gridX": 8,
+					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 1,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 8,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 1,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 7,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 3,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 7,
+					"gridY": 6,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 0,
+					"gridY": 7,
+					"type": "obstacle"
+				},
+				{
+					"gridX": -1,
+					"gridY": 8,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 5,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 3,
+					"gridY": 1,
+					"type": "specimen",
+					"direction": "southeast"
+				},
+				{
+					"gridX": 4,
+					"gridY": 2,
+					"type": "specimen",
+					"direction": "southeast"
+				}
+			]
+		},
+		{
+			"name": "coincidence",
+			"type": "level",
+			"stage": "medical",
+			"max": 8,
+			"map": [
+				{
+					"gridX": 2,
+					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 7,
+					"gridY": 3,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 1,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 1,
+					"gridY": 5,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 6,
+					"gridY": 5,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 4,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 5,
+					"gridY": 2,
+					"type": "specimen",
+					"direction": "southeast"
+				},
+				{
+					"gridX": -2,
+					"gridY": 9,
+					"type": "specimen",
+					"direction": "northeast"
+				},
+				{
+					"gridX": 7,
+					"gridY": 5,
+					"type": "specimen",
+					"direction": "west"
+				}
+			]
+		},
+		{
+			"name": "endscene",
+			"type": "cutscene",
+			"stage": "end",
+			"map": [],
+			"entities": []
 		}
 	]
 }
