@@ -509,7 +509,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				console.log(c.type);
 				switch (c.type) {
 					case "box":
-						e = Object.create(Box).init(c.format, c.border, []);
+						e = Object.create(Box).init(c.format, c.border, {counter: 0, maxCount: 1000, type: "fade"});
 						for (var j = 0; j < c.contents.length; j++) {
 							var co = c.contents[j];
 							console.log(co, "blah", co.type);
@@ -1227,29 +1227,36 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	var Box = Object.create(Entity);
 	Box.z = 1;
-	Box.init = function (format, border, contents) {
+	Box.init = function (format, border, transition) {
 		for (key in format) {
 			this[key] = format[key];
 		}
 		this.border = border;
-		this.contents = contents || [];
+		this.transition = transition || {type: "none", counter: 0, maxCount: 0};
+		this.contents = [];
 		return this;
 	}
 	Box.draw = function (ctx) {
 		if (this.delay > 0 || this.duration < 0) return;
+		if (this.transition.type == "fade") {
+			ctx.globalAlpha = this.transition.counter / this.transition.maxCount; 
+		}
 		ctx.fillStyle = this.color;
 		ctx.fillRect(this.x, this.y, this.w, this.h);
 		ctx.strokeStyle = this.border.color || "black";
 		ctx.lineWidth = this.border.w || 0;
 		ctx.strokeRect(this.x, this.y, this.w, this.h);
-
 		for (var  i = 0; i < this.contents.length; i++) {
 			this.contents[i].draw(ctx);
 		}
+		ctx.globalAlpha = 1;
 	}
 	Box.update = function (dt) {
 		if (this.delay > 0) {
 			this.delay -= dt;
+		}
+		else if (this.transition.counter < this.transition.maxCount) {
+			this.transition.counter += dt;
 		}
 		else if (this.duration > 0) {
 			this.duration -= dt;
