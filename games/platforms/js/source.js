@@ -147,6 +147,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "unstable.png", frames: 4, speed: 300},
 		{path: "scenes.js"},
 		{path: "empty.png", frames: 2, speed: 1000},
+		{path: "tutorial.png", frames: 2, speed: 650, animations: 11},
 		{path: "habitation.png", frames: 2, speed: 650, animations: 11},
 		{path: "hydroponics.png", frames: 2, speed: 650, animations: 11},
 		{path: "operations.png", frames: 2, speed: 650, animations: 11},
@@ -437,7 +438,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		},
 		stageUnlock: function () {
 			for (var i = 0; i < this.scenes.length; i++) {
-				if (this.scenes[i].max) {
+				if (this.scenes[i].max && this.stages[this.scenes[i].stage] !== undefined) {
 					this.stages[this.scenes[i].stage] += this.scenes[i].max + 1000;
 				}
 			}
@@ -454,11 +455,11 @@ window.addEventListener("DOMContentLoaded", function () {
 		stageScore: function (stage) {
 			var s = 0;
 			for (var i = 0; i < this.scenes.length; i++) {
-				if (STAGES.indexOf(this.scenes[i].stage) <= STAGES.indexOf(stage)) {
+				if (STAGES.indexOf(this.scenes[i].stage) == -1) { console.log(this.scenes[i].stage, "mm")}
+				else if (STAGES.indexOf(this.scenes[i].stage) <= STAGES.indexOf(stage)) {
 					s += this.scenes[i].score || 0;
 				}
 			}
-			console.log(s);
 			return s;
 		},
 		musicLoop: function () {
@@ -505,7 +506,38 @@ window.addEventListener("DOMContentLoaded", function () {
 			for (var i = 0; i < config.entities.length; i++) {
 				var c = config.entities[i];
 				var e = undefined;
+				console.log(c.type);
 				switch (c.type) {
+					case "box":
+						e = Object.create(Box).init(c.format, c.border, []);
+						for (var j = 0; j < c.contents.length; j++) {
+							var co = c.contents[j];
+							console.log(co, "blah", co.type);
+							if (co.type == "text") {
+								var t = Object.create(Text).init(co.gridX + e.x, co.gridY + e.y, co.text, co.format, co.speed, co.delay + e.delay, co.duration);
+								e.contents.push(t);
+							} else if (co.type == "textblock") {
+								var lines = co.text.split("\n");
+								console.log(lines);
+								var start = {x: co.gridX + e.x, y: co.gridY + e.y};
+								co.speed = co.speed || 0;
+								co.pause = co.pause || 0;
+								var delay = 0 + e.delay;
+								for (var k = 0; k < lines.length; k++) {
+									var t = Object.create(Text).init(start.x, start.y, lines[k], co.format, co.speed, delay, co.duration);
+									delay += co.speed * (lines[k].length) + co.pause;
+									console.log("delayt", delay);
+									e.contents.push(t);
+									start.y += co.format.size + 4;
+								}
+							} else {
+								console.log(co.type, Resources[co.type]);
+								var t = Object.create(Entity).init(co.gridX, co.gridY, Resources[co.type]);
+								t.offset = {x: e.x, y: e.y};
+								e.contents.push(t);
+							}
+						}
+						break;
 					case "textblock":
 						var lines = c.text.split("\n");
 						var start = {x: c.gridX, y: c.gridY};
@@ -588,6 +620,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				// ADD LEVEL BUTTONS: reset, back, play
 				var b = Object.create(Button).init( 1, 0, Resources.reset);
 				b.name = "retry";
+				b.offset = {x: 0, y: -8};
 				b.callback = function () {
 					world.reset();
 				};
@@ -595,6 +628,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 				var b = Object.create(Button).init( 11, 0, Resources.help);
 				b.name = "walkthrough";
+				b.offset = {x: 0, y: -8};
 				b.callback = function () {
 					console.log("help!?");
 				};
@@ -602,6 +636,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 				var b = Object.create(Button).init( 2, 0, Resources.back);
 				b.name = "undo";
+				b.offset = {x: 0, y: -8};
 				b.callback = function () {
 					world.undo();
 				};
@@ -609,6 +644,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 				var b = Object.create(Button).init( 0, 0, Resources.play);
 				b.name = "run";
+				b.offset = {x: 0, y: -8};
 				b.callback = function () {
 					world.paused = false;
 					world.scene.platformsUsed = world.scene.count("platform");
@@ -683,6 +719,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 			} else if (s.type != "cutscene") {
 				var b = Object.create(Button).init(12, 0, Resources.menu);
+				b.offset = {x: 0, y: -8};
 				b.name = "menu";
 				if (s.type == "level")
 					b.callback = function () {	world.doScene(2); };
@@ -912,19 +949,22 @@ window.addEventListener("DOMContentLoaded", function () {
 			return this;
 		},
 		draw: function (ctx) {
-			if (this.type == "level") {
-				ctx.drawImage(Resources.bottomBar.image, 0, canvas.height - 36, canvas.width, Resources.bottomBar.image.height * GLOBALS.scale);
-				ctx.drawImage(Resources.topBar.image, 0, -8, canvas.width, Resources.bottomBar.image.height * GLOBALS.scale);
-				//ctx.fillStyle = "rgba(255,255,255,0.4)";
-				//ctx.fillRect(0,0,canvas.width,32);
-				//ctx.fillRect(0,canvas.height-28,canvas.width,canvas.height);
-			}
 			for (y in this.map) {
 				for (x in this.map[y]) {
 					if (this.map[y][x]) {
 						this.map[y][x].draw(ctx);
 					}
 				}
+			}
+			if (this.type == "level") {
+				//ctx.drawImage(Resources.bottomBar.image, 0, canvas.height - 36, canvas.width, Resources.bottomBar.image.height * GLOBALS.scale);
+				//ctx.drawImage(Resources.topBar.image, 0, -6, canvas.width, Resources.bottomBar.image.height * GLOBALS.scale);
+				ctx.fillStyle = "rgba(255,255,255,0.6)";
+				ctx.fillRect(0,0,canvas.width,32);
+				ctx.fillRect(0,canvas.height-32,canvas.width,canvas.height);
+				ctx.fillStyle = "#18140c";
+				ctx.fillRect(0,32,canvas.width,4);
+				ctx.fillRect(0,canvas.height-32,canvas.width,4);
 			}
 			var e = this.entities.sort(function (a, b) { return a.z != b.z ? a.z - b.z : (a.getPosition().y - a.offset.y) - (b.getPosition().y - b.offset.y); });
 			for (var i = 0; i < e.length; i++) {
@@ -958,10 +998,10 @@ window.addEventListener("DOMContentLoaded", function () {
 								var n = (this.uid + 1) % world.scenes.length;
 								if (world.scenes[n].stage != this.stage && !world.stageComplete(this.stage)) {
 									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2, "<Next>", {size: 60});
-									t.z = 20;
+									t.z = 100;
 									this.entities.push(t);
 									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2 - 16, "Complete all levels to unlock next stage!", {size: 20, color: "#EEEEEE"});
-									t.z = 21;
+									t.z = 101;
 									this.entities.push(t);
 								}
 								else {
@@ -975,6 +1015,7 @@ window.addEventListener("DOMContentLoaded", function () {
 								}
 								if (world.scenes[this.uid].score <= this.max) {
 									var t2 = Object.create(Text).init(canvas.width / 2, canvas.height / 2 + 60, "Perfect!", {size: 72, color: "gold"}, 10, 300);
+									t2.z = 100;
 									this.entities.push(t2);
 								}
 								world.save();
@@ -1184,6 +1225,39 @@ window.addEventListener("DOMContentLoaded", function () {
 		}
 	};
 
+	var Box = Object.create(Entity);
+	Box.z = 1;
+	Box.init = function (format, border, contents) {
+		for (key in format) {
+			this[key] = format[key];
+		}
+		this.border = border;
+		this.contents = contents || [];
+		return this;
+	}
+	Box.draw = function (ctx) {
+		if (this.delay > 0 || this.duration < 0) return;
+		ctx.fillStyle = this.color;
+		ctx.fillRect(this.x, this.y, this.w, this.h);
+		ctx.strokeStyle = this.border.color || "black";
+		ctx.lineWidth = this.border.w || 0;
+		ctx.strokeRect(this.x, this.y, this.w, this.h);
+
+		for (var  i = 0; i < this.contents.length; i++) {
+			this.contents[i].draw(ctx);
+		}
+	}
+	Box.update = function (dt) {
+		if (this.delay > 0) {
+			this.delay -= dt;
+		}
+		else if (this.duration > 0) {
+			this.duration -= dt;
+		}
+		for (var  i = 0; i < this.contents.length; i++) {
+			this.contents[i].update(dt);
+		}
+	}
 	var Button = Object.create(Entity);
 	Button.type = "button";
 	Button.drawButton = Entity.draw;
@@ -1192,7 +1266,8 @@ window.addEventListener("DOMContentLoaded", function () {
 		if (this.frame == 1 && this.name) {
 			var p = this.getPosition();
 			ctx.font = "900 14px Arial";
-			ctx.fillStyle = "black";
+			ctx.fillStyle = "#f4f0e8";
+			ctx.textAlign = "center";
 			ctx.fillText(this.name, p.x, p.y + 24);
 		}
 	}

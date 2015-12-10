@@ -82,9 +82,9 @@
 			]
 		},
 		{
-			"name": "simple enough",
+			"name": "first",
 			"type": "level",
-			"stage": "habitation",
+			"stage": "tutorial",
 			"max": 2,
 			"map": [
 				{
@@ -112,55 +112,158 @@
 					"type": "collectable"
 				},
 				{
-					"gridX": 24,
-					"gridY": 216,
-					"text": ">>     I've put down platforms to land on - \n>>     - making a path TO the object, and BACK.\n\n>>     Just press 'RUN' to send me down.",
-					"type": "textblock",
-					"speed": 40,
-					"pause": 1000,
+					"type": "box",
 					"format": {
-						"size": 16,
-						"align": "left"
-					}
+						"x": 130, "y": 60, "h": 30, "w": 280, "color": "rgba(255,255,255,0.6)", "delay": 500
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "This is the view from above",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 10, "y": 100, "h": 30, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 2000
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "^ Press 'RUN' to send down the astronaut",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 50, "y": 200, "h": 30, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 3200
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "The platforms direct you THERE and BACK",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
 				}
-
 			]
 		},
 		{
-			"name": "an inconvenience",
+			"name": "second",
 			"type": "level",
 			"stage": "habitation",
 			"max": 4,
-			"map": [
-				{
-					"gridX": 8,
-					"gridY": 4,
-					"type": "obstacle"
-				}
+			"map": [								
 			],
 			"entities": [
 				{
-					"gridX": 7,
-					"gridY": 4,
+					"gridX": 4,
+					"gridY": 5,
 					"type": "character"
 				},
 				{
-					"gridX": 9,
-					"gridY": 4,
+					"gridX": 8,
+					"gridY": 3,
 					"type": "collectable"
 				},
 				{
-					"gridX": 24,
-					"gridY": 192,
-					"text": ">>     That's an OBSTACLE.\n>>     Can you make me a path around it?\n\n>>     Just CLICK and HOLD\n>>     Move the MOUSE to change direction.",
-					"type": "textblock",
-					"speed": 40,
-					"pause": 1000,
+					"type": "box",
 					"format": {
-						"size": 16,
-						"align": "left"
-					}
-				}
+						"x": 100, "y": 192, "h": 30, "w": 370, "color": "rgba(255,255,255,0.6)", "delay": 2400
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 362,
+							"gridY": 20,
+							"text": "To add a platform, CLICK and HOLD.",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "right"
+							}
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 10, "y": 232, "h": 30, "w": 370, "color": "rgba(255,255,255,0.6)", "delay": 4800
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "A platform will move you TWO spaces.",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 10, "y": 60, "h": 50, "w": 190, "color": "rgba(255,255,255,0.6)", "delay": 500
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "Make a path to the\nOBJECT and BACK.",
+							"type": "textblock",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 360, "y": 120, "h": 30, "w": 100, "color": "rgba(255,255,255,0.6)", "delay": 1000
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "^ (object)",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
+				}				
 			]
 		},
 		{
@@ -194,19 +297,94 @@
 					"type": "collectable"
 				},
 				{
-					"gridX": 24,
-					"gridY": 216,
-					"text": ">>     I already placed a couple platforms  .  .  .\n>>     But they're in the wrong place.\n\n>>     RIGHT-CLICK to remove any platform",
-					"type": "textblock",
-					"speed": 40,
-					"pause": 1000,
+					"type": "box",
 					"format": {
-						"size": 16,
-						"align": "left"
-					}
+						"x": 10, "y": 240, "h": 30, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 300
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "RIGHT-CLICK to remove a platform.",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
 				}
 			]
-		},		
+		},	
+		{
+			"name": "an inconvenience",
+			"type": "level",
+			"stage": "habitation",
+			"max": 4,
+			"map": [
+				{
+					"gridX": 8,
+					"gridY": 4,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 9,
+					"gridY": 4,
+					"type": "collectable"
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 10, "y": 60, "h": 50, "w": 260, "color": "rgba(255,255,255,0.6)", "delay": 200
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 252,
+							"gridY": 30,
+							"text": " - this is an OBSTACLE",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "right"
+							}
+						},
+						{
+							"gridX": 0,
+							"gridY": 0,
+							"type": "obstacle"
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 10, "y": 240, "h": 30, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 1600
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "You will need to make a path AROUND it.",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
+				}
+			]
+		},
 		{
 			"name": "all lined up",
 			"type": "level",
@@ -214,12 +392,12 @@
 			"max": 6,
 			"map": [
 				{
-					"gridX":0,
+					"gridX":1,
 					"gridY":4,
 					"type": "obstacle"
 				},
 				{
-					"gridX":7,
+					"gridX":6,
 					"gridY":4,
 					"type": "obstacle"
 				}
@@ -236,17 +414,43 @@
 					"type": "collectable"
 				},
 				{
-					"gridX": 24,
-					"gridY": 192,
-					"text": ">>     A platform will move me TWO spaces.\n>>     But if there is an obstacle in the way -\n>>     - it will only move me ONE space.\n\n>>     You can use this to adjust my movement.",
-					"type": "textblock",
-					"speed": 40,
-					"pause": 1000,
+					"type": "box",
 					"format": {
-						"size": 16,
-						"align": "left"
-					}
-				}			
+						"x": 10, "y": 180, "h": 50, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 300
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "If there is an obstacle blocking a jump\nYou will only jump ONE space.",
+							"type": "textblock",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 210, "y": 60, "h": 30, "w": 260, "color": "rgba(255,255,255,0.6)", "delay": 2200
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 252,
+							"gridY": 20,
+							"text": "Use this to adjust your path.",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "right"
+							}
+						}
+					]
+				}				
 			]
 		},
 		{
@@ -818,17 +1022,48 @@
 					"type": "collectable"
 				},
 				{
-					"gridX":24,
-					"gridY":244,
-					"text": ">>     Watch out for the undertow, ok?\n>>     It'll turn a platform each time I jump.",
-					"type": "textblock",
-					"pause": 1000,
-					"speed": 40,
+					"type": "box",
 					"format": {
-						"size": 16,
-						"align": "left"
-					}
-				}
+						"x": 70, "y": 220, "h": 50, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 500
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 392,
+							"gridY": 30,
+							"text": " - this is an space with an UNDERTOW",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "right"
+							}
+						},
+						{
+							"type": "undertow",
+							"gridX": 0,
+							"gridY": 0
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 10, "y": 60, "h": 70, "w": 105, "color": "rgba(255,255,255,0.6)", "delay": 1700
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "It will turn\neach time\nyou JUMP",
+							"type": "textblock",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
+				}				
 			]
 		},
 		{
@@ -1600,16 +1835,47 @@
 					"type": "collectable"
 				},
 				{
-					"gridX": 24,
-					"gridY": 224,
-					"text": ">>     I call those 'hotspots'.\n>>     A platform on one of those will --\n>>     - become an obstacle after one jump.",
-					"type": "textblock",
-					"pause": 1000,
-					"speed": 40,
+					"type": "box",
 					"format": {
-						"size": 16,
-						"align": "left"
-					}
+						"x": 10, "y": 60, "h": 50, "w": 240, "color": "rgba(255,255,255,0.6)", "delay": 200
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 38,
+							"gridY": 30,
+							"text": " - this is a HOTSPOT",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						},
+						{
+							"type": "hotspot",
+							"gridX": 0,
+							"gridY": 0
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 10, "y": 220, "h": 50, "w": 360, "color": "rgba(255,255,255,0.6)", "delay": 1500
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "A platform on a HOTSPOT turns into an\nOBSTACLE after being jumped on.",
+							"type": "textblock",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
 				}
 			]
 		},
