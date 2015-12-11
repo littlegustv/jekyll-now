@@ -259,19 +259,29 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 50, "y": 200, "h": 30, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 3200
+						"x": 10, "y": 200, "h": 50, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 3200
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
-							"gridX": 8,
-							"gridY": 20,
-							"text": "The platforms get you THERE and BACK.",
+							"gridX": 452,
+							"gridY": 30,
+							"text": " - the platforms will get you THERE and BACK.",
 							"type": "text",
 							"format": {
 								"size": 16,
-								"align": "left"
+								"align": "right"
 							}
+						},
+						{
+							"gridX": 0,
+							"gridY": 0,
+							"type": "platform"
+						},
+						{
+							"gridX": 0,
+							"gridY": 0,
+							"type": "directions"
 						}
 					]
 				}
