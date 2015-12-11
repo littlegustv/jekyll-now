@@ -136,8 +136,6 @@ window.addEventListener("DOMContentLoaded", function () {
 	var Resources = {};
 	var resourceInfo = [
 		{path: "splash.png"},
-		{path: "bottomBar.png"},
-		{path: "topBar.png"},
 		{path: "platform.png", frames: 2, speed: 1000},
 		{path: "directions.png", frames: 2, speed: 1000, animations: 6},
 		{path: "character.png", frames: 2, speed: 500, animations: 6},
@@ -161,7 +159,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "menu.png", frames: 2, speed: 500},
 		{path: "lock.png"},
 		{path: "mute.png", frames: 2, speed: 500, animations: 2},
-		{path: "blank.png"},
+		{path: "cursor.png", frames: 2, speed: 500, animations: 6},
 		{path: "temp.png", frames: 2, speed: 500, animations: 6},
 		{path: "soundtrack.ogg"},
 		{path: "soundtrackFast.ogg"},
@@ -887,9 +885,13 @@ window.addEventListener("DOMContentLoaded", function () {
 			        cursor.direction = DIRECTION[directions[this.mouse.angle]];
 			        cursor.opacity = 0.5;
 			        cursor.draw(ctx);
-			        var d1 = Object.create(Entity).init(m.x + cursor.direction.x, m.y + cursor.direction.y, Resources.blank);
+			        var d1 = Object.create(Entity).init(m.x + cursor.direction.x, m.y + cursor.direction.y, Resources.cursor);
+			        d1.animation = this.mouse.angle;
+			        d1.frame = 0;
 			        d1.draw(ctx);
-					var d2 = Object.create(Entity).init(m.x + 2 * cursor.direction.x, m.y + 2 * cursor.direction.y, Resources.blank);
+					var d2 = Object.create(Entity).init(m.x + 2 * cursor.direction.x, m.y + 2 * cursor.direction.y, Resources.cursor);
+			        d2.animation = this.mouse.angle;
+			        d2.frame = 1;
 			        d2.draw(ctx);			       
 		    	}
 			}
@@ -1529,7 +1531,11 @@ window.addEventListener("DOMContentLoaded", function () {
 	Specimen.jumping = GLOBALS.jumpSpeed;
 	Specimen.distance = 1;
 	Specimen.update = function (dt) {
-		if (!this.next) this.next = Object.create(Entity).init(this.gridX + this.distance * this.direction.x, this.gridY + this.distance * this.direction.y, Resources.blank);
+		if (!this.next) {
+			this.next = Object.create(Entity).init(this.gridX + this.distance * this.direction.x, this.gridY + this.distance * this.direction.y, Resources.cursor);
+			this.animation = directions.indexOf(getDirectionName(this.direction));
+			this.next.frame = 1;
+		}
 		this.animate(dt);
 		if (world.paused) return;
 		if (this.jumping > 0) {

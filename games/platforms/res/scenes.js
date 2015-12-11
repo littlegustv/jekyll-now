@@ -2759,16 +2759,23 @@
 					"direction": "northeast"
 				},
 				{
-					"gridX": 24,
-					"gridY": 256,
-					"text": ">>     Be careful with the specimen please -\n>>     - -  they  . . . move . . .\n",
-					"type": "textblock",
-					"speed": 40,
-					"pause": 1000,
+					"type": "box",
 					"format": {
-						"size": 16,
-						"align": "left"
-					}
+						"x": 10, "y": 240, "h": 30, "w": 280, "color": "rgba(255,255,255,0.6)", "delay": 500
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "Specimen move when you do.",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
 				}
 			]
 		},
