@@ -6,16 +6,23 @@
 			"map": {},
 			"entities": [
 				{
-					"gridX": 240,
-					"gridY": 64,
-					"text": "the floor is the\nSURFACE of the SUN",
-					"type": "textblock",
-					"speed": 25,
-					"pause": 100,
+					"type": "box",
 					"format": {
-						"size": 32,
-						"align": "center"
-					}
+						"x": 10, "y": 60, "h": 78, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 10
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 230,
+							"gridY": 32,
+							"text": "the floor is the\nSURFACE of the SUN",
+							"type": "textblock",
+							"format": {
+								"size": 32,
+								"align": "center"
+							}
+						}
+					]
 				}
 			]
 		},
@@ -62,22 +69,122 @@
 			]
 		},
 		{
-			"name": "habitation cutscene",
+			"name": "intro cutscene",
 			"type": "cutscene",
 			"stage": "habitation",
 			"map": [],
 			"entities": [
 				{
-					"gridX": 24,
-					"gridY": 24,
-					"text": ">< Starship Icarus IJ93.2 Mainframe Computer ><\n\n>>     <Access granted, what is your query?>\n\n>>     .  .  .  I've dropped some things - \n>>     -- on the surface on the sun.\n\n>>     - just bear with me  .  .  .\n\n>>     I have a plan.",
-					"type": "textblock",
-					"speed": 40,
-					"pause": 1000,
+					"type": "box",
 					"format": {
-						"size": 16,
-						"align": "left"
-					}
+						"x": 10, "y": 60, "h": 50, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 200
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 392,
+							"gridY": 30,
+							"text": " - you are the pilot of the Solar Explorer",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "right"
+							}
+						},
+						{
+							"gridX": 0,
+							"gridY": 0,
+							"type": "character",
+							"animation": 0
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 70, "y": 120, "h": 30, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 2000
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "somehow, you've dropped a few things . . .",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 10, "y": 160, "h": 50, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 3700
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 452,
+							"gridY": 30,
+							"text": " ... on the surface of the sun.",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "right"
+							}
+						},
+						{
+							"gridX": 0,
+							"gridY": 0,
+							"type": "habitation",
+							"animation": 2
+						},
+						{
+							"gridX": 1,
+							"gridY": 0,
+							"type": "medical",
+							"animation": 4
+						},
+						{
+							"gridX": 2,
+							"gridY": 0,
+							"type": "habitation",
+							"animation": 6
+						},
+						{
+							"gridX": 3,
+							"gridY": 0,
+							"type": "hydroponics",
+							"animation": 5
+						},
+						{
+							"gridX": 4,
+							"gridY": 0,
+							"type": "operations",
+							"animation": 3
+						}
+					]
+				},				
+				{
+					"type": "box",
+					"format": {
+						"x": 70, "y": 220, "h": 30, "w": 340, "color": "rgba(255,255,255,0.6)", "delay": 5400
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "I guess you'd better pick them up.",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
 				}
 			]
 		},
@@ -140,7 +247,7 @@
 						{
 							"gridX": 8,
 							"gridY": 20,
-							"text": "^ Press 'RUN' to send down the astronaut",
+							"text": "^ Press 'RUN' to send yourself down.",
 							"type": "text",
 							"format": {
 								"size": 16,
@@ -159,7 +266,7 @@
 						{
 							"gridX": 8,
 							"gridY": 20,
-							"text": "The platforms direct you THERE and BACK",
+							"text": "The platforms get you THERE and BACK.",
 							"type": "text",
 							"format": {
 								"size": 16,
@@ -480,6 +587,25 @@
 					"gridX":4,
 					"gridY":5,
 					"type": "collectable"
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 350, "y": 60, "h": 30, "w": 120, "color": "rgba(255,255,255,0.6)", "delay": 400
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "Good luck!",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
 				}
 			]
 		},
@@ -3463,7 +3589,71 @@
 			"type": "cutscene",
 			"stage": "end",
 			"map": [],
-			"entities": []
+			"entities": [
+				{
+					"type": "box",
+					"format": {
+						"x": 10, "y": 60, "h": 40, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 10
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 230,
+							"gridY": 32,
+							"text": "Complete!",
+							"type": "text",
+							"format": {
+								"size": 32,
+								"align": "center"
+							}
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 10, "y": 120, "h": 30, "w": 320, "color": "rgba(255,255,255,0.6)", "delay": 1000
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "all items accounted for!",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 120, "y": 200, "h": 50, "w": 350, "color": "rgba(255,255,255,0.6)", "delay": 2400
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 342,
+							"gridY": 32,
+							"text": " - congratulations and thank you!",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "right"
+							}
+						},
+						{
+							"gridX": 0,
+							"gridY": 0,
+							"type": "character",
+							"animation": 2
+						}
+					]
+				}
+			]
 		}
 	]
 }

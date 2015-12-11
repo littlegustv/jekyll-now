@@ -135,7 +135,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	var Resources = {};
 	var resourceInfo = [
-		{path: "splash.png"},
+		//{path: "splash.png"},
 		{path: "platform.png", frames: 2, speed: 1000},
 		{path: "directions.png", frames: 2, speed: 1000, animations: 6},
 		{path: "character.png", frames: 2, speed: 500, animations: 6},
@@ -529,8 +529,9 @@ window.addEventListener("DOMContentLoaded", function () {
 									start.y += co.format.size + 4;
 								}
 							} else {
-								console.log(co.type, Resources[co.type]);
+								console.log(co.type, Resources[co.type], co.animation);
 								var t = Object.create(Entity).init(co.gridX, co.gridY, Resources[co.type]);
+								t.animation = co.animation != undefined ? co.animation : 0;
 								t.offset = {x: e.x, y: e.y};
 								e.contents.push(t);
 							}
@@ -1533,7 +1534,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	Specimen.update = function (dt) {
 		if (!this.next) {
 			this.next = Object.create(Entity).init(this.gridX + this.distance * this.direction.x, this.gridY + this.distance * this.direction.y, Resources.cursor);
-			this.animation = directions.indexOf(getDirectionName(this.direction));
+			this.next.animation = directions.indexOf(getDirectionName(this.direction));
 			this.next.frame = 1;
 		}
 		this.animate(dt);
