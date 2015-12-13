@@ -189,16 +189,28 @@
 			]
 		},
 		{
-			"name": "first",
+			"name": "for you",
 			"type": "level",
 			"stage": "tutorial",
-			"max": 2,
+			"max": 4,
 			"map": [
 				{
 					"gridX": 4,
 					"gridY": 5,
 					"type": "platform",
+					"direction": "northeast"
+				},
+				{
+					"gridX": 6,
+					"gridY": 3,
+					"type": "platform",
 					"direction": "east"
+				},
+				{
+					"gridX": 8,
+					"gridY": 3,
+					"type": "platform",
+					"direction": "southwest"
 				},
 				{
 					"gridX": 6,
@@ -214,21 +226,21 @@
 					"type": "character"
 				},
 				{
-					"gridX": 6,
-					"gridY": 5,
+					"gridX": 8,
+					"gridY": 3,
 					"type": "collectable"
 				},
 				{
 					"type": "box",
 					"format": {
-						"x": 130, "y": 60, "h": 30, "w": 280, "color": "rgba(255,255,255,0.6)", "delay": 500
+						"x": 40, "y": 150, "h": 30, "w": 190, "color": "rgba(255,255,255,0.6)", "delay": 100
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
 							"gridX": 8,
 							"gridY": 20,
-							"text": "This is the view from above",
+							"text": "You'll start here >>",
 							"type": "text",
 							"format": {
 								"size": 16,
@@ -240,14 +252,14 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 100, "h": 30, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 2000
+						"x": 10, "y": 50, "h": 30, "w": 160, "color": "rgba(255,255,255,0.6)", "delay": 3500
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
 							"gridX": 8,
 							"gridY": 20,
-							"text": "^ Press 'RUN' to send yourself down.",
+							"text": "^ press 'RUN'",
 							"type": "text",
 							"format": {
 								"size": 16,
@@ -259,7 +271,7 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 200, "h": 50, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 3200
+						"x": 10, "y": 220, "h": 50, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 1800
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
@@ -288,7 +300,7 @@
 			]
 		},
 		{
-			"name": "second",
+			"name": "make a path",
 			"type": "level",
 			"stage": "habitation",
 			"max": 4,
@@ -296,45 +308,26 @@
 			],
 			"entities": [
 				{
-					"gridX": 4,
+					"gridX": 1,
 					"gridY": 5,
 					"type": "character"
 				},
 				{
-					"gridX": 8,
+					"gridX": 5,
 					"gridY": 3,
 					"type": "collectable"
 				},
 				{
 					"type": "box",
 					"format": {
-						"x": 100, "y": 192, "h": 30, "w": 370, "color": "rgba(255,255,255,0.6)", "delay": 2400
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 362,
-							"gridY": 20,
-							"text": "To add a platform, CLICK and HOLD.",
-							"type": "text",
-							"format": {
-								"size": 16,
-								"align": "right"
-							}
-						}
-					]
-				},
-				{
-					"type": "box",
-					"format": {
-						"x": 10, "y": 232, "h": 30, "w": 370, "color": "rgba(255,255,255,0.6)", "delay": 4800
+						"x": 100, "y": 192, "h": 30, "w": 370, "color": "rgba(255,255,255,0.6)", "delay": 100
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
 							"gridX": 8,
 							"gridY": 20,
-							"text": "A platform will move you TWO spaces.",
+							"text": "To add a platform, CLICK and HOLD -",
 							"type": "text",
 							"format": {
 								"size": 16,
@@ -346,34 +339,34 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 60, "h": 50, "w": 190, "color": "rgba(255,255,255,0.6)", "delay": 500
+						"x": 10, "y": 232, "h": 30, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 1500
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
 							"gridX": 8,
 							"gridY": 20,
-							"text": "Make a path to the\nOBJECT and BACK.",
+							"text": "- move the MOUSE to change the direction.",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 290, "y": 90, "h": 75, "w": 135, "color": "rgba(255,255,255,0.6)", "delay": 3500
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "< this is the\nOBJECT that\nyou need",
 							"type": "textblock",
-							"format": {
-								"size": 16,
-								"align": "left"
-							}
-						}
-					]
-				},
-				{
-					"type": "box",
-					"format": {
-						"x": 360, "y": 120, "h": 30, "w": 100, "color": "rgba(255,255,255,0.6)", "delay": 1000
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 8,
-							"gridY": 20,
-							"text": "^ (object)",
-							"type": "text",
 							"format": {
 								"size": 16,
 								"align": "left"
@@ -506,7 +499,7 @@
 			"name": "all lined up",
 			"type": "level",
 			"stage": "habitation",
-			"max": 6,
+			"max": 4,
 			"map": [
 				{
 					"gridX":1,
@@ -526,7 +519,7 @@
 					"type": "character"
 				},
 				{
-					"gridX":5,
+					"gridX":3,
 					"gridY":4,
 					"type": "collectable"
 				},
@@ -1111,24 +1104,19 @@
 			"max": 6,
 			"map": [
 				{
-					"gridX":5,
+					"gridX":8,
 					"gridY":2,
 					"type": "obstacle"
 				},
 				{
-					"gridX":6,
+					"gridX":9,
 					"gridY":3,
 					"type": "obstacle"
 				},
 				{
-					"gridX":4,
+					"gridX":7,
 					"gridY":4,
 					"type": "undertow"
-				},
-				{
-					"gridX":2,
-					"gridY":5,
-					"type": "obstacle"
 				},
 				{
 					"gridX":5,
@@ -1136,24 +1124,29 @@
 					"type": "obstacle"
 				},
 				{
-					"gridX":3,
+					"gridX":8,
+					"gridY":5,
+					"type": "obstacle"
+				},
+				{
+					"gridX":6,
 					"gridY":6,
 					"type": "obstacle"
 				}
 			],
 			"entities": [
 				{
-					"gridX":2,
+					"gridX":5,
 					"gridY":4,
 					"type": "character"
 				},
 				{
-					"gridX":6,
+					"gridX":9,
 					"gridY":4,
 					"type": "collectable"
 				},
 				{
-					"gridX":4,
+					"gridX":7,
 					"gridY":6,
 					"type": "collectable"
 				},
@@ -1167,7 +1160,7 @@
 						{
 							"gridX": 392,
 							"gridY": 30,
-							"text": " - this is an space with an UNDERTOW",
+							"text": " - this is a space with an UNDERTOW",
 							"type": "text",
 							"format": {
 								"size": 16,
@@ -1184,14 +1177,14 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 60, "h": 70, "w": 105, "color": "rgba(255,255,255,0.6)", "delay": 1700
+						"x": 10, "y": 60, "h": 100, "w": 160, "color": "rgba(255,255,255,0.6)", "delay": 1700
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
 							"gridX": 8,
 							"gridY": 20,
-							"text": "It will turn\neach time\nyou JUMP",
+							"text": "A platform on an\nUNDERTOW will\nTURN each time\nyou jump.",
 							"type": "textblock",
 							"format": {
 								"size": 16,
@@ -1706,7 +1699,7 @@
 			"name": "when you follow the lead",
 			"type": "level",
 			"stage": "hydroponics",
-			"max": 17,
+			"max": 14,
 			"map": [
 				{
 					"gridX": 8,
@@ -1806,7 +1799,7 @@
 			"name": "when you have to choose",
 			"type": "level",
 			"stage": "hydroponics",
-			"max": 16,
+			"max": 15,
 			"map": [
 				{
 					"gridX":6,
@@ -2184,7 +2177,7 @@
 			"name": "can you plan to start and stop?",
 			"type": "level",
 			"stage": "operations",
-			"max": 9,
+			"max": 8,
 			"map": [
 				{
 					"gridX": 4,
@@ -2284,7 +2277,7 @@
 			"name": "trapdoor",
 			"type": "level",
 			"stage": "operations",
-			"max": 14,
+			"max": 13,
 			"map": [
 				{
 					"gridX": "10",
@@ -2690,6 +2683,16 @@
 					"gridX": 5,
 					"gridY": 7,
 					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 8,
+					"type": "obstacle"
+				},
+				{
+					"gridX": 5,
+					"gridY": 9,
+					"type": "obstacle"
 				}
 			],
 			"entities": [
@@ -2919,7 +2922,7 @@
 			"name": "catch me",
 			"type": "level",
 			"stage": "medical",
-			"max": 10,
+			"max": 12,
 			"map": [
 				{
 					"gridX": 6,

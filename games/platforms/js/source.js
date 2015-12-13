@@ -145,7 +145,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "unstable.png", frames: 4, speed: 300},
 		{path: "scenes.js"},
 		{path: "empty.png", frames: 2, speed: 1000},
-		{path: "tutorial.png", frames: 2, speed: 650, animations: 11},
+		{path: "tutorial.png", frames: 2, speed: 650, animations: 1},
 		{path: "habitation.png", frames: 2, speed: 650, animations: 11},
 		{path: "hydroponics.png", frames: 2, speed: 650, animations: 11},
 		{path: "operations.png", frames: 2, speed: 650, animations: 11},
@@ -158,6 +158,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "play.png", frames: 2, speed: 500},
 		{path: "menu.png", frames: 2, speed: 500},
 		{path: "lock.png"},
+		{path: "blocked.png"},
 		{path: "mute.png", frames: 2, speed: 500, animations: 2},
 		{path: "cursor.png", frames: 2, speed: 500, animations: 6},
 		{path: "temp.png", frames: 2, speed: 500, animations: 6},
@@ -886,14 +887,27 @@ window.addEventListener("DOMContentLoaded", function () {
 			        cursor.direction = DIRECTION[directions[this.mouse.angle]];
 			        cursor.opacity = 0.5;
 			        cursor.draw(ctx);
-			        var d1 = Object.create(Entity).init(m.x + cursor.direction.x, m.y + cursor.direction.y, Resources.cursor);
-			        d1.animation = this.mouse.angle;
-			        d1.frame = 0;
-			        d1.draw(ctx);
-					var d2 = Object.create(Entity).init(m.x + 2 * cursor.direction.x, m.y + 2 * cursor.direction.y, Resources.cursor);
-			        d2.animation = this.mouse.angle;
-			        d2.frame = 1;
-			        d2.draw(ctx);			       
+   			        var o1 = this.scene.map[m.y + cursor.direction.y][m.x + cursor.direction.x];
+			        var o2 = this.scene.map[m.y + 2*cursor.direction.y][m.x + cursor.direction.x * 2];
+			        if (o1 && o1.type == "obstacle") {
+				        var d1 = Object.create(Entity).init(m.x + cursor.direction.x, m.y + cursor.direction.y, Resources.blocked);
+				        d1.offset = {x: 0, y: -4};
+				        d1.draw(ctx);			        	
+			        } else if (o2 && o2.type == "obstacle") {
+				        var d1 = Object.create(Entity).init(m.x + cursor.direction.x, m.y + cursor.direction.y, Resources.cursor);
+				        d1.animation = this.mouse.angle;
+				        d1.frame = 1;
+				        d1.draw(ctx);			    		
+			    	} else {
+				        var d1 = Object.create(Entity).init(m.x + cursor.direction.x, m.y + cursor.direction.y, Resources.cursor);
+				        d1.animation = this.mouse.angle;
+				        d1.frame = 0;
+				        d1.draw(ctx);
+						var d2 = Object.create(Entity).init(m.x + 2 * cursor.direction.x, m.y + 2 * cursor.direction.y, Resources.cursor);
+				        d2.animation = this.mouse.angle;
+				        d2.frame = 1;
+				        d2.draw(ctx);
+		     		}		       
 		    	}
 			}
 			/*
@@ -1435,10 +1449,11 @@ window.addEventListener("DOMContentLoaded", function () {
 		this.jumping = GLOBALS.jumpSpeed;
 		playSound(Resources.fall);
      	canvas.style.webkitFilter = "invert(100%)";
+     	world.paused = true;
 		setTimeout(function () { 
    			canvas.style.webkitFilter = "invert(0%)";
 			world.reset(); 
-		}, 100);
+		}, 500);
 	}
 	Character.update = function (dt) {
 		if (world.paused) return;
