@@ -4,7 +4,7 @@ title: DareDevil Comes So Close To Being Excellent
 tags: review tv marvel
 ---
 
-### Sadly that doesn't even make it that good.
+### But you missed the chance!  How could you miss it, it was right there?!
 
 ![Image here](http://assets1.ignimgs.com/2015/04/08/daredevil-1280jpg-782297_1280w.jpg "it's him!")
 
@@ -18,7 +18,7 @@ Already weakness is showing, but there is some saving grace to be found.  DareDe
 
 The intro sequence commences, and my faith is again tempted (if that's possible).  He's not a nice man.  He helps people, fights criminals, all those - but his motivations are not pure.  He's got the devil in him.  It's interesting.
 
-### How it all falls down.
+### It was there, no, back a bit.  Right at the beginning.
 
 The devil is in the details, so to speak.  The monologue that opens (!) the show is powerful because it has details, and it implies even more.  Details about a past, about motivation, about passions and character and morality.  But most of the content of the show, as it begins to fill in those details for us and even add more that we didn't ask for - most of that is banal and cliched and boring.  The story shines when confronting the difficulty of acting - being able to act - of not being sure of why you do something or if it is right or wrong.  So why does it throw away this gem whenever it gets the chance?
 
