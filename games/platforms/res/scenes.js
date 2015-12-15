@@ -192,6 +192,7 @@
 			"name": "for you",
 			"type": "level",
 			"stage": "tutorial",
+			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=4s",
 			"max": 4,
 			"map": [
 				{
@@ -303,6 +304,7 @@
 			"name": "make a path",
 			"type": "level",
 			"stage": "habitation",
+			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=13s",			
 			"max": 4,
 			"map": [								
 			],
@@ -380,6 +382,7 @@
 			"name": "remove what's in the way",
 			"type": "level",
 			"stage": "habitation",
+			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=25s",
 			"max": 2,
 			"map": [
 				{
@@ -431,6 +434,7 @@
 			"name": "an inconvenience",
 			"type": "level",
 			"stage": "habitation",
+			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=33s",
 			"max": 4,
 			"map": [
 				{
@@ -499,6 +503,7 @@
 			"name": "all lined up",
 			"type": "level",
 			"stage": "habitation",
+			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=43s",
 			"max": 4,
 			"map": [
 				{
@@ -567,6 +572,7 @@
 			"name": "direction is important",
 			"type": "level",
 			"stage": "habitation",
+			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=54s",
 			"max": 7,
 			"map": [
 				{
@@ -616,6 +622,7 @@
 			"name": "don't waste time",
 			"type": "level",
 			"stage": "habitation",
+			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=1m8s",
 			"max": 7,
 			"map": [
 				{
@@ -691,6 +698,7 @@
 			"name": "reverse to go forward",
 			"type": "level",
 			"stage": "habitation",
+			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=1m23s",
 			"max": 8,
 			"map": [
 				{
@@ -746,6 +754,7 @@
 			"name": "you need space",
 			"type": "level",
 			"stage": "habitation",
+			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=1m40s",
 			"max": 8,
 			"map": [
 				{
@@ -821,6 +830,7 @@
 			"name": "avoid the obvious",
 			"type": "level",
 			"stage": "habitation",
+			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=1m58s",
 			"max": 8,
 			"map": [
 				{
@@ -891,6 +901,7 @@
 			"name": "establish order",
 			"type": "level",
 			"stage": "habitation",
+			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=2m16s",
 			"max": 9,
 			"map": [
 				{
@@ -991,6 +1002,7 @@
 			"name": "make a good entrance",
 			"type": "level",
 			"stage": "habitation",
+			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=2m35s",
 			"max": 15,
 			"map": [
 				{
@@ -1101,6 +1113,7 @@
 			"name": "when repetition is unavoidable",
 			"type": "level",
 			"stage": "hydroponics",
+			"walkthrough": "https://youtu.be/rQpYy6tYv_M?t=3s",
 			"max": 6,
 			"map": [
 				{
@@ -1199,6 +1212,7 @@
 			"name": "when you keep track",
 			"type": "level",
 			"stage": "hydroponics",
+			"walkthrough": "https://youtu.be/rQpYy6tYv_M?t=24s",
 			"max": 8,
 			"map": [
 				{
@@ -1279,6 +1293,7 @@
 			"name": "when it's early days",
 			"type": "level",
 			"stage": "hydroponics",
+			"walkthrough": "https://youtu.be/rQpYy6tYv_M?t=44s",
 			"max": 8,
 			"map": [
 				{
@@ -1349,6 +1364,7 @@
 			"name": "when we're back again",
 			"type": "level",
 			"stage": "hydroponics",
+			"walkthrough": "https://youtu.be/rQpYy6tYv_M?t=1m12s",
 			"max": 9,
 			"map": [
 				{
@@ -1404,6 +1420,7 @@
 			"name": "when space is tight",
 			"type": "level",
 			"stage": "hydroponics",
+			"walkthrough": "https://youtu.be/rQpYy6tYv_M?t=1m42s",
 			"max": 8,
 			"map": [
 				{
@@ -1479,6 +1496,7 @@
 			"name": "when it's doubled",
 			"type": "level",
 			"stage": "hydroponics",
+			"walkthrough": "https://youtu.be/rQpYy6tYv_M?t=2m02s",
 			"max": 8,
 			"map": [
 				{
@@ -1544,6 +1562,7 @@
 			"name": "when you coordinate",
 			"type": "level",
 			"stage": "hydroponics",
+			"walkthrough": "https://youtu.be/rQpYy6tYv_M?t=2m26s",
 			"max": 11,
 			"map": [
 				{
@@ -1619,6 +1638,7 @@
 			"name": "when it isn't as complicated",
 			"type": "level",
 			"stage": "hydroponics",
+			"walkthrough": "https://youtu.be/rQpYy6tYv_M?t=2m58s",
 			"max": 9,
 			"map": [
 				{
@@ -1699,6 +1719,7 @@
 			"name": "when you follow the lead",
 			"type": "level",
 			"stage": "hydroponics",
+			"walkthrough": "https://youtu.be/rQpYy6tYv_M?t=4m15s",
 			"max": 14,
 			"map": [
 				{
@@ -1799,6 +1820,7 @@
 			"name": "when you have to choose",
 			"type": "level",
 			"stage": "hydroponics",
+			"walkthrough": "https://youtu.be/rQpYy6tYv_M?t=4m46s",
 			"max": 15,
 			"map": [
 				{
@@ -1859,6 +1881,7 @@
 			"name": "when it goes around",
 			"type": "level",
 			"stage": "hydroponics",
+			"walkthrough": "https://youtu.be/rQpYy6tYv_M?t=5m37s",
 			"max": 15,
 			"map": [
 				{
@@ -1939,6 +1962,7 @@
 			"name": "can you learn?",
 			"type": "level",
 			"stage": "operations",
+			"walkthrough": "https://youtu.be/rzOZPSBn2I0?t=1s",
 			"max": 7,
 			"map": [
 				{
@@ -2012,6 +2036,7 @@
 			"name": "can you get in the way?",
 			"type": "level",
 			"stage": "operations",
+			"walkthrough": "https://youtu.be/rzOZPSBn2I0?t=23s",
 			"max": 6,
 			"map": [
 				{
@@ -2057,6 +2082,7 @@
 			"name": "can you make your own?",
 			"type": "level",
 			"stage": "operations",
+			"walkthrough": "https://youtu.be/rzOZPSBn2I0?t=41s",
 			"max": 10,
 			"map": [
 				{
@@ -2122,6 +2148,7 @@
 			"name": "can you reduce?",
 			"type": "level",
 			"stage": "operations",
+			"walkthrough": "https://youtu.be/rzOZPSBn2I0?t=1m28s",
 			"max": 10,
 			"map": [
 				{
@@ -2177,6 +2204,7 @@
 			"name": "can you plan to start and stop?",
 			"type": "level",
 			"stage": "operations",
+			"walkthrough": "https://youtu.be/rzOZPSBn2I0?t=1m51s",
 			"max": 8,
 			"map": [
 				{
@@ -2277,6 +2305,7 @@
 			"name": "trapdoor",
 			"type": "level",
 			"stage": "operations",
+			"walkthrough": "https://youtu.be/rzOZPSBn2I0?t=2m14s",
 			"max": 13,
 			"map": [
 				{
@@ -2362,6 +2391,7 @@
 			"name": "3-point turn",
 			"type": "level",
 			"stage": "operations",
+			"walkthrough": "https://youtu.be/rzOZPSBn2I0?t=2m55s",
 			"max": 10,
 			"map": [
 				{
@@ -2482,6 +2512,7 @@
 			"name": "bow and arrow",
 			"type": "level",
 			"stage": "operations",
+			"walkthrough": "https://youtu.be/rzOZPSBn2I0?t=3m23s",
 			"max": 8,
 			"map": [
 				{
@@ -2562,6 +2593,7 @@
 			"name": "'heist'",
 			"type": "level",
 			"stage": "operations",
+			"walkthrough": "https://youtu.be/rzOZPSBn2I0?t=3m47s",
 			"max": 14,
 			"map": [
 				{
@@ -2637,6 +2669,7 @@
 			"name": "propeller",
 			"type": "level",
 			"stage": "operations",
+			"walkthrough": "https://youtu.be/rzOZPSBn2I0?t=4m20s",
 			"max": 12,
 			"map": [
 				{
@@ -2712,6 +2745,7 @@
 			"name": "approach with care",
 			"type": "level",
 			"stage": "operations",
+			"walkthrough": "https://youtu.be/rzOZPSBn2I0?t=4m50s",
 			"max": 15,
 			"map": [
 				{

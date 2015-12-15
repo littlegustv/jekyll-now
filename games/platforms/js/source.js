@@ -629,8 +629,9 @@ window.addEventListener("DOMContentLoaded", function () {
 				var b = Object.create(Button).init( 11, 0, Resources.help);
 				b.name = "walkthrough";
 				b.offset = {x: 0, y: -8};
+				b.target = config.walkthrough || "http://www.youtube.com";
 				b.callback = function () {
-					console.log("help!?");
+					window.open(this.target, "_blank");
 				};
 				s.buttons.push(b);
 
