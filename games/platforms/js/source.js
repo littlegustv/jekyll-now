@@ -2,6 +2,7 @@
 var debug;
 var audioContext;
 var AudioContext = window.AudioContext || window.webkitAudioContext;
+AudioContext.createGain = AudioContext.createGain || AudioContext.createGainNode;
 
 function modulo(n, p) {
 	return (n % p + p) % p;
@@ -15,7 +16,8 @@ function playSound(sound)
 		var source = audioContext.createBufferSource();
 		source.buffer = buffer;
 		
-		source.connect(audioContext.destination);
+		source.connect(audioContext.gn);
+		audioContext.gn.connect(audioContext.destination);
 		source.start(0);
 		
 		return source;
@@ -96,6 +98,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	if (AudioContext) {
 		audioContext = new AudioContext();
+		audioContext.gn = audioContext.createGain();
 	}
 //	ctx.globalCompositeOperation = "multiply";
 	//debug = ctx;
@@ -701,10 +704,12 @@ window.addEventListener("DOMContentLoaded", function () {
 					mute.animation = audioContext.state == "suspended" ? 1 : 0;
 					mute.callback = function () {
 						if (this.animation == 0) {
-							audioContext.suspend();
+							if (audioContext.suspend) audioContext.suspend();
+							else audioContext.gn.gain.value = 0;
 							this.animation = 1;
 						} else {
-							audioContext.resume();
+							if (audioContext.resume) audioContext.resume();
+							else audioContext.gn.gain.value = 1;
 							this.animation = 0;
 						}
 					}

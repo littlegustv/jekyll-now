@@ -2896,6 +2896,7 @@
 			"name": "interception",
 			"type": "level",
 			"stage": "medical",
+			"walkthrough": "https://youtu.be/_UQiBITjXlg?t=1s",
 			"max": 6,
 			"map": [
 				{
@@ -2956,6 +2957,7 @@
 			"name": "catch me",
 			"type": "level",
 			"stage": "medical",
+			"walkthrough": "https://youtu.be/_UQiBITjXlg?t=16s",
 			"max": 12,
 			"map": [
 				{
@@ -3001,6 +3003,7 @@
 			"name": "rendezvous",
 			"type": "level",
 			"stage": "medical",
+			"walkthrough": "https://youtu.be/_UQiBITjXlg?t=48s",
 			"max": 8,
 			"map": [
 				{
@@ -3067,6 +3070,7 @@
 			"name": "rush",
 			"type": "level",
 			"stage": "medical",
+			"walkthrough": "https://youtu.be/_UQiBITjXlg?t=1m8s",
 			"max": 10,
 			"map": [
 				{
@@ -3135,6 +3139,7 @@
 			"name": "scattershot",
 			"type": "level",
 			"stage": "medical",
+			"walkthrough": "https://youtu.be/_UQiBITjXlg?t=1m33s",
 			"max": 12,
 			"map": [
 				{
@@ -3196,6 +3201,7 @@
 			"name": "inside out",
 			"type": "level",
 			"stage": "medical",
+			"walkthrough": "https://youtu.be/_UQiBITjXlg?t=2m5s",
 			"max": 12,
 			"map": [
 				{
@@ -3253,6 +3259,7 @@
 			"name": "pisces",
 			"type": "level",
 			"stage": "medical",
+			"walkthrough": "https://youtu.be/_UQiBITjXlg?t=3m8s",
 			"max": 9,
 			"map": [
 				{
@@ -3315,6 +3322,7 @@
 			"name": "invasion",
 			"type": "level",
 			"stage": "medical",
+			"walkthrough": "https://youtu.be/_UQiBITjXlg?t=3m28s",
 			"max": 5,
 			"map": [
 				{
@@ -3417,6 +3425,7 @@
 			"name": "convergence",
 			"type": "level",
 			"stage": "medical",
+			"walkthrough": "https://youtu.be/_UQiBITjXlg?t=3m43s",
 			"max": 14,
 			"map": [
 				{
@@ -3480,6 +3489,7 @@
 			"name": "rain",
 			"type": "level",
 			"stage": "medical",
+			"walkthrough": "https://youtu.be/_UQiBITjXlg?t=4m15s",
 			"max": 12,
 			"map": [
 				{
@@ -3567,6 +3577,7 @@
 			"name": "coincidence",
 			"type": "level",
 			"stage": "medical",
+			"walkthrough": "https://youtu.be/_UQiBITjXlg?t=4m47s",
 			"max": 8,
 			"map": [
 				{
