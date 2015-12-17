@@ -2,7 +2,7 @@
 var debug;
 var audioContext;
 var AudioContext = window.AudioContext || window.webkitAudioContext;
-AudioContext.createGain = AudioContext.createGain || AudioContext.createGainNode;
+if (AudioContext) AudioContext.createGain = AudioContext.createGain || AudioContext.createGainNode;
 
 function modulo(n, p) {
 	return (n % p + p) % p;
