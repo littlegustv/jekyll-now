@@ -22,4 +22,4 @@ The Force Awakens made none of the mistakes of the prequels, or even of the orig
 
 What story was it telling?  What technical constraint was it overcoming?  What agenda was it pushing, even?  I can see no motivation for making this movie, aside from the obvious one.  But what's my motivation for seeing it?   .... again ...
 
-That's maybe an investigation for another time.  Potential title - I'm an easy mark, come at me.
+That's maybe an investigation for another time.  Potential title - "I'm an easy target, come get me!"
