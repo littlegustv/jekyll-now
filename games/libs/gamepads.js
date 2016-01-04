@@ -65,7 +65,6 @@ var Gamepad = {
         this.aleft.update(dt, pad.axes[0], pad.axes[1]);
         this.aright.update(dt, pad.axes[2], pad.axes[3]);
       }
-      result.innerHTML = buffer;
     }
   }
 }
