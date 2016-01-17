@@ -2,7 +2,7 @@ var CONFIG = {
 	height: 400,
 	width: 600,
 	title: "My Game"
-}
+};
 
  var GLOBALS = {
 	scale: 3,
@@ -58,7 +58,7 @@ var KEYCODES = {
     80: "p"
 };
 
-
+var Resources = [];
 var RESOURCES = [
 	{path: "ship.png", frames: 5, speed: 0.2},
 	{path: "a.png"},
