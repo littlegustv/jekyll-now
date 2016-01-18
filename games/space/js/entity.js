@@ -16,14 +16,13 @@ var Entity = {
 		ctx.globalAlpha = 1;
 	},
 	behavior: function (dt) {},
-	checkCollision: function (obj) {},
+	checkCollision: function (obj) { return false },
 	checkCollisions: function (entities) { 
 		for (var i = 0; i < entities.length; i++) {
 			if (this == entities[i]) {}
 			else {
-				if (this.checkCollision(entities[i]) && entities[i].checkCollision(this)) {
+				if (this.checkCollision(entities[i])) {
 					this.handleCollision(entities[i]);
-					entities[i].handleCollision(this);
 				}
 			}
 		}
@@ -62,6 +61,11 @@ Sprite.draw = function (ctx) {
 		this.sprite.w, this.sprite.h, 
 		Math.round(this.x - this.w / 2), this.y - Math.round(this.h / 2), this.w, this.h);
 	ctx.globalAlpha = 1;
+	if (CONFIG.debug) {
+		ctx.strokeStyle = "red";
+		ctx.strokeRect(this.getBoundX(), this.getBoundY(), this.w, this.h);
+		ctx.strokeRect(this.x - 1, this.y - 1, 2, 2);
+	}
 };
 
 var TiledBackground = Object.create(Sprite);
@@ -81,12 +85,12 @@ TiledBackground.init = function (x, y, w, h, sprite) {
 };
 TiledBackground.draw = function (ctx) {
 	ctx.globalAlpha = this.opacity;
-	for (var i = 0; i < this.w; i += this.sprite.w) {
-		for (var j = 0; j < this.h; j += this.sprite.h) {
+	for (var i = 0; i < this.w; i += this.sprite.w * GLOBALS.scale) {
+		for (var j = 0; j < this.h; j += this.sprite.h * GLOBALS.scale) {
 			ctx.drawImage(this.sprite.image, 
 				this.frame * this.sprite.w, 0, 
 				this.sprite.w, this.sprite.h, 
-				Math.round(this.x - this.w / 2) + i, this.y - Math.round(this.h / 2) + j, this.sprite.w, this.sprite.h);
+				Math.round(this.x - this.w / 2) + i, this.y - Math.round(this.h / 2) + j, this.sprite.w * GLOBALS.scale, this.sprite.h * GLOBALS.scale);
 		}
 	}
 	ctx.globalAlpha = 1;	

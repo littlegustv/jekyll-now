@@ -15,6 +15,8 @@ var Collision = {
 			this.getImageData = function () {
 			if (!this.imageData) {
 	    			var c = document.createElement("canvas");
+	    			c.width = this.w;
+	    			c.height = this.h;
 	    			var ctx = c.getContext("2d");
 	    			var x = this.x, y = this.y, opacity = this.opacity;
 	    			this.x = this.w / 2, this.y = this.h / 2, this.opacity = 1;

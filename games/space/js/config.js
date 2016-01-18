@@ -1,8 +1,17 @@
+function clamp (n, min, max) {
+	return Math.max(Math.min(n, max), min);
+}
+
+function distance (x1, y1, x2, y2) {
+	return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+}
+
 var CONFIG = {
 	height: 400,
 	width: 600,
 	title: "My Game",
-	startScene: "mainmenu"
+	startScene: "mainmenu",
+	debug: false
 };
 
  var GLOBALS = {
@@ -72,6 +81,7 @@ var RESOURCES = [
 	{path: "shoot.ogg"},
 	{path: "hit.ogg"},
 	{path: "ground.png"},
+	{path: "tower.png"},
 	{path: "scenes.js"},
 	{path: "bomb.png", frames: 3, speed: 0.3}
 ];

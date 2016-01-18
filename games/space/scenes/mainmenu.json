@@ -10,6 +10,22 @@
 			"tile": true
 		},
 		{
+			"x": 0,
+			"y": 380,
+			"h": 20,
+			"sprite": "ground",
+			"tile": true,
+			"solid": true,
+			"collide": "doPixelPerfect"
+		},
+		{
+			"x": 400,
+			"y": 306,
+			"sprite": "tower",
+			"solid": true,
+			"collide": "doPixelPerfect"
+		},
+		{
 			"x": 400,
 			"y": 210,
 			"velocity": {"x": -0, "y": -0},
