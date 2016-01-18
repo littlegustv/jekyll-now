@@ -1,7 +1,8 @@
 var CONFIG = {
 	height: 400,
 	width: 600,
-	title: "My Game"
+	title: "My Game",
+	startScene: "mainmenu"
 };
 
  var GLOBALS = {
@@ -74,3 +75,5 @@ var RESOURCES = [
 	{path: "scenes.js"},
 	{path: "bomb.png", frames: 3, speed: 0.3}
 ];
+
+var debug = {};

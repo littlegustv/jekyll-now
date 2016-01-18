@@ -23,6 +23,7 @@ var Scene = {
 		request.open("GET", "scenes/" + this.name + ".json", true);
 		request.onload = function () {
 			t.data = JSON.parse(request.response);
+			t.width = t.data.width, t.height = t.data.height;
 			if (t.data.script) {
 				t.resourceCount += 1;
 				t.loadBehavior(t.data.script)
@@ -48,14 +49,20 @@ var Scene = {
 		};
 	},
 	draw: function (ctx) {
+		// FIX ME: ctx.save/restore in place for camera, is there a better place for it?
+		ctx.save();
 		for (var i = 0; i < this.entities.length; i++) {
 			this.entities[i].draw(ctx);
 		}
+		ctx.restore();
 	},
 	update: function (dt) {
 		// update
 		for (var i = 0; i < this.entities.length; i++) {
 			this.entities[i].update(dt);
+		}
+		for (var i = 0; i < this.entities.length; i++) {
+			this.entities[i].checkCollisions(this.entities);
 		}
 		this.onUpdate(dt);
 	}

@@ -1,0 +1,3 @@
+Notes:
+
+Slowly growing square enemies that must be squeezed between.  Maybe when 'destroyed', they split into two (or more?) smaller squares that repeat the process.

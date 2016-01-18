@@ -4,6 +4,7 @@ var World = {
 		this.createCanvas();
 		this.scenes = [];
 		this.scene = undefined;
+//		this.loadScenes();
 		this.loadResources();
 		return this;
 	},
@@ -45,11 +46,50 @@ var World = {
 		this.resourceLoadCount += 1;
 		var t = this;
 		if (this.resourceLoadCount >= this.resourceCount) {
-			setTimeout( function () {
-				t.startTime = new Date();
-				t.step();
-			}, 100);
+			if (this.scene) {
+				setTimeout( function () {
+					t.beginTime();
+					t.step();
+				}, 100);
+			} else {
+				this.loadScenes();
+			}
 		}
+	},
+	beginTime: function () {
+		this.startTime = new Date();
+		var t = this;
+		document.addEventListener("visibilitychange", function (e) { 
+			/*if (document.visibilityState == "hidden") {
+				//if (AudioContext) audioContext.suspend();
+				//else window.muted = true;
+			}
+			else {
+				//if (AudioContext) audioContext.resume();
+				//else window.muted = false;
+			}*/
+			t.startTime = new Date(); 
+		});
+	},
+	loadScenes: function () {
+		var t = this;
+		var request = new XMLHttpRequest();
+		request.open("GET", "scenes/", true);
+		request.onload = function (data) {
+			var sceneData = request.response.match(/"\w+.json"/gi);
+			for (var i = 0; i < sceneData.length; i++) {
+				// strip off quotation marks and .json extension
+				var sceneName = sceneData[i].substring(1, sceneData[i].length - 6);
+				var s = Object.create(Scene).init(sceneName);
+				t.scenes.push(s);
+
+				if (sceneName == CONFIG.startScene) {
+					t.scene = s;
+					t.progressBar();
+				}
+			}
+		}
+		request.send();
 	},
 	/* FIX ME: loads image, sound and data assets into global Resources array -> is there a better place to do this? */
 	loadResources: function () {

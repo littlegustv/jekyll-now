@@ -1,25 +1,19 @@
 {
 	"script": "mainmenu.js",
+	"height": 400,
+	"width": 1200,
 	"entities": [
 		{
-			"x": 20,
-			"y": 30,
-			"velocity": {"x": 100, "y": 40}
-		},
-		{
-			"x": 90,
-			"y": 120,
-			"velocity": {"x": 65, "y": 25}
+			"x": 0,
+			"y": 0,
+			"sprite": "bg",
+			"tile": true
 		},
 		{
 			"x": 400,
 			"y": 210,
-			"velocity": {"x": -200, "y": -6}
-		},
-		{
-			"x": 200,
-			"y": 340,
-			"velocity": {"x": 10, "y": -90}
+			"velocity": {"x": -0, "y": -0},
+			"sprite": "ship"
 		}
 	]
 }
