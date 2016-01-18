@@ -9,6 +9,8 @@ var Collision = {
 	},
 	doPixelPerfect: function (object) {
 		//var o1 = m, o2 = n;
+
+		// this is a weird/hacky/exciting thing... so if an entity has the 'doPixelPerfect' collision, it will check for imageData, and create and supply its own function if it isn't found.
 		if (!this.getImageData) {
 			this.getImageData = function () {
 			if (!this.imageData) {
