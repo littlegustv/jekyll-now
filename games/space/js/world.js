@@ -108,7 +108,7 @@ var World = {
 			var name = res.substring(0, e);
 			var ext = res.substring(e, res.length);
 			if (ext == ".png") {
-				Resources[name] = {image: new Image(), frames: RESOURCES[i].frames || 1, speed: RESOURCES[i].speed || 1};
+				Resources[name] = {image: new Image(), frames: RESOURCES[i].frames || 1, speed: RESOURCES[i].speed || 1, animations: RESOURCES[i].animations || 1 };
 				Resources[name].image.src = "res/" + res;
 				Resources[name].image.onload = function () {
 					w.progressBar();

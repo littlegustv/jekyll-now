@@ -1,18 +1,21 @@
 {
 	"script": "mainmenu.js",
-	"height": 400,
-	"width": 1200,
+	"height": 800,
+	"width": 2400,
 	"entities": [
 		{
-			"x": 0,
+			"x": 800,
 			"y": 0,
+			"h": 800,
+			"w": 3200,
 			"sprite": "bg",
 			"tile": true
 		},
 		{
-			"x": 0,
-			"y": 380,
+			"x": 800,
+			"y": 780,
 			"h": 20,
+			"w": 3200,
 			"sprite": "ground",
 			"tile": true,
 			"solid": true,
@@ -20,7 +23,7 @@
 		},
 		{
 			"x": 400,
-			"y": 306,
+			"y": 706,
 			"sprite": "tower",
 			"solid": true,
 			"collide": "doPixelPerfect"
@@ -29,7 +32,7 @@
 			"x": 400,
 			"y": 210,
 			"velocity": {"x": -0, "y": -0},
-			"sprite": "ship"
+			"sprite": "saucer"
 		}
 	]
 }

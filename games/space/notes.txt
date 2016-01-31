@@ -1,3 +1,47 @@
 Notes:
 
-Slowly growing square enemies that must be squeezed between.  Maybe when 'destroyed', they split into two (or more?) smaller squares that repeat the process.
+ - Slowly growing square enemies that must be squeezed between.  Maybe when 'destroyed', they split into two (or more?) smaller squares that repeat the process.
+ - Projectiles hurt EVERYONE - can use to your advantage (lure homing missile back into enemies) or hazards
+ - Repair 'minigame' when damaged or 'destroyed' - allow for those comeback moments, & something to do instead of just reloading... maybe use d-pad or something, to keep you from shooting at the same time, more or less (or to make it actually difficult)
+
+Story:
+
+Titles(?): Slave Cylinder
+
+IMPORTANT: non-verbal game.  AI and player, master and slave.  the AI has the goal of controlling the playing, of getting them to do what it wants.  By force, if neccessary.  The player is weaker, inexperienced.  Physically resisting is very difficult, at first.  But there may not even be a confrontation.
+
+Scene begins.  The player-ship is crashed on the surface.  An unknown ship hovers nearby.  It mimes out the action of taking off, but the game provides no button suggestions.  If it gets frustrated, the AI may fire on you, but never to destroy.  Perhaps not ever, even as the game progresses.  Just to control, to subdue - never to destroy.
+
+Communication is by demonstration, reinforcement is varied.  The AI will send signals and react if you respond as though you understand.  (I.E. signals for stop, follow, etc.)  If it feels you are out of control, it will discipline you.  If you behave and show loyalty, it will reward you - and demand more of you.  It can protect you, give you supplies - all sort of things.  But it has a goal - a single goal.
+
+Considerations:
+	- can you upgrade your ship?  i.e. do you get rewarded with currency with which to upgrade?
+	- you don't 'die', just are badly damaged and must repair.  try and try again.  the AI forgives, but is ever wary, ready to strike down.
+	- can you, the slave, become the master?  can you take control, become the abuser, the enslaver?
+	- top of level is 'escape' into space, AI will try to shoot your engines (or trigger explosion in magnetic cloud) if you get too close - you'll fall back, have to be repaired - probably first chance to escape is the first time you confront the AI and gain an advantage - but who will take that opportunity?
+		- once in space, have a window to continue escaping, or return back to the fight - if you continue escaping, the game ends.
+	- if the AI is knocked out, you can destroy them completely - that's another ending?  but it is difficult - they repair quickly, and are effective at defense
+	- can control the AI as well, teach them to be YOUR slave, instead of visa versa ... but how does this end?  In the game, that is, not philosophically
+
+Other:
+ - 'The Cave': game where you have to look at a scene, identify the 'enemies', and then describe them (somehow) to automated turret so that it destroys them
+ 		(they're square...ish, coming from above, larger than the friendly ones, etc.) - done from memory
+
+
+
+
+>>> Deprecated
+
+ -- it's about the relationship between teacher/student, master/slave - a relationship of dependance.  How that affects both parties.  As such, the 'teacher' should perhaps be as non-linear as possible - a kind of AI who responds more directly to your actions, although with a quasi-fixed ultimate motivation.  It would be interesting to see how that would play out.  And, of course, how to make it happen.
+
+A spouse plans to sacrifice their 'other half' to elder gods.  The parter who uses their lover as a means to their own ends; the master who has the slave's labor at their disposal.  It's about control, which eventually will - must - become a struggle to the death.
+
+So we arrive at the secluded vacation spot.  The moon has almost no atmosphere - it is amazing that its icy seas don't boil away into space.  Ancient towers dot the landscape, they seemed to be carved (or perhaps sedimented?) from the stone itself.  In places they converge into great cities where there squat huge statues and monuments to something... else.  But we get ahead of things.
+
+The ship is a classic, one of a kind.  Beautiful, though not really my kind of thing.  (He) means for me to like it though, it is one hell of a gesture.  Expensive and personal - a symbol of trust.  He guides me out onto my first space voyage.
+
+The handling is precise, the controls responsive, almost flying by intuition.  Mechanically simple, elegant, and unsophisticated.  Like me, perhaps.  He guides me through gentle flights - soaring to the magnetitic cloud that so rarely parts, sealing in our perfect getaway paradise.  We do loops through ancient archways - me piloting, him watching.  Yes.
+
+A sound.  A shiver.  Something stirs.  His voice rises, then he calms it.  There is nothing to worry about, just another hazard.  One that I will overcome, as I have overcome gravity, momentum, and inertia.  I dart around the crippled towers.  The dark thing flits behind me, oily and fluid.  It is fast, but I am faster.  I escape.
+
+But the world is not so quiet anymore...

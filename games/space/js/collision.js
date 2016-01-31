@@ -18,10 +18,12 @@ var Collision = {
 	    			c.width = this.w;
 	    			c.height = this.h;
 	    			var ctx = c.getContext("2d");
+	    			ctx.imageSmoothingEnabled = false;
 	    			var x = this.x, y = this.y, opacity = this.opacity;
 	    			this.x = this.w / 2, this.y = this.h / 2, this.opacity = 1;
 	    			this.draw(ctx);
-	    			this.imageData = ctx.getImageData(0, 0, this.w, this.h).data;
+	    			this.ig = ctx.getImageData(0, 0, this.w, this.h);
+	    			this.imageData = this.ig.data;
 	    			this.x = x, this.y = y, this.opacity = opacity;
 	       			return this.imageData;
 	    		}
@@ -64,7 +66,7 @@ var Collision = {
 					mx = ((minX - m.x) + i) * 4 + 3;
 				var ny = ((minY - n.y) + j) * n.w * 4,
 					nx = ((minX - n.x) + i) * 4 + 3;
-				if (m_data[my + mx] == 255 && n_data[ny + nx] == 255)
+				if (m_data[my + mx] != 0 && n_data[ny + nx] != 0)
 				{
 				
 /**					************************					**/
@@ -80,5 +82,25 @@ var Collision = {
 			}
 		}
 		return false;
+	},
+	handleSolid: function (other) { 
+		if (other.solid) {
+			var dx = Math.abs(this.x - other.x);
+			var d = distance(this.x, this.y, other.x, other.y);
+			var cross = distance(other.x, other.y, other.getBoundX(), other.getBoundY());
+			console.log(dx, d, 0.5 * other.w, cross);
+			var bounce = (this.bounce || 0) + (other.bounce || 0);
+			if (Math.abs(dx / d) < Math.abs(0.5 * other.w / cross)) {
+				console.log('vertical');
+				this.y += this.getBoundY() < other.getBoundY() ? -2 : 2;
+        		this.velocity.y = this.getBoundY() < other.getBoundY() ? Math.min(-1 * bounce * this.velocity.y, this.velocity.y) : Math.max(-1 * bounce * this.velocity.y, this.velocity.y);
+        		this.acceleration.y = this.getBoundY() < other.getBoundY() ? Math.min(0, this.acceleration.y) : Math.max(0, this.acceleration.y);
+        	} else {
+        		console.log('horizontal')
+				this.x += this.getBoundX() < other.getBoundX() ? -2 : 2;
+        		this.velocity.x = this.getBoundX() < other.getBoundX() ? Math.min(-1 * bounce * this.velocity.x, this.velocity.x) : Math.max(-1 * bounce * this.velocity.x, this.velocity.x);
+        		this.acceleration.x = this.getBoundX() < other.getBoundX() ? Math.min(0, this.acceleration.x) : Math.max(0, this.acceleration.x);
+        	}//this.velY *= -1;
+		}
 	}
 }

@@ -65,5 +65,11 @@ var Scene = {
 			this.entities[i].checkCollisions(this.entities);
 		}
 		this.onUpdate(dt);
+		// clean up
+		for (var i = 0; i < this.entities.length; i++) {
+			if (!this.entities[i].alive) {
+				this.entities.splice(i, 1);
+			}
+		}
 	}
 };

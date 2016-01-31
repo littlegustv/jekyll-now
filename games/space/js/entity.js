@@ -1,8 +1,10 @@
 var Entity = {
 	velocity: {x: 0, y: 0},
 	opacity: 1,
+	angle: 0,
+	alive: true,
 	init: function (x, y) {
-		this.behaviors = [Behavior.doVelocity(), Behavior.doGrowth({speed: 0.3})];
+		this.behaviors = [];
 		this.checkCollision = Collision.doBox;
 		this.x = x, this.y = y;
 		this.h = 4, this.w = 4;
@@ -11,11 +13,34 @@ var Entity = {
     getBoundX: function () { return Math.floor(this.x - this.w/2); },
     getBoundY: function () { return Math.floor(this.y - this.h/2); },
 	draw: function (ctx) {
+		//ctx.save();
+		//ctx.resetTransform();
+		//ctx.translate(this.x, this.y);
+		//ctx.rotate(this.angle);
 		ctx.globalAlpha = this.opacity;
+		for (var i = 0; i < this.behaviors.length; i++) {
+			this.behaviors[i].draw(ctx);
+		}
 		ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+
+//		ctx.translate(-this.x, -this.y);
+		//ctx.restore();
 		ctx.globalAlpha = 1;
 	},
-	behavior: function (dt) {},
+	addBehavior: function (name, config) {
+		var b = Object.create(name).init(this, config);
+		this.behaviors.push(b);
+	},
+	start: function () {
+		for (var i = 0; i < this.behaviors.length; i++) {
+			this.behaviors[i].start();
+		}
+	},
+	end: function () {
+		for (var i = 0; i < this.behaviors.length; i++) {
+			this.behaviors[i].end();
+		}
+	},
 	checkCollision: function (obj) { return false },
 	checkCollisions: function (entities) { 
 		for (var i = 0; i < entities.length; i++) {
@@ -31,8 +56,7 @@ var Entity = {
 	},
 	update: function (dt) {
 		for (var i = 0; i < this.behaviors.length; i++) {
-			this.behavior = this.behaviors[i];
-			this.behavior(dt);
+			this.behaviors[i].update(dt);
 		}
 //		this.x += dt * this.velocity.x;
 //		this.y += dt * this.velocity.y;
@@ -43,29 +67,39 @@ var Sprite = Object.create(Entity);
 Sprite.acceleration = {x: 0, y: 0};
 Sprite.init = function (x, y, sprite) {
 	this.x = x, this.y = y;
-	this.behaviors = [Behavior.doVelocity(), Behavior.doAnimations(), Behavior.doAcceleration()];
+	this.behaviors = [];
 	this.checkCollision = Collision.doPixelPerfect;
+	this.addBehavior(Animate);
 	if (sprite) {
 		// FIX ME: add multiple animations (see PLATFORMS code)
-		this.sprite = sprite, this.sprite.h = this.sprite.image.height, this.sprite.w = this.sprite.image.width / this.sprite.frames;
-		this.h = this.sprite.image.height * GLOBALS.scale, this.w = this.sprite.image.width * GLOBALS.scale / this.sprite.frames;
+		this.sprite = sprite, this.sprite.w = this.sprite.image.width / this.sprite.frames;
+		this.animations = sprite.animations, this.animation = 0, this.sprite.h = this.sprite.image.height / this.animations;
+		this.h = this.sprite.h * GLOBALS.scale, this.w = this.sprite.image.width * GLOBALS.scale / this.sprite.frames;
 		this.frame = 0, this.maxFrame = this.sprite.frames, this.frameDelay = this.sprite.speed, this.maxFrameDelay = this.sprite.speed;
 		//this.imageData = this.getImageData(buf);
 	}
 	return this;
 };
 Sprite.draw = function (ctx) {
+	ctx.save();
+	ctx.translate(this.x, this.y);
+	ctx.rotate(this.angle);
+	ctx.translate(-this.x, -this.y);
 	ctx.globalAlpha = this.opacity;
+	for (var i = 0; i < this.behaviors.length; i++) {
+		this.behaviors[i].draw(ctx);
+	}
 	ctx.drawImage(this.sprite.image, 
-		this.frame * this.sprite.w, 0, 
+		this.frame * this.sprite.w, this.animation * this.sprite.h, 
 		this.sprite.w, this.sprite.h, 
 		Math.round(this.x - this.w / 2), this.y - Math.round(this.h / 2), this.w, this.h);
-	ctx.globalAlpha = 1;
 	if (CONFIG.debug) {
 		ctx.strokeStyle = "red";
 		ctx.strokeRect(this.getBoundX(), this.getBoundY(), this.w, this.h);
 		ctx.strokeRect(this.x - 1, this.y - 1, 2, 2);
 	}
+	ctx.restore();
+	ctx.globalAlpha = 1;
 };
 
 var TiledBackground = Object.create(Sprite);

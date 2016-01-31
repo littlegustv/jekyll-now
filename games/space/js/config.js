@@ -70,8 +70,10 @@ var KEYCODES = {
 
 var Resources = [];
 var RESOURCES = [
-	{path: "ship.png", frames: 5, speed: 0.2},
+	{path: "saucer.png", frames: 5, speed: 0.2},
+	{path: "viper.png", animations: 2, frames: 4, speed: 0.6},
 	{path: "a.png"},
+	{path: "scope.png"},
 	{path: "laser.png"},
 	{path: "item.png"},
 	{path: "itemHeal.png"},
