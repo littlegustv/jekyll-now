@@ -31,6 +31,10 @@ var Entity = {
 		var b = Object.create(name).init(this, config);
 		this.behaviors.push(b);
 	},
+	removeBehavior: function (obj) {
+		var i = this.behaviors.indexOf(obj);
+		this.behaviors.splice(i, 1);
+	},
 	start: function () {
 		for (var i = 0; i < this.behaviors.length; i++) {
 			this.behaviors[i].start();

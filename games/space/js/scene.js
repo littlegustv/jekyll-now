@@ -10,6 +10,9 @@ var Scene = {
 	onStart: function () {},
 	onUpdate: function () {},
 	onEnd: function () {},
+	addEntity: function (e) {
+		this.entities.push(e);
+	},
 	loadProgress: function () {
 		this.resourceLoadCount += 1;
 		if (this.resourceLoadCount >= this.resourceCount) {
@@ -45,6 +48,7 @@ var Scene = {
 			t.onStart = onStart;
 			t.onUpdate = onUpdate;
 			t.onEnd = onEnd;
+			t.onDraw = onDraw;
 			t.loadProgress();
 		};
 	},
@@ -55,6 +59,7 @@ var Scene = {
 			this.entities[i].draw(ctx);
 		}
 		ctx.restore();
+		if (this.onDraw) this.onDraw(ctx);
 	},
 	update: function (dt) {
 		// update

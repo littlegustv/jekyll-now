@@ -69,6 +69,19 @@ DrawHitBox.draw = function (ctx) {
 	ctx.fillRect(this.entity.x - this.entity.w / 2, this.entity.y - this.entity.h / 2, this.entity.w, this.entity.h);
 }
 
+var SimpleAI = Object.create(Behavior);
+SimpleAI.update = function (dt) {
+	console.log(this.target);
+	console.log(this.target.x, this.entity.x, (this.entity.x > this.target.x ? -1 : 1))
+	this.entity.velocity = {
+		x: clamp( (this.entity.x > this.target.x ? -1 : 1) * Math.abs(this.entity.x - this.target.x) / 2, - SPEED.ship / 2, SPEED.ship / 2),
+		y: clamp( (this.entity.y > this.target.y ? -1 : 1) * Math.abs(this.entity.y - this.target.y) / 2, - SPEED.ship / 2, SPEED.ship / 2)
+	}
+	if (this.entity.health < 5) {
+		this.entity.removeBehavior(this);
+	}
+}
+
 var Behaviors = {
 	velocity: Velocity,
 	accelerate: Accelerate,

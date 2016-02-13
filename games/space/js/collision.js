@@ -88,15 +88,15 @@ var Collision = {
 			var dx = Math.abs(this.x - other.x);
 			var d = distance(this.x, this.y, other.x, other.y);
 			var cross = distance(other.x, other.y, other.getBoundX(), other.getBoundY());
-			console.log(dx, d, 0.5 * other.w, cross);
-			var bounce = (this.bounce || 0) + (other.bounce || 0);
+			//console.log(dx, d, 0.5 * other.w, cross);
+			var bounce = (this.bounce || 0) || (other.bounce || 0);
 			if (Math.abs(dx / d) < Math.abs(0.5 * other.w / cross)) {
-				console.log('vertical');
+				//console.log('vertical');
 				this.y += this.getBoundY() < other.getBoundY() ? -2 : 2;
         		this.velocity.y = this.getBoundY() < other.getBoundY() ? Math.min(-1 * bounce * this.velocity.y, this.velocity.y) : Math.max(-1 * bounce * this.velocity.y, this.velocity.y);
         		this.acceleration.y = this.getBoundY() < other.getBoundY() ? Math.min(0, this.acceleration.y) : Math.max(0, this.acceleration.y);
         	} else {
-        		console.log('horizontal')
+        		//console.log('horizontal')
 				this.x += this.getBoundX() < other.getBoundX() ? -2 : 2;
         		this.velocity.x = this.getBoundX() < other.getBoundX() ? Math.min(-1 * bounce * this.velocity.x, this.velocity.x) : Math.max(-1 * bounce * this.velocity.x, this.velocity.x);
         		this.acceleration.x = this.getBoundX() < other.getBoundX() ? Math.min(0, this.acceleration.x) : Math.max(0, this.acceleration.x);

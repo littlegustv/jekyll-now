@@ -81,6 +81,7 @@ a {
 	cursor: pointer;
   &:hover, &:active {
     color: $blue;
+    text-decoration: none;
   }
 }
 
@@ -207,13 +208,13 @@ img {
 
 .site-name {
   margin: 0;
-  color: $white;
+  color: #fff;
   cursor: pointer;
-  font-family: $helveticaNeue;
-  font-weight: 300;
-  font-size: 18vh;
-  line-height: 20vh;
-  letter-spacing: -3px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 600;
+  font-size: 120px;
+  line-height: 266px;
+  letter-spacing: -5px;
   
   @include mobile {
      font-size: 16vh;
@@ -230,7 +231,7 @@ img {
     margin: 3px 0;
   }
 }
-
+/*
 nav {
   float: right;
   margin-top: 23px; // @TODO: Vertically middle align
@@ -260,7 +261,7 @@ nav {
     }
   }
 }
-
+*/
 //
 // .main
 //
@@ -319,6 +320,64 @@ footer {
   padding: 20px 0;
   text-align: center;
 }
+
+/*
+
+horizontal panels
+
+*/
+
+.label-post {
+  background-color: #649D03
+}
+
+.panel-post {
+  border-color: #68B8C3;
+}
+
+.panel-post > .panel-heading {
+  background-color: #68B8C3;
+}
+
+.panel.panel-horizontal {
+    display:table;
+    width:100%;
+    margin: 10px 0px 10px 0px;
+}
+.panel.panel-horizontal > .panel-heading, .panel.panel-horizontal > .panel-body, .panel.panel-horizontal > .panel-footer {
+    display:table-cell;
+}
+.panel.panel-horizontal > .panel-heading, .panel.panel-horizontal > .panel-footer {
+    width: 25%;
+    border:0;
+    vertical-align: middle;
+}
+.panel.panel-horizontal > .panel-heading {
+    border-right: 1px solid #ddd;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 4px;
+}
+.panel.panel-horizontal > .panel-heading.panel-heading-right {
+    border-left: 1px solid #ddd;
+    border-right: 0px solid transparent;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 4px;
+}
+.panel.panel-horizontal > .panel-footer {
+    border-left: 1px solid #ddd;
+    border-top-left-radius: 0;
+    border-bottom-right-radius: 4px;
+}
+
+.affix {
+    top: 0;
+    width: 100%;
+}
+.affix + .container-fluid {
+    padding-top: 70px;
+}
+
 
 /*FLIP!*/
 
