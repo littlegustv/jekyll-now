@@ -36,11 +36,14 @@ function playSound(sound)
 window.addEventListener("DOMContentLoaded", function () {
 
 	function mouseUp (e) {
-		//console.log(e);
-		//if (e.changedTouches) {
-		e.offsetX = e.offsetX || e.clientX;//e.changedTouches[0].clientX;
-		e.offsetY = e.offsetY || e.clientY;//e.changedTouches[0].clientY;
-		//}
+		if (e.changedTouches) {
+			e.offsetX = e.offsetX || e.changedTouches[0].clientX;
+			e.offsetY = e.offsetY || e.changedTouches[0].clientY;
+		}
+		else {
+			e.offsetX = e.offsetX || e.clientX;//e.changedTouches[0].clientX;
+			e.offsetY = e.offsetY || e.clientY;//e.changedTouches[0].clientY;
+		}
 		var m = world.toGrid(e.offsetX, e.offsetY);
 		world.mouse.down = false;
 		
@@ -66,24 +69,30 @@ window.addEventListener("DOMContentLoaded", function () {
 	}
 
 	function mouseDown (e) {
-		//console.log(e);
-		//if (e.changedTouches) {
+		if (e.changedTouches) {
+			e.offsetX = e.offsetX || e.changedTouches[0].clientX;
+			e.offsetY = e.offsetY || e.changedTouches[0].clientY;
+		}
+		else {
 			e.offsetX = e.offsetX || e.clientX;//e.changedTouches[0].clientX;
 			e.offsetY = e.offsetY || e.clientY;//e.changedTouches[0].clientY;
-		//}
+		}
 		world.mouse.x = e.offsetX, world.mouse.y = e.offsetY;
 
-		if (e.changedTouches) console.log("start", e);
 		if (!world.scene || world.scene.type != "level") return;
 		else if (e.which === 3 || e.button === 2) {}
 		else world.mouse.down = true;
 	}
 
 	function mouseMove (e) {
-		//if (e.changedTouches) {
+		if (e.changedTouches) {
+			e.offsetX = e.offsetX || e.changedTouches[0].clientX;
+			e.offsetY = e.offsetY || e.changedTouches[0].clientY;
+		}
+		else {
 			e.offsetX = e.offsetX || e.clientX;//e.changedTouches[0].clientX;
 			e.offsetY = e.offsetY || e.clientY;//e.changedTouches[0].clientY;
-		//}
+		}
 		world.scene.highlightButton(e.offsetX, e.offsetY);
 		if (!world.scene || world.scene.type != "level") return;
 		var theta = Math.atan2(e.offsetY - world.mouse.y, e.offsetX - world.mouse.x);
@@ -200,7 +209,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 			var a = new Audio();
 			this.audioType = a.canPlayType("audio/ogg");
-			console.log(this.audioType, a.canPlayType("audio/mp3"), "AUDIO");
+			//console.log(this.audioType, a.canPlayType("audio/mp3"), "AUDIO");
 
 			for (var i = 0; i < resourceInfo.length; i++ ) {
 				var res = resourceInfo[i].path;
@@ -235,9 +244,9 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 			if (this.audioType.length <= 0) {
 				res = res.replace("ogg", "mp3");
-				console.log("replaced?");
+				//console.log("replaced?");
 			}
-			console.log("NEW", res);
+			//console.log("NEW", res);
 			var w = this;
 			if (!AudioContext) {
 				Resources[name] = new Audio("res/" + res, streaming=false);
@@ -266,7 +275,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			var request = new XMLHttpRequest();
 			request.open("GET", "res/" + res, true);
 			request.onload = function () {
-				console.log("js", request);
+				//console.log("js", request);
 				try {
 					w.sceneInfo = JSON.parse(request.response);
 					w.progressBar();
@@ -330,7 +339,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					var m = this.toGrid(this.mouse.x, this.mouse.y);
 					var s = Object.create(Specimen).init(m.x, m.y, Resources[this.scene.stage]);
 					s.direction = DIRECTION[directions[this.mouse.angle] || "east"];
-					console.log(s.direction, directions[this.mouse.angle], this.mouse);
+					//console.log(s.direction, directions[this.mouse.angle], this.mouse);
 					this.addEntity(s);
 					break;
 			}
@@ -395,7 +404,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.newGame = true;
 			if (this.setupStorage()) {
 				var loadData = localStorage.platformSaveData;
-				console.log("here...", loadData);
+				//console.log("here...", loadData);
 				if (loadData) {
 					loadData = JSON.parse(loadData);
 					for (i in loadData) {
@@ -457,7 +466,9 @@ window.addEventListener("DOMContentLoaded", function () {
 		stageScore: function (stage) {
 			var s = 0;
 			for (var i = 0; i < this.scenes.length; i++) {
-				if (STAGES.indexOf(this.scenes[i].stage) == -1) { console.log(this.scenes[i].stage, "mm")}
+				if (STAGES.indexOf(this.scenes[i].stage) == -1) { 
+					//console.log(this.scenes[i].stage, "mm")
+				}
 				else if (STAGES.indexOf(this.scenes[i].stage) <= STAGES.indexOf(stage)) {
 					s += this.scenes[i].score || 0;
 				}
@@ -508,19 +519,19 @@ window.addEventListener("DOMContentLoaded", function () {
 			for (var i = 0; i < config.entities.length; i++) {
 				var c = config.entities[i];
 				var e = undefined;
-				console.log(c.type);
+				//console.log(c.type);
 				switch (c.type) {
 					case "box":
 						e = Object.create(Box).init(c.format, c.border, {counter: 0, maxCount: 1000, type: "fade"});
 						for (var j = 0; j < c.contents.length; j++) {
 							var co = c.contents[j];
-							console.log(co, "blah", co.type);
+							//console.log(co, "blah", co.type);
 							if (co.type == "text") {
 								var t = Object.create(Text).init(co.gridX + e.x, co.gridY + e.y, co.text, co.format, co.speed, co.delay + e.delay, co.duration);
 								e.contents.push(t);
 							} else if (co.type == "textblock") {
 								var lines = co.text.split("\n");
-								console.log(lines);
+								//console.log(lines);
 								var start = {x: co.gridX + e.x, y: co.gridY + e.y};
 								co.speed = co.speed || 0;
 								co.pause = co.pause || 0;
@@ -528,12 +539,12 @@ window.addEventListener("DOMContentLoaded", function () {
 								for (var k = 0; k < lines.length; k++) {
 									var t = Object.create(Text).init(start.x, start.y, lines[k], co.format, co.speed, delay, co.duration);
 									delay += co.speed * (lines[k].length) + co.pause;
-									console.log("delayt", delay);
+									//console.log("delayt", delay);
 									e.contents.push(t);
 									start.y += co.format.size + 4;
 								}
 							} else {
-								console.log(co.type, Resources[co.type], co.animation);
+								//console.log(co.type, Resources[co.type], co.animation);
 								var t = Object.create(Entity).init(co.gridX, co.gridY, Resources[co.type]);
 								t.animation = co.animation != undefined ? co.animation : 0;
 								t.offset = {x: e.x, y: e.y};
@@ -579,7 +590,7 @@ window.addEventListener("DOMContentLoaded", function () {
 						e = Object.create(Specimen).init(c.gridX, c.gridY, Resources[s.stage]);
 						e.animation = s.uid % e.sprite.animations;
 						e.direction = DIRECTION[c.direction || "east"];
-						console.log(e.direction);
+						//console.log(e.direction);
 						break;
 				}
 				if (e) {s.entities.push(e);}
@@ -692,7 +703,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					world.doScene(1);
 				};
 				s.buttons.push(tb);
-				console.log(tb.x, tb.gridX);
+				//console.log(tb.x, tb.gridX);
 /*
 				var e = Object.create(Entity).init(3,3,Resources.temp);
 				e.animation = 0;
