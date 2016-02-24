@@ -1,20 +1,20 @@
 var onStart = function () {
 
 	var t = this;
-	console.log(t, t.h);
+	//console.log(t, t.h);
 
 	var s = Object.create(Sprite).init(300, 200, Resources.viper);
-	//s.velocity = {x: 10, y: 10};
 	s.handleCollision = Collision.handleSolid;
 	s.addBehavior(Accelerate, {maxSpeed: SPEED.ship});
 	s.addBehavior(Velocity);
 	s.addBehavior(Bound, {min: {x: -600, y: 0}, max: {x: 1800, y: 800}})
 	s.health = 10;
 	this._player = s;
-	//s.addBehavior(DrawHitBox);
-	//s.behaviors.push(Behavior.doAcceleration({maxSpeed: SPEED.ship}));
-	//s.behaviors.push(Behavior.doBound());
-	//s.behaviors.push(function (dt) { this.velocity.y += dt * 100; }); //gravity
+
+	s.setCollision(Polygon)
+	s.collision.onHandle = /*function () {console.log('collided!') }; */HandleCollision.handleSolid;
+
+	debug = s;
 	
 	for (var i = 0; i < this.data.entities.length; i++) {
 		var eData = this.data.entities[i];
@@ -23,7 +23,6 @@ var onStart = function () {
 				var e = Object.create(TiledBackground).init(eData.x, eData.y, eData.w || this.width * 2, eData.h || this.height * 2, Resources[eData.sprite]);
 				e.bounce = 0.2;
 				e.addBehavior(Animate);
-//				e.behaviors.push(Behavior.doAnimations());
 			} else {
 				var e = Object.create(Sprite).init(eData.x, eData.y, Resources[eData.sprite]);
 				e.opacity = 0;
@@ -35,35 +34,30 @@ var onStart = function () {
 				e.addBehavior(Fade, {speed: 1});
 				if (eData.sprite == "saucer") {
 					e.health = 10;
-					e.addBehavior(SimpleAI, {target: s});
+					//e.addBehavior(SimpleAI, {target: s});
 					e.addBehavior(Velocity);
-					e.handleCollision = Collision.handleSolid;
-					debug = e;
+					//e.setCollision(Polygon);
+					//e.handleCollision = Collision.handleSolid;
 				}
-//				e.behaviors.push(Behavior.doFade({speed: 10}));
 			}
 		}
 		else {
 			var e = Object.create(Entity).init(eData.x, eData.y);
 			e.angle = Math.random() * Math.PI * 2;
 		}
-		if (eData.collide) {
-			e.checkCollision = Collision[eData.collide];
+		if (eData.collide == "Polygon") {
+			e.setCollision(Polygon);
 		}
 		e.solid = eData.solid || false;
+		e.bounce = 0;
 		if (eData.velocity) e.velocity = eData.velocity;
 		this.entities.push(e);
+
+		if (eData.vertices) e.vertices = eData.vertices;
 	}
 
 
 	this.addEntity(s);
-/*
-	var scope = Object.create(Sprite).init(300, 200, Resources.scope);
-	scope.behaviors.push(function (dt) {this.x = s.x; this.y = s.y;})
-	scope.opacity = 0.4;
-	this.entities.push(scope);
-*/
-//	debug = s;
 
 	var camera = Object.create(Camera).init(0, 0);
 	var b = Object.create(Behavior);
@@ -79,14 +73,7 @@ var onStart = function () {
 		if (Math.abs(this.x) > 0.3) {
 			s.angle += dt * this.x * 5;
 		}
-		//s.acceleration = {x: 3 * SPEED.ship * Math.round(this.x * 2) / 2, y: 3 * SPEED.ship * Math.round(this.y * 2) / 2}
 	}
-	/*
-	this._gamepad.aright.onUpdate = function (dt) {
-		if (Math.abs(this.x) > 0.3) {
-			scope.angle += dt * this.x * 5;
-		}		
-	}*/
 
 	var scene = this;
 	this._gamepad.buttons.lt.onUpdate = function (dt) {
@@ -114,7 +101,6 @@ var onStart = function () {
 		e.velocity = {x: Math.cos(s.angle) * SPEED.projectile, y: Math.sin(s.angle) * SPEED.projectile};
 		e.addBehavior(Velocity);
 		scene.entities.push(e);
-		debug = e;
 	}
 
 };
@@ -131,15 +117,17 @@ var onUpdate = function (dt) {
 		asteroid.addBehavior(b);
 		asteroid.addBehavior(Velocity);
 		asteroid.solid = true;
-		asteroid.checkCollision = Collision.doPixelPerfect;
-		asteroid.handleSolid = Collision.handleSolid;
-		asteroid.handleCollision = function (other) {
+		asteroid.setCollision(Polygon);
+		asteroid.collision.onHandle = HandleCollision.handleSolid;
+//		asteroid.checkCollision = Collision.doPixelPerfect;
+//		asteroid.handleSolid = Collision.handleSolid;
+/*		asteroid.handleCollision = function (other) {
 			if (other.health) {
 				other.health -= 1;
 			}
 			this.handleSolid(other);
-		};
-		asteroid.bounce = 0.9;
+		};*/
+//		asteroid.bounce = 0.9;
 		asteroid.velocity = {x: Math.random() * SPEED.ship - SPEED.ship / 2, y: Math.random() * SPEED.ship - SPEED.ship / 2 };
 		this.entities.push(asteroid);
 	}

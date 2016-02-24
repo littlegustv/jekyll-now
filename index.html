@@ -1,28 +1,20 @@
 ---
 layout: default
 ---
-<div class="container">
+<div class="row">
+  <div class="grid" data-masonry='{ "itemSelector": ".grid-item", "percentPosition": true, "gutter": 10 }'>
   {% for post in paginator.posts %}
-	{% unless post.draft %}
-    <div class="panel panel-post panel-horizontal">
-        {% assign index = forloop.index | modulo: 2 %}
-        {% if index == 0 %}
-        <div class="panel-heading">
-            <a href="{{ site.baseurl }}{{ post.url }}"><h1>{{ post.title }}</h1></a>
-        </div>
-        {% endif %}
-        <div class="panel-body">
-            {{ post.content | truncatewords:55}}
-            <a class='label label-post' href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
-        </div>
-        {% if index == 1 %}
-        <div class="panel-heading panel-heading-right">
-            <a href="{{ site.baseurl }}{{ post.url }}"><h1>{{ post.title }}</h1></a>
-        </div>
-        {% endif %}
-    </div>
-	{% endunless %}
+  {% unless post.draft %}
+      {% assign index = forloop.index | modulo:3 %}
+      <div class="grid-item panel panel-post">
+          <div class="panel-heading">
+            <h1 class="h1"><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h1>
+          </div>
+          <div class="panel-body">{{ post.content | truncatewords:150 }}</div>
+      </div>
+  {% endunless %}
   {% endfor %}
+  </div>
   <ul class="pagination">
       {% if paginator.previous_page %}
         <li><a href="{{ paginator.previous_page_path }}">prev.</a></li>

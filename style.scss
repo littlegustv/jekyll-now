@@ -207,6 +207,7 @@ img {
 }
 
 .site-name {
+  text-align: right;
   margin: 0;
   color: #fff;
   cursor: pointer;
@@ -326,6 +327,16 @@ footer {
 horizontal panels
 
 */
+.grid {
+  margin-top: 10px;
+}
+.grid-sizer, .grid-item {
+  width: calc(25% - 10px);
+}
+
+.navbar-inverse {
+  z-index: 200;
+}
 
 .label-post {
   background-color: #649D03
@@ -337,6 +348,20 @@ horizontal panels
 
 .panel-post > .panel-heading {
   background-color: #68B8C3;
+}
+
+.panel-post:nth-child(3n + 1) {
+  border-color: #649D03;
+}
+.panel-post:nth-child(3n + 1) > .panel-heading {
+  background-color: #649D03;
+}
+
+.panel-post:nth-child(3n + 2) {
+  border-color: #FF685C;
+}
+.panel-post:nth-child(3n + 2) > .panel-heading {
+  background-color: #FF685C;
 }
 
 .panel.panel-horizontal {

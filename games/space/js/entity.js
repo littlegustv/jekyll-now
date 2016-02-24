@@ -5,7 +5,6 @@ var Entity = {
 	alive: true,
 	init: function (x, y) {
 		this.behaviors = [];
-		this.checkCollision = Collision.doBox;
 		this.x = x, this.y = y;
 		this.h = 4, this.w = 4;
 		return this;
@@ -13,19 +12,16 @@ var Entity = {
     getBoundX: function () { return Math.floor(this.x - this.w/2); },
     getBoundY: function () { return Math.floor(this.y - this.h/2); },
 	draw: function (ctx) {
-		//ctx.save();
-		//ctx.resetTransform();
-		//ctx.translate(this.x, this.y);
-		//ctx.rotate(this.angle);
 		ctx.globalAlpha = this.opacity;
 		for (var i = 0; i < this.behaviors.length; i++) {
 			this.behaviors[i].draw(ctx);
 		}
 		ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
-
-//		ctx.translate(-this.x, -this.y);
-		//ctx.restore();
 		ctx.globalAlpha = 1;
+	},
+	setCollision: function (collision) {
+		this.collision = Object.create(collision);
+		this.collision.onStart(this);
 	},
 	addBehavior: function (name, config) {
 		var b = Object.create(name).init(this, config);
@@ -45,19 +41,20 @@ var Entity = {
 			this.behaviors[i].end();
 		}
 	},
-	checkCollision: function (obj) { return false },
+//	checkCollision: function (obj) { return false },
 	checkCollisions: function (entities) { 
+		if (!this.collision) return;
 		for (var i = 0; i < entities.length; i++) {
 			if (this == entities[i]) {}
 			else {
-				if (this.checkCollision(entities[i])) {
-					this.handleCollision(entities[i]);
+				if (this.collision.onCheck(this, entities[i])) {
+					this.collision.onHandle(this, entities[i]);
 				}
 			}
 		}
 	},
-	handleCollision: function ( other ) {
-	},
+//	handleCollision: function ( other ) {
+//	},
 	update: function (dt) {
 		for (var i = 0; i < this.behaviors.length; i++) {
 			this.behaviors[i].update(dt);
@@ -72,7 +69,7 @@ Sprite.acceleration = {x: 0, y: 0};
 Sprite.init = function (x, y, sprite) {
 	this.x = x, this.y = y;
 	this.behaviors = [];
-	this.checkCollision = Collision.doPixelPerfect;
+	//this.checkCollision = Collision.doPixelPerfect;
 	this.addBehavior(Animate);
 	if (sprite) {
 		// FIX ME: add multiple animations (see PLATFORMS code)
@@ -81,6 +78,9 @@ Sprite.init = function (x, y, sprite) {
 		this.h = this.sprite.h * GLOBALS.scale, this.w = this.sprite.image.width * GLOBALS.scale / this.sprite.frames;
 		this.frame = 0, this.maxFrame = this.sprite.frames, this.frameDelay = this.sprite.speed, this.maxFrameDelay = this.sprite.speed;
 		//this.imageData = this.getImageData(buf);
+		if (sprite.vertices) {
+			this.vertices = sprite.vertices;
+		}
 	}
 	return this;
 };
@@ -97,13 +97,33 @@ Sprite.draw = function (ctx) {
 		this.frame * this.sprite.w, this.animation * this.sprite.h, 
 		this.sprite.w, this.sprite.h, 
 		Math.round(this.x - this.w / 2), this.y - Math.round(this.h / 2), this.w, this.h);
-	if (CONFIG.debug) {
-		ctx.strokeStyle = "red";
-		ctx.strokeRect(this.getBoundX(), this.getBoundY(), this.w, this.h);
-		ctx.strokeRect(this.x - 1, this.y - 1, 2, 2);
-	}
 	ctx.restore();
 	ctx.globalAlpha = 1;
+	if (CONFIG.debug) {
+		ctx.strokeStyle = "red";
+		if (this.vertices) {
+			var v = this.getVertices();
+			ctx.beginPath();
+			ctx.moveTo(v[0].x, v[0].y);
+			for (var i = 1; i < v.length; i++) {
+				ctx.lineTo(v[i].x, v[i].y);
+			}
+			ctx.closePath();
+			ctx.stroke();
+
+			var a = this.getAxes();
+			ctx.strokeStyle = "green";
+			ctx.beginPath();
+			ctx.moveTo(this.x + a[0].x, this.y + a[0].y);
+			for (var i = 1; i < a.length; i++) {
+				ctx.lineTo(a[i].x + this.x, a[i].y + this.y);
+			}
+			ctx.closePath();
+			ctx.stroke();
+		}
+		//ctx.strokeRect(this.getBoundX(), this.getBoundY(), this.w, this.h);
+		//ctx.strokeRect(this.x - 1, this.y - 1, 2, 2);
+	}
 };
 
 var TiledBackground = Object.create(Sprite);

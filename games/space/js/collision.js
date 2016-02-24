@@ -1,106 +1,183 @@
+// a collision object, which will set up the required data
+
 var Collision = {
-	doBox: function (object) {
-		if (this.x + this.w > object.x && this.x < object.x + object.w) {
-			if (this.y + this.h > object.y && this.y < object.y + object.h) {
-				return true;
-			}
-		}
-		return false;
+	init: function ( fns ) {
+		object.onStart = fns.start || object.onStart,
+		object.onCheck = fns.check || object.onCheck,
+		object.onHandle = fns.handle || object.onHandle,
+		object.onEnd = fns.end || object.onEnd;
 	},
-	doPixelPerfect: function (object) {
-		//var o1 = m, o2 = n;
+	onStart: function (object) {},
+	onCheck: function (object, other) {},
+	onHandle: function (object, object) { },
+	onEnd: function (object) {},
+	onDraw: function (object, ctx) {}
+};
 
-		// this is a weird/hacky/exciting thing... so if an entity has the 'doPixelPerfect' collision, it will check for imageData, and create and supply its own function if it isn't found.
-		if (!this.getImageData) {
-			this.getImageData = function () {
-			if (!this.imageData) {
-	    			var c = document.createElement("canvas");
-	    			c.width = this.w;
-	    			c.height = this.h;
-	    			var ctx = c.getContext("2d");
-	    			ctx.imageSmoothingEnabled = false;
-	    			var x = this.x, y = this.y, opacity = this.opacity;
-	    			this.x = this.w / 2, this.y = this.h / 2, this.opacity = 1;
-	    			this.draw(ctx);
-	    			this.ig = ctx.getImageData(0, 0, this.w, this.h);
-	    			this.imageData = this.ig.data;
-	    			this.x = x, this.y = y, this.opacity = opacity;
-	       			return this.imageData;
-	    		}
-	    		else {
-	    			return this.imageData;
-	    		}
-		    };
-		}
+var PixelPerfect = Object.create(Collision);
+PixelPerfect.onStart = function (object) {
+	console.log("hi there");
+		if (!object.getImageData) {
+			object.getImageData = function () {
+				if (!object.imageData) {
+					var c = document.createElement("canvas");
+					c.width = object.w;
+					c.height = object.h;
+					var ctx = c.getContext("2d");
+					ctx.imageSmoothingEnabled = false;
+					var x = object.x, y = object.y, opacity = object.opacity;
+					object.x = object.w / 2, object.y = object.h / 2, object.opacity = 1;
+					object.draw(ctx);
+					object.ig = ctx.getImageData(0, 0, object.w, object.h);
+					object.imageData = object.ig.data;
+					object.x = x, object.y = y, object.opacity = opacity;
+		   			return object.imageData;
+				}
+				else {
+					return object.imageData;
+				}
+	  };
+	}
+};
+PixelPerfect.onCheck = function (object, other) {
+	// object is a weird/hacky/exciting thing... so if an entity has the 'doPixelPerfect' collision, it will check for imageData, and create and supply its own function if it isn't found.
 
-		if (!this.getImageData || !object.getImageData) return false;
-    	
-    	var m = this, n = object;
-    	var n_data = n.getImageData();
-		var m_data = m.getImageData();
+	if (!object.getImageData || !other.getImageData) return false;
+  
+	var m = object, n = other;
+	var n_data = n.getImageData();
+	var m_data = m.getImageData();
 
-		// if either does not have an imageData field, cannot find collision
+	// if either does not have an imageData field, cannot find collision
 
-        m = {x: m.getBoundX(), y: m.getBoundY(), w: m.w, h: m.h};
-        n = {x: n.getBoundX(), y: n.getBoundY(), w: n.w, h: n.h};
-		if (m.x + m.w < n.x || m.x > n.x + n.w)
-			return false;
-		if (m.y + m.h < n.y || m.y > n.y + n.h)
-			return false;
+  m = {x: m.getBoundX(), y: m.getBoundY(), w: m.w, h: m.h};
+  n = {x: n.getBoundX(), y: n.getBoundY(), w: n.w, h: n.h};
+	if (m.x + m.w < n.x || m.x > n.x + n.w)
+		return false;
+	if (m.y + m.h < n.y || m.y > n.y + n.h)
+		return false;
 
-		// find intersection...
-		var minX = Math.max(m.x, n.x), minY = Math.max(m.y, n.y);
-		var maxX =  Math.min(m.x + m.w, n.x + n.w), maxY = Math.min(m.y + m.h, n.y + n.h);
-		
+
+	// find intersection...
+	var minX = Math.max(m.x, n.x), minY = Math.max(m.y, n.y);
+	var maxX =  Math.min(m.x + m.w, n.x + n.w), maxY = Math.min(m.y + m.h, n.y + n.h);
+	
 /**					************************					**/
 /**					Compare in overlap range					**/
 /**					(Pixel by pixel, if not 					**/
 /**					transparent i.e. 255)   					**/
 /**					************************					**/
 
-		for (var j = 0; j < maxY - minY; j++)
+	for (var j = 0; j < maxY - minY; j++)
+	{
+		for (var i = 0; i < maxX - minX; i++)
 		{
-			for (var i = 0; i < maxX - minX; i++)
+			var my = ((minY - m.y) + j) * m.w * 4,
+				mx = ((minX - m.x) + i) * 4 + 3;
+			var ny = ((minY - n.y) + j) * n.w * 4,
+				nx = ((minX - n.x) + i) * 4 + 3;
+			if (m_data[my + mx] != 0 && n_data[ny + nx] != 0)
 			{
-				var my = ((minY - m.y) + j) * m.w * 4,
-					mx = ((minX - m.x) + i) * 4 + 3;
-				var ny = ((minY - n.y) + j) * n.w * 4,
-					nx = ((minX - n.x) + i) * 4 + 3;
-				if (m_data[my + mx] != 0 && n_data[ny + nx] != 0)
-				{
-				
-/**					************************					**/
-/**					PUSH OUT FROM EACH OTHER					**/
-/**					************************					**/
-/*
-					o1.x = m.x < n.x ? o1.x - 1 : o1.x + 1;
-					o2.x = n.x < m.x ? o2.x - 1 : o2.x + 1;
-					o1.y = m.y < n.y ? o1.y - 1 : o1.y + 1;
-					o2.y = n.y < m.y ? o2.y - 1 : o2.y + 1;*/
-					return true;
-				}
+				return true;
 			}
 		}
-		return false;
-	},
-	handleSolid: function (other) { 
+	}
+	return false;
+};
+
+var Box = Object.create(Collision);
+Box.onCheck = function (object, other) {
+	if (object.x + object.w > other.x && object.x < other.x + other.w) {
+		if (object.y + object.h > other.y && object.y < other.y + other.h) {
+			return true;
+		}
+	}
+	return false;
+};
+
+var Polygon = Object.create(Collision);
+Polygon.onStart = function (object) {
+	if (!object.vertices) {
+		var d = Math.sqrt(Math.pow(object.w, 2) + Math.pow(object.h, 2)) / 2;
+		var th = Math.acos(0.5 * object.w / d);
+		object.vertices = [
+			{d: d, theta: th},
+			{d: d, theta: Math.PI - th},
+			{d: d, theta: Math.PI + th},
+			{d: d, theta: 2 * Math.PI - th}
+		];
+	}
+	object.getVertices = function () {
+		var result = [];
+		for (var i = 0; i < this.vertices.length; i++) {
+			var x = this.x + this.vertices[i].d * Math.cos(this.vertices[i].theta + this.angle);
+			var y = this.y + this.vertices[i].d * Math.sin(this.vertices[i].theta + this.angle);
+			result.push({x: x, y: y});
+		}
+		return result;
+	}
+	object.getAxes = function () {
+		var result = [];
+		var v = this.getVertices();
+		for (var i = 0; i < v.length; i++) {
+			var x = v[i].x - v[(i+1) % v.length].x;
+			var y = v[i].y - v[(i+1) % v.length].y;
+			result.push({x: -y, y: x});
+		}
+		return result;
+	}
+};
+
+Polygon.onCheck = function (o1, o2) {
+	if (!o1.vertices || !o2.vertices) return false;
+	else if (o1 == o2) return false;
+
+	var v1 = o1.getVertices(), v2 = o2.getVertices();
+	var a1 = o1.getAxes(), a2 = o2.getAxes();
+
+	var separate = false;
+
+	for (var i = 0; i < a1.length; i++) {
+		var p1 = project(a1[i], v1);
+		var p2 = project(a1[i], v2);
+
+		if (!overlap(p1, p2)) separate = true;
+	}
+
+	for (var i = 0; i < a2.length; i++) {
+		var p1 = project(a2[i], v1);
+		var p2 = project(a2[i], v2);
+
+		if (!overlap(p1, p2)) separate = true;
+	}
+
+	return !separate;
+}
+
+
+var Collisions = {
+	Box: Box
+}
+
+var HandleCollision = {
+	handleSolid: function (object, other) { 
 		if (other.solid) {
-			var dx = Math.abs(this.x - other.x);
-			var d = distance(this.x, this.y, other.x, other.y);
+			var dx = Math.abs(object.x - other.x);
+			var d = distance(object.x, object.y, other.x, other.y);
 			var cross = distance(other.x, other.y, other.getBoundX(), other.getBoundY());
 			//console.log(dx, d, 0.5 * other.w, cross);
-			var bounce = (this.bounce || 0) || (other.bounce || 0);
+			var bounce = (object.bounce || 0) || (other.bounce || 0);
 			if (Math.abs(dx / d) < Math.abs(0.5 * other.w / cross)) {
 				//console.log('vertical');
-				this.y += this.getBoundY() < other.getBoundY() ? -2 : 2;
-        		this.velocity.y = this.getBoundY() < other.getBoundY() ? Math.min(-1 * bounce * this.velocity.y, this.velocity.y) : Math.max(-1 * bounce * this.velocity.y, this.velocity.y);
-        		this.acceleration.y = this.getBoundY() < other.getBoundY() ? Math.min(0, this.acceleration.y) : Math.max(0, this.acceleration.y);
+				object.y += object.getBoundY() < other.getBoundY() ? -2 : 2;
+        		object.velocity.y = object.getBoundY() < other.getBoundY() ? Math.min(-1 * bounce * object.velocity.y, object.velocity.y) : Math.max(-1 * bounce * object.velocity.y, object.velocity.y);
+        		object.acceleration.y = object.getBoundY() < other.getBoundY() ? Math.min(0, object.acceleration.y) : Math.max(0, object.acceleration.y);
         	} else {
         		//console.log('horizontal')
-				this.x += this.getBoundX() < other.getBoundX() ? -2 : 2;
-        		this.velocity.x = this.getBoundX() < other.getBoundX() ? Math.min(-1 * bounce * this.velocity.x, this.velocity.x) : Math.max(-1 * bounce * this.velocity.x, this.velocity.x);
-        		this.acceleration.x = this.getBoundX() < other.getBoundX() ? Math.min(0, this.acceleration.x) : Math.max(0, this.acceleration.x);
-        	}//this.velY *= -1;
+				object.x += object.getBoundX() < other.getBoundX() ? -2 : 2;
+        		object.velocity.x = object.getBoundX() < other.getBoundX() ? Math.min(-1 * bounce * object.velocity.x, object.velocity.x) : Math.max(-1 * bounce * object.velocity.x, object.velocity.x);
+        		object.acceleration.x = object.getBoundX() < other.getBoundX() ? Math.min(0, object.acceleration.x) : Math.max(0, object.acceleration.x);
+        	}//object.velY *= -1;
 		}
 	}
 }

@@ -19,14 +19,19 @@
 			"sprite": "ground",
 			"tile": true,
 			"solid": true,
-			"collide": "doPixelPerfect"
+			"collide": "doPolygon"
 		},
 		{
 			"x": 400,
 			"y": 706,
 			"sprite": "tower",
 			"solid": true,
-			"collide": "doPixelPerfect"
+			"collide": "Polygon",
+			"vertices": [
+				{"d": 32, "theta": 0},
+				{"d": 100, "theta": 2.3},
+				{"d": 100, "theta": 4.6}
+			]
 		},
 		{
 			"x": 400,

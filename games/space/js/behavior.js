@@ -71,8 +71,8 @@ DrawHitBox.draw = function (ctx) {
 
 var SimpleAI = Object.create(Behavior);
 SimpleAI.update = function (dt) {
-	console.log(this.target);
-	console.log(this.target.x, this.entity.x, (this.entity.x > this.target.x ? -1 : 1))
+	//console.log(this.target);
+	//console.log(this.target.x, this.entity.x, (this.entity.x > this.target.x ? -1 : 1))
 	this.entity.velocity = {
 		x: clamp( (this.entity.x > this.target.x ? -1 : 1) * Math.abs(this.entity.x - this.target.x) / 2, - SPEED.ship / 2, SPEED.ship / 2),
 		y: clamp( (this.entity.y > this.target.y ? -1 : 1) * Math.abs(this.entity.y - this.target.y) / 2, - SPEED.ship / 2, SPEED.ship / 2)
