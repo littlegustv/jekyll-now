@@ -122,14 +122,15 @@ Polygon.onStart = function (object) {
 		for (var i = 0; i < v.length; i++) {
 			var x = v[i].x - v[(i+1) % v.length].x;
 			var y = v[i].y - v[(i+1) % v.length].y;
-			result.push({x: -y, y: x});
+			var magnitude = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+			result.push({x: -y / magnitude, y: x / magnitude});
 		}
 		return result;
 	}
 };
 
 Polygon.onCheck = function (o1, o2) {
-	if (!o1.vertices || !o2.vertices) return false;
+	if (!o1.getVertices || !o2.getVertices) return false;
 	else if (o1 == o2) return false;
 
 	var v1 = o1.getVertices(), v2 = o2.getVertices();
@@ -141,17 +142,18 @@ Polygon.onCheck = function (o1, o2) {
 		var p1 = project(a1[i], v1);
 		var p2 = project(a1[i], v2);
 
-		if (!overlap(p1, p2)) separate = true;
+		if (!overlap(p1, p2)) return false;
 	}
 
+	console.log(a2.length);
 	for (var i = 0; i < a2.length; i++) {
 		var p1 = project(a2[i], v1);
 		var p2 = project(a2[i], v2);
 
-		if (!overlap(p1, p2)) separate = true;
+		if (!overlap(p1, p2)) return false;
 	}
 
-	return !separate;
+	return true;
 }
 
 

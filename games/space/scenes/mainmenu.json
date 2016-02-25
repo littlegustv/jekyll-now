@@ -1,7 +1,7 @@
 {
 	"script": "mainmenu.js",
-	"height": 800,
-	"width": 2400,
+	"height": 1600,
+	"width": 4800,
 	"entities": [
 		{
 			"x": 800,

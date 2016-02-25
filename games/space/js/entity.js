@@ -101,7 +101,7 @@ Sprite.draw = function (ctx) {
 	ctx.globalAlpha = 1;
 	if (CONFIG.debug) {
 		ctx.strokeStyle = "red";
-		if (this.vertices) {
+		if (this.getVertices) {
 			var v = this.getVertices();
 			ctx.beginPath();
 			ctx.moveTo(v[0].x, v[0].y);
@@ -114,9 +114,9 @@ Sprite.draw = function (ctx) {
 			var a = this.getAxes();
 			ctx.strokeStyle = "green";
 			ctx.beginPath();
-			ctx.moveTo(this.x + a[0].x, this.y + a[0].y);
-			for (var i = 1; i < a.length; i++) {
-				ctx.lineTo(a[i].x + this.x, a[i].y + this.y);
+			for (var i = 0; i < a.length; i++) {
+				ctx.moveTo(this.x + a[i].x, this.y + a[i].y);
+				ctx.lineTo(100 * a[i].x + this.x, 100 * a[i].y + this.y);
 			}
 			ctx.closePath();
 			ctx.stroke();

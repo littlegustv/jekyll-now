@@ -129,7 +129,7 @@ var onUpdate = function (dt) {
 		};*/
 //		asteroid.bounce = 0.9;
 		asteroid.velocity = {x: Math.random() * SPEED.ship - SPEED.ship / 2, y: Math.random() * SPEED.ship - SPEED.ship / 2 };
-		this.entities.push(asteroid);
+		//this.entities.push(asteroid);
 	}
 };
 

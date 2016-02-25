@@ -22,14 +22,14 @@ function project(axes, vertices) {
 }
 
 function overlap(p1, p2) {
-    if ((p1[0] > p2[0] && p1[0] < p2[1]) || (p1[1] > p2[0] && p1[1] < p2[1])) {
-        return true;
+  if ((p1[0] > p2[0] && p1[0] < p2[1]) || (p1[1] > p2[0] && p1[1] < p2[1])) {
+      return true;
   }
-    if ((p2[0] > p1[0] && p2[0] < p1[1]) || (p2[1] > p2[0] && p2[1] < p1[1])) {
-        return true;
+  if ((p2[0] > p1[0] && p2[0] < p1[1]) || (p2[1] > p2[0] && p2[1] < p1[1])) {
+      return true;
   }
-    else {
-        return false;
+  else {
+      return false;
   }
 }
 
@@ -42,11 +42,11 @@ function distance (x1, y1, x2, y2) {
 }
 
 var CONFIG = {
-	height: 400,
-	width: 600,
+	height: 480,
+	width: 640,
 	title: "My Game",
 	startScene: "mainmenu",
-	debug: true
+	debug: false
 };
 
  var GLOBALS = {

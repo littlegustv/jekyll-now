@@ -14,20 +14,22 @@ layout: default
       </div>
   {% endunless %}
   {% endfor %}
+    <div class="grid-item">
+      <ul class="pagination">
+          {% if paginator.previous_page %}
+            <li><a href="{{ paginator.previous_page_path }}">prev.</a></li>
+          {% endif %}
+          {% for pnum in (1..paginator.total_pages) %}
+            {% if pnum == 1 %}
+              <li><a href="{{ site.baseurl }}/index.html">{{pnum}}</a></li>
+            {% else %}
+              <li><a href="{{ site.baseurl }}/page{{ pnum }}">{{pnum}}</a></li>
+            {% endif %}
+          {% endfor %}
+          {% if paginator.next_page %}
+            <li><a href="{{ paginator.next_page_path}}">next.</a></li>
+          {% endif %}
+      </ul>
+    </div>
   </div>
-  <ul class="pagination">
-      {% if paginator.previous_page %}
-        <li><a href="{{ paginator.previous_page_path }}">prev.</a></li>
-      {% endif %}
-      {% for pnum in (1..paginator.total_pages) %}
-        {% if pnum == 1 %}
-          <li><a href="{{ site.baseurl }}/index.html">{{pnum}}</a></li>
-        {% else %}
-          <li><a href="{{ site.baseurl }}/page{{ pnum }}">{{pnum}}</a></li>
-        {% endif %}
-      {% endfor %}
-      {% if paginator.next_page %}
-        <li><a href="{{ paginator.next_page_path}}">next.</a></li>
-      {% endif %}
-  </ul>
 </div>
