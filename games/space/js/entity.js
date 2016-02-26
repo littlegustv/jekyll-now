@@ -19,6 +19,17 @@ var Entity = {
 		ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
 		ctx.globalAlpha = 1;
 	},
+	setVertices: function (vertices) {
+		if (vertices) {
+			this.vertices = vertices.map( function (v) {
+				var _d = GLOBALS.scale * Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));
+				var _theta = Math.atan2(v.y, v.x);
+				console.log(v, _d, _theta);
+				return {d: _d, theta: _theta}
+			});
+		}
+		console.log(1,this.vertices);
+	},
 	setCollision: function (collision) {
 		this.collision = Object.create(collision);
 		this.collision.onStart(this);
@@ -42,13 +53,14 @@ var Entity = {
 		}
 	},
 //	checkCollision: function (obj) { return false },
-	checkCollisions: function (entities) { 
+	checkCollisions: function (start, entities) { 
 		if (!this.collision) return;
-		for (var i = 0; i < entities.length; i++) {
+		for (var i = start; i < entities.length; i++) {
 			if (this == entities[i]) {}
 			else {
 				if (this.collision.onCheck(this, entities[i])) {
 					this.collision.onHandle(this, entities[i]);
+					entities[i].collision.onHandle(entities[i], this);
 				}
 			}
 		}
@@ -78,9 +90,6 @@ Sprite.init = function (x, y, sprite) {
 		this.h = this.sprite.h * GLOBALS.scale, this.w = this.sprite.image.width * GLOBALS.scale / this.sprite.frames;
 		this.frame = 0, this.maxFrame = this.sprite.frames, this.frameDelay = this.sprite.speed, this.maxFrameDelay = this.sprite.speed;
 		//this.imageData = this.getImageData(buf);
-		if (sprite.vertices) {
-			this.vertices = sprite.vertices;
-		}
 	}
 	return this;
 };

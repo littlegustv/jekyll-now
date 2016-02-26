@@ -19,7 +19,8 @@
 			"sprite": "ground",
 			"tile": true,
 			"solid": true,
-			"collide": "doPolygon"
+			"collide": "Polygon",
+			"family": "neutral"
 		},
 		{
 			"x": 400,
@@ -28,10 +29,13 @@
 			"solid": true,
 			"collide": "Polygon",
 			"vertices": [
-				{"d": 32, "theta": 0},
-				{"d": 100, "theta": 2.3},
-				{"d": 100, "theta": 4.6}
-			]
+				{"x": 3, "y": 24},
+				{"x": -3, "y": 24},
+				{"x": -3, "y": -20},
+				{"x": 0, "y": -24},
+				{"x": 3, "y": -20}
+			],
+			"family": "neutral"
 		},
 		{
 			"x": 400,

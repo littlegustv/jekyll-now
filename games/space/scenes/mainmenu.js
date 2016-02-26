@@ -1,21 +1,35 @@
+function notFriendly (callback) {
+	return function (object, other) {
+		if (other.family == object.family) return false;
+		return callback.call(this, object, other);
+	}
+}
+
 var onStart = function () {
 
+	Polygon.onCheck = notFriendly(Polygon.onCheck);
+
 	var t = this;
-	//console.log(t, t.h);
 
 	var s = Object.create(Sprite).init(300, 200, Resources.viper);
-	s.handleCollision = Collision.handleSolid;
 	s.addBehavior(Accelerate, {maxSpeed: SPEED.ship});
 	s.addBehavior(Velocity);
 	s.addBehavior(Bound, {min: {x: -600, y: 0}, max: {x: 1800, y: 800}})
 	s.health = 10;
 	this._player = s;
 
+	s.setVertices([
+		{x: -3, y: -4},
+		{x: -3, y: 4},
+		{x: 5, y: 0}
+	]);
+
 	s.setCollision(Polygon)
-	s.collision.onHandle = /*function () {console.log('collided!') }; */HandleCollision.handleSolid;
+	s.collision.onHandle = HandleCollision.handleSolid;
 
 	debug = s;
-	
+
+
 	for (var i = 0; i < this.data.entities.length; i++) {
 		var eData = this.data.entities[i];
 		if (eData.sprite) {
@@ -48,12 +62,13 @@ var onStart = function () {
 		if (eData.collide == "Polygon") {
 			e.setCollision(Polygon);
 		}
+		e.family = eData.family || "";
 		e.solid = eData.solid || false;
 		e.bounce = 0;
 		if (eData.velocity) e.velocity = eData.velocity;
 		this.entities.push(e);
 
-		if (eData.vertices) e.vertices = eData.vertices;
+		if (eData.vertices) e.setVertices(eData.vertices);
 	}
 
 

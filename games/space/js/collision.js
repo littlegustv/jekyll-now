@@ -132,7 +132,7 @@ Polygon.onStart = function (object) {
 Polygon.onCheck = function (o1, o2) {
 	if (!o1.getVertices || !o2.getVertices) return false;
 	else if (o1 == o2) return false;
-
+	else if (distance(o1.x, o1.y, o2.x, o2.y) > Math.max(o1.h, o1.w) + Math.max(o2.h, o2.w)) return false;
 	var v1 = o1.getVertices(), v2 = o2.getVertices();
 	var a1 = o1.getAxes(), a2 = o2.getAxes();
 

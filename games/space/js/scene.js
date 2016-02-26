@@ -67,7 +67,7 @@ var Scene = {
 			this.entities[i].update(dt);
 		}
 		for (var i = 0; i < this.entities.length; i++) {
-			this.entities[i].checkCollisions(this.entities);
+			this.entities[i].checkCollisions(i, this.entities);
 		}
 		this.onUpdate(dt);
 		// clean up
