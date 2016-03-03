@@ -298,7 +298,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			ctx.fillStyle = "black";
 			ctx.fillRect(0, 0, canvas.width * this.resourceLoadCount / this.resourceCount, canvas.height);
 			ctx.fillStyle = "white";
-			ctx.font = "900 64px Arial";
+			ctx.font = "900 64px Visitor";
 			ctx.textAlign = "center";
 			ctx.fillText("loading...", canvas.width / 2, canvas.height / 2);
 		},
@@ -1306,7 +1306,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		this.drawButton(ctx);
 		if (this.frame == 1 && this.name) {
 			var p = this.getPosition();
-			ctx.font = "900 14px Arial";
+			ctx.font = "900 14px Visitor";
 			ctx.fillStyle = "#f4f0e8";
 			ctx.textAlign = "center";
 			ctx.fillText(this.name, p.x, p.y + 24);
@@ -1453,7 +1453,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		if (this.duration < 0) return;
 		ctx.textAlign = this.align;
 		ctx.fillStyle = this.color;
-		ctx.font = "900 " + this.size + "px Arial";
+		ctx.font = "900 " + this.size + "px Visitor";
 		ctx.fillText(this.text.substr(0,this.current), this.x, this.y);
 	};
 
