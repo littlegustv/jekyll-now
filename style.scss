@@ -284,15 +284,26 @@ nav {
     height: 30px;
     left: 0px;
     margin-top: 6px;
-    transform: rotate(1deg);
+  -webkit-transform: perspective(999px) rotate(1deg);
+  -moz-transform: rotate(1deg);
+  -ms-transform: rotate(1deg);
+  -o-transform: rotate(1deg);
+  transform: perspective(999px) rotate(1deg);
     background-color:inherit;
 }
 .post-row:nth-child(even):after {
-    transform: rotate(-1deg);
+  -webkit-transform: perspective(999px) rotate(-1deg);
+  -moz-transform: rotate(-1deg);
+  -ms-transform: rotate(-1deg);
+  -o-transform: rotate(-1deg);
+  transform: perspective(999px) rotate(-1deg);
 }
 
 .post-row:nth-child(3n+1) {
   background-color: #FFF2AE;  
+}
+.post-row:nth-child(3n+1):after {
+  border-bottom: 8px dashed #649D03;
 }
 .post-row:nth-child(3n+2) {
   background-color: #649D03  
