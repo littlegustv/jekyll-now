@@ -273,41 +273,32 @@ nav {
 /*	max-width: 2000px;*/
 }
 
-.posts
-{
-	max-width: 740px;
-	margin:auto;
-	overflow:hidden;
+.post-row {
+  padding: 20px 40px 20px 40px;
+  background-color: #68B8C3;
+}
+.post-row:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 30px;
+    left: 0px;
+    margin-top: 6px;
+    transform: rotate(1deg);
+    background-color:inherit;
+}
+.post-row:nth-child(even):after {
+    transform: rotate(-1deg);
 }
 
-.posts > .post {
-  padding-bottom: 2em;
-  border-bottom: 1px solid $lightGray;
+.post-row:nth-child(3n+1) {
+  background-color: #FFF2AE;  
 }
-
-.posts > .post:last-child {
-  padding-bottom: 1em;
-  border-bottom: none;
+.post-row:nth-child(3n+2) {
+  background-color: #649D03  
 }
 
 .post {
-  blockquote {
-    margin: 1.8em .8em;
-    border-left: 2px solid $gray;
-    padding: 0.1em 1em;
-    color: $gray;
-    font-size: 22px;
-    font-style: italic;
-  }
-
-  .comments {
-    margin-top: 10px;
-  }
-
-  .read-more {
-    text-transform: uppercase;
-    font-size: 15px;
-  }
 }
 
 .wrapper-footer {
