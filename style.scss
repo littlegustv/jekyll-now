@@ -20,7 +20,8 @@ html {
 
 body {
 	background: $white;
-  font: 18px/1.4 $georgia;
+  /*font: 18px/1.4 $georgia;*/
+  font: 18px/1.4 Oswald, sans-serif;
   color: $darkGray;
 }
 
@@ -211,7 +212,6 @@ img {
   margin: 0;
   color: #fff;
   cursor: pointer;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 600;
   font-size: 120px;
   line-height: 266px;
