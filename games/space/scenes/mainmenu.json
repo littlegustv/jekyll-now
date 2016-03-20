@@ -23,7 +23,7 @@
 			"family": "neutral"
 		},
 		{
-			"x": 400,
+			"x": -200,
 			"y": 706,
 			"sprite": "tower",
 			"solid": true,
@@ -35,6 +35,33 @@
 				{"x": 0, "y": -24},
 				{"x": 3, "y": -20}
 			],
+			"family": "neutral"
+		},
+		{
+			"x": -360,
+			"y": 736,
+			"sprite": "cathedral",
+			"solid": true,
+			"collide": "Polygon",
+			"vertices": [
+				{"x": -17, "y": 3},
+				{"x": -10, "y": -3},
+				{"x": -10, "y": -13},
+				{"x": 0, "y": -18},
+				{"x": 10, "y": -13},
+				{"x": 10, "y": -3},
+				{"x": 17, "y": 3},
+				{"x": 17, "y": 18},
+				{"x": -17, "y": 18}
+			],
+			"family": "neutral"
+		},
+		{
+			"x": 1000,
+			"y": 736,
+			"sprite": "box",
+			"solid": true,
+			"collide": "Polygon",
 			"family": "neutral"
 		},
 		{

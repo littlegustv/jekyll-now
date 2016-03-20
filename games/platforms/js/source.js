@@ -1,8 +1,25 @@
 
 var debug;
 var audioContext;
+var scale = 1;
+var fontFamily = "Frijole"
+
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 if (AudioContext) AudioContext.createGain = AudioContext.createGain || AudioContext.createGainNode;
+
+function resizeCanvas(canvas) {
+	canvas.style.width = "", canvas.style.height = "";
+	var ratio = canvas.width / canvas.height;
+	// wider
+  if (window.innerWidth / window.innerHeight > ratio)
+  {
+    canvas.style.height = window.innerHeight + "px";
+    scale = window.innerHeight / canvas.height;
+  } else {
+  	canvas.style.width = window.innerWidth + "px";
+  	scale = window.innerWidth / canvas.width;
+  }
+}
 
 function modulo(n, p) {
 	return (n % p + p) % p;
@@ -44,12 +61,13 @@ window.addEventListener("DOMContentLoaded", function () {
 			e.offsetX = e.offsetX || e.clientX;//e.changedTouches[0].clientX;
 			e.offsetY = e.offsetY || e.clientY;//e.changedTouches[0].clientY;
 		}
-		var m = world.toGrid(e.offsetX, e.offsetY);
+		var offsetX = e.offsetX / scale, offsetY = e.offsetY / scale;
+		var m = world.toGrid(offsetX, offsetY);
 		world.mouse.down = false;
 		
 		// check if button is at location
 
-		if (world.scene.button(e.offsetX, e.offsetY)) { return; }
+		if (world.scene.button(offsetX, offsetY)) { return; }
 		
 		if (!world.paused) return;
 
@@ -77,7 +95,8 @@ window.addEventListener("DOMContentLoaded", function () {
 			e.offsetX = e.offsetX || e.clientX;//e.changedTouches[0].clientX;
 			e.offsetY = e.offsetY || e.clientY;//e.changedTouches[0].clientY;
 		}
-		world.mouse.x = e.offsetX, world.mouse.y = e.offsetY;
+		var offsetX = e.offsetX / scale, offsetY = e.offsetY / scale;
+		world.mouse.x = offsetX, world.mouse.y = offsetY;
 
 		if (!world.scene || world.scene.type != "level") return;
 		else if (e.which === 3 || e.button === 2) {}
@@ -93,17 +112,21 @@ window.addEventListener("DOMContentLoaded", function () {
 			e.offsetX = e.offsetX || e.clientX;//e.changedTouches[0].clientX;
 			e.offsetY = e.offsetY || e.clientY;//e.changedTouches[0].clientY;
 		}
-		world.scene.highlightButton(e.offsetX, e.offsetY);
+		var offsetX = e.offsetX / scale, offsetY = e.offsetY / scale;
+		world.scene.highlightButton(offsetX, offsetY);
 		if (!world.scene || world.scene.type != "level") return;
-		var theta = Math.atan2(e.offsetY - world.mouse.y, e.offsetX - world.mouse.x);
-		world.mouse.angle = modulo(Math.round(theta / (Math.PI / 3)), 6);
+		var theta = Math.atan2(offsetY - world.mouse.y, offsetX - world.mouse.x);
+		world.mouse.angle = world.cs > 5 ? modulo(Math.round(theta / (Math.PI / 3)), 6) : 0;
 		if (!world.mouse.down) {
-			world.mouse.x = e.offsetX, world.mouse.y = e.offsetY;
+			world.mouse.x = offsetX, world.mouse.y = offsetY;
 		}
 	}
 
 	var canvas = document.getElementById("mygame");
 	var ctx = canvas.getContext("2d");
+
+	resizeCanvas(canvas);
+	window.addEventListener('resize', function () { resizeCanvas(canvas); });
 
 	if (AudioContext) {
 		audioContext = new AudioContext();
@@ -153,6 +176,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "character.png", frames: 2, speed: 500, animations: 6},
 		{path: "obstacle.png", frames: 2, speed: 1000},
 		{path: "hotspot.png", frames: 2, speed: 500},
+		{path: "highlight.png", frames: 2, speed: 400},
 		{path: "undertow.png", frames: 4, speed: 200},
 		{path: "unstable.png", frames: 4, speed: 300},
 		{path: "scenes.js"},
@@ -298,7 +322,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			ctx.fillStyle = "black";
 			ctx.fillRect(0, 0, canvas.width * this.resourceLoadCount / this.resourceCount, canvas.height);
 			ctx.fillStyle = "white";
-			ctx.font = "900 64px Visitor";
+			ctx.font = "900 64px " + fontFamily;
 			ctx.textAlign = "center";
 			ctx.fillText("loading...", canvas.width / 2, canvas.height / 2);
 		},
@@ -584,6 +608,8 @@ window.addEventListener("DOMContentLoaded", function () {
 					case "collectable":
 						e = Object.create(Collectable).init(c.gridX, c.gridY, Resources[s.stage]);
 						e.animation = s.uid % e.sprite.animations;
+						s.total += 1;
+
 						//debug = e;
 						break;
 					case "specimen":
@@ -591,6 +617,9 @@ window.addEventListener("DOMContentLoaded", function () {
 						e.animation = s.uid % e.sprite.animations;
 						e.direction = DIRECTION[c.direction || "east"];
 						//console.log(e.direction);
+						break;
+					case "highlight":
+						e = Object.create(Entity).init(c.gridX, c.gridY, Resources.highlight);
 						break;
 				}
 				if (e) {s.entities.push(e);}
@@ -616,6 +645,9 @@ window.addEventListener("DOMContentLoaded", function () {
 						m  = Object.create(Platform).init(c.gridX, c.gridY, Resources.platform);
 						m.direction = DIRECTION[c.direction];
 						break;
+					case "highlight":
+						m = Object.create(Entity).init(c.gridX, c.gridY, Resources.highlight);
+						break;
 				}
 				if (m) {
 					if (!s.map[c.gridY]) s.map[c.gridY] = {};
@@ -632,43 +664,53 @@ window.addEventListener("DOMContentLoaded", function () {
 			if (s.type == "level") {
 
 				// ADD LEVEL BUTTONS: reset, back, play
-				var b = Object.create(Button).init( 1, 0, Resources.reset);
-				b.name = "retry";
-				b.offset = {x: 0, y: -8};
+				//var b = Object.create(Button).init( 1, 0, Resources.reset);
+				//b.name = "retry";
+				//b.offset = {x: 0, y: -8};
+				var t_reset = Object.create(Text).init(0,0,"retry", {size: 14, align: "left"});
+				var b = Object.create(TextButton).init(10, 38, t_reset);
 				b.callback = function () {
 					world.reset();
 				};
 				s.buttons.push(b);
 
-				var b = Object.create(Button).init( 11, 0, Resources.help);
-				b.name = "walkthrough";
-				b.offset = {x: 0, y: -8};
-				b.target = config.walkthrough || "http://www.youtube.com";
-				b.callback = function () {
-					window.open(this.target, "_blank");
-				};
-				s.buttons.push(b);
+				//var b = Object.create(Button).init( 11, 0, Resources.help);
+				//b.name = "walkthrough";
+				//b.offset = {x: 0, y: -8};
+				if (config.walkthrough) {
+					var t_walkthrough = Object.create(Text).init(0,0,"solution", {size: 14, align: "right"});
+					var b = Object.create(TextButton).init(470, 38, t_walkthrough);
+					b.target = config.walkthrough || "http://www.youtube.com";
+					b.callback = function () {
+						window.open(this.target, "_blank");
+					};
+					s.buttons.push(b);
+				}
 
-				var b = Object.create(Button).init( 2, 0, Resources.back);
-				b.name = "undo";
-				b.offset = {x: 0, y: -8};
+//				var b = Object.create(Button).init( 2, 0, Resources.back);
+//				b.name = "undo";
+//				b.offset = {x: 0, y: -8};
+				var t_undo = Object.create(Text).init(0,0,"undo", {size: 14, align: "left"});
+				var b = Object.create(TextButton).init(10, 20, t_undo);
 				b.callback = function () {
 					world.undo();
 				};
 				s.buttons.push(b);
 
-				var b = Object.create(Button).init( 0, 0, Resources.play);
-				b.name = "run";
-				b.offset = {x: 0, y: -8};
+				var t_run = Object.create(Text).init(0,0,"run", {size: 14, align: "left"});
+				var b = Object.create(TextButton).init(10, 56, t_run);
+	//			var b = Object.create(Button).init( 0, 0, Resources.play);
+	//			b.name = "run";
+	//			b.offset = {x: 0, y: -8};
 				b.callback = function () {
 					world.paused = false;
 					world.scene.platformsUsed = world.scene.count("platform");
 				};
 				s.buttons.push(b);
-				var t = Object.create(Text).init(canvas.width / 2, canvas.height - GLOBALS.height / 2, s.name, {});
+				var t = Object.create(Text).init(canvas.width / 2, canvas.height - GLOBALS.height / 2, s.name, {size: 18});
 				s.addEntity(t);
 
-				var t2 = Object.create(Text).init(canvas.width / 2, GLOBALS.border, s.name, {align: "center"});
+				var t2 = Object.create(Text).init(canvas.width / 2, GLOBALS.border, s.name, {align: "center", size: 18});
 				s.addEntity(t2);
 				s.par = t2;
 			}
@@ -677,10 +719,10 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 			if (s.name == "mainmenu") {
 
-				var t = Object.create(Text).init(canvas.width / 2,canvas.height / 2 + 16,"<Continue>", world.newGame ? {color: "#333333"}:{} );
+				var t = Object.create(Text).init(canvas.width / 2,canvas.height / 2 + 16,"Continue", world.newGame ? {color: "#333333"}:{} );
 				if (!world.newGame) {
 					world.load();
-					var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 16,t);
+					var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 22,t);
 					tb.callback = function () {
 						world.doScene(2);
 					};
@@ -689,16 +731,16 @@ window.addEventListener("DOMContentLoaded", function () {
 					s.entities.push(t);
 				}
 			
-				var t = Object.create(Text).init(0, 0,"<New Game>",{});
-				var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2 + 44,t);
+				var t = Object.create(Text).init(0, 0,"New Game",{});
+				var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2 + 66,t);
 				tb.callback = function () {
 					world.clear();
 					world.doScene(3);
 				};
 				s.buttons.push(tb);
 
-				var t = Object.create(Text).init(0, 0,"<Credits>",{});
-				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 72,t);
+				var t = Object.create(Text).init(0, 0,"Credits",{});
+				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 110,t);
 				tb.callback = function () {
 					world.doScene(1);
 				};
@@ -708,9 +750,10 @@ window.addEventListener("DOMContentLoaded", function () {
 				var e = Object.create(Entity).init(3,3,Resources.temp);
 				e.animation = 0;
 				s.entities.push(e);*/
-
-				var mute = Object.create(Button).init(12, 0, Resources.mute);
-				mute.name = "mute";
+				var t_mute = Object.create(Text).init(0,0,"mute", {size: 14, align: "right"});
+				var mute = Object.create(TextButton).init(470, 20, t_mute);
+				//var mute = Object.create(Button).init(12, 0, Resources.mute);
+				//mute.name = "mute";
 				if (AudioContext) {
 					mute.animation = audioContext.state == "suspended" ? 1 : 0;
 					mute.callback = function () {
@@ -735,9 +778,12 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.buttons.push(mute);
 
 			} else if (s.type != "cutscene") {
+				/*
 				var b = Object.create(Button).init(12, 0, Resources.menu);
 				b.offset = {x: 0, y: -8};
-				b.name = "menu";
+				b.name = "menu";*/
+				var t_menu = Object.create(Text).init(0,0,"menu", {size: 14, align: "right"});
+				var b = Object.create(TextButton).init(470, 20, t_menu);
 				if (s.type == "level")
 					b.callback = function () {	world.doScene(2); };
 				else
@@ -745,11 +791,11 @@ window.addEventListener("DOMContentLoaded", function () {
 				s.buttons.push(b);
 			}
 			if (s.name == "credits") {
-				var t = Object.create(Text).init(0, 0, "@littlegustv", {});
+				var t = Object.create(Text).init(0, 0, "@littlegustv", {size: 16});
 				var b = Object.create(TextButton).init(240, 136, t);
 				b.callback = function () { window.open("http://www.twitter.com/littlegustv", "_blank"); };
 				s.buttons.push(b);
-				var t = Object.create(Text).init(0, 0, "littlegustv.github.io", {});
+				var t = Object.create(Text).init(0, 0, "littlegustv.github.io", {size: 16});
 				var b = Object.create(TextButton).init(240, 162, t);
 				b.callback = function () { window.open("https://littlegustv.github.io", "_blank"); };
 				s.buttons.push(b);
@@ -763,7 +809,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					var levels = this.scenes.filter(function (a) { return a.stage == stage && a.type == "level"; });
 					for (var i = 0; i < levels.length; i++) {
 						var w = this.scenes.indexOf(levels[i]);
-						if (!sc || this.stageComplete(sc)) {
+						if (true) {//!sc || this.stageComplete(sc)) {
 							var tb;
 							if (!levels[i].score) {
 								tb = Object.create(Button).init(i - j, 2 * j + 2, Resources.empty);
@@ -801,11 +847,11 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 				var score = 0, max = 0;
 				for (var i = 0; i < this.scenes.length; i++) {
-					if (this.scenes[i].type == 'level' && this.scenes[i].score) {
+					if (this.scenes[i].type == 'level' && this.scenes[i].stage != "tutorial" && this.scenes[i].score) {
 						score += this.scenes[i].score, max += this.scenes[i].max;
 					}
 				}
-				s.entities.push(Object.create(Text).init(244,canvas.height - 20,String(score) + " / " + String(max) + " platforms used",{color: "black"}));
+				s.entities.push(Object.create(Text).init(244,canvas.height - 20,String(score) + " / " + String(max) + " platforms used",{color: "black", size: 24}));
 			}
 			return s;
 		},
@@ -901,7 +947,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			        ctx.drawImage(Resources.directions.image, 0, this.mouse.angle * h / GLOBALS.scale, w / GLOBALS.scale, h / GLOBALS.scale, mx - Math.round(w / 2), Math.ceil(my - h / 2), w, h);
 			        ctx.globalAlpha = 1.0;*/
 			        var cursor = Object.create(Platform).init(m.x, m.y, Resources.platform);
-			        cursor.direction = DIRECTION[directions[this.mouse.angle]];
+			        cursor.direction = DIRECTION[directions[this.mouse.angle]]; 
 			        cursor.opacity = 0.5;
 			        cursor.draw(ctx);
    			        var o1 = this.scene.map[m.y + cursor.direction.y][m.x + cursor.direction.x];
@@ -929,7 +975,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 			/*
 			if (this.scene.start) {
-				ctx.font = "24px VT323";
+				ctx.font = "24px " + fontFamily;
 				ctx.textAlign = "center";
 				ctx.fillStyle = "black";
 				var mx = modulo(m.x - this.scene.start.x, 2);
@@ -980,6 +1026,8 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.buttons = [];
 			this.selected = 0;
 			this.score;
+			this.total = 0;
+			this.collected = 0;
 			return this;
 		},
 		draw: function (ctx) {
@@ -993,12 +1041,13 @@ window.addEventListener("DOMContentLoaded", function () {
 			if (this.type == "level") {
 				//ctx.drawImage(Resources.bottomBar.image, 0, canvas.height - 36, canvas.width, Resources.bottomBar.image.height * GLOBALS.scale);
 				//ctx.drawImage(Resources.topBar.image, 0, -6, canvas.width, Resources.bottomBar.image.height * GLOBALS.scale);
+				/*
 				ctx.fillStyle = "rgba(255,255,255,0.6)";
 				ctx.fillRect(0,0,canvas.width,32);
 				ctx.fillRect(0,canvas.height-32,canvas.width,canvas.height);
-				ctx.fillStyle = "#18140c";
+				ctx.fillStyle = "black";
 				ctx.fillRect(0,32,canvas.width,4);
-				ctx.fillRect(0,canvas.height-32,canvas.width,4);
+				ctx.fillRect(0,canvas.height-32,canvas.width,4);*/
 			}
 			var e = this.entities.sort(function (a, b) { return a.z != b.z ? a.z - b.z : (a.getPosition().y - a.offset.y) - (b.getPosition().y - b.offset.y); });
 			for (var i = 0; i < e.length; i++) {
@@ -1049,6 +1098,9 @@ window.addEventListener("DOMContentLoaded", function () {
 								}
 								if (world.scenes[this.uid].score <= this.max) {
 									var t2 = Object.create(Text).init(canvas.width / 2, canvas.height / 2 + 60, "Perfect!", {size: 72, color: "gold"}, 10, 300);
+									t2.z = 100;
+									this.entities.push(t2);
+									var t2 = Object.create(Text).init(canvas.width / 2 + 4, canvas.height / 2 + 64, "Perfect!", {size: 72, color: "black"}, 10, 320);
 									t2.z = 100;
 									this.entities.push(t2);
 								}
@@ -1306,7 +1358,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		this.drawButton(ctx);
 		if (this.frame == 1 && this.name) {
 			var p = this.getPosition();
-			ctx.font = "900 14px Visitor";
+			ctx.font = "400 14px " + fontFamily;
 			ctx.fillStyle = "#f4f0e8";
 			ctx.textAlign = "center";
 			ctx.fillText(this.name, p.x, p.y + 24);
@@ -1422,8 +1474,8 @@ window.addEventListener("DOMContentLoaded", function () {
 	Text.z = -1;
 	Text.init = function (x, y, text, format, speed, delay, duration) {
 		this.x = x, this.y = y, this.text = text;
-		this.size = format.size || 24;
-		this.color = format.color || "#18140c";
+		this.size = format.size || 40;
+		this.color = format.color || "black";
 		this.align = format.align || "center";
 		this.speed = speed ? speed : 0;
 		this.current = speed ? 0 : text.length;
@@ -1453,7 +1505,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		if (this.duration < 0) return;
 		ctx.textAlign = this.align;
 		ctx.fillStyle = this.color;
-		ctx.font = "900 " + this.size + "px Visitor";
+		ctx.font = "900 " + this.size + "px " + fontFamily;
 		ctx.fillText(this.text.substr(0,this.current), this.x, this.y);
 	};
 
@@ -1493,7 +1545,12 @@ window.addEventListener("DOMContentLoaded", function () {
 					var ep = e[i].getPosition(), tp = this.getPosition();
 					if (Math.abs(ep.x - tp.x) < 10 && Math.abs(ep.y - tp.y) < 10) {
 						if (e[i].type == "collectable") { 
+							var n = Object.create(Entity).init(world.scene.collected - 5, 10, e[i].sprite);
+							n.offset = {x: 0, y: -8};
+							n.animation = e[i].animation;
+							world.addEntity(n);
 							world.removeEntity(e[i]);
+							world.scene.collected += 1;
 							playSound(Resources.collect);
 							return;
 						}
@@ -1666,7 +1723,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 	document.addEventListener("visibilitychange", function (e) { 
 		if (document.visibilityState == "hidden") {
-			if (AudioContext) audioContext.suspend();
+			if (AudioContext) audioContext.suspend(); // FIX ME: adjust volume instead?
 			else window.muted = true;
 		}
 		else {

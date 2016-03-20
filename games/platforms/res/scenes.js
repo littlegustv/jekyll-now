@@ -8,12 +8,23 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 60, "h": 78, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 10
+						"x": -10, "y": 60, "h": 75, "w": 500, "color": "rgba(255,255,255,0.0)", "delay": 10
 					},
-					"border" : {"color" : "#18140c", "w": 4},
+					"border" : {"color" : "rgba(255,255,255,0.0)", "w": 0},
 					"contents": [
 						{
-							"gridX": 230,
+							"gridX": 246,
+							"gridY": 30,
+							"text": "the floor is the\nSURFACE of the SUN",
+							"type": "textblock",
+							"format": {
+								"size": 32,
+								"align": "center",
+								"color": "gold"
+							}
+						},					
+						{
+							"gridX": 250,
 							"gridY": 32,
 							"text": "the floor is the\nSURFACE of the SUN",
 							"type": "textblock",
@@ -46,7 +57,7 @@
 					"gridY": 110,
 					"text": "developed by Benny Heller",
 					"type": "text",
-					"format": {}
+					"format": {"size": 16}
 				}
 			]
 		},
@@ -69,130 +80,10 @@
 			]
 		},
 		{
-			"name": "intro cutscene",
-			"type": "cutscene",
-			"stage": "habitation",
-			"map": [],
-			"entities": [
-				{
-					"type": "box",
-					"format": {
-						"x": 10, "y": 60, "h": 50, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 200
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 392,
-							"gridY": 30,
-							"text": " - you are the pilot of the Solar Explorer",
-							"type": "text",
-							"format": {
-								"size": 16,
-								"align": "right"
-							}
-						},
-						{
-							"gridX": 0,
-							"gridY": 0,
-							"type": "character",
-							"animation": 0
-						}
-					]
-				},
-				{
-					"type": "box",
-					"format": {
-						"x": 70, "y": 120, "h": 30, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 2000
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 8,
-							"gridY": 20,
-							"text": "somehow, you've dropped a few things . . .",
-							"type": "text",
-							"format": {
-								"size": 16,
-								"align": "left"
-							}
-						}
-					]
-				},
-				{
-					"type": "box",
-					"format": {
-						"x": 10, "y": 160, "h": 50, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 3700
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 452,
-							"gridY": 30,
-							"text": " ... on the surface of the sun.",
-							"type": "text",
-							"format": {
-								"size": 16,
-								"align": "right"
-							}
-						},
-						{
-							"gridX": 0,
-							"gridY": 0,
-							"type": "habitation",
-							"animation": 2
-						},
-						{
-							"gridX": 1,
-							"gridY": 0,
-							"type": "medical",
-							"animation": 4
-						},
-						{
-							"gridX": 2,
-							"gridY": 0,
-							"type": "habitation",
-							"animation": 6
-						},
-						{
-							"gridX": 3,
-							"gridY": 0,
-							"type": "hydroponics",
-							"animation": 5
-						},
-						{
-							"gridX": 4,
-							"gridY": 0,
-							"type": "operations",
-							"animation": 3
-						}
-					]
-				},				
-				{
-					"type": "box",
-					"format": {
-						"x": 70, "y": 220, "h": 30, "w": 340, "color": "rgba(255,255,255,0.6)", "delay": 5400
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 8,
-							"gridY": 20,
-							"text": "I guess you'd better pick them up.",
-							"type": "text",
-							"format": {
-								"size": 16,
-								"align": "left"
-							}
-						}
-					]
-				}
-			]
-		},
-		{
 			"name": "for you",
 			"type": "level",
 			"stage": "tutorial",
-			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=4s",
+			"walkthrough": "",
 			"max": 4,
 			"map": [
 				{
@@ -234,26 +125,7 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 40, "y": 150, "h": 30, "w": 190, "color": "rgba(255,255,255,0.6)", "delay": 100
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 8,
-							"gridY": 20,
-							"text": "You'll start here >>",
-							"type": "text",
-							"format": {
-								"size": 16,
-								"align": "left"
-							}
-						}
-					]
-				},
-				{
-					"type": "box",
-					"format": {
-						"x": 10, "y": 50, "h": 30, "w": 160, "color": "rgba(255,255,255,0.6)", "delay": 3500
+						"x": 10, "y": 70, "h": 30, "w": 160, "color": "rgba(255,255,255,0.6)", "delay": 0
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
@@ -268,68 +140,62 @@
 							}
 						}
 					]
-				},
-				{
-					"type": "box",
-					"format": {
-						"x": 10, "y": 220, "h": 50, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 1800
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 452,
-							"gridY": 30,
-							"text": " - the platforms will get you THERE and BACK.",
-							"type": "text",
-							"format": {
-								"size": 16,
-								"align": "right"
-							}
-						},
-						{
-							"gridX": 0,
-							"gridY": 0,
-							"type": "platform"
-						},
-						{
-							"gridX": 0,
-							"gridY": 0,
-							"type": "directions"
-						}
-					]
 				}
 			]
 		},
 		{
 			"name": "make a path",
 			"type": "level",
-			"stage": "habitation",
-			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=13s",			
+			"stage": "tutorial",
+			"walkthrough": "",			
 			"max": 4,
-			"map": [								
+			"map": [
+				{
+					"gridX": 0,
+					"gridY": 3,
+					"type": "platform",
+					"direction": "southeast"
+				},
+				{
+					"gridX": 2,
+					"gridY": 5,
+					"type": "platform",
+					"direction": "northwest"
+				},
+				{
+					"gridX": 2,
+					"gridY": 3,
+					"type": "platform",
+					"direction": "west"
+				},
+				{
+					"gridX": 0,
+					"gridY": 5,
+					"type": "highlight"
+				}								
 			],
 			"entities": [
 				{
-					"gridX": 1,
-					"gridY": 5,
+					"gridX": 0,
+					"gridY": 3,
 					"type": "character"
 				},
 				{
-					"gridX": 5,
+					"gridX": 2,
 					"gridY": 3,
 					"type": "collectable"
 				},
 				{
 					"type": "box",
 					"format": {
-						"x": 100, "y": 192, "h": 30, "w": 370, "color": "rgba(255,255,255,0.6)", "delay": 100
+						"x": 100, "y": 192, "h": 30, "w": 350, "color": "rgba(255,255,255,0.6)", "delay": 100
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
 							"gridX": 8,
 							"gridY": 20,
-							"text": "To add a platform, CLICK and HOLD -",
+							"text": "^ add platform: CLICK HERE",
 							"type": "text",
 							"format": {
 								"size": 16,
@@ -337,70 +203,38 @@
 							}
 						}
 					]
-				},
-				{
-					"type": "box",
-					"format": {
-						"x": 10, "y": 232, "h": 30, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 1500
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 8,
-							"gridY": 20,
-							"text": "- move the MOUSE to change the direction.",
-							"type": "text",
-							"format": {
-								"size": 16,
-								"align": "left"
-							}
-						}
-					]
-				},
-				{
-					"type": "box",
-					"format": {
-						"x": 290, "y": 90, "h": 75, "w": 135, "color": "rgba(255,255,255,0.6)", "delay": 3500
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 8,
-							"gridY": 20,
-							"text": "< this is the\nOBJECT that\nyou need",
-							"type": "textblock",
-							"format": {
-								"size": 16,
-								"align": "left"
-							}
-						}
-					]
-				}				
+				}			
 			]
 		},
 		{
 			"name": "remove what's in the way",
 			"type": "level",
-			"stage": "habitation",
-			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=25s",
-			"max": 2,
+			"stage": "tutorial",
+			"walkthrough": "",
+			"max": 3,
 			"map": [
 				{
 					"gridX": 2,
 					"gridY": 5,
 					"type": "platform",
-					"direction": "east"
+					"direction": "southeast"
 				},
 				{
 					"gridX": 4,
 					"gridY": 5,
 					"type": "platform",
+					"direction": "northwest"
+				},
+				{
+					"gridX": 4,
+					"gridY": 3,
+					"type": "platform",
 					"direction": "southwest"
-				}								
+				}									
 			],
 			"entities": [
 				{
-					"gridX": 2,
+					"gridX": 4,
 					"gridY": 5,
 					"type": "character"
 				},
@@ -410,16 +244,73 @@
 					"type": "collectable"
 				},
 				{
+					"gridX": 2,
+					"gridY": 5,
+					"type": "highlight"
+				},
+				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 240, "h": 30, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 300
+						"x": 172, "y": 192, "h": 30, "w": 280, "color": "rgba(255,255,255,0.6)", "delay": 100
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
 							"gridX": 8,
 							"gridY": 20,
-							"text": "RIGHT-CLICK to remove a platform.",
+							"text": "^ remove: RIGHT-CLICK",
+							"type": "text",
+							"format": {
+								"size": 16,
+								"align": "left"
+							}
+						}
+					]
+				}
+			]
+		},	
+		{
+			"name": "turning & turning",
+			"type": "level",
+			"stage": "tutorial",
+			"walkthrough": "",
+			"max": 3,
+			"map": [
+				{
+					"gridX": 7,
+					"gridY": 4,
+					"type": "platform",
+					"direction": "west"
+				},
+				{
+					"gridX": 7,
+					"gridY": 2,
+					"type": "platform",
+					"direction": "southeast"
+				}
+			],
+			"entities": [
+				{
+					"gridX": 5,
+					"gridY": 4,
+					"type": "character"
+				},
+				{
+					"gridX": 7,
+					"gridY": 2,
+					"type": "collectable"
+				},
+				{
+					"type": "box",
+					"format": {
+						"x": 100, "y": 192, "h": 30, "w": 360, "color": "rgba(255,255,255,0.6)", "delay": 100
+					},
+					"border" : {"color" : "#18140c", "w": 4},
+					"contents": [
+						{
+							"gridX": 8,
+							"gridY": 20,
+							"text": "move MOUSE to TURN platform",
 							"type": "text",
 							"format": {
 								"size": 16,
@@ -434,7 +325,7 @@
 			"name": "an inconvenience",
 			"type": "level",
 			"stage": "habitation",
-			"walkthrough": "https://youtu.be/OU7yr5dV5HI?t=33s",
+			"walkthrough": "",
 			"max": 4,
 			"map": [
 				{
@@ -457,14 +348,14 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 60, "h": 50, "w": 260, "color": "rgba(255,255,255,0.6)", "delay": 200
+						"x": 10, "y": 100, "h": 50, "w": 280, "color": "rgba(255,255,255,0.6)", "delay": 200
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
 							"gridX": 252,
 							"gridY": 30,
-							"text": " - this is an OBSTACLE",
+							"text": "  avoid OBSTACLES",
 							"type": "text",
 							"format": {
 								"size": 16,
@@ -477,18 +368,84 @@
 							"type": "obstacle"
 						}
 					]
+				}
+			]
+		},
+		{
+			"name": "closed in",
+			"type": "level",
+			"stage": "habitation",
+			"walkthrough": "",
+			"max": 2,
+			"map": [
+				{
+					"gridX":1,
+					"gridY":7,
+					"type": "obstacle"
+				},
+				{
+					"gridX":2,
+					"gridY":7,
+					"type": "obstacle"
+				},
+				{
+					"gridX":3,
+					"gridY":7,
+					"type": "obstacle"
+				},
+				{
+					"gridX":4,
+					"gridY":6,
+					"type": "obstacle"
+				},
+				{
+					"gridX":4,
+					"gridY":5,
+					"type": "obstacle"
+				},
+				{
+					"gridX":4,
+					"gridY":4,
+					"type": "obstacle"
+				},
+				{
+					"gridX":3,
+					"gridY":4,
+					"type": "obstacle"
+				},
+				{
+					"gridX":2,
+					"gridY":5,
+					"type": "obstacle"
+				},
+				{
+					"gridX":1,
+					"gridY":6,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX":2,
+					"gridY":6,
+					"type": "character"
+				},
+				{
+					"gridX":3,
+					"gridY":5,
+					"type": "collectable"
 				},
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 240, "h": 30, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 1600
+						"x": 90, "y": 60, "h": 30, "w": 380, "color": "rgba(255,255,255,0.6)", "delay": 100
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
 							"gridX": 8,
 							"gridY": 20,
-							"text": "You will need to make a path AROUND it.",
+							"text": "use OBSTACLE to shorten jumps",
 							"type": "text",
 							"format": {
 								"size": 16,
@@ -496,7 +453,7 @@
 							}
 						}
 					]
-				}
+				}		
 			]
 		},
 		{
@@ -527,45 +484,48 @@
 					"gridX":3,
 					"gridY":4,
 					"type": "collectable"
+				}			
+			]
+		},
+		{
+			"name": "star",
+			"type": "level",
+			"stage": "habitation",
+			"walkthrough": "",
+			"max": 4,
+			"map": [
+				{
+					"gridX":1,
+					"gridY":4,
+					"type": "obstacle"
 				},
 				{
-					"type": "box",
-					"format": {
-						"x": 10, "y": 180, "h": 50, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 300
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 8,
-							"gridY": 20,
-							"text": "If there is an obstacle blocking a jump\nYou will only jump ONE space.",
-							"type": "textblock",
-							"format": {
-								"size": 16,
-								"align": "left"
-							}
-						}
-					]
+					"gridX":3,
+					"gridY":3,
+					"type": "obstacle"
 				},
 				{
-					"type": "box",
-					"format": {
-						"x": 210, "y": 60, "h": 30, "w": 260, "color": "rgba(255,255,255,0.6)", "delay": 2200
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 252,
-							"gridY": 20,
-							"text": "Use this to adjust your path.",
-							"type": "text",
-							"format": {
-								"size": 16,
-								"align": "right"
-							}
-						}
-					]
-				}				
+					"gridX":3,
+					"gridY":6,
+					"type": "obstacle"
+				},
+				{
+					"gridX":0,
+					"gridY":6,
+					"type": "obstacle"
+				}
+			],
+			"entities": [
+				{
+					"gridX":2,
+					"gridY":4,
+					"type": "character"
+				},
+				{
+					"gridX":3,
+					"gridY":4,
+					"type": "collectable"
+				}			
 			]
 		},
 		{
@@ -600,7 +560,7 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 350, "y": 60, "h": 30, "w": 120, "color": "rgba(255,255,255,0.6)", "delay": 400
+						"x": 320, "y": 60, "h": 30, "w": 150, "color": "rgba(255,255,255,0.6)", "delay": 400
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
@@ -1166,14 +1126,14 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 70, "y": 220, "h": 50, "w": 400, "color": "rgba(255,255,255,0.6)", "delay": 500
+						"x": 10, "y": 220, "h": 50, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 500
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
-							"gridX": 392,
+							"gridX": 442,
 							"gridY": 30,
-							"text": " - this is a space with an UNDERTOW",
+							"text": "an UNDERTOW spins your platform",
 							"type": "text",
 							"format": {
 								"size": 16,
@@ -1186,26 +1146,7 @@
 							"gridY": 0
 						}
 					]
-				},
-				{
-					"type": "box",
-					"format": {
-						"x": 10, "y": 60, "h": 100, "w": 160, "color": "rgba(255,255,255,0.6)", "delay": 1700
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 8,
-							"gridY": 20,
-							"text": "A platform on an\nUNDERTOW will\nTURN each time\nyou jump.",
-							"type": "textblock",
-							"format": {
-								"size": 16,
-								"align": "left"
-							}
-						}
-					]
-				}				
+				}			
 			]
 		},
 		{
@@ -1990,17 +1931,17 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 60, "h": 50, "w": 240, "color": "rgba(255,255,255,0.6)", "delay": 200
+						"x": 10, "y": 224, "h": 50, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 200
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
 							"gridX": 38,
 							"gridY": 30,
-							"text": " - this is a HOTSPOT",
+							"text": "- a HOTSPOT turns a platform -> obstacle",
 							"type": "text",
 							"format": {
-								"size": 16,
+								"size": 14,
 								"align": "left"
 							}
 						},
@@ -2008,25 +1949,6 @@
 							"type": "hotspot",
 							"gridX": 0,
 							"gridY": 0
-						}
-					]
-				},
-				{
-					"type": "box",
-					"format": {
-						"x": 10, "y": 220, "h": 50, "w": 360, "color": "rgba(255,255,255,0.6)", "delay": 1500
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 8,
-							"gridY": 20,
-							"text": "A platform on a HOTSPOT turns into an\nOBSTACLE after being jumped on.",
-							"type": "textblock",
-							"format": {
-								"size": 16,
-								"align": "left"
-							}
 						}
 					]
 				}
@@ -2935,7 +2857,7 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 240, "h": 30, "w": 280, "color": "rgba(255,255,255,0.6)", "delay": 500
+						"x": 10, "y": 240, "h": 30, "w": 360, "color": "rgba(255,255,255,0.6)", "delay": 500
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
@@ -3639,77 +3561,6 @@
 					"gridY": 5,
 					"type": "specimen",
 					"direction": "west"
-				}
-			]
-		},
-		{
-			"name": "endscene",
-			"type": "cutscene",
-			"stage": "end",
-			"map": [],
-			"entities": [
-				{
-					"type": "box",
-					"format": {
-						"x": 10, "y": 60, "h": 40, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 10
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 230,
-							"gridY": 32,
-							"text": "Complete!",
-							"type": "text",
-							"format": {
-								"size": 32,
-								"align": "center"
-							}
-						}
-					]
-				},
-				{
-					"type": "box",
-					"format": {
-						"x": 10, "y": 120, "h": 30, "w": 320, "color": "rgba(255,255,255,0.6)", "delay": 1000
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 8,
-							"gridY": 20,
-							"text": "all items accounted for!",
-							"type": "text",
-							"format": {
-								"size": 16,
-								"align": "left"
-							}
-						}
-					]
-				},
-				{
-					"type": "box",
-					"format": {
-						"x": 120, "y": 200, "h": 50, "w": 350, "color": "rgba(255,255,255,0.6)", "delay": 2400
-					},
-					"border" : {"color" : "#18140c", "w": 4},
-					"contents": [
-						{
-							"gridX": 342,
-							"gridY": 32,
-							"text": " - congratulations and thank you!",
-							"type": "text",
-							"format": {
-								"size": 16,
-								"align": "right"
-							}
-						},
-						{
-							"gridX": 0,
-							"gridY": 0,
-							"type": "character",
-							"animation": 2
-						}
-					]
 				}
 			]
 		}

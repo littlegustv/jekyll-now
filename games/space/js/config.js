@@ -10,6 +10,10 @@ function dot (v1, v2) {
   return v1.x * v2.x + v1.y * v2.y;
 }
 
+function cross(v1, v2) {
+  return v1.x * v2.y - v1.y * v2.x;
+}
+
 function project(axes, vertices) {
   var min = dot(axes, vertices[0]);
   var max = min;
@@ -64,7 +68,7 @@ var SPEED = {
 	ship: 200,
     projectile: 330,
     // acceleration multipliers
-    acel: 0.1,
+    acel: 600,
     decel: 0.01,
     gravity: 0.1
 };
@@ -118,7 +122,11 @@ var RESOURCES = [
 	{path: "shoot.ogg"},
 	{path: "hit.ogg"},
 	{path: "ground.png"},
-	{path: "tower.png"},
+	{path: "tower.png", frames: 2},
+  {path: "beam.png"},
+  {path: "cathedral.png"},
+  {path: "connecterVertical.png"},
+  {path: "box.png"},
 	{path: "scenes.js"},
 	{path: "bomb.png", frames: 3, speed: 0.3}
 ];

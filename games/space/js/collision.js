@@ -16,7 +16,6 @@ var Collision = {
 
 var PixelPerfect = Object.create(Collision);
 PixelPerfect.onStart = function (object) {
-	console.log("hi there");
 		if (!object.getImageData) {
 			object.getImageData = function () {
 				if (!object.imageData) {
@@ -145,7 +144,6 @@ Polygon.onCheck = function (o1, o2) {
 		if (!overlap(p1, p2)) return false;
 	}
 
-	console.log(a2.length);
 	for (var i = 0; i < a2.length; i++) {
 		var p1 = project(a2[i], v1);
 		var p2 = project(a2[i], v2);
@@ -153,7 +151,25 @@ Polygon.onCheck = function (o1, o2) {
 		if (!overlap(p1, p2)) return false;
 	}
 
-	return true;
+	// line between center point of the two objects
+	/*
+	var s_a = {x: (o1.x - o2.x) , y: (o1.y - o2.y)}
+	var max = 0, index = 0;
+
+	for (var i = 0; i < v2.length; i++) {
+		var p = dot(s_a, v2[i]);
+		if (p > max) {
+			max = p;
+			index = i;
+		}
+	}
+
+	var v = {x: v2[index].x - o2.x, y: v2[index].y - o2.y};
+
+	var proj = (dot(v, s_a) / dot(s_a, s_a));
+	var projection = {x: proj * s_a.x, y: proj * s_a.y};*/
+
+	return true;//distance(0, 0, projection.x, projection.y);
 }
 
 

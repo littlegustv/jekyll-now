@@ -3,32 +3,46 @@ var Entity = {
 	opacity: 1,
 	angle: 0,
 	alive: true,
-	init: function (x, y) {
+	init: function (x, y, w, h) {
 		this.behaviors = [];
 		this.x = x, this.y = y;
-		this.h = 4, this.w = 4;
+		this.h = h || 4, this.w = w || 4;
 		return this;
 	},
     getBoundX: function () { return Math.floor(this.x - this.w/2); },
     getBoundY: function () { return Math.floor(this.y - this.h/2); },
 	draw: function (ctx) {
+		ctx.save();
+		ctx.translate(this.x, this.y);
+		ctx.rotate(this.angle);
+		ctx.translate(-this.x, -this.y);
 		ctx.globalAlpha = this.opacity;
+
 		for (var i = 0; i < this.behaviors.length; i++) {
 			this.behaviors[i].draw(ctx);
 		}
+		ctx.fillStyle = this.color || "black";
 		ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
 		ctx.globalAlpha = 1;
+		ctx.restore();
 	},
 	setVertices: function (vertices) {
 		if (vertices) {
 			this.vertices = vertices.map( function (v) {
 				var _d = GLOBALS.scale * Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));
 				var _theta = Math.atan2(v.y, v.x);
-				console.log(v, _d, _theta);
 				return {d: _d, theta: _theta}
 			});
+		} else {
+			var d = Math.sqrt(Math.pow(this.w, 2) + Math.pow(this.h, 2)) / 2;
+			var th = Math.acos(0.5 * this.w / d);
+			this.vertices = [
+				{d: d, theta: th},
+				{d: d, theta: Math.PI - th},
+				{d: d, theta: Math.PI + th},
+				{d: d, theta: 2 * Math.PI - th}
+			];
 		}
-		console.log(1,this.vertices);
 	},
 	setCollision: function (collision) {
 		this.collision = Object.create(collision);
@@ -82,8 +96,8 @@ Sprite.init = function (x, y, sprite) {
 	this.x = x, this.y = y;
 	this.behaviors = [];
 	//this.checkCollision = Collision.doPixelPerfect;
-	this.addBehavior(Animate);
 	if (sprite) {
+		if (sprite.speed) this.addBehavior(Animate);
 		// FIX ME: add multiple animations (see PLATFORMS code)
 		this.sprite = sprite, this.sprite.w = this.sprite.image.width / this.sprite.frames;
 		this.animations = sprite.animations, this.animation = 0, this.sprite.h = this.sprite.image.height / this.animations;
@@ -132,6 +146,13 @@ Sprite.draw = function (ctx) {
 		}
 		//ctx.strokeRect(this.getBoundX(), this.getBoundY(), this.w, this.h);
 		//ctx.strokeRect(this.x - 1, this.y - 1, 2, 2);
+	}
+};
+Sprite.setFrame = function (frame) {
+	if (frame == "random") {
+		this.frame = Math.floor(Math.random() * this.maxFrame);
+	} else {
+		this.frame = frame;
 	}
 };
 

@@ -13,6 +13,12 @@ var Scene = {
 	addEntity: function (e) {
 		this.entities.push(e);
 	},
+	removeEntity: function (e) {
+		var index = this.entities.indexOf(e);
+		if (e != -1) {
+			this.entities.splice(index, 1);
+		}
+	},
 	loadProgress: function () {
 		this.resourceLoadCount += 1;
 		if (this.resourceLoadCount >= this.resourceCount) {
