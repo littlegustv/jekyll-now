@@ -809,7 +809,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					var levels = this.scenes.filter(function (a) { return a.stage == stage && a.type == "level"; });
 					for (var i = 0; i < levels.length; i++) {
 						var w = this.scenes.indexOf(levels[i]);
-						if (true) {//!sc || this.stageComplete(sc)) {
+						if (!sc || this.stageComplete(sc)) {
 							var tb;
 							if (!levels[i].score) {
 								tb = Object.create(Button).init(i - j, 2 * j + 2, Resources.empty);
