@@ -173,7 +173,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		//{path: "splash.png"},
 		{path: "platform.png", frames: 2, speed: 1000},
 		{path: "directions.png", frames: 2, speed: 1000, animations: 6},
-		{path: "character.png", frames: 2, speed: 500, animations: 6},
+		{path: "character.png", frames: 2, speed: 500, animations: 7},
 		{path: "obstacle.png", frames: 2, speed: 1000},
 		{path: "hotspot.png", frames: 2, speed: 500},
 		{path: "highlight.png", frames: 2, speed: 400},
@@ -1515,14 +1515,19 @@ window.addEventListener("DOMContentLoaded", function () {
 	Character.type = "character";
 	Character.fall = function () {
 		if (this.gridX == world.scene.start.x && this.gridY == world.scene.start.y && world.scene.entities.filter(function (e) { return e.type == "collectable"; }).length == 0) return;
-		this.jumping = GLOBALS.jumpSpeed;
-		playSound(Resources.fall);
-     	canvas.style.webkitFilter = "invert(100%)";
-     	world.paused = true;
-		setTimeout(function () { 
-   			canvas.style.webkitFilter = "invert(0%)";
+			//this.jumping = GLOBALS.jumpSpeed;
+			this.falling = true;
+			playSound(Resources.fall);
+			this.animation = 6;
+     	//canvas.style.webkitFilter = "invert(100%)";
+     	//world.paused = true;
+     	var c = this;
+		setTimeout(function () {
+			world.paused = true;
+			c.falling = false;
+   			//canvas.style.webkitFilter = "invert(0%)";
 			world.reset(); 
-		}, 500);
+		}, 1000);
 	}
 	Character.update = function (dt) {
 		if (world.paused) return;
@@ -1560,7 +1565,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 			var p = world.getAt(this.gridX, this.gridY);
 			if (!p || p.type == "obstacle") { 
-				this.fall();
+				if (!this.falling) this.fall();
 			}
 			else if (p.direction) {
 				var c = this;
