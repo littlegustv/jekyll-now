@@ -1579,7 +1579,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					}
 				}
 				if (d == 0 || p.type == "obstacle") {
-					this.fall();
+					if (!this.falling) this.fall();
 				} else {
 					/* onjump */
 					var o = p.getPosition();
