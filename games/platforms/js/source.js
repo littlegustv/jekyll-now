@@ -8,7 +8,7 @@ var AudioContext = window.AudioContext || window.webkitAudioContext;
 if (AudioContext) AudioContext.createGain = AudioContext.createGain || AudioContext.createGainNode;
 
 var service, tracker;
-if (analytics) {
+if (analytics && chrome.runtime.getManifest) {
 	service = analytics.getService('platforms');
   tracker = service.getTracker('UA-65874667-3');
   tracker.sendAppView('MainView');

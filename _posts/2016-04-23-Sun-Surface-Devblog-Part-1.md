@@ -6,7 +6,7 @@ tags: development programming game-design
 
 ![Image here]({{ site.baseurl }}/images/chrome_tile_3.png "Marquee?")
 
-Here are some thoughts as I continue to try various ways of publishing my game.  Right now I am working on a Chrome Web Store version, which basically means writing a manifest, creating some **new** thumbnails and promo pictures (with the appropriate - and unique - aspect ratios of course).  And also, dealing with Google's unique api for the things I had programmed a long time ago and forgotten about.
+Here are some thoughts as I continue to try various ways of publishing my <a href="{{ site.baseurl }}/games/platforms" class="btn btn-primary">game</a>  Right now I am working on a Chrome Web Store version, which basically means writing a manifest, creating some **new** thumbnails and promo pictures (with the appropriate - and unique - aspect ratios of course).  And also, dealing with Google's unique api for the things I had programmed a long time ago and forgotten about.
 
 Fortunately Chrome is an up-to-date browser.  That's the advantage of JavaScript development in general, I think.  I have yet to try any kind of mobile export (like with PhoneGap - is that still around?), but the fact that its all based on webkit is just lovely.  But Chrome doesn't want me to use localStorage, it wants me to use *chrome* storage, which led me to an interesting (frustrating) problem.
 
