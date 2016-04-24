@@ -7,6 +7,14 @@ var fontFamily = "Frijole"
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 if (AudioContext) AudioContext.createGain = AudioContext.createGain || AudioContext.createGainNode;
 
+var service, tracker;
+if (analytics) {
+	service = analytics.getService('platforms');
+  tracker = service.getTracker('UA-65874667-3');
+  tracker.sendAppView('MainView');
+  // Supply your GA Tracking ID.
+}
+
 function resizeCanvas(canvas) {
 	canvas.style.width = "", canvas.style.height = "";
 	var ratio = canvas.width / canvas.height;
@@ -67,7 +75,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		
 		// check if button is at location
 
-		if (world.scene.button(offsetX, offsetY)) { return; }
+		if (world.scene.button(offsetX, offsetY, world.mouse.x, world.mouse.y)) { return; }
 		
 		if (!world.paused) return;
 
@@ -96,7 +104,13 @@ window.addEventListener("DOMContentLoaded", function () {
 			e.offsetY = e.offsetY || e.clientY;//e.changedTouches[0].clientY;
 		}
 		var offsetX = e.offsetX / scale, offsetY = e.offsetY / scale;
+		var m = world.toGrid(offsetX, offsetY);
+		
 		world.mouse.x = offsetX, world.mouse.y = offsetY;
+
+		if (e.which !== 3 && e.button !== 2) {
+			world.remove(m, "platform");
+		}
 
 		if (!world.scene || world.scene.type != "level") return;
 		else if (e.which === 3 || e.button === 2) {}
@@ -173,7 +187,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		//{path: "splash.png"},
 		{path: "platform.png", frames: 2, speed: 1000},
 		{path: "directions.png", frames: 2, speed: 1000, animations: 6},
-		{path: "character.png", frames: 2, speed: 500, animations: 7},
+		{path: "character.png", frames: 2, speed: 500, animations: 8},
 		{path: "obstacle.png", frames: 2, speed: 1000},
 		{path: "hotspot.png", frames: 2, speed: 500},
 		{path: "highlight.png", frames: 2, speed: 400},
@@ -420,26 +434,42 @@ window.addEventListener("DOMContentLoaded", function () {
 					}
 				}
 				saveData = JSON.stringify(saveData);
-				localStorage.setItem("platformSaveData", saveData);
+				if (chrome && chrome.storage) {
+					chrome.storage.local.set({"platformSaveData": saveData});
+				} else {
+					localStorage.setItem("platformSaveData", saveData);
+				}
 			}
 			this.newGame = false;
 		},
 		load: function () {
 			this.newGame = true;
 			if (this.setupStorage()) {
-				var loadData = localStorage.platformSaveData;
-				//console.log("here...", loadData);
-				if (loadData) {
-					loadData = JSON.parse(loadData);
-					for (i in loadData) {
-						var n = Number(i);
-						if (this.scenes[n]) {
-							this.scenes[n].score = Number(loadData[i]);
-						}
-					}
-					this.newGame = false;
+				if (chrome && chrome.storage) {
+					var t = this;
+					chrome.storage.local.get('platformSaveData', function (r) { 
+						t.loadData(r);
+					});
+				} else {
+					//var loadData = localStorage.platformSaveData;
+					this.loadData(localStorage);
 				}
+				//console.log("here...", loadData);
 			}
+		},
+		loadData: function (data) {
+			data = data.platformSaveData // FIX ME!
+			if (data) {
+				data = JSON.parse(data);
+				for (i in data) {
+					var n = Number(i);
+					if (this.scenes[n]) {
+						this.scenes[n].score = Number(data[i]);
+					}
+				}
+				this.newGame = false;
+			}
+			this.ready = true;
 		},
 		loadBG: function () {
 			
@@ -516,6 +546,15 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.scenes = this.sceneInfo.scenes, this.cs = 0;
 			this.stageUnlock();
 			this.load();
+			var t = this;
+			var s = setInterval(function () {
+				if (t.ready) {
+					t.readyNow();
+					window.clearInterval(s);
+				}
+			}, 100);
+		},
+		readyNow: function () {
 			this.scene = this.createScene(this.cs);
 
 			this.paused = true;
@@ -593,6 +632,7 @@ window.addEventListener("DOMContentLoaded", function () {
 						break;
 					case "character":
 						var start = Object.create(Entity).init(c.gridX, c.gridY, Resources.start);
+						start.opacity = 0.65;
 						start.offset = {x: 0, y: -11 * GLOBALS.height - 7};
 						//start.blend = "hard-light";
 						start.type = "start";
@@ -1073,6 +1113,10 @@ window.addEventListener("DOMContentLoaded", function () {
 						if (this.entities.filter(function (a) { return a.type == "collectable"; }).length <= 0) {
 							if (!this.completed) {
 								playSound(Resources.complete);
+								if (tracker.sendEvent) {
+									console.log('sending event');
+								  tracker.sendEvent('Complete', 'Level', this.uid);
+								}	
 								world.speed += 1;
 								this.completed = true;
 								this.character.animation = 1, this.character.frame = 0;
@@ -1083,11 +1127,15 @@ window.addEventListener("DOMContentLoaded", function () {
 									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2, "<Next>", {size: 60});
 									t.z = 100;
 									this.entities.push(t);
-									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2 - 16, "Complete all levels to unlock next stage!", {size: 20, color: "#EEEEEE"});
+									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2 - 16, "lockeclockedlockedlockedlockedlocked", {size: 20, color: "#EEEEEE"});
 									t.z = 101;
 									this.entities.push(t);
 								}
 								else {
+									// completed a level...
+									if (world.scenes[n].stage != this.stage && tracker.sendEvent) {
+										tracker.sendEvent('Complete', 'Stage', this.stage);
+									}
 									var t = Object.create(Text).init(0,0,"<Next>",{size: 60});
 									var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2, t);
 									tb.callback = function () {
@@ -1124,11 +1172,15 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 			}
 		},
-		button: function (x, y) {
+		button: function (x, y, mx, my) {
 			for (var i = 0; i < this.buttons.length; i++) {
 				if (this.buttons[i].check(x, y)) {
 					playSound(Resources.select);
 					this.buttons[i].callback();
+					return true;
+				} 
+				// check if the initial click was on a button, and they just dragged away to 'cancel'
+				else if (this.buttons[i].check(mx, my)) {
 					return true;
 				}
 			}
@@ -1465,6 +1517,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	var Collectable = Object.create(Entity);
 	Collectable.type = "collectable";
 	Collectable.offset = {x: 0, y: -12};
+	Collectable.opacity = 0.8;
 
 	var Cell = Object.create(Entity);
 	Cell.type = "cell";
@@ -1513,12 +1566,16 @@ window.addEventListener("DOMContentLoaded", function () {
 	Character.offset = {x: 0, y: -16};
 	Character.jumping = 0;
 	Character.type = "character";
-	Character.fall = function () {
+	Character.fall = function (isObstacle) {
 		if (this.gridX == world.scene.start.x && this.gridY == world.scene.start.y && world.scene.entities.filter(function (e) { return e.type == "collectable"; }).length == 0) return;
 			//this.jumping = GLOBALS.jumpSpeed;
 			this.falling = true;
 			playSound(Resources.fall);
-			this.animation = 6;
+			if (isObstacle) {
+				this.animation = 7;
+			} else {
+				this.animation = 6;
+			}
      	//canvas.style.webkitFilter = "invert(100%)";
      	//world.paused = true;
      	var c = this;
@@ -1565,7 +1622,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 			var p = world.getAt(this.gridX, this.gridY);
 			if (!p || p.type == "obstacle") { 
-				if (!this.falling) this.fall();
+				if (!this.falling) this.fall((p && p.type == "obstacle"));
 			}
 			else if (p.direction) {
 				var c = this;
@@ -1573,13 +1630,14 @@ window.addEventListener("DOMContentLoaded", function () {
 				while (d < p.distance) {
 					var p2 = world.getAt(this.gridX + p.direction.x * (d + 1), this.gridY + p.direction.y * (d + 1));
 					if (p2 && p2.type == "obstacle") {
+						d = 1;
 						break;
 					} else {
 						d += 1;
 					}
 				}
-				if (d == 0 || p.type == "obstacle") {
-					if (!this.falling) this.fall();
+				if (false){//d == 0 || p.type == "obstacle") {
+					//if (!this.falling) this.fall();
 				} else {
 					/* onjump */
 					var o = p.getPosition();
