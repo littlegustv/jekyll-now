@@ -1,0 +1,74 @@
+{
+	"script": "mainmenu.js",
+	"height": 1600,
+	"width": 4800,
+	"entities": [
+		{
+			"x": 800,
+			"y": 0,
+			"h": 800,
+			"w": 3200,
+			"sprite": "bg",
+			"tile": true
+		},
+		{
+			"x": 1600,
+			"y": 780,
+			"h": 20,
+			"w": 3200,
+			"sprite": "ground",
+			"tile": true,
+			"solid": true,
+			"collide": "Polygon",
+			"family": "neutral"
+		},
+		{
+			"x": -200,
+			"y": 706,
+			"sprite": "tower",
+			"solid": true,
+			"collide": "Polygon",
+			"vertices": [
+				{"x": 3, "y": 24},
+				{"x": -3, "y": 24},
+				{"x": -3, "y": -20},
+				{"x": 0, "y": -24},
+				{"x": 3, "y": -20}
+			],
+			"family": "neutral"
+		},
+		{
+			"x": -360,
+			"y": 736,
+			"sprite": "cathedral",
+			"solid": true,
+			"collide": "Polygon",
+			"vertices": [
+				{"x": -17, "y": 3},
+				{"x": -10, "y": -3},
+				{"x": -10, "y": -13},
+				{"x": 0, "y": -18},
+				{"x": 10, "y": -13},
+				{"x": 10, "y": -3},
+				{"x": 17, "y": 3},
+				{"x": 17, "y": 18},
+				{"x": -17, "y": 18}
+			],
+			"family": "neutral"
+		},
+		{
+			"x": 1000,
+			"y": 736,
+			"sprite": "box",
+			"solid": true,
+			"collide": "Polygon",
+			"family": "neutral"
+		},
+		{
+			"x": 400,
+			"y": 210,
+			"velocity": {"x": -0, "y": -0},
+			"sprite": "saucer"
+		}
+	]
+}

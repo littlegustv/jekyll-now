@@ -12,6 +12,16 @@ if (analytics && chrome.runtime.getManifest) {
 	service = analytics.getService('platforms');
   tracker = service.getTracker('UA-65874667-3');
   tracker.sendAppView('MainView');
+  service.getConfig().addCallback(
+    /** @param {!analytics.Config} config */
+    function(config) {
+    	console.log('hey!');
+      var permitted = myApp.askUser('Allow anonymous usage tracking?');
+      config.setTrackingPermitted(permitted);
+      // If "permitted" is false the library will automatically stop
+      // sending information to Google Analytics and will persist this
+      // behavior automatically.
+    });
   // Supply your GA Tracking ID.
 }
 
@@ -191,7 +201,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		{path: "obstacle.png", frames: 2, speed: 1000},
 		{path: "hotspot.png", frames: 2, speed: 500},
 		{path: "highlight.png", frames: 2, speed: 400},
-		{path: "undertow.png", frames: 4, speed: 200},
+		{path: "undertow.png", frames: 5, speed: 200},
 		{path: "unstable.png", frames: 4, speed: 300},
 		{path: "scenes.js"},
 		{path: "empty.png", frames: 2, speed: 1000},
@@ -1342,14 +1352,13 @@ window.addEventListener("DOMContentLoaded", function () {
         		this.w / GLOBALS.scale, this.h / GLOBALS.scale, 
         		Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2), Math.round(o.scale * this.w), Math.round(o.scale * this.h));
 			ctx.globalAlpha = 1;
-			ctx.globalCompositeOperation = "normal";
 			if (this.special) {
 				ctx.drawImage(Resources[this.special].image, 
     	    		this.frame * this.w / GLOBALS.scale, this.animation * this.h / GLOBALS.scale, 
         			this.w / GLOBALS.scale, this.h / GLOBALS.scale, 
-        			Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2) - 12, o.scale * this.w, o.scale * this.h);				
+        			Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2) - 12, o.scale * this.w, o.scale * this.h);
 			}
-
+			ctx.globalCompositeOperation = "normal";
 		},
 		animate: function (dt) {
 			this.frameDelay -= dt;
@@ -1472,10 +1481,12 @@ window.addEventListener("DOMContentLoaded", function () {
     		this.w / GLOBALS.scale, this.h / GLOBALS.scale, 
     		Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2) + this.frame * GLOBALS.scale, Math.round(o.scale * this.w), Math.round(o.scale * this.h));		
 		if (this.special) {
+			ctx.globalAlpha = 0.6;
 			ctx.drawImage(Resources[this.special].image, 
 	    		this.frame * this.w / GLOBALS.scale, this.animation * this.h / GLOBALS.scale, 
     			this.w / GLOBALS.scale, this.h / GLOBALS.scale, 
-    			Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2) + this.frame * GLOBALS.scale, o.scale * this.w, o.scale * this.h);				
+    			Math.round(o.x - o.scale * this.w / 2), Math.ceil(o.y - o.scale * this.h / 2) + this.frame * GLOBALS.scale, o.scale * this.w, o.scale * this.h);
+    	ctx.globalAlpha = 1;			
 		}
 	};
 	Platform.update = function (dt) {};
@@ -1621,7 +1632,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 
 			var p = world.getAt(this.gridX, this.gridY);
-			if (!p || p.type == "obstacle") { 
+			if (!p || p.type != "platform") { 
 				if (!this.falling) this.fall((p && p.type == "obstacle"));
 			}
 			else if (p.direction) {

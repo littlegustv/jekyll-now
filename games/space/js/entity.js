@@ -3,14 +3,17 @@ var Entity = {
 	opacity: 1,
 	angle: 0,
 	alive: true,
+	behaviors: [],
 	init: function (x, y, w, h) {
 		this.behaviors = [];
 		this.x = x, this.y = y;
 		this.h = h || 4, this.w = w || 4;
 		return this;
 	},
-    getBoundX: function () { return Math.floor(this.x - this.w/2); },
-    getBoundY: function () { return Math.floor(this.y - this.h/2); },
+	getX: function () { return this.x },
+	getY: function () { return this.y },
+  getBoundX: function () { return Math.floor(this.x - this.w/2); },
+  getBoundY: function () { return Math.floor(this.y - this.h/2); },
 	draw: function (ctx) {
 		ctx.save();
 		ctx.translate(this.x, this.y);
@@ -185,6 +188,7 @@ TiledBackground.draw = function (ctx) {
 };
 
 var Camera = Object.create(Entity);
+Camera.to_s = "Camera";
 Camera.draw = function (ctx) {
 	ctx.translate(-this.x,-this.y);
 };

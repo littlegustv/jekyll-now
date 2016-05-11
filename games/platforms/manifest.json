@@ -1,17 +1,12 @@
 {
   "name": "The Floor is the Surface of the Sun",
   "description": "A tricky puzzle game on the surface of the sun.",
-  "version": "0.3",
+  "version": "1.0",
   "manifest_version": 2,
   "offline_enabled": true,
   "app": {
     "background": {
       "scripts": ["background.js"]
-    },
-    "launch": {
-      "container": "canvas",
-      "height": 645,
-      "width": 800
     }
   },
   "permissions": [
