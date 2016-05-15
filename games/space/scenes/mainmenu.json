@@ -13,12 +13,6 @@
 			"solid": true,
 			"collide": "Polygon",
 			"family": "neutral"
-		},
-		{
-			"x": 400,
-			"y": 210,
-			"velocity": {"x": -0, "y": -0},
-			"sprite": "saucer"
 		}
 	]
 }

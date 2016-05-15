@@ -81,6 +81,7 @@ var World = {
 				// strip off quotation marks and .json extension
 				var sceneName = sceneData[i].substring(1, sceneData[i].length - 6);
 				var s = Object.create(Scene).init(sceneName);
+				s.world = t;
 				t.scenes.push(s);
 
 				if (sceneName == CONFIG.startScene) {

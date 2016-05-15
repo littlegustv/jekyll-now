@@ -147,6 +147,8 @@ Sprite.draw = function (ctx) {
 			ctx.closePath();
 			ctx.stroke();
 		}
+		ctx.fillStyle = "red";
+		ctx.fillText(Math.floor(this.x) + ", " + Math.floor(this.y), this.x, this.y);
 		//ctx.strokeRect(this.getBoundX(), this.getBoundY(), this.w, this.h);
 		//ctx.strokeRect(this.x - 1, this.y - 1, 2, 2);
 	}
