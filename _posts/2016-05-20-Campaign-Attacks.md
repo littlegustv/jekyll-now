@@ -4,7 +4,7 @@ title: Campaign Attacks and Weakness
 tags: politics bernie sanders hillary clinton donald trump
 ---
 
-<img src="{{ site.baseurl }}/images/campaign attacks.jpg" title="Friends Forever?" class="img-thumbnail">They Are Best Friends IRL</img>
+<img src="{{ site.baseurl }}/images/campaign attacks.jpg" title="Friends Forever?" class="img-thumbnail"></img>
 
 <span class='lead'><strong class='text-primary'>Hillary Clinton</strong> and <strong class='text-danger'>Bernie Sanders</strong> have been doing this politics thing for most of their adult lives.  So why do they seem so bad at it?  Or maybe: to every commentator and pundit writing articles about how the ongoing Democratic Primary is weakening the Democratic Party, let me ask you - is this why you spent three years at the Ohio State Journalism program?</span>
 
