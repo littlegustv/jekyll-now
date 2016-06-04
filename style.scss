@@ -307,7 +307,8 @@ nav {
   background-color: #FFF2AE;  
 }
 .post-row:nth-child(3n+1):after {
-  border-bottom: 8px dashed #649D03;
+  /*border-bottom: 8px dashed #649D03;*/
+  box-shadow: 0px 6px 6px 0px rgba(0,0,0,0.3);
 }
 .post-row:nth-child(3n+2) {
   background-color: #649D03  

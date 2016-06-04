@@ -3,20 +3,25 @@ var Scene = {
 	resourceLoadCount: 0,
 	init: function (name) {
 		this.name = name;
-		this.entities = [];
+		this.layers = [];
 		this.loadData();
 		return this;
 	},
 	onStart: function () {},
 	onUpdate: function () {},
 	onEnd: function () {},
-	addEntity: function (e) {
-		this.entities.push(e);
+	add: function (e) {
+		if (this.layers.length <= 0) console.log('this scene has no layers.');
+		else {
+			var layer = e.layer || this.layers[0];
+			layer.add(e);
+		}
 	},
-	removeEntity: function (e) {
-		var index = this.entities.indexOf(e);
-		if (e != -1) {
-			this.entities.splice(index, 1);
+	remove: function (e) {
+		if (this.layers.length <= 0) console.log('this scene has no layers.');
+		else {
+			var layer = e.layer || this.layers[0];
+			layer.remove(e);
 		}
 	},
 	loadProgress: function () {
@@ -60,27 +65,27 @@ var Scene = {
 	},
 	draw: function (ctx) {
 		// FIX ME: ctx.save/restore in place for camera, is there a better place for it?
-		ctx.save();
-		for (var i = 0; i < this.entities.length; i++) {
-			this.entities[i].draw(ctx);
+		//ctx.save();
+		for (var i = 0; i < this.layers.length; i++) {
+			this.layers[i].draw(ctx);
 		}
-		ctx.restore();
-		if (this.onDraw) this.onDraw(ctx);
+		//ctx.restore();
+		//if (this.onDraw) this.onDraw(ctx);
 	},
 	update: function (dt) {
 		// update
-		for (var i = 0; i < this.entities.length; i++) {
-			this.entities[i].update(dt);
+		for (var i = 0; i < this.layers.length; i++) {
+			this.layers[i].update(dt);
 		}
-		for (var i = 0; i < this.entities.length; i++) {
+		/*for (var i = 0; i < this.entities.length; i++) {
 			this.entities[i].checkCollisions(i, this.entities);
-		}
+		}*/
 		this.onUpdate(dt);
 		// clean up
-		for (var i = 0; i < this.entities.length; i++) {
+		/*for (var i = 0; i < this.entities.length; i++) {
 			if (!this.entities[i].alive) {
 				this.entities.splice(i, 1);
 			}
-		}
+		}*/
 	}
 };

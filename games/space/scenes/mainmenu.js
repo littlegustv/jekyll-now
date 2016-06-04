@@ -30,12 +30,38 @@ var onStart = function () {
 
 	Polygon.onCheck = notFriendly(Polygon.onCheck);
 
+	var scene = this;
+
+	var bg_camera = Object.create(Camera).init(0, 0);
+	var b = Object.create(Behavior);
+	b.update = function (dt) {
+		this.entity.x = (s.x - CONFIG.width / 2) / 10;
+	}
+	bg_camera.addBehavior(b);
+	var bg = Object.create(Layer).init(bg_camera);
+	scene.layers.push(bg);
+
+	bg.add(Object.create(Entity).init(0,0,60,200));
+
+	var fg_camera = Object.create(Camera).init(0, 0);
+	var b = Object.create(Behavior);
+	b.update = function (dt) { 
+		this.entity.x = s.x - CONFIG.width/2;//Math.floor(s.x - CONFIG.width/2);
+		this.entity.y = s.y - CONFIG.height/2;//Math.max(0, Math.min(t.height - CONFIG.height, s.y - CONFIG.height / 2));
+	};
+	fg_camera.addBehavior(b);
+	fg_camera.addBehavior(Bound, {min: {x: -10000, y: 0}, max: {x: 10000, y: this.height - CONFIG.height}})
+
+	var fg = Object.create(Layer).init(fg_camera);
+
+	scene.layers.push(fg);
+
 	// create an entity to define the overlap region
 	var overlap_region = Object.create(Entity).init(CONFIG.width / 2,this.height / 2,CONFIG.width,this.height);
 	overlap_region.setCollision(Polygon);
 	overlap_region.family = "code";
 	
-	var t = this;
+	var t = fg;
 
 	t.super_update = t.update, t.super_draw = t.draw;
 	t.update = function (dt) {
@@ -73,7 +99,7 @@ var onStart = function () {
 	s.addBehavior(Accelerate, {maxSpeed: SPEED.ship});
 	s.addBehavior(Velocity);
 	s.family = "player";
-	//s.addBehavior(Bound, {min: {x: -600, y: 0}, max: {x: 1800, y: 800}})
+	s.addBehavior(Bound, {min: {x: -10000000, y: 0}, max: {x: 1000000, y: 1600}})
 	s.health = 10;
 	s.rotate_rate = 1;
 	this._player = s;
@@ -94,46 +120,40 @@ var onStart = function () {
 	ai.addBehavior(Accelerate, {maxSpeed: SPEED.ship});
 	ai.addBehavior(Velocity);
 	ai.velocity = {x: 0, y: 0};
-	ai.addBehavior(Pathfind, {
-		scene: this,
+	/*ai.addBehavior(Pathfind, {
+		layer: fg,
 		bound: {min: {x: 0, y: 0}, max: {x: 3200, y: 1600}},
 		cell_size: 80,
 		target: s
-	})
+	})*/
 	//ai.addBehavior(SimpleAI, {target: s});
 	ai.family = "enemy";
 	// FIX ME: have to add collision before an entity 'wraps'
 	ai.setCollision(Polygon);
 	ai.collision.onHandle = HandleCollision.handleSolid;
 
-	this.addEntity(ai);
+	ai.addBehavior(Loop, {duration: 2, radius: 40});
+	ai.addBehavior(Bounce, {duration: 4, max: 40});
+	ai.addBehavior(Beacon, {target: s});
+	ai.addBehavior(WarningShot, {target: s});
+
+	fg.add(ai);
 
 	var barrier = Object.create(Entity).init(500, 0, 10, 600);
 	barrier.setCollision(Polygon);
 	barrier.family = "neutral";
 	barrier.solid = true;
-	this.addEntity(barrier);
+	fg.add(barrier);
 
-	//other = ai;
-	debug = ai;
-
+	other = ai;
+	//debug = ai;
+	/*
 	for (var i = -10000; i < 10000; i += 200) {
 		var m = Object.create(Marker).init(i);
 		this.entities.push(m);
-	}
+	}*/
 
-	this.addEntity(s);
-
-	var camera = Object.create(Camera).init(0, 0);
-	var b = Object.create(Behavior);
-	b.update = function (dt) { 
-		this.entity.x = s.x - CONFIG.width/2;//Math.floor(s.x - CONFIG.width/2);
-		this.entity.y = s.y - CONFIG.height/2;//Math.max(0, Math.min(t.height - CONFIG.height, s.y - CONFIG.height / 2));
-	};
-	camera.addBehavior(b);
-	camera.addBehavior(Bound, {min: {x: -10000, y: -10000}, max: {x: 10000, y: CONFIG.height / 2 + 80}})
-	this.entities.unshift(camera);
-	this.camera = camera;
+	fg.add(s);
 
 	this._gamepad = Object.create(Gamepad).init();
 	this._gamepad.aleft.onUpdate = function (dt) {
@@ -168,9 +188,9 @@ var onStart = function () {
 			var start = {x: s.x + Math.cos(s.angle) * (s.w / 2), y: s.y + Math.sin(s.angle) * s.w / 2};
 			var dir = {x: Math.cos(s.angle) * 400, y: Math.sin(s.angle) * 400 };
 
-			for (var i = 0; i < scene.entities.length; i++) {
-				if (scene.entities[i].family != this.entity.family && scene.entities[i].getVertices) {
-					var v = scene.entities[i].getVertices();
+			for (var i = 0; i < fg.entities.length; i++) {
+				if (fg.entities[i].family != this.entity.family && fg.entities[i].getVertices) {
+					var v = fg.entities[i].getVertices();
 					for (var j = 0; j < v.length; j++) {
 						var v_start = {x: v[j].x, y: v[j].y};
 						var v_next = v[(j + 1) % v.length];
@@ -203,55 +223,19 @@ var onStart = function () {
 			if (other.doDamage) other.doDamage(1);
 			//other.opacity = 0.5;
 		};
-		scene.addEntity(beam);
+		beam.layer = fg;
+		scene.add(beam);
 	}
 	this._gamepad.buttons.rt.onEnd = function () {
-		scene.removeEntity(beam);
+		fg.remove(beam);
 		s.rotate_rate = 1;		
 	}
 
-	//generate(this);
+	generate(fg, this.width, this.height);
 };
 
 var onUpdate = function (dt) {
 	this._gamepad.update(dt);
-
-	if (Math.random() < 0.01) {
-		var asteroid = Object.create(Sprite).init(Math.random() * this.width, Math.random() * this.height, Resources.asteroid);
-		var b = Object.create(Behavior);
-		asteroid.health = 3;
-		asteroid.family = "enemy";
-		b.update = function (dt) { if (this.entity.health <= 0) this.entity.end(); };
-		b.end = function () { this.entity.alive = false; }
-		asteroid.addBehavior(b);
-		asteroid.addBehavior(Fade);
-
-		var invuln = Object.create(Behavior);
-		invuln.update = function (dt) { 
-			if (this.entity.invulnerable && this.entity.invulnerable > 0) {
-				this.entity.invulnerable -= dt;
-				this.entity.opacity = 0.5;
-			} else {
-				this.entity.invulnerable = false;
-			}
-		}
-		asteroid.addBehavior(invuln);
-		asteroid.addBehavior(Wrap, {min: {x: 0}, max: {x: 3200}});
-
-		asteroid.addBehavior(Velocity);
-		asteroid.solid = true;
-		asteroid.setCollision(Polygon);
-		asteroid.collision.onHandle = HandleCollision.handleSolid;
-		asteroid.velocity = {x: Math.random() * SPEED.ship / 3, y: Math.random() * SPEED.ship / 3 };
-		asteroid.doDamage = function (d) {
-			if (!this.invulnerable) {
-					this.health -= d;
-					this.invulnerable = 0.2;
-					console.log(this.invulnerable);
-			}
-		}
-		this.addEntity(asteroid);
-	}
 };
 
 var onEnd = function () {
@@ -265,12 +249,12 @@ var onDraw = function (ctx) {
 	}
 };
 
-function generate (scene) {
+function generate (layer, w, h) {
 	var last = 0;
-	for (var i = 0; i < scene.width; i++) {
+	for (var i = 0; i < w; i++) {
 		if (Math.random() * 1000 <= last) {
 			var maxWidth = Math.floor(Math.random() * 100) + 100;
-			createBox(scene, i, 800, maxWidth);
+			createBox(layer, i, h, maxWidth);
 			i += maxWidth + 20;
 			last = 0;
 		}
@@ -278,7 +262,7 @@ function generate (scene) {
 	}	
 }
 
-function createBox(scene, x, y, w) {
+function createBox(layer, x, y, w) {
 	var h = Math.floor(Math.random() * 200) + 150;
 	var e = Object.create(Entity).init(x - w/2, y - h/2, w, h);
 	e.setCollision(Polygon);
@@ -286,11 +270,11 @@ function createBox(scene, x, y, w) {
 	e.family = "neutral";
 	e.color = "#" + Math.floor(Math.random() *16777216).toString(16);
 	e.opacity = 0.4;
-	scene.addEntity(e);
+	layer.add(e);
 	var offset =  Math.floor(Math.random() * 2) * Math.floor(Math.random() * 0.1 * w);
 	x = x + offset;
 	w = (w - offset);
 	if (Math.random() * 100 < 33) {
-		createBox(scene, x, y - h - 200, w);
+		createBox(layer, x, y - h - 200, w);
 	}
 }

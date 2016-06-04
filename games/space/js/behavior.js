@@ -78,7 +78,7 @@ Pathfind.start = function () {
 	e.family = "code";
 	e.setCollision(Polygon);
 
-	var objects = this.scene.entities.filter( function (e) { return (e.solid && e.family == "neutral"); });
+	var objects = this.layer.entities.filter( function (e) { return (e.solid && e.family == "neutral"); });
 	for (var i = this.bound.min.x + this.cell_size / 2; i < this.bound.max.x; i += this.cell_size) {
 		e.x = i;
 		for (var j = this.bound.min.y + this.cell_size / 2; j < this.bound.max.y; j += this.cell_size) {
@@ -112,6 +112,17 @@ Pathfind.draw = function (ctx) {
 					ctx.fillRect(this.bound.min.x + this.cell_size * i, this.bound.min.y + this.cell_size * j, this.cell_size, this.cell_size);
 			}
 		}
+		if (this.route) {
+			ctx.fillStyle = "red";
+			for (var i = 0; i < this.route.length; i++) {
+				ctx.fillRect(this.route[i].x * this.cell_size, this.route[i].y * this.cell_size, this.cell_size, this.cell_size);
+			}
+		}
+		/*
+		if (this.goal) {
+			ctx.fillRect(this.goal.x - 2, this.goal.y - 2, 4, 4);
+		}*/
+
 		ctx.globalAlpha = 1;
 	} else {
 	}
@@ -119,13 +130,17 @@ Pathfind.draw = function (ctx) {
 Pathfind.getNeighbors = function (node) {
 	var x = node.x, y = node.y;
 	var neighbors =[];
-	for (var i = x - 1; i <= x + 1; i += 2) {
-		if (this.grid[i] && this.grid[i][y])
-			neighbors.push(this.grid[i][y]);
+	for (var i = x - 1; i <= x + 1; i += 1) {
+		var nx = (i + this.grid.length) % this.grid.length;
+		if (this.grid[nx] && this.grid[nx][y])
+			neighbors.push(this.grid[nx][y]);
 	}
-	for (var j = y - 1; j <= y + 1; j += 2) {
-		if (this.grid[x] && this.grid[x][j])
-			neighbors.push(this.grid[x][j]);
+	for (var j = y - 1; j <= y + 1; j += 1) {
+		if (this.grid[x]) {
+			var ny = (j + this.grid[x].length) % this.grid[x].length;
+			if (this.grid[x][ny])
+				neighbors.push(this.grid[x][ny]);
+		}
 	}
 	//console.log('n', neighbors.length);
 	return neighbors;
@@ -143,7 +158,8 @@ Pathfind.a_star = function (start, goals) {
       var route = [];
       //ai.searching = false;
       while (f.from) {
-      	route.push({x: f.x - f.from.x, y: f.y - f.from.y});
+	      console.log("hi", f.cost, f.distance);
+      	route.push({x: f.x , y: f.y });
         g = f.from;
         f.from = undefined;
         f = g;
@@ -177,17 +193,18 @@ Pathfind.resetCost = function () {
 Pathfind.update = function (dt) {
 	if (this.grid) {
 		if (this.route && this.route.length > 0) {
-			if (this.next) {
-				var dx = 0.1 * this.next.x, dy = 0.1 * this.next.y;
-				this.entity.x += dx, this.entity.y += dy;
-				this.next.x -= dx, this.next.y -= dy;
-				if (Math.abs(this.next.x) < 0.1 * this.cell_size && Math.abs(this.next.y) < 0.1 * this.cell_size) {
-					this.next = undefined;
+			if (this.goal) {
+				
+				this.entity.velocity.x = (this.goal.x - this.entity.x);
+				this.entity.velocity.y = (this.goal.y - this.entity.y);
+				if (Math.abs(this.goal.x - this.entity.x) < 10 && Math.abs(this.goal.y - this.entity.y) < 10)
+				{
+					this.goal = undefined;
 				}
 			} else {
 				var next = this.route.pop();
 				if (next) {
-					this.next = {x: this.cell_size * next.x, y: this.cell_size * next.y};
+					this.goal = {x: this.cell_size * next.x + this.cell_size / 2, y: this.cell_size * next.y + this.cell_size / 2};
 				}
 			}
 		} else {
