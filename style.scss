@@ -288,6 +288,11 @@ nav {
 /*	max-width: 2000px;*/
 }
 
+.headliner {
+    background: linear-gradient(to right, #F44336 0%, #F44336 80%, #222 80%);
+    color: #fff;
+    height: 200px;
+}
 .post-row {
   padding: 20px 40px 20px 40px;
   background-color: #68B8C3;
@@ -305,6 +310,8 @@ nav {
   -o-transform: rotate(1deg);
   transform: perspective(999px) rotate(1deg);
     background-color:inherit;
+  border-bottom: 10px solid #222222;
+  box-shadow: 0px 5px 10px 0px rgba(0,0,0,0.2);
 }
 .post-row:nth-child(even):after {
   -webkit-transform: perspective(999px) rotate(-1deg);
@@ -312,6 +319,9 @@ nav {
   -ms-transform: rotate(-1deg);
   -o-transform: rotate(-1deg);
   transform: perspective(999px) rotate(-1deg);
+}
+.post-row:nth-child(3n + 2):after {
+    background-color: #222222;
 }
 
 .post-row:nth-child(3n+1) {
