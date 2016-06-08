@@ -26,14 +26,6 @@ body {
   color: $darkGray;
 }
 
-.container {
-  margin: 0 auto;
-  //max-width: 740px;
-  padding: 0 10px;
-  width: 100%;
-  max-width: 740px;
-  overflow: hidden;
-}
 .main-stuff {
   background-color: #FFF2AE;
 }
@@ -44,9 +36,12 @@ article {
 }
 
 .read-more {
-    display: block;
     text-align: center;
     background: rgba(255,255,255,0.5);
+    display: inline-block;
+    padding: 4px;
+    margin-top: 8px;
+    border-radius: 5px;
 }
 .read-more:hover, .read-more:active, .read-more:focus {
    background: rgba(255,255,255,0.9);
