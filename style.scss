@@ -43,6 +43,16 @@ article {
   font-size: 15px;
 }
 
+.read-more {
+    display: block;
+    text-align: center;
+    background: rgba(255,255,255,0.5);
+}
+.read-more:hover, .read-more:active, .read-more:focus {
+   background: rgba(255,255,255,0.9);
+   color: #333;
+}
+
 h1, h2, h3, h4, h5, h6 {
   //font-family: $helveticaNeue;
   color: $darkerGray;
