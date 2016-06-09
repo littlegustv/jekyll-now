@@ -1,10 +1,10 @@
 ---
 layout: post
-title: The Most Beautiful Place in the World: Undead Burg
+title: The Most Beautiful Place in the World - Undead Burg
 tags: game-review game-design dark souls level-design
 ---
 
-<img src="{{ site.baseurl }}/images/undeadburg.jpg" title="Funkytown" class="img-thumbnail"></img>
+<img src="{{ site.baseurl }}/images/undeadburg.jpg" title="Undead Burg" class="img-thumbnail"></img>
 Dark Souls is a game that increases in scale and majesty as time goes on.  You start fighting (or getting brutalized by) the lowest of the low - skeletons, hollow warriors, and giant rats.  By the time the game ends, you are fighting and defeating the Gods out of legend.  The scale and spectacle of the Dark Souls finale makes the early levels seem drab and brown, without much of interest.  But they are at the same time beautiful under a deceptively mundane outward appearance, and one of the best - and most instructive - examples of level design out there.
 
 The artistic value of this area - as well as Firelink Shrine and the Graveyard, I would say - is quite obvious.  So much of the game is about this cycle, of repetition and madness in the face of immortality but also stagnation - and more than any other place in Lordran, this starting area *feels* that way, all the time.  The architecture is dilapidated, the atmosphere sunny but cold, the colors muted and worn down - while much simpler than the cathedrals in Anor Londo, it feels somehow *older*.
