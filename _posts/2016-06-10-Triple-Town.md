@@ -1,6 +1,6 @@
 ---
 layout: post
-title: The Most Beautiful Place in the World - Undead Burg
+title: Triple Town, I hardly even know her
 tags: game-review game-design dark souls level-design
 ---
 
