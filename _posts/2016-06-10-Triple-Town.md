@@ -4,7 +4,7 @@ title: Triple Town, I hardly even know her
 tags: game-review game-design dark souls level-design
 ---
 
-<img src="{{ site.baseurl }}/images/tripletown.png" title="Is It A Town" class="img-thumbnail"></img>
+<img src="{{ site.baseurl }}/images/tripletown.png" title="Is It A Town" class="img-thumbnail" style="float: left; margin-right: 10px;"></img>
 By adding a little bit of depth to its repetition, Triple Town is able to be engaging (or distracting) for far longer than you would think.  Although it's technically a 'match-3' game, it feels far more similar to a game like "Threes" (or 2048) due to its gradual progression in complexity.  It's a game about spatial management more than matching, which is what lets you spend a great deal of time with, trying to unlock what are essentially 'combos'.
 
 The satisfaction from Triple Town doesn't come from the town, but rather from your own execution of the game.  Lining each of your moves up to smoothly collapse a huge clump of buildings into one, clearing up the map to begin again - this is the peak you are aspiring to.  Overall the game is good at what it does, and I applaud it even more for having a microtransaction system that becomes irrelevant if you want it to.  I was willing to watch a few ads for the game as I was learning to play, but it's nice that you can become good enough to never have to do that again.  It also makes the randomness that usually ends your game easier to deal with (mentally), because it doesn't feel like you're being milked for coins.
