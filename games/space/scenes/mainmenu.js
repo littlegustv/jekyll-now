@@ -3,6 +3,7 @@
 
 var player;
 var other;
+var debug;
 
 function notFriendly (callback) {
 	return function (object, other) {
@@ -132,10 +133,10 @@ var onStart = function () {
 	ai.setCollision(Polygon);
 	ai.collision.onHandle = HandleCollision.handleSolid;
 
-	ai.addBehavior(Loop, {duration: 2, radius: 40});
-	ai.addBehavior(Bounce, {duration: 4, max: 40});
-	ai.addBehavior(Beacon, {target: s});
-	ai.addBehavior(WarningShot, {target: s});
+	ai.addBehavior(SalvageAI, {target: s, maxRange: 300});
+	var salvageAI = ai.behaviors[ai.behaviors.length - 1];
+	console.log(salvageAI);
+	debug = salvageAI;
 
 	fg.add(ai);
 

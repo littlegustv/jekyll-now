@@ -54,6 +54,7 @@ var Entity = {
 	addBehavior: function (name, config) {
 		var b = Object.create(name).init(this, config);
 		this.behaviors.push(b);
+		return b;
 	},
 	removeBehavior: function (obj) {
 		var i = this.behaviors.indexOf(obj);

@@ -96,11 +96,106 @@ WarningShot.start = function () {
   this.entity.layer.add(missile);
 }
 
+// requires target
+
+var Goal = {
+  init: function (state) {
+    this.state = state;
+    return this;
+  },
+  state: function () {
+    return 0;
+  },
+  regress: function (n) {
+    return 1 / (1 + Math.exp(-n));
+  } 
+}
+
+var Motivation = {
+  init: function (behavior, initial) {
+    this.memory = [initial],
+    this.behavior = behavior;
+    return this;
+  },
+  add: function (n) {
+    this.memory.push(n);
+  },
+  apply: function () {
+    this.behavior.start();
+    return this.behavior.duration || 2;
+  },
+  success: function () {
+    return this.memory.reduce( function (a, b) { return a + b; }, 0) / (this.memory.length);
+  }
+}
+
 var SalvageAI = Object.create(Behavior);
 SalvageAI.start = function () {
-  this.MEMORY = {
-    patience: 100,
-    trust: 100,
-    despair: 0
-  };
+  this.debug = document.createElement('div');
+  this.debug.style.height = "100px";
+  this.debug.style.width = "100%";
+  this.debug.style.border = "1px solid black";
+  document.body.appendChild(this.debug);
+
+  this.time = 0;
+  this.delay = 1;
+  this.error = 0.01;
+
+  this.loop = this.entity.addBehavior(Loop, {duration: 2, radius: 40});
+  this.bounce = this.entity.addBehavior(Bounce, {duration: 4, max: 40});
+  this.beacon = this.entity.addBehavior(Beacon, {target: this.target});
+  this.warning = this.entity.addBehavior(WarningShot, {target: this.target});
+
+  this.motivations = [
+    Object.create(Motivation).init(this.loop, 1),
+    Object.create(Motivation).init(this.bounce, 0.6),
+    Object.create(Motivation).init(this.beacon, 0.5),
+    Object.create(Motivation).init(this.warning, 0.5)    
+  ];
+
+  console.log(this.beacon);
+}
+SalvageAI.getCurrentMotivation = function () {
+  var max = 0;
+  var choice = 0;
+  for (var i = 0; i < this.motivations.length; i++) {
+    var success = this.motivations[i].success();
+    if (success > max) {
+      max = success;
+      choice = i;
+    }
+  }
+  return this.motivations[choice];
+}
+SalvageAI.doDebug = function () {
+  var output = "";
+  for (var i = 0; i < this.motivations.length; i++) {
+    output += "<b>" + i + ":</b> " + this.motivations[i].success() + ",<i>" + this.motivations[i].memory.length + "</i><br>"
+  }
+  this.debug.innerHTML = output;
+}
+SalvageAI.createGoal = function (state) {
+  if (!this.goal) this.goal = Object.create(Goal).init(state);
+}
+SalvageAI.update = function (dt) {
+  if (!this.loop) this.start();
+  
+  this.doDebug();
+  this.time += dt;
+  if (this.time > this.delay) {
+    this.time = 0;
+    //if (!this.goal);// this.createGoal(function () {});
+    if (this.goal) {
+      console.log('we got a goal');
+      var state = this.goal.state();
+      this.getCurrentMotivation().add(state);
+      if (state >= (1 - this.error)) {
+        // done!
+        console.log('and now we done');
+        this.goal = undefined;
+      } else {
+        this.delay = this.getCurrentMotivation().apply();
+      }
+    }
+  }
 }
