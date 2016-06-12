@@ -6,7 +6,7 @@ permalink: /apps/
 
 ### Released
 
-[Miser](http://www.twocatgames.com/projects/miser/) - <i>A simple personal finance app</i>
+Miser: A simple personal finance app</i> <b>(No longer available)</b>
 
 ### Prototypes
 

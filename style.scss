@@ -284,7 +284,7 @@ nav {
 }
 
 .headliner {
-    background: linear-gradient(to right, #F44336 0%, #F44336 80%, #222 80%);
+    background: #F44336;
     color: #fff;
     height: 200px;
 }
@@ -331,9 +331,9 @@ nav {
 
 .wrapper-footer {
   //margin-top: 50px;
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
-  background-color: $lightGray;
+  border-top: 1px solid #222;
+  border-bottom: 1px solid #222;
+  background-color: #222;
 }
 
 footer {
