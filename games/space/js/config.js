@@ -114,6 +114,7 @@ var RESOURCES = [
 	{path: "a.png"},
 	{path: "scope.png"},
 	{path: "laser.png"},
+  {path: "node.png"},
 	{path: "item.png"},
 	{path: "itemHeal.png"},
 	{path: "asteroid.png"},

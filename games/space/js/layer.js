@@ -34,6 +34,7 @@ var Layer = {
     }
     for (var i = 0; i < this.entities.length; i++) {
       if (!this.entities[i].alive) {
+        this.entities[i].end();
         this.entities.splice(i, 1);
       }
     }

@@ -13,6 +13,14 @@ function notFriendly (callback) {
 	}
 }
 
+function doDamage (d) { 
+	if (this.invulnerable > 0) return;
+	else this.health -= d;
+
+	if (this.invulnerable !== undefined) this.invulnerable = 1;
+	if (this.health <= 0) this.alive = false;
+}
+
 var Marker = Object.create(Entity);
 Marker.init =  function (x) {
 	this.x = x;
@@ -27,11 +35,16 @@ Marker.draw = function (ctx) {
 		ctx.fillText('(' + this.x + ', ' + i + ')', this.x + 10, i);
 }
 
+// health, maxHealth, score
+
 var onStart = function () {
 
 	Polygon.onCheck = notFriendly(Polygon.onCheck);
 
 	var scene = this;
+
+	scene.enemies = [];
+	scene.node = undefined;
 
 	var bg_camera = Object.create(Camera).init(0, 0);
 	var b = Object.create(Behavior);
@@ -42,7 +55,7 @@ var onStart = function () {
 	var bg = Object.create(Layer).init(bg_camera);
 	scene.layers.push(bg);
 
-	bg.add(Object.create(Entity).init(0,0,60,200));
+//	bg.add(Object.create(Entity).init(0,0,60,200));
 
 	var fg_camera = Object.create(Camera).init(0, 0);
 	var b = Object.create(Behavior);
@@ -51,47 +64,18 @@ var onStart = function () {
 		this.entity.y = s.y - CONFIG.height/2;//Math.max(0, Math.min(t.height - CONFIG.height, s.y - CONFIG.height / 2));
 	};
 	fg_camera.addBehavior(b);
-	fg_camera.addBehavior(Bound, {min: {x: -10000, y: 0}, max: {x: 10000, y: this.height - CONFIG.height}})
+	fg_camera.addBehavior(Bound, {min: {x: 0, y: 0}, max: {x: this.width - CONFIG.width, y: this.height - CONFIG.height}})
 
 	var fg = Object.create(Layer).init(fg_camera);
 
 	scene.layers.push(fg);
+	scene.fg = fg;
 
-	// create an entity to define the overlap region
-	var overlap_region = Object.create(Entity).init(CONFIG.width / 2,this.height / 2,CONFIG.width,this.height);
-	overlap_region.setCollision(Polygon);
-	overlap_region.family = "code";
-	
-	var t = fg;
-
-	t.super_update = t.update, t.super_draw = t.draw;
-	t.update = function (dt) {
-		this.super_update(dt);
-		var overlaps = this.entities.filter( function (e) {
-			return (overlap_region.collision.onCheck(overlap_region, e));
-//			return (e.x < CONFIG.width && e.x >= 0 && e.to_s != "Camera");
-		});
-		for (var i = 0; i < overlaps.length; i++) {
-			overlaps[i].x += 3200;
-			overlaps[i].checkCollisions(i, this.entities);
-			overlaps[i].x -= 3200;
-		}
-	}
-	t.draw = function (ctx) {
-		this.super_draw(ctx);
-		ctx.save();
-		this.camera.draw(ctx);
-		var overlaps = this.entities.filter( function (e) {
-			return (overlap_region.collision.onCheck(overlap_region, e));
-//			return (e.x < CONFIG.width && e.x >= 0 && e.to_s != "Camera");
-		});
-		for (var i = 0; i < overlaps.length; i++) {
-			overlaps[i].x += 3200;
-			overlaps[i].draw(ctx);
-			overlaps[i].x -= 3200;
-		}
-		ctx.restore();
-	}
+	this.nodeSprite = Object.create(Sprite).init(100, 100, Resources.node);
+	this.nodeSprite.setCollision(Polygon);
+	this.nodeSprite.family = "collect";
+	this.nodeSprite.health = 1;
+	this.nodeSprite.doDamage = doDamage; 
 
 	var beam = undefined;
 
@@ -100,12 +84,14 @@ var onStart = function () {
 	s.addBehavior(Accelerate, {maxSpeed: SPEED.ship});
 	s.addBehavior(Velocity);
 	s.family = "player";
-	s.addBehavior(Bound, {min: {x: -10000000, y: 0}, max: {x: 1000000, y: 1600}})
+	s.addBehavior(Bound, {min: {x: 0, y: 0}, max: {x: this.width, y: 1600}})
 	s.health = 10;
+	s.maxHealth = 10;
+	s.score = 0;
 	s.rotate_rate = 1;
 	this._player = s;
 
-	s.addBehavior(Wrap, {min: {x: 320}, max: {x: 3520}});
+//	s.addBehavior(Wrap, {min: {x: 320}, max: {x: 3520}});
 
 	s.setVertices([
 		{x: -3, y: -4},
@@ -117,43 +103,34 @@ var onStart = function () {
 	s.collision.onHandle = HandleCollision.handleSolid;
 
 	var ai = Object.create(Sprite).init(400, 200, Resources.saucer);
-	ai.addBehavior(Wrap, {min: {x: 0}, max: {x: 3200}});
+	ai.health = 10;
+	ai.maxHealth = 10;
+	ai.score = 0;
+
+	//ai.addBehavior(Wrap, {min: {x: 0}, max: {x: 3200}});
 	ai.addBehavior(Accelerate, {maxSpeed: SPEED.ship});
 	ai.addBehavior(Velocity);
+	ai.addBehavior(Invulnerable);
 	ai.velocity = {x: 0, y: 0};
-	/*ai.addBehavior(Pathfind, {
+	ai.addBehavior(Bound, {min: {x: 0, y: 0}, max: {x: this.width, y: 1600}});
+	scene.pathfind = ai.addBehavior(Pathfind, {
 		layer: fg,
 		bound: {min: {x: 0, y: 0}, max: {x: 3200, y: 1600}},
 		cell_size: 80,
 		target: s
-	})*/
-	//ai.addBehavior(SimpleAI, {target: s});
+	});
 	ai.family = "enemy";
-	// FIX ME: have to add collision before an entity 'wraps'
 	ai.setCollision(Polygon);
 	ai.collision.onHandle = HandleCollision.handleSolid;
-
+	ai.doDamage = doDamage;
 	ai.addBehavior(SalvageAI, {target: s, maxRange: 300});
 	var salvageAI = ai.behaviors[ai.behaviors.length - 1];
 	console.log(salvageAI);
-	debug = salvageAI;
+	//debug = salvageAI;
 
 	fg.add(ai);
 
-	var barrier = Object.create(Entity).init(500, 0, 10, 600);
-	barrier.setCollision(Polygon);
-	barrier.family = "neutral";
-	barrier.solid = true;
-	fg.add(barrier);
-
 	other = ai;
-	//debug = ai;
-	/*
-	for (var i = -10000; i < 10000; i += 200) {
-		var m = Object.create(Marker).init(i);
-		this.entities.push(m);
-	}*/
-
 	fg.add(s);
 
 	this._gamepad = Object.create(Gamepad).init();
@@ -222,7 +199,6 @@ var onStart = function () {
 		beam.setCollision(Polygon);
 		beam.collision.onHandle = function (object, other) {
 			if (other.doDamage) other.doDamage(1);
-			//other.opacity = 0.5;
 		};
 		beam.layer = fg;
 		scene.add(beam);
@@ -232,11 +208,36 @@ var onStart = function () {
 		s.rotate_rate = 1;		
 	}
 
-	generate(fg, this.width, this.height);
+//	generate(fg, this.width, this.height);
 };
 
 var onUpdate = function (dt) {
 	this._gamepad.update(dt);
+
+	if (this.node && !this.node.alive) {
+		this.node = undefined;
+	}
+
+	if (!this.node && this.enemies.reduce( function (a, b) { return a.health + b.health }, 0) <= 0) {
+		this.node = Object.create(this.nodeSprite);
+		this.node.x = Math.floor(Math.random() * this.width), this.node.y = Math.floor(Math.random() * this.height);
+		this.node.addBehavior(Invulnerable);
+		var nodePoint = Object.create(Entity).init(this.node.x, this.node.y, 14, 14);
+		nodePoint.setCollision(Polygon);
+		nodePoint.family = "collect";
+		nodePoint.collision.onHandle = function (object, other) {
+			if (other.score !== undefined) {
+				object.alive = false;
+				other.score += 1;
+			}
+		}
+		this.node.addBehavior(Drop, {drop: nodePoint});
+		this.fg.add(this.node);
+		this.pathfind.target = this.node;
+		this.pathfind.route = null;
+		debug = this.node;
+	}
+
 };
 
 var onEnd = function () {

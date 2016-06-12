@@ -131,13 +131,13 @@ Pathfind.getNeighbors = function (node) {
 	var x = node.x, y = node.y;
 	var neighbors =[];
 	for (var i = x - 1; i <= x + 1; i += 1) {
-		var nx = (i + this.grid.length) % this.grid.length;
+		var nx = i;
 		if (this.grid[nx] && this.grid[nx][y])
 			neighbors.push(this.grid[nx][y]);
 	}
 	for (var j = y - 1; j <= y + 1; j += 1) {
 		if (this.grid[x]) {
-			var ny = (j + this.grid[x].length) % this.grid[x].length;
+			var ny = j;
 			if (this.grid[x][ny])
 				neighbors.push(this.grid[x][ny]);
 		}
@@ -244,10 +244,21 @@ Wrap.update = function (dt) {
 	}
 }
 
-var Behaviors = {
-	velocity: Velocity,
-	accelerate: Accelerate,
-	animate: Animate,
-	fade: Fade,
-	bound: Bound
+var Invulnerable = Object.create(Behavior);
+Invulnerable.start = function () {
+	this.entity.invulnerable = 0;
+}
+Invulnerable.update = function (dt) {
+	if (this.entity.invulnerable === undefined) this.start();
+	if (this.entity.invulnerable > 0) {
+		this.entity.invulnerable -= dt;
+	}
+}
+
+var Drop = Object.create(Behavior);
+Drop.end = function () {
+	if (this.drop) {
+		var d = Object.create(this.drop);
+		this.entity.layer.add(d);
+	}
 }
