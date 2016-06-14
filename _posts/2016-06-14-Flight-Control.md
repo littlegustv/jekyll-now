@@ -4,8 +4,9 @@ title: Flight Control (Demo) Review
 tags: game-review game-design dark souls level-design
 ---
 
-<img src="{{ site.baseurl }}/images/flightcontrol.jpg" title="Is It A Plane?" class="img-thumbnail" style="float: left; margin-right: 10px;"></img>
-Who will help me land this plane?  Not I, said the cat.
+<img src="{{ site.baseurl }}/images/flightcontrol.jpg" title="Is It A Plane?" class="img-thumbnail" style="float: right; margin-right: 10px;"></img>
+
+<h4>Who will help me land this plane?  Not I, said the cat.</h4>
 
 Imagine working hard to become better at your job.  It's an important job, and one you seem to have some aptitude for.  But apparenty, everyone else in the entire world is a useless, sponging slacker, because the better you are, the more work there seems to be for you to do.  What follows is the inevitable descent into screaming madness as, hampered by overwork, you begin to deteriorate, flailing to keep up with the escalating burden of responsibility placed upon you.  It's a mad world.
 
