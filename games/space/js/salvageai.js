@@ -185,6 +185,31 @@ SalvageAI.update = function (dt) {
   if (this.time > this.delay) {
     this.time = 0;
     //if (!this.goal);// this.createGoal(function () {});
+
+    /* 1. if Node some distance away */
+    if (this.node) {
+      // roughly speaking, it's 'off screen'
+      if (!onscreen(this.node.x, this.node.y)) {
+        // if AI is oncreen, start moving towards node
+        if (onscreen(this.entity.x, this.entity.y)) {
+          // create goal, that player moves closer to node
+          if (this.entity.pathfind.target != this.node) {
+            console.log('pathfinding new target');
+            this.entity.pathfind.new(this.node);
+          }
+        } 
+        // otherwise, start moving towards 
+        else {
+          if (this.entity.pathfind.target != this.player) {
+            console.log('pathfinding player');
+            this.entity.pathfind.new(this.player);
+          }
+        }
+
+        // check that we're not already doing this...
+      } 
+    }
+
     if (this.goal) {
       console.log('we got a goal');
       var state = this.goal.state();

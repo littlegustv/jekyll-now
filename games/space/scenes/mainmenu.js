@@ -5,6 +5,8 @@ var player;
 var other;
 var debug;
 
+var onscreen; // hacky! this will be a function shortly!
+
 function notFriendly (callback) {
 	return function (object, other) {
 		if (other.family == object.family) return false;
@@ -66,10 +68,16 @@ var onStart = function () {
 	fg_camera.addBehavior(b);
 	fg_camera.addBehavior(Bound, {min: {x: 0, y: 0}, max: {x: this.width - CONFIG.width, y: this.height - CONFIG.height}})
 
+	debug = fg_camera;
+
 	var fg = Object.create(Layer).init(fg_camera);
 
 	scene.layers.push(fg);
 	scene.fg = fg;
+
+	onscreen = function (x, y) {
+		return (x > fg_camera.x && x < fg_camera.x + CONFIG.width && y > fg_camera.y && y < fg_camera.y + CONFIG.height);
+	}
 
 	this.nodeSprite = Object.create(Sprite).init(100, 100, Resources.node);
 	this.nodeSprite.setCollision(Polygon);
@@ -113,7 +121,7 @@ var onStart = function () {
 	ai.addBehavior(Invulnerable);
 	ai.velocity = {x: 0, y: 0};
 	ai.addBehavior(Bound, {min: {x: 0, y: 0}, max: {x: this.width, y: 1600}});
-	scene.pathfind = ai.addBehavior(Pathfind, {
+	ai.pathfind = ai.addBehavior(Pathfind, {
 		layer: fg,
 		bound: {min: {x: 0, y: 0}, max: {x: 3200, y: 1600}},
 		cell_size: 80,
@@ -123,10 +131,11 @@ var onStart = function () {
 	ai.setCollision(Polygon);
 	ai.collision.onHandle = HandleCollision.handleSolid;
 	ai.doDamage = doDamage;
-	ai.addBehavior(SalvageAI, {target: s, maxRange: 300});
-	var salvageAI = ai.behaviors[ai.behaviors.length - 1];
-	console.log(salvageAI);
+	ai.salvageai = ai.addBehavior(SalvageAI, {target: s, maxRange: 300});
 	//debug = salvageAI;
+
+	this.ai = ai;
+	this.ai.salvageai.player = s;
 
 	fg.add(ai);
 
@@ -233,9 +242,10 @@ var onUpdate = function (dt) {
 		}
 		this.node.addBehavior(Drop, {drop: nodePoint});
 		this.fg.add(this.node);
-		this.pathfind.target = this.node;
-		this.pathfind.route = null;
-		debug = this.node;
+		this.ai.salvageai.node = this.node;
+//		this.pathfind.target = this.node;
+//		this.pathfind.route = null;
+		//debug = this.node;
 	}
 
 };

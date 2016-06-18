@@ -145,6 +145,10 @@ Pathfind.getNeighbors = function (node) {
 	//console.log('n', neighbors.length);
 	return neighbors;
 }
+Pathfind.new = function (target) {
+	this.target = target;
+	this.route = null;
+}
 Pathfind.a_star = function (start, goals) {
   start.cost = 0;
 	var checked = [];
@@ -158,7 +162,6 @@ Pathfind.a_star = function (start, goals) {
       var route = [];
       //ai.searching = false;
       while (f.from) {
-	      console.log("hi", f.cost, f.distance);
       	route.push({x: f.x , y: f.y });
         g = f.from;
         f.from = undefined;
