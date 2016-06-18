@@ -75,8 +75,15 @@ var onStart = function () {
 	scene.layers.push(fg);
 	scene.fg = fg;
 
-	onscreen = function (x, y) {
-		return (x > fg_camera.x && x < fg_camera.x + CONFIG.width && y > fg_camera.y && y < fg_camera.y + CONFIG.height);
+	for (var i = 0; i < 20; i++) {
+		var img = Object.create(Sprite).init(i, 0, Resources.bg);
+		img.x = img.w * i;
+		fg.add(img);
+	}
+
+	onscreen = function (x, y, tolerance) {
+		tolerance = tolerance || 0;
+		return (x > fg_camera.x - tolerance && x < fg_camera.x + CONFIG.width + tolerance && y > fg_camera.y - tolerance && y < fg_camera.y + CONFIG.height + tolerance);
 	}
 
 	this.nodeSprite = Object.create(Sprite).init(100, 100, Resources.node);

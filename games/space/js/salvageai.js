@@ -191,8 +191,23 @@ SalvageAI.update = function (dt) {
       // roughly speaking, it's 'off screen'
       if (!onscreen(this.node.x, this.node.y)) {
         // if AI is oncreen, start moving towards node
-        if (onscreen(this.entity.x, this.entity.y)) {
+        if (onscreen(this.entity.x, this.entity.y, -100)) {
           // create goal, that player moves closer to node
+          if (!this.goal) {
+          var p = this.player, n = this.node;
+          this.createGoal(function () {
+            if (!this.lastDistance) {
+              this.lastDistance = distance(p.x, p.y, n.x, n.y);
+              return null;
+            } else {
+              var d =  distance(p.x, p.y, n.x, n.y);
+              var dd = this.lastDistance - d;
+              this.lastDistance = d;
+              return Goal.regress(dd);
+            }
+          });
+          }
+
           if (this.entity.pathfind.target != this.node) {
             console.log('pathfinding new target');
             this.entity.pathfind.new(this.node);
@@ -213,13 +228,16 @@ SalvageAI.update = function (dt) {
     if (this.goal) {
       console.log('we got a goal');
       var state = this.goal.state();
-      this.getCurrentMotivation().add(state);
-      if (state >= (1 - this.error)) {
-        // done!
-        console.log('and now we done');
-        this.goal = undefined;
-      } else {
-        this.delay = this.getCurrentMotivation().apply();
+      if (state === null);
+      else {
+        this.getCurrentMotivation().add(state);
+        if (state >= (1 - this.error)) {
+          // done!
+          console.log('and now we done');
+          this.goal = undefined;
+        } else {
+          this.delay = this.getCurrentMotivation().apply();
+        }
       }
     }
   }

@@ -103,6 +103,7 @@ Pathfind.start = function () {
 	this.grid = grid;
 }
 Pathfind.draw = function (ctx) {
+	return;
 	if (this.grid) {
 		ctx.globalAlpha = 0.3;
 		ctx.fillStyle = this.route && this.route.length > 0 ? "green" : "yellow";
