@@ -126,6 +126,20 @@ Sprite.draw = function (ctx) {
 		Math.round(this.x - this.w / 2), this.y - Math.round(this.h / 2), this.w, this.h);
 	ctx.restore();
 	ctx.globalAlpha = 1;
+	
+	if (this.health && this.maxHealth) {
+		ctx.fillStyle = "black";
+		var size = this.w / this.maxHealth;
+		for (var  i = 0; i < this.maxHealth; i++) {
+			if (i < this.health) {
+				ctx.fillStyle = "black";
+			} else {
+				ctx.fillStyle = "gray";
+			}
+			ctx.fillRect(this.x - this.w / 2 + i * size, this.y + this.h / 2, size - 1, size);
+		}
+	}
+
 	if (CONFIG.debug) {
 		ctx.strokeStyle = "red";
 		if (this.getVertices) {

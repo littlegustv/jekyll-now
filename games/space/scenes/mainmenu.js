@@ -89,7 +89,8 @@ var onStart = function () {
 	this.nodeSprite = Object.create(Sprite).init(100, 100, Resources.node);
 	this.nodeSprite.setCollision(Polygon);
 	this.nodeSprite.family = "collect";
-	this.nodeSprite.health = 1;
+	this.nodeSprite.health = 10;
+	this.nodeSprite.maxHealth = 10;
 	this.nodeSprite.doDamage = doDamage; 
 
 	var beam = undefined;
@@ -234,10 +235,42 @@ var onUpdate = function (dt) {
 		this.node = undefined;
 	}
 
-	if (!this.node && this.enemies.reduce( function (a, b) { return a.health + b.health }, 0) <= 0) {
+	if (!this.node && this.enemies.filter( function (a) { return a.alive }).length <= 0) {
 		this.node = Object.create(this.nodeSprite);
-		this.node.x = Math.floor(Math.random() * this.width), this.node.y = Math.floor(Math.random() * this.height);
+		this.node.x = Math.floor(Math.random() * this.width / 4), this.node.y = Math.floor(Math.random() * this.height / 4);
 		this.node.addBehavior(Invulnerable);
+		var scene = this;
+		var b = Object.create(Behavior);
+		b.start = function () {
+			this.total = 10;
+			this.startAggro = true;
+		}
+		b.update = function (dt) {
+			if (this.entity.health < this.entity.maxHealth && !this.startAggro) {
+				this.start();
+			}
+			if (this.startAggro && this.total > 0) {
+				if (Math.random() * 100 < 1) {
+					var o = Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.asteroid);
+					o.family = "enemy";
+					o.addBehavior(Velocity);
+					o.setCollision(Polygon);
+					o.velocity = {x: Math.random() * 200 - 100, y: Math.random() * 200 - 100};
+					o.health = 2, o.maxHealth = 2;
+					o.doDamage = doDamage;
+					o.addBehavior(Wrap, {min: {x: 0, y:0}, max: {x: 1000, y: 1000}})
+					scene.enemies.push(o);
+					this.entity.layer.add(o);
+					this.total -= 1;
+				}
+			}
+
+			if (scene.enemies.filter(function (e) { return e.alive }).length > 0) {
+				this.entity.invulnerable = 1;
+			}
+		}
+		this.node.addBehavior(b);
+
 		var nodePoint = Object.create(Entity).init(this.node.x, this.node.y, 14, 14);
 		nodePoint.setCollision(Polygon);
 		nodePoint.family = "collect";

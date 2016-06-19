@@ -193,27 +193,29 @@ SalvageAI.update = function (dt) {
         // if AI is oncreen, start moving towards node
         if (onscreen(this.entity.x, this.entity.y, -100)) {
           // create goal, that player moves closer to node
-          if (!this.goal) {
-          var p = this.player, n = this.node;
-          this.createGoal(function () {
-            if (!this.lastDistance) {
-              this.lastDistance = distance(p.x, p.y, n.x, n.y);
-              return null;
-            } else {
-              var d =  distance(p.x, p.y, n.x, n.y);
-              var dd = this.lastDistance - d;
-              this.lastDistance = d;
-              return Goal.regress(dd);
-            }
-          });
-          }
 
           if (this.entity.pathfind.target != this.node) {
             console.log('pathfinding new target');
             this.entity.pathfind.new(this.node);
           }
-        } 
-        // otherwise, start moving towards 
+        
+          //this.entity.pathfind.new(); // clear pathfinding
+          if (!this.goal) {
+            var p = this.player, n = this.node;
+            this.createGoal(function () {
+              if (!this.lastDistance) {
+                this.lastDistance = distance(p.x, p.y, n.x, n.y);
+                return null;
+              } else {
+                var d =  distance(p.x, p.y, n.x, n.y);
+                var dd = this.lastDistance - d;
+                this.lastDistance = d;
+                return Goal.regress(dd);
+              }
+            });
+          }
+        }
+        // otherwise, start moving towards player
         else {
           if (this.entity.pathfind.target != this.player) {
             console.log('pathfinding player');
@@ -223,7 +225,16 @@ SalvageAI.update = function (dt) {
 
         // check that we're not already doing this...
       } 
+      // 2. at node, it has yet to be attacked
+      else if (this.node.health >= this.node.maxHealth) {
+        console.log('new goal: attack node'); 
+        var n = this.node;
+        this.createGoal(function () {
+          return (n.health >= n.maxHealth) ? -1 : 1; 
+        });
+      }
     }
+
 
     if (this.goal) {
       console.log('we got a goal');

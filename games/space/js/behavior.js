@@ -195,6 +195,7 @@ Pathfind.resetCost = function () {
 	}
 }
 Pathfind.update = function (dt) {
+	if (!this.target) return;
 	if (this.grid) {
 		if (this.route && this.route.length > 0) {
 			if (this.goal) {
