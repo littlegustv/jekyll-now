@@ -180,9 +180,18 @@ SalvageAI.createGoal = function (state) {
 SalvageAI.update = function (dt) {
   if (!this.loop) this.start();
   
+  var theta = modulo(angle(this.player.x, this.player.y, this.entity.x, this.entity.y), PI2) - modulo(this.player.angle, PI2);
+  if (this.player.beam && Math.abs(theta) < PI / 6) {
+    var direction = theta > 0 ? 1 : -1;
+    var goalTheta = this.player.angle + direction * PI / 3;
+    var dx = this.player.x + 64 * Math.cos(goalTheta), dy = this.player.y + 64 * Math.sin(goalTheta);
+    this.entity.velocity.x =  (dx - this.entity.x);
+    this.entity.velocity.y =  (dy - this.entity.y);
+  }
+
   this.doDebug();
   this.time += dt;
-  if (this.time > this.delay) {
+  if (false) { //this.time > this.delay) {
     this.time = 0;
     //if (!this.goal);// this.createGoal(function () {});
 

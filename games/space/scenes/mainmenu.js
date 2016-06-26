@@ -115,7 +115,7 @@ var onStart = function () {
 		{x: 5, y: 0}
 	]);
 
-	s.setCollision(Polygon)
+	s.setCollision(Polygon);
 	s.collision.onHandle = HandleCollision.handleSolid;
 
 	var ai = Object.create(Sprite).init(400, 200, Resources.saucer);
@@ -124,7 +124,7 @@ var onStart = function () {
 	ai.score = 0;
 
 	//ai.addBehavior(Wrap, {min: {x: 0}, max: {x: 3200}});
-	ai.addBehavior(Accelerate, {maxSpeed: SPEED.ship});
+	//ai.addBehavior(Accelerate, {maxSpeed: SPEED.ship});
 	ai.addBehavior(Velocity);
 	ai.addBehavior(Invulnerable);
 	ai.velocity = {x: 0, y: 0};
@@ -132,7 +132,7 @@ var onStart = function () {
 	ai.pathfind = ai.addBehavior(Pathfind, {
 		layer: fg,
 		bound: {min: {x: 0, y: 0}, max: {x: 3200, y: 1600}},
-		cell_size: 80,
+		cell_size: 96,
 		target: s
 	});
 	ai.family = "enemy";
@@ -175,6 +175,7 @@ var onStart = function () {
 		beam.opacity = 0.7;
 		beam.angle = s.angle;
 		beam.family = "player";
+		s.beam = beam;
 		var b = Object.create(Behavior);
 		b.update = function (dt) {
 			var w = 400;
@@ -222,10 +223,11 @@ var onStart = function () {
 	}
 	this._gamepad.buttons.rt.onEnd = function () {
 		fg.remove(beam);
+		s.beam = undefined;
 		s.rotate_rate = 1;		
 	}
 
-//	generate(fg, this.width, this.height);
+	//generate(fg, this.width, this.height);
 };
 
 var onUpdate = function (dt) {
@@ -237,7 +239,8 @@ var onUpdate = function (dt) {
 
 	if (!this.node && this.enemies.filter( function (a) { return a.alive }).length <= 0) {
 		this.node = Object.create(this.nodeSprite);
-		this.node.x = Math.floor(Math.random() * this.width / 4), this.node.y = Math.floor(Math.random() * this.height / 4);
+		this.node.onHandle = HandleCollision.handleSolid;
+		this.node.x = Math.floor(Math.random() * this.width), this.node.y = Math.floor(Math.random() * this.height);
 		this.node.addBehavior(Invulnerable);
 		var scene = this;
 		var b = Object.create(Behavior);
@@ -253,12 +256,14 @@ var onUpdate = function (dt) {
 				if (Math.random() * 100 < 1) {
 					var o = Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.asteroid);
 					o.family = "enemy";
+					o.solid = true;
 					o.addBehavior(Velocity);
 					o.setCollision(Polygon);
+					o.collision.onHandle = HandleCollision.handleSolid;
 					o.velocity = {x: Math.random() * 200 - 100, y: Math.random() * 200 - 100};
 					o.health = 2, o.maxHealth = 2;
 					o.doDamage = doDamage;
-					o.addBehavior(Wrap, {min: {x: 0, y:0}, max: {x: 1000, y: 1000}})
+					o.addBehavior(Wrap, {min: {x: 0, y:0}, max: {x: this.width, y: this.height}})
 					scene.enemies.push(o);
 					this.entity.layer.add(o);
 					this.total -= 1;
@@ -302,31 +307,48 @@ var onDraw = function (ctx) {
 };
 
 function generate (layer, w, h) {
-	var last = 0;
+	console.log('what');
+/*	var last = 0;
 	for (var i = 0; i < w; i++) {
-		if (Math.random() * 1000 <= last) {
-			var maxWidth = Math.floor(Math.random() * 100) + 100;
+		if (Math.random() * 10000 <= last) {
+			var maxWidth = GLOBALS.scale * 32;//Math.floor(Math.random() * 100) + 100;
 			createBox(layer, i, h, maxWidth);
 			i += maxWidth + 20;
 			last = 0;
 		}
 		else last += 1;
+	}*/
+	var blockSize = 32 * GLOBALS.scale;
+	for (var i = 0; i < w; i += blockSize) {
+		if (Math.random() <= 0.4) {
+			createBox(layer, i, h, blockSize);
+		}
 	}	
 }
 
 function createBox(layer, x, y, w) {
-	var h = Math.floor(Math.random() * 200) + 150;
-	var e = Object.create(Entity).init(x - w/2, y - h/2, w, h);
+	var h = Math.floor(Math.random() * 3) * 32 * GLOBALS.scale + 32 * 3 * GLOBALS.scale;
+//	var e = Object.create(Entity).init(x - w/2, y - h/2, w, h);
+	if (Math.random() > 0.5)
+		var e = Object.create(TiledBackground).init(x - w/2, y - h/2, w, h, Resources.building2);
+	else
+		var e = Object.create(TiledBackground).init(x - w/2, y - h/2, w, h, Resources.box);
+
 	e.setCollision(Polygon);
 	e.solid = true;
 	e.family = "neutral";
-	e.color = "#" + Math.floor(Math.random() *16777216).toString(16);
-	e.opacity = 0.4;
-	layer.add(e);
-	var offset =  Math.floor(Math.random() * 2) * Math.floor(Math.random() * 0.1 * w);
+	//e.color = "#" + Math.floor(Math.random() *16777216).toString(16);
+	//e.opacity = 0.4;
+	var offset =  0;//Math.floor(Math.random() * 2) * Math.floor(Math.random() * 0.1 * w);
+
 	x = x + offset;
 	w = (w - offset);
 	if (Math.random() * 100 < 33) {
+		var scaffold = Object.create(TiledBackground).init(e.x, y - h - 100, Resources.scaffold.w * GLOBALS.scale, 200, Resources.scaffold);
+		console.log(scaffold.w);
+		scaffold.family = "neutral";
+		layer.add(scaffold);
 		createBox(layer, x, y - h - 200, w);
 	}
+	layer.add(e);
 }

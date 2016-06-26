@@ -201,7 +201,9 @@ TiledBackground.draw = function (ctx) {
 				Math.round(this.x - this.w / 2) + i, this.y - Math.round(this.h / 2) + j, this.sprite.w * GLOBALS.scale, this.sprite.h * GLOBALS.scale);
 		}
 	}
-	ctx.globalAlpha = 1;	
+	ctx.globalAlpha = 1;
+	//ctx.strokeStyle = "red";
+	//ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
 };
 
 var Camera = Object.create(Entity);

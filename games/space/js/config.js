@@ -1,9 +1,16 @@
+var PI = Math.PI;
+var PI2 = 2 * Math.PI;
+
 function distance(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 }
 
 function angle(x1, y1, x2, y2) {
   return Math.atan2(y2 - y1, x2 - x1);
+}
+
+function modulo(n, p) {
+  return (n % p + p) % p;
 }
 
 function dot (v1, v2) {
@@ -26,10 +33,10 @@ function project(axes, vertices) {
 }
 
 function overlap(p1, p2) {
-  if ((p1[0] > p2[0] && p1[0] < p2[1]) || (p1[1] > p2[0] && p1[1] < p2[1])) {
+  if ((p1[0] >= p2[0] && p1[0] < p2[1]) || (p1[1] > p2[0] && p1[1] <= p2[1])) {
       return true;
   }
-  if ((p2[0] > p1[0] && p2[0] < p1[1]) || (p2[1] > p2[0] && p2[1] < p1[1])) {
+  if ((p2[0] >= p1[0] && p2[0] < p1[1]) || (p2[1] > p2[0] && p2[1] <= p1[1])) {
       return true;
   }
   else {
@@ -123,6 +130,9 @@ var RESOURCES = [
 	{path: "shoot.ogg"},
 	{path: "hit.ogg"},
 	{path: "ground.png"},
+  {path: "building1.png"},
+  {path: "building2.png"},
+  {path: "scaffold.png"},
 	{path: "tower.png", frames: 2},
   {path: "beam.png"},
   {path: "cathedral.png"},

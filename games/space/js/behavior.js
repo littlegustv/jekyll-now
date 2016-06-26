@@ -80,9 +80,9 @@ Pathfind.start = function () {
 
 	var objects = this.layer.entities.filter( function (e) { return (e.solid && e.family == "neutral"); });
 	for (var i = this.bound.min.x + this.cell_size / 2; i < this.bound.max.x; i += this.cell_size) {
-		e.x = i;
+		e.x = Math.floor(i);
 		for (var j = this.bound.min.y + this.cell_size / 2; j < this.bound.max.y; j += this.cell_size) {
-			e.y = j;
+			e.y = Math.floor(j);
 			var distance = 1;
 			var c = {x: Math.floor(i / this.cell_size), y: Math.floor(j / this.cell_size)};
 			for (var k = 0; k < objects.length; k++) {
@@ -103,7 +103,7 @@ Pathfind.start = function () {
 	this.grid = grid;
 }
 Pathfind.draw = function (ctx) {
-	return;
+	//return;
 	if (this.grid) {
 		ctx.globalAlpha = 0.3;
 		ctx.fillStyle = this.route && this.route.length > 0 ? "green" : "yellow";
@@ -119,10 +119,10 @@ Pathfind.draw = function (ctx) {
 				ctx.fillRect(this.route[i].x * this.cell_size, this.route[i].y * this.cell_size, this.cell_size, this.cell_size);
 			}
 		}
-		/*
+		
 		if (this.goal) {
 			ctx.fillRect(this.goal.x - 2, this.goal.y - 2, 4, 4);
-		}*/
+		}
 
 		ctx.globalAlpha = 1;
 	} else {
@@ -131,6 +131,7 @@ Pathfind.draw = function (ctx) {
 Pathfind.getNeighbors = function (node) {
 	var x = node.x, y = node.y;
 	var neighbors =[];
+	var right = false, left = false;
 	for (var i = x - 1; i <= x + 1; i += 1) {
 		var nx = i;
 		if (this.grid[nx] && this.grid[nx][y])
@@ -199,13 +200,19 @@ Pathfind.update = function (dt) {
 	if (this.grid) {
 		if (this.route && this.route.length > 0) {
 			if (this.goal) {
-				
-				this.entity.velocity.x = (this.goal.x - this.entity.x);
+				var theta = angle(this.entity.x, this.entity.y, this.goal.x, this.goal.y);
+				var dx = SPEED.ship * Math.cos(theta), dy = SPEED.ship * Math.sin(theta);
+				this.entity.velocity.x += 2 * dt * (dx - this.entity.velocity.x);
+				this.entity.velocity.y += 2 * dt * (dy - this.entity.velocity.y);
+				if (distance(this.entity.x, this.entity.y, this.goal.x, this.goal.y) < 20) {
+					this.goal = undefined;
+				}
+/*				this.entity.velocity.x = (this.goal.x - this.entity.x);
 				this.entity.velocity.y = (this.goal.y - this.entity.y);
 				if (Math.abs(this.goal.x - this.entity.x) < 10 && Math.abs(this.goal.y - this.entity.y) < 10)
 				{
 					this.goal = undefined;
-				}
+				}*/
 			} else {
 				var next = this.route.pop();
 				if (next) {
