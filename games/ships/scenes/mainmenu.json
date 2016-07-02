@@ -1,18 +1,5 @@
 {
 	"script": "mainmenu.js",
 	"height": 1600,
-	"width": 3200,
-	"entities": [
-		{
-			"x": 1600,
-			"y": 780,
-			"h": 20,
-			"w": 3200,
-			"sprite": "ground",
-			"tile": true,
-			"solid": true,
-			"collide": "Polygon",
-			"family": "neutral"
-		}
-	]
+	"width": 3200
 }

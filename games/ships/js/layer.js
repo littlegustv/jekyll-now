@@ -18,8 +18,15 @@ var Layer = {
     // FIX ME: ctx.save/restore in place for camera, is there a better place for it?
     ctx.save();
     this.camera.draw(ctx);
-    for (var i = 0; i < this.entities.length; i++) {
-      this.entities[i].draw(ctx);
+    
+    if (this.drawOrder) {
+      var entities = this.drawOrder();
+    } else {
+      var entities = this.entities;
+    }
+
+    for (var i = 0; i < entities.length; i++) {
+      entities[i].draw(ctx);
     }
     ctx.restore();
   },

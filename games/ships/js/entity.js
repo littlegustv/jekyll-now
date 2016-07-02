@@ -99,6 +99,7 @@ Sprite.acceleration = {x: 0, y: 0};
 Sprite.init = function (x, y, sprite) {
 	this.x = x, this.y = y;
 	this.behaviors = [];
+	this.offset = {x: 0, y: 0};
 	//this.checkCollision = Collision.doPixelPerfect;
 	if (sprite) {
 		if (sprite.speed) this.addBehavior(Animate);
@@ -115,7 +116,9 @@ Sprite.draw = function (ctx) {
 	ctx.save();
 	ctx.translate(this.x, this.y);
 	ctx.rotate(this.angle);
+	if (this.mirrored) ctx.scale(-1, 1);
 	ctx.translate(-this.x, -this.y);
+
 	ctx.globalAlpha = this.opacity;
 	for (var i = 0; i < this.behaviors.length; i++) {
 		this.behaviors[i].draw(ctx);
@@ -123,7 +126,7 @@ Sprite.draw = function (ctx) {
 	ctx.drawImage(this.sprite.image, 
 		this.frame * this.sprite.w, this.animation * this.sprite.h, 
 		this.sprite.w, this.sprite.h, 
-		Math.round(this.x - this.w / 2), this.y - Math.round(this.h / 2), this.w, this.h);
+		Math.round(this.x - this.w / 2 + this.offset.x), this.y - Math.round(this.h / 2) + this.offset.y, this.w, this.h);
 	ctx.restore();
 	ctx.globalAlpha = 1;
 	
@@ -202,8 +205,11 @@ TiledBackground.draw = function (ctx) {
 		}
 	}
 	ctx.globalAlpha = 1;
-	//ctx.strokeStyle = "red";
-	//ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+	if (CONFIG.debug) {
+		ctx.strokeStyle = "red";
+		ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+		ctx.strokeRect(this.x - 2, this.y - 2, 4, 4);
+	}
 };
 
 var Camera = Object.create(Entity);
