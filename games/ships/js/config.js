@@ -53,15 +53,15 @@ function distance (x1, y1, x2, y2) {
 }
 
 var CONFIG = {
-	height: 480,
-	width: 640,
+	height: 720,
+	width: 1280,
 	title: "My Game",
 	startScene: "mainmenu",
 	debug: false
 };
 
  var GLOBALS = {
-	scale: 3,
+	scale: 4,
 	invulnerability: 0.3
 };
 
@@ -72,7 +72,7 @@ var STATE = {
 
 var SPEED = {
 	// max speeds
-	ship: 200,
+	ship: 160,
     projectile: 330,
     // acceleration multipliers
     acel: 600,
@@ -116,7 +116,11 @@ var KEYCODES = {
 
 var Resources = [];
 var RESOURCES = [
-	{path: "saucer.png", frames: 5, speed: 0.2},
+  {path: "ship1.png", frames: 2, speed: 0.5},
+  {path: "ship2.png", frames: 2, speed: 0.5},
+  {path: "wave_tile1.png"},
+  {path: "cannonball.png"}
+	/*{path: "saucer.png", frames: 5, speed: 0.2},
 	{path: "viper.png", animations: 2, frames: 4, speed: 0.6},
 	{path: "a.png"},
 	{path: "scope.png"},
@@ -139,7 +143,7 @@ var RESOURCES = [
   {path: "connecterVertical.png"},
   {path: "box.png"},
 	{path: "scenes.js"},
-	{path: "bomb.png", frames: 3, speed: 0.3}
+	{path: "bomb.png", frames: 3, speed: 0.3}*/
 ];
 
 var debug = {};
