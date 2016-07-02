@@ -108,7 +108,10 @@ var Goal = {
   },
   regress: function (n) {
     return 1 / (1 + Math.exp(-n));
-  } 
+  },
+  scale: function (n, min, max) {
+    return 4 * 2 * (n - (min + max) / 2) / (max - min);
+  }
 }
 
 var Motivation = {
@@ -168,7 +171,7 @@ SalvageAI.getCurrentMotivation = function () {
   return this.motivations[choice];
 }
 SalvageAI.doDebug = function () {
-  var output = "";
+  var output = "<h3>" + (this.goal ? this.goal.text : "no goal") + "</h3>";
   for (var i = 0; i < this.motivations.length; i++) {
     output += "<b>" + i + ":</b> " + this.motivations[i].success() + ",<i>" + this.motivations[i].memory.length + "</i><br>"
   }
@@ -180,80 +183,84 @@ SalvageAI.createGoal = function (state) {
 SalvageAI.update = function (dt) {
   if (!this.loop) this.start();
   
-  var theta = modulo(angle(this.player.x, this.player.y, this.entity.x, this.entity.y), PI2) - modulo(this.player.angle, PI2);
-  if (this.player.beam && Math.abs(theta) < PI / 6) {
-    var direction = theta > 0 ? 1 : -1;
-    var goalTheta = this.player.angle + direction * PI / 3;
-    var dx = this.player.x + 64 * Math.cos(goalTheta), dy = this.player.y + 64 * Math.sin(goalTheta);
-    this.entity.velocity.x =  (dx - this.entity.x);
-    this.entity.velocity.y =  (dy - this.entity.y);
+  if (!onscreen(this.entity.x, this.entity.y, -100)) {
+    // This works pretty well...
+    console.log(1);
+    this.goal = null;
+    if (this.entity.pathfind.target != this.player) {
+      this.entity.pathfind.new(this.player);
+    }
+  } 
+  /*else if (this.player.beam) { // works ok in isolation
+    
+    var dd = distance(this.entity.x, this.entity.y, this.player.x, this.player.y);
+
+    var theta = modulo(angle(this.player.x, this.player.y, this.entity.x, this.entity.y), PI2) - modulo(this.player.angle, PI2);
+    if (Math.abs(theta) < PI / 3 || dd < 100) {
+      this.entity.pathfind.stop();
+      this.goal = null;
+      console.log(2.4);
+      dd = Math.max(dd, 200);
+      var direction = theta > 0 ? 1 : -1;
+      var goalTheta = this.player.angle + direction * PI / 3;
+      var dx = this.player.x + dd * Math.cos(goalTheta), dy = this.player.y + dd * Math.sin(goalTheta);
+
+      if (this.goal && this.goal.text == "Avoid Beam") {
+        return;
+      } else {
+        this.createGoal( function () {
+          return Goal.regress(Goal.scale(theta, 0, PI / 3))
+        });
+        this.goal.text = "Avoid Beam"
+      }
+      
+      this.entity.velocity.x =  (dx - this.entity.x);
+      this.entity.velocity.y =  (dy - this.entity.y);
+    }*/
+  } else if (this.node && !onscreen(this.node.x, this.node.y)) { // lead to node - good!
+
+    //var p = this.player, n = this.node;
+    if (this.entity.pathfind.target != this.node) {
+      this.entity.pathfind.new(this.node);
+    }
+  } else if (this.node && this.node.health >= this.node.maxHealth) {
+
+    var t = this;
+    this.createGoal(function () {
+      return Goal.regress(Goal.scale(t.node.health >= t.node.maxHealth ? -1 : 1, -1, 1));
+    });
+    this.goal.text = "Attack Node"
+  } else if (this.node && this.node.health > 0) {
+    var t = this;
+    this.createGoal(function () {
+      this.lastHealth = this.lastHealth || t.node.health;
+      var newHealth = t.node.health;
+      var dh = this.lastHealth - newHealth;
+      this.lastHealth = newHealth;
+      return Goal.regress(Goal.scale(dh, -t.node.maxHealth, t.node.maxHealth));
+    });
+    this.goal.text = "Destroy Node";
+  } else {
+    this.goal = null;
   }
 
   this.doDebug();
   this.time += dt;
-  if (false) { //this.time > this.delay) {
+  if (this.time > this.delay) {
     this.time = 0;
     //if (!this.goal);// this.createGoal(function () {});
 
-    /* 1. if Node some distance away */
-    if (this.node) {
-      // roughly speaking, it's 'off screen'
-      if (!onscreen(this.node.x, this.node.y)) {
-        // if AI is oncreen, start moving towards node
-        if (onscreen(this.entity.x, this.entity.y, -100)) {
-          // create goal, that player moves closer to node
-
-          if (this.entity.pathfind.target != this.node) {
-            console.log('pathfinding new target');
-            this.entity.pathfind.new(this.node);
-          }
-        
-          //this.entity.pathfind.new(); // clear pathfinding
-          if (!this.goal) {
-            var p = this.player, n = this.node;
-            this.createGoal(function () {
-              if (!this.lastDistance) {
-                this.lastDistance = distance(p.x, p.y, n.x, n.y);
-                return null;
-              } else {
-                var d =  distance(p.x, p.y, n.x, n.y);
-                var dd = this.lastDistance - d;
-                this.lastDistance = d;
-                return Goal.regress(dd);
-              }
-            });
-          }
-        }
-        // otherwise, start moving towards player
-        else {
-          if (this.entity.pathfind.target != this.player) {
-            console.log('pathfinding player');
-            this.entity.pathfind.new(this.player);
-          }
-        }
-
-        // check that we're not already doing this...
-      } 
-      // 2. at node, it has yet to be attacked
-      else if (this.node.health >= this.node.maxHealth) {
-        console.log('new goal: attack node'); 
-        var n = this.node;
-        this.createGoal(function () {
-          return (n.health >= n.maxHealth) ? -1 : 1; 
-        });
-      }
-    }
-
-
     if (this.goal) {
-      console.log('we got a goal');
       var state = this.goal.state();
+      
+      if (state > 0.5) this.debug.style.color = "green";
+      else this.debug.style.color = "red";
+
       if (state === null);
       else {
         this.getCurrentMotivation().add(state);
         if (state >= (1 - this.error)) {
           // done!
-          console.log('and now we done');
           this.goal = undefined;
         } else {
           this.delay = this.getCurrentMotivation().apply();
