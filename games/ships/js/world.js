@@ -1,3 +1,5 @@
+var AudioContext = window.AudioContext || window.webkitAudioContext;
+		
 var World = {
 	init: function () {
 		this.height = CONFIG.height, this.width = CONFIG.width;
@@ -92,10 +94,23 @@ var World = {
 		}
 		request.send();
 	},
+	initAudio: function () {
+		var a = new Audio();
+		this.audioType = a.canPlayType("audio/ogg");
+
+		if (AudioContext) AudioContext.createGain = AudioContext.createGain || AudioContext.createGainNode;
+
+		if (AudioContext) {
+			this.audioContext = new AudioContext();
+			this.audioContext.gn = this.audioContext.createGain();
+		}
+	},
 	/* FIX ME: loads image, sound and data assets into global Resources array -> is there a better place to do this? */
 	loadResources: function () {
 		if (!RESOURCES) return;
 		//this.setupControls();
+		this.initAudio();
+
 		this.resourceLoadCount = 0;
 		this.resourceCount = RESOURCES.length;
 		this.ctx.fillStyle = "gray";
@@ -116,11 +131,12 @@ var World = {
 				}
 			}
 			else if (ext == ".ogg") {
-				Resources[name] = {sound: new Audio("res/" + res, streaming=false)};
+				this.loadOGG(res, name);
+/*				Resources[name] = {sound: new Audio("res/" + res, streaming=false)};
 				w.progressBar();
 				Resources[name].sound.onload = function () {
 					console.log("loaded sound");
-				}
+				}*/
 			}
 			else if (ext == ".js") {
 				var request = new XMLHttpRequest();
@@ -132,11 +148,62 @@ var World = {
 				request.send();
 			}
 		}
+	},
+	loadOGG: function (res, name) {
+		// cant play ogg, load mp3
+		if (name == "soundtrack" || name == "soundtrackFast") {
+			this.progressBar();
+		}
+		if (this.audioType.length <= 0) {
+			res = res.replace("ogg", "mp3");
+			//console.log("replaced?");
+		}
+		//console.log("NEW", res);
+		if (!AudioContext) {
+			Resources[name] = new Audio("res/" + res, streaming=false);
+			//Resources[name].src = "res/" + res;
+			w.progressBar();
+			return;
+		}
+		var request = new XMLHttpRequest();
+		request.open('GET', "res/" + res, true);
+		request.responseType = 'arraybuffer';
+
+		var w = this;
+		request.onload = function() {
+			w.audioContext.decodeAudioData(request.response, function(b) {
+				Resources[name] = {buffer: b, play: false};
+				if (name == "soundtrack" || name == "soundtrackFast") {
+					if (AudioContext && Resources.soundtrack && name == "soundtrack") w.musicLoop();
+				} else {
+					w.progressBar();
+				}
+			}, function () {console.log("ERROR with decoding audio");});
+		};
+		request.send();
+	},
+	playSound: function(sound)
+	{
+		if (AudioContext) {
+
+			var buffer = sound.buffer;
+			var source = this.audioContext.createBufferSource();
+			source.buffer = buffer;
+			
+			source.connect(this.audioContext.gn);
+			this.audioContext.gn.connect(this.audioContext.destination);
+			source.start(0);
+			
+			return source;
+		} else {
+			if (window.muted) {
+				return;
+			}
+			else {
+				sound.play();
+				debug = sound;
+				return sound;
+			}
+		}
 	}
 };
-
-function loadResources () {
-	if (!RESOURCES) return;
-
-
-}

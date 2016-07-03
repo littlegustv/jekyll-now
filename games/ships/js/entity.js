@@ -230,3 +230,22 @@ Camera.shake = function (n) {
 		c.shake(n - 1);
 	}, 10)
 };
+
+var Text = Object.create(Entity);
+Text.type = "text";
+Text.z = -1;
+Text.init = function (x, y, text, format) {
+	this.x = x, this.y = y, this.text = text;
+	this.size = format.size || 40;
+	this.color = format.color || "black";
+	this.align = format.align || "center";
+	return this;
+};
+Text.update = function (dt) {
+};
+Text.draw = function (ctx) {
+	ctx.textAlign = this.align;
+	ctx.fillStyle = this.color;
+	ctx.font = "900 " + this.size + "px " + "Visitor2";
+	ctx.fillText(this.text, this.x, this.y);
+};

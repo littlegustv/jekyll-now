@@ -119,7 +119,9 @@ var RESOURCES = [
   {path: "ship1.png", frames: 2, speed: 0.5},
   {path: "ship2.png", frames: 2, speed: 0.5},
   {path: "wave_tile1.png"},
-  {path: "cannonball.png"}
+  {path: "cannonball.png"},
+  {path: "cannon.ogg"},
+  {path: "hit.ogg"}
 	/*{path: "saucer.png", frames: 5, speed: 0.2},
 	{path: "viper.png", animations: 2, frames: 4, speed: 0.6},
 	{path: "a.png"},

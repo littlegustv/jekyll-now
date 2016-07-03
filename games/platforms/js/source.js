@@ -45,6 +45,7 @@ function modulo(n, p) {
 
 function playSound(sound)
 {
+	console.log(sound);
 	if (AudioContext) {
 
 		var buffer = sound.buffer;
@@ -1123,7 +1124,7 @@ window.addEventListener("DOMContentLoaded", function () {
 						if (this.entities.filter(function (a) { return a.type == "collectable"; }).length <= 0) {
 							if (!this.completed) {
 								playSound(Resources.complete);
-								if (tracker.sendEvent) {
+								if (tracker && tracker.sendEvent) {
 									console.log('sending event');
 								  tracker.sendEvent('Complete', 'Level', this.uid);
 								}	
