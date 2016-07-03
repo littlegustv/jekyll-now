@@ -240,6 +240,10 @@ var shake;
 
 var onStart = function () {
 
+	this.onClick = function (e) {
+		console.log(e.offsetX, e.offsetY);
+	}
+
 	Polygon.onCheck = notFriendly(Polygon.onCheck);
 
 	var fg_camera = Object.create(Camera).init(0, 0);

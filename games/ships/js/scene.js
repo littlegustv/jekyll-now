@@ -27,6 +27,7 @@ var Scene = {
 	loadProgress: function () {
 		this.resourceLoadCount += 1;
 		if (this.resourceLoadCount >= this.resourceCount) {
+			this.ready = true;
 			this.onStart();
 		}
 	},

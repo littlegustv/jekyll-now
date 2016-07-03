@@ -87,12 +87,31 @@ var World = {
 				t.scenes.push(s);
 
 				if (sceneName == CONFIG.startScene) {
-					t.scene = s;
+					t.setScene(s);
 					t.progressBar();
 				}
 			}
 		}
 		request.send();
+	},
+	setScene: function (scene) {
+		this.scene = scene;
+		this.addEventListeners(scene);
+	},
+	addEventListeners: function (scene) {
+		var t = this;
+		if (scene.ready) {
+			if (scene.onClick) this.canvas.addEventListener('click', scene.onClick);
+			if (scene.onMouseMove) this.canvas.addEventListener('mousemove', scene.onMouseMove);
+			if (scene.onMouseDown) this.canvas.addEventListener('mousedown', scene.onMouseDown);
+			if (scene.onMouseUp) this.canvas.addEventListener('mouseup', scene.onMouseUp);
+			if (scene.onKeyDown) this.canvas.addEventListener('keydown', scene.onKeyDown);
+			if (scene.onKeyUp) this.canvas.addEventListener('keyup', scene.onKeyUp);
+			if (scene.onKeyPress) this.canvas.addEventListener('keypress', scene.onKeyPress);
+		} else {
+			// fix me: is there maybe a more elegant way of checking whether the scene is loaded?
+			setTimeout(function () { t.addEventListeners(scene), 500});
+		}
 	},
 	initAudio: function () {
 		var a = new Audio();
