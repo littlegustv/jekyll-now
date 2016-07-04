@@ -41,7 +41,7 @@ Trail.update = function (dt) {
   this.totalTime += dt;
   if (this.time > this.interval) {
     this.time = 0;
-    var p = this.createParticle(this.entity.x, this.entity.y - 48);
+    var p = this.createParticle(this.entity.x, this.entity.y - 12 * GLOBALS.scale);
     p.health = 0;
     p.opacity = 0.3;
     p.addBehavior(FadeOut, {duration: 1});
@@ -107,7 +107,7 @@ FadeOut.update = function (dt) {
     this.time += dt;
 
     if (this.time >= this.duration) this.entity.alive = false;
-    this.entity.opacity = this.maxOpacity * (this.duration - this.time) / this.duration;
+    this.entity.opacity = clamp(this.maxOpacity * (this.duration - this.time) / this.duration, 0, 1);
 };
 FadeOut.start = function () {
   if (this.entity.collision) {
@@ -130,4 +130,24 @@ Climb.update = function (dt) {
     this.entity.x = this.min.x;
     this.entity.y = this.entity.y - 32 * GLOBALS.scale / 2;
   }
+}
+
+var PeriodicCannon = Object.create(Behavior);
+PeriodicCannon.update = function (dt) {
+  if (this.time == undefined) this.start();
+  this.time += dt;
+  if (this.time > this.interval) {
+    this.time = 0;
+    var exp = Object.create(Explosion).init(this.entity.x, this.entity.y - 1, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
+    //exp.offset = {x: 0, y: GLOBALS.scale * 4};
+    this.entity.layer.add(exp);
+
+    addCannon(this.entity, {x: 0, y: -SPEED.ship});
+
+    gameWorld.playSound(Resources.cannon);
+  }
+}
+PeriodicCannon.start = function () {
+  this.time = 0;
+  this.interval = this.interval || 3;
 }

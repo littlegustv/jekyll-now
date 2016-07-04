@@ -7,7 +7,7 @@ var World = {
 		this.scenes = [];
 		this.scene = undefined;
 //		this.loadScenes();
-		this.loadResources();
+		this.loadGameInfo();
 		return this;
 	},
 	step: function () {
@@ -75,26 +75,30 @@ var World = {
 			t.startTime = new Date(); 
 		});
 	},
-	loadScenes: function () {
-		var t = this;
+	loadGameInfo: function () {
 		var request = new XMLHttpRequest();
 		request.open("GET", "index.json", true);
+		var w = this;
 		request.onload = function (data) {
-			var sceneData = JSON.parse(request.response).scenes;
-			for (var i = 0; i < sceneData.length; i++) {
-				// strip off quotation marks and .json extension
-				var sceneName = sceneData[i].substring(0, sceneData[i].length - 5);
-				var s = Object.create(Scene).init(sceneName);
-				s.world = t;
-				t.scenes.push(s);
+			w.gameInfo = JSON.parse(request.response);
+			w.loadResources();
+		};
+		request.send();				
+	},
+	loadScenes: function () {
+		var sceneData = this.gameInfo.scenes;
+		for (var i = 0; i < sceneData.length; i++) {
+			// strip off quotation marks and .json extension
+			var sceneName = sceneData[i].substring(0, sceneData[i].length - 5);
+			var s = Object.create(Scene).init(sceneName);
+			s.world = this;
+			this.scenes.push(s);
 
-				if (sceneName == CONFIG.startScene) {
-					t.setScene(s);
-					t.progressBar();
-				}
+			if (sceneName == CONFIG.startScene) {
+				this.setScene(s);
+				this.progressBar();
 			}
 		}
-		request.send();
 	},
 	setScene: function (scene) {
 		this.scene = scene;
@@ -134,24 +138,24 @@ var World = {
 	},
 	/* FIX ME: loads image, sound and data assets into global Resources array -> is there a better place to do this? */
 	loadResources: function () {
-		if (!RESOURCES) return;
+		if (!this.gameInfo.resources) return;
 		//this.setupControls();
 		this.initAudio();
 
 		this.resourceLoadCount = 0;
-		this.resourceCount = RESOURCES.length;
+		this.resourceCount = this.gameInfo.resources.length;
 		this.ctx.fillStyle = "gray";
 		this.ctx.fillRect(this.width / 2 - 25 * this.resourceCount + i * 50, this.height / 2 - 12, 50, 25);			
 		this.ctx.fillText("loading...", this.width / 2, this.height / 2 - 50);
 		var w = this;
 
-		for (var i = 0; i < RESOURCES.length; i++ ) {
-			var res = RESOURCES[i].path;
+		for (var i = 0; i < this.gameInfo.resources.length; i++ ) {
+			var res = this.gameInfo.resources[i].path;
 			var e = res.indexOf(".");
 			var name = res.substring(0, e);
 			var ext = res.substring(e, res.length);
 			if (ext == ".png") {
-				Resources[name] = {image: new Image(), frames: RESOURCES[i].frames || 1, speed: RESOURCES[i].speed || 1, animations: RESOURCES[i].animations || 1 };
+				Resources[name] = {image: new Image(), frames: this.gameInfo.resources[i].frames || 1, speed: this.gameInfo.resources[i].speed || 1, animations: this.gameInfo.resources[i].animations || 1 };
 				Resources[name].image.src = "res/" + res;
 				Resources[name].image.onload = function () {
 					w.progressBar();

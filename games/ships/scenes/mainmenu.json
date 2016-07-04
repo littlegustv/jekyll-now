@@ -1,5 +1,5 @@
 {
-	"script": "mainmenu.js",
-	"height": 1600,
-	"width": 3200
+  "script": "mainmenu.js",
+  "height": 360,
+  "width": 640
 }

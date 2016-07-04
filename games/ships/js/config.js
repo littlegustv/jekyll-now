@@ -57,15 +57,15 @@ function distance (x1, y1, x2, y2) {
 }
 
 var CONFIG = {
-	height: 720,
-	width: 1280,
+	height: 360,
+	width: 640,
 	title: "My Game",
 	startScene: "mainmenu",
 	debug: false
 };
 
  var GLOBALS = {
-	scale: 4,
+	scale: 2,
 	invulnerability: 0.3
 };
 
@@ -119,7 +119,7 @@ var KEYCODES = {
 };
 
 var Resources = [];
-var RESOURCES = [
+var RESOURCES = []; /* = [
   {path: "ship1.png", frames: 2, speed: 0.5},
   {path: "ship2.png", frames: 2, speed: 0.5},
   {path: "wave_tile1.png"},
@@ -150,7 +150,7 @@ var RESOURCES = [
   {path: "connecterVertical.png"},
   {path: "box.png"},
 	{path: "scenes.js"},
-	{path: "bomb.png", frames: 3, speed: 0.3}*/
-];
+	{path: "bomb.png", frames: 3, speed: 0.3}
+];*/
 
 var debug = {};
