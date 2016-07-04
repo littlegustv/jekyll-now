@@ -26,6 +26,7 @@ var World = {
 		this.canvas = document.createElement("canvas");
 		this.canvas.height = this.height, this.canvas.width = this.width;
 		document.body.appendChild(this.canvas);
+		//this.canvas.fullscreenElement ();
 		this.ctx = this.canvas.getContext("2d");
 		// FIX ME: cross-browser
 		this.ctx.imageSmoothingEnabled = false;
@@ -109,6 +110,12 @@ var World = {
 			if (scene.onKeyDown) this.canvas.addEventListener('keydown', scene.onKeyDown);
 			if (scene.onKeyUp) this.canvas.addEventListener('keyup', scene.onKeyUp);
 			if (scene.onKeyPress) this.canvas.addEventListener('keypress', scene.onKeyPress);
+
+			if (scene.onTouchStart) this.canvas.addEventListener('touchstart', scene.onTouchStart);
+			if (scene.onTouchEnd) this.canvas.addEventListener('touchend', scene.onTouchEnd);
+			if (scene.onTouchCancel) this.canvas.addEventListener('touchcancel', scene.onTouchCancel);
+			if (scene.onTouchMove) this.canvas.addEventListener('touchmove', scene.onTouchMove);
+
 		} else {
 			// fix me: is there maybe a more elegant way of checking whether the scene is loaded?
 			setTimeout(function () { t.addEventListeners(scene), 500});
@@ -205,7 +212,7 @@ var World = {
 	playSound: function(sound)
 	{
 		if (AudioContext) {
-
+			console.log(sound);
 			var buffer = sound.buffer;
 			var source = this.audioContext.createBufferSource();
 			source.buffer = buffer;

@@ -189,8 +189,6 @@ var onStart = function () {
 		scene.soundtrack.onended = scene.musicLoop;
 	}
 
-	this.musicLoop();
-
 	this.onClick = function (e) {
 		console.log(e.offsetX, e.offsetY);
 	}
@@ -283,16 +281,34 @@ var onStart = function () {
 		addCannon(player, {x: SPEED.ship * Math.cos(PI / 2 + PI / 6), y: SPEED.ship * Math.sin(PI / 2 + PI / 6)});
 		addCannon(player, {x: SPEED.ship * Math.cos(PI / 2 - PI / 6), y: SPEED.ship * Math.sin(PI / 2 - PI / 6)});
 
-		console.log(Resources.cannon);
+		//console.log(Resources.cannon);
 		gameWorld.playSound(Resources.cannon);
 
 		shake.start();
 	}
 	this._gamepad.buttons.rt.onEnd = function () {	
 	}
+
+	this.onTouchStart = function () {
+		var exp = Object.create(Explosion).init(player.x, player.y + 16, 48, 40, "rgba(255,255,255,0.2)");
+		fg.add(exp);
+
+		addCannon(player, {x: 0, y: SPEED.ship});
+		addCannon(player, {x: SPEED.ship * Math.cos(PI / 2 + PI / 6), y: SPEED.ship * Math.sin(PI / 2 + PI / 6)});
+		addCannon(player, {x: SPEED.ship * Math.cos(PI / 2 - PI / 6), y: SPEED.ship * Math.sin(PI / 2 - PI / 6)});
+
+		//console.log(Resources.cannon);
+		gameWorld.playSound(Resources.cannon);
+
+		shake.start();
+	}
 };
 
 var onUpdate = function (dt) {
+	if (Resources.soundtrack && !this.soundtrack) {
+		this.musicLoop();
+	}
+
 	this._gamepad.update(dt);
 
 	comboTimer += dt;
