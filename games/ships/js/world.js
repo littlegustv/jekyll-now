@@ -95,14 +95,14 @@ var World = {
 			this.scenes.push(s);
 
 			if (sceneName == CONFIG.startScene) {
-				this.setScene(s);
+				this.setScene(i);
 				this.progressBar();
 			}
 		}
 	},
-	setScene: function (scene) {
-		this.scene = scene;
-		this.addEventListeners(scene);
+	setScene: function (n) {
+		this.scene = this.scenes[n];
+		this.addEventListeners(this.scene);
 	},
 	addEventListeners: function (scene) {
 		var t = this;

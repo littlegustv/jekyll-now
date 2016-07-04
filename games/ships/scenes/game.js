@@ -161,7 +161,7 @@ Spray.update = function (dt) {
 				this.y + Math.random() * this.radius - this.radius / 2, 
 				Math.random() * this.radius / 3, 
 				{x: SPEED.ship * Math.cos(theta), y: SPEED.ship * Math.sin(theta)},
-				colors[Math.floor(Math.random() * 3)]
+				choose(colors)
 			);
 			this.particles.push(e);
 			this.count++;
@@ -218,6 +218,12 @@ var onStart = function () {
 	fg.add(scoreText);
 	fg.add(comboText);
 
+	var Lose = Object.create(Behavior);
+	Lose.end = function () {
+		console.log('ending');
+		gameWorld.setScene(2);
+	}
+
 	player = Object.create(Sprite).init(100, 116, Resources.ship1);
 	player.addBehavior(Animate);
 	player.addBehavior(Wrap, {min: {x: 0, y: 0}, max: {x: CONFIG.width, y: CONFIG.height}});
@@ -225,6 +231,7 @@ var onStart = function () {
 	player.addBehavior(Flip);
 	player.addBehavior(Die, {duration: 1});
 	player.addBehavior(SeaSpray);
+	player.addBehavior(Lose);
 	player.setVertices([
 		{x: -13, y: -2},
 		{x: 13, y: -2},
@@ -233,7 +240,7 @@ var onStart = function () {
 	]);
 	player.setCollision(Polygon);
 	player.family = "player";
-	player.health = 10;
+	player.health = 1;
 	//player.addBehavior(Mirror);
 	player.offset = {x: 0, y: -12 * GLOBALS.scale};
 
@@ -242,20 +249,9 @@ var onStart = function () {
 	this.layers.push(fg);
 	this.fg = fg;
 	
-	var Shift = Object.create(Behavior);
-	Shift.update = function (dt) {
-		if (!this.time) this.start();
-		this.time += dt;
-		this.entity.x += 1 * Math.sin(this.time);
-	}
-	Shift.start = function () {
-		this.time = 0;
-		this.constant = this.constant || 10;
-	}
-
 	for (var i = 4; i < 13; i++) {
 		var wave = Object.create(TiledBackground).init(0, i * GLOBALS.scale * 32 / 2, this.width * 3, GLOBALS.scale * 32, Resources.wave_tile1);
-		wave.addBehavior(Shift, {constant: 100, time: Math.random() * Math.PI}); 	
+		wave.addBehavior(Shift, {field: 'x', constant: 1, time: Math.random() * Math.PI}); 			
 		//wave.opacity = 0.9;
 		fg.add(wave);
 	}
@@ -273,7 +269,7 @@ var onStart = function () {
 	}
 	this._gamepad.buttons.lt.onEnd = function () {
 	}
-	this._gamepad.buttons.rt.onStart = function () {
+	this._gamepad.buttons.a.onStart = function () {
 		var exp = Object.create(Explosion).init(player.x, player.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
 		fg.add(exp);
 
@@ -331,7 +327,7 @@ var onStart = function () {
 
 var onUpdate = function (dt) {
 	if (Resources.soundtrack && !this.soundtrack) {
-		//this.musicLoop();
+		this.musicLoop();
 	}
 
 	this._gamepad.update(dt);
@@ -349,14 +345,15 @@ var onUpdate = function (dt) {
 
 	if (Math.random() * 100 < 0.5 && this.fg.entities.filter( function (r) { r.family == "enemy" && r.h > 40}).length < 10 ) {
 		var right = Math.random() > 0.5;
-		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Math.random() > 0.5 ? Resources.ship2 : Resources.ship3);
+		var ships = [Resources.ship2, Resources.ship3, Resources.monitor];
+		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, choose(ships));
 		s.velocity = {x: right ? - SPEED.ship : SPEED.ship, y: 0};
 		s.addBehavior(Flip);
 		s.addBehavior(SeaSpray);
 		s.addBehavior(Animate);
 		s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
 		s.addBehavior(Velocity);
-		s.addBehavior(PeriodicCannon, {interval: 2});
+		//s.addBehavior(PeriodicCannon, {interval: 2});
 		s.addBehavior(Die, {duration: 1});
 		s.setVertices([
 			{x: -13, y: -6},
@@ -365,6 +362,13 @@ var onUpdate = function (dt) {
 			{x: -13, y: 4}
 		]);
 		s.setCollision(Polygon);
+		s.collision.onHandle = function(object, other) {
+			if (other == player && object.health > 0) {
+				other.health -= 1;
+				object.health = 0;
+				gameWorld.playSound(Resources.hit);
+			}
+		}
 		
 		var offsetY = s.h > 64 ?  16 * GLOBALS.scale : 12 * GLOBALS.scale;
 		s.offset = {x: 0, y: - offsetY};

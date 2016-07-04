@@ -151,3 +151,25 @@ PeriodicCannon.start = function () {
   this.time = 0;
   this.interval = this.interval || 3;
 }
+
+var Shift = Object.create(Behavior);
+Shift.update = function (dt) {
+  if (!this.time) this.start();
+  this.time += dt;
+  this.entity[this.field] += this.constant * Math.sin(this.time);
+}
+Shift.start = function () {
+  this.time = 0;
+  this.constant = this.constant || 1;
+}
+
+var Oscillate = Object.create(Behavior);
+Oscillate.update = function (dt) {
+  if (!this.time) this.start();
+  this.time += dt;
+  this.entity[this.field] = this.constant * Math.sin(this.time);
+}
+Oscillate.start = function () {
+  this.time = 0;
+  this.constant = this.constant || 1;
+}

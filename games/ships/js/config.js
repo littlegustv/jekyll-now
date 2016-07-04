@@ -25,6 +25,10 @@ function sign (n) {
   return n >= 0 ? 1 : -1;
 }
 
+function choose (array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
 function project(axes, vertices) {
   var min = dot(axes, vertices[0]);
   var max = min;

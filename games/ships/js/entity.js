@@ -246,6 +246,6 @@ Text.update = function (dt) {
 Text.draw = function (ctx) {
 	ctx.textAlign = this.align;
 	ctx.fillStyle = this.color;
-	ctx.font = "900 " + this.size + "px " + "Visitor2";
+	ctx.font = "900 " + this.size + "px " + "Visitor";
 	ctx.fillText(this.text, this.x, this.y);
 };

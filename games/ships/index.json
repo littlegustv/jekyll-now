@@ -1,16 +1,19 @@
 {
   "scenes": [
     "mainmenu.json",
-    "game.json"
+    "game.json",
+    "upgrades.json"
   ],
   "resources": [
     {"path": "ship1.png", "frames": 2, "speed": 0.5},
     {"path": "ship2.png", "frames": 2, "speed": 0.5},
     {"path": "ship3.png", "frames": 2, "speed": 0.8},
+    {"path": "monitor.png"},
     {"path": "wave_tile1.png"},
     {"path": "cannonball.png"},
     {"path": "soundtrack.ogg"},
     {"path": "cannon.ogg"},
     {"path": "hit.ogg"}
-  ]
+  ],
+  "fontFamily": "Visitor"
 }
