@@ -31,6 +31,7 @@ var World = {
 		this.ctx.imageSmoothingEnabled = false;
 	},
 	update: function (dt) {
+		debug.fps = Math.floor(100 / dt) / 100;
 		if (this.scene) {
 			this.scene.update(dt);
 		}
@@ -76,12 +77,12 @@ var World = {
 	loadScenes: function () {
 		var t = this;
 		var request = new XMLHttpRequest();
-		request.open("GET", "scenes/", true);
+		request.open("GET", "index.json", true);
 		request.onload = function (data) {
-			var sceneData = request.response.match(/"\w+.json"/gi);
+			var sceneData = JSON.parse(request.response).scenes;
 			for (var i = 0; i < sceneData.length; i++) {
 				// strip off quotation marks and .json extension
-				var sceneName = sceneData[i].substring(1, sceneData[i].length - 6);
+				var sceneName = sceneData[i].substring(0, sceneData[i].length - 5);
 				var s = Object.create(Scene).init(sceneName);
 				s.world = t;
 				t.scenes.push(s);
@@ -193,7 +194,7 @@ var World = {
 			w.audioContext.decodeAudioData(request.response, function(b) {
 				Resources[name] = {buffer: b, play: false};
 				if (name == "soundtrack" || name == "soundtrackFast") {
-					if (AudioContext && Resources.soundtrack && name == "soundtrack") w.musicLoop();
+//					if (AudioContext && Resources.soundtrack && name == "soundtrack") w.musicLoop();
 				} else {
 					w.progressBar();
 				}

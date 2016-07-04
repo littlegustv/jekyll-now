@@ -75,7 +75,7 @@ function doDamage (d) {
 
 var ExplosionParticle = Object.create(Entity);
 ExplosionParticle.init = function (x, y, r, clr) {
-	this.x = x, this.y = y, this.radius = r, this.color = clr;
+	this.x = x, this.y = y, this.radius = r, this.duration = 1, this.time = 0, this.color = clr;
 	return this;
 }
 ExplosionParticle.update = function (dt) {
@@ -90,27 +90,6 @@ ExplosionParticle.draw = function (ctx) {
 	ctx.fillStyle = this.color;
 	ctx.fill();
 	ctx.globalAlpha = 1;
-}
-
-var Shake = Object.create(Behavior);
-Shake.update = function (dt) {
-	this.time += dt;
-	if (!this.time || this.time > this.duration) {
-		if (this.original)
-		{
-			this.entity.x = this.original.x, this.entity.y = this.original.y;
-			this.original = undefined;
-		}
-		return;
-	}
-	else {
-		this.entity.x += Math.random() * this.magnitude - this.magnitude / 2;
-		this.entity.y += Math.random() * this.magnitude - this.magnitude / 2;
-	}
-}
-Shake.start = function () {
-	this.original = {x: this.entity.x, y: this.entity.y};
-	this.time = 0;
 }
 
 var Explosion = Object.create(Entity);
@@ -145,100 +124,72 @@ Explosion.draw = function (ctx) {
 	}
 }
 
-var Crop = Object.create(Behavior);
-Crop.update = function (dt) {
-	if (this.entity.x > this.max.x || this.entity.x < this.min.x) this.entity.alive = false;
-	if (this.entity.y > this.max.y || this.entity.y < this.min.y) this.entity.alive = false;
+var SprayParticle = Object.create(ExplosionParticle);
+SprayParticle.init = function (x, y, radius, velocity, color) {
+	this.x = x, this.alive = true, this.y = y - Math.random(), this.radius = radius, this.duration = 0.5, this.time = 0, this.velocity = velocity, this.color = color, this.opacity = 0.5;
+	return this;
 }
+SprayParticle.draw = function (ctx) {
+	ctx.globalAlpha = this.opacity;
+	ctx.beginPath();
+	ctx.arc(this.x, this.y, this.radius, 0, 2 * PI, true);
+	ctx.closePath();
+	ctx.fillStyle = this.color;
+	ctx.fill();
+	ctx.globalAlpha = 1;
+}
+SprayParticle.oldUpdate = SprayParticle.update;
+SprayParticle.update = function (dt) {
+	this.oldUpdate(dt);
+	this.x += dt * this.velocity.x;
+	this.y += dt * this.velocity.y;
+	this.velocity.y += dt * 200;
+}
+// /SprayParticle.addBehavior(Velocity);
 
-var Trail = Object.create(Behavior);
-Trail.update = function (dt) {
-	if (!this.time) this.start();
-	if (this.totalTime > this.duration) return;
-	this.time += dt;
-	this.totalTime += dt;
-	if (this.time > this.interval) {
-		this.time = 0;
-		var p = this.createParticle(this.entity.x, this.entity.y - 48);
-		p.health = 0;
-		p.opacity = 0.3;
-		p.addBehavior(FadeOut, {duration: 1});
-		this.entity.layer.add(p);
-	}
-}
-Trail.createParticle = function (x, y) {
-	return Object.create(Entity).init(x,y,32,32);
-}
-Trail.start = function () {
-	this.time = 0;
-	this.totalTime = 0;
-	this.interval = this.interval || 0.05;
-	this.duration = this.duration || 10;
-}
-
-var Flip = Object.create(Behavior);
-Flip.update = function (dt) {
-	if (this.entity.velocity.x > 0) {
-		this.entity.mirrored = false;
-	} else {
-		this.entity.mirrored = true;
-	}
-}
-
-var Die = Object.create(Behavior);
-Die.update = function (dt) {
-	if (this.entity.health <= 0) {
-		if (!this.time) this.start();
-		this.time += dt;
-		if (this.time >= this.duration) this.entity.alive = false;
-		this.entity.opacity = (this.duration - this.time) / this.duration;
-		if (this.entity.offset) {
-			this.entity.offset.y += Math.sin(this.time) * 5;
+var Spray = Object.create(Explosion);
+Spray.update = function (dt) {
+  var colors = ["#1d66bc", "#4a97d6", "white"]
+	if (this.max === false);
+	else if (this.count >= this.max && this.particles.length <= 0) this.alive = false;
+	
+	if (this.max === false || this.count < this.max) {
+		if (Math.random() < 0.7) {
+			var theta = 3 * PI / 2 + Math.random() * PI / 3 - PI / 6;
+			var e = Object.create(SprayParticle).init(
+				this.x + Math.random() * this.radius - this.radius / 2, 
+				this.y + Math.random() * this.radius - this.radius / 2, 
+				Math.random() * this.radius / 3, 
+				{x: SPEED.ship * Math.cos(theta), y: SPEED.ship * Math.sin(theta)},
+				colors[Math.floor(Math.random() * 3)]
+			);
+			this.particles.push(e);
+			this.count++;
 		}
-		this.entity.angle += dt / 10;
 	}
-};
-Die.start = function () {
-	if (this.entity.collision) {
-		this.entity.collision.onCheck = function (a, b) { return false };
+	for (var i = 0; i < this.particles.length; i++) {
+		this.particles[i].update(dt);
 	}
-	this.time = 0;
-}
-
-var FadeOut = Object.create(Behavior);
-FadeOut.update = function (dt) {
-		if (!this.time) this.start();
-		this.time += dt;
-
-		if (this.time >= this.duration) this.entity.alive = false;
-		this.entity.opacity = this.maxOpacity * (this.duration - this.time) / this.duration;
-};
-FadeOut.start = function () {
-	if (this.entity.collision) {
-		this.entity.collision.onCheck = function (a, b) { return false };
+	for (var i = 0; i < this.particles.length; i++) {
+		if (!this.particles[i].alive) this.particles.splice(i, 1);
 	}
-	this.maxOpacity = this.entity.opacity;
-	this.time = 0;
-}
-
-
-var Climb = Object.create(Behavior);
-Climb.update = function (dt) {
-	if (this.entity.x > this.max.x) {
-		this.entity.velocity.x *= -1;
-		this.entity.x = this.max.x;
-		this.entity.y = this.entity.y - 32 * GLOBALS.scale / 2;
-	}
-	if (this.entity.x < this.min.x) {
-		this.entity.velocity.x *= -1;
-		this.entity.x = this.min.x;
-		this.entity.y = this.entity.y - 32 * GLOBALS.scale / 2;
+	for (var i = 0; i < this.behaviors.length; i++) {
+		this.behaviors[i].update(dt);
 	}
 }
 
 var shake;
 
 var onStart = function () {
+
+	var scene = this;
+
+	scene.musicLoop = function () {
+		scene.soundtrack = gameWorld.playSound(Resources.soundtrack);
+		scene.soundtrack.onended = scene.musicLoop;
+	}
+
+	this.musicLoop();
 
 	this.onClick = function (e) {
 		console.log(e.offsetX, e.offsetY);
@@ -275,6 +226,7 @@ var onStart = function () {
 	player.addBehavior(Wrap, {min: {x: 0, y: 0}, max: {x: 1280, y: 720}});
 	player.addBehavior(Velocity);
 	player.addBehavior(Flip);
+	player.addBehavior(SeaSpray);
 	player.setVertices([
 		{x: -13, y: -2},
 		{x: 13, y: -2},
@@ -359,6 +311,7 @@ var onUpdate = function (dt) {
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 168 + 4 * GLOBALS.scale * 32, Resources.ship2);
 		s.velocity = {x: right ? - SPEED.ship : SPEED.ship, y: 0};
 		s.addBehavior(Flip);
+		s.addBehavior(SeaSpray);
 		s.addBehavior(Animate);
 		s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
 		s.addBehavior(Velocity);

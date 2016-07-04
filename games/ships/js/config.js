@@ -21,6 +21,10 @@ function cross(v1, v2) {
   return v1.x * v2.y - v1.y * v2.x;
 }
 
+function sign (n) {
+  return n >= 0 ? 1 : -1;
+}
+
 function project(axes, vertices) {
   var min = dot(axes, vertices[0]);
   var max = min;
@@ -120,6 +124,7 @@ var RESOURCES = [
   {path: "ship2.png", frames: 2, speed: 0.5},
   {path: "wave_tile1.png"},
   {path: "cannonball.png"},
+  {path: "soundtrack.ogg"},
   {path: "cannon.ogg"},
   {path: "hit.ogg"}
 	/*{path: "saucer.png", frames: 5, speed: 0.2},
