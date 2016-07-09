@@ -111,9 +111,9 @@ var World = {
 			if (scene.onMouseMove) this.canvas.addEventListener('mousemove', scene.onMouseMove);
 			if (scene.onMouseDown) this.canvas.addEventListener('mousedown', scene.onMouseDown);
 			if (scene.onMouseUp) this.canvas.addEventListener('mouseup', scene.onMouseUp);
-			if (scene.onKeyDown) this.canvas.addEventListener('keydown', scene.onKeyDown);
-			if (scene.onKeyUp) this.canvas.addEventListener('keyup', scene.onKeyUp);
-			if (scene.onKeyPress) this.canvas.addEventListener('keypress', scene.onKeyPress);
+			if (scene.onKeyDown) document.addEventListener('keydown', scene.onKeyDown);
+			if (scene.onKeyUp) document.addEventListener('keyup', scene.onKeyUp);
+			if (scene.onKeyPress) document.addEventListener('keypress', scene.onKeyPress);
 
 			if (scene.onTouchStart) this.canvas.addEventListener('touchstart', scene.onTouchStart);
 			if (scene.onTouchEnd) this.canvas.addEventListener('touchend', scene.onTouchEnd);

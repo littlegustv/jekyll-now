@@ -123,12 +123,14 @@ Climb.update = function (dt) {
   if (this.entity.x > this.max.x) {
     this.entity.velocity.x *= -1;
     this.entity.x = this.max.x;
-    this.entity.y = this.entity.y - 32 * GLOBALS.scale / 2;
+    if (this.entity.y > 116)
+      this.entity.y = this.entity.y - 32 * GLOBALS.scale / 2;
   }
   if (this.entity.x < this.min.x) {
     this.entity.velocity.x *= -1;
     this.entity.x = this.min.x;
-    this.entity.y = this.entity.y - 32 * GLOBALS.scale / 2;
+    if (this.entity.y > 116)
+      this.entity.y = this.entity.y - 32 * GLOBALS.scale / 2;
   }
 }
 
@@ -172,4 +174,15 @@ Oscillate.update = function (dt) {
 Oscillate.start = function () {
   this.time = 0;
   this.constant = this.constant || 1;
+}
+
+var Cooldown = Object.create(Behavior);
+Cooldown.update = function (dt) {
+  if (this.entity.cooldown === undefined) this.start;
+
+  if (this.entity.cooldown > 0)
+    this.entity.cooldown -= dt;
+}
+Cooldown.start = function () {
+  this.entity.cooldown = 0;
 }

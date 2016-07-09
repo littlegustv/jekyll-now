@@ -15,14 +15,15 @@ var scoreText;
 
 Sprite.z = 1, TiledBackground.z = 1;
 
-function addCannon (entity, velocity) {
-	var cb = Object.create(Sprite).init(entity.x, entity.y, Resources.cannonball);
+function addCannon (entity, velocity, offset) {
+	offset = offset || {x: 0, y: 0};
+	var cb = Object.create(Sprite).init(entity.x + offset.x, entity.y + offset.y, Resources.cannonball);
 	//cb.addBehavior(Velocity);
 	cb.setCollision(Polygon);
 	cb.addBehavior(Velocity);
 	cb.collision.onHandle = function (object, other) {
 		if (other.health > 0) {
-			console.log('hey!');
+			//console.log('hey!');
 			var e = Object.create(Explosion).init(other.x, other.y - 1, other.w / 2, 20, 'rgba(240,200,100,0.4)');
 			other.layer.add(e);
 			combo += 1;
@@ -178,11 +179,117 @@ Spray.update = function (dt) {
 	}
 }
 
+var costs = [1.4, 5, 10, 15, 40];
+var shipCost = {
+	40: function () {
+		if (Math.random() < 0.5) return false;
+		var right = Math.random() > 0.5;
+		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.monitor);
+		s.velocity = {x: right ? - SPEED.ship / 2 : SPEED.ship / 2, y: 0};
+		s.health = 2;
+		return s;
+	},
+	15: function () {
+		if (Math.random() < 0.7) return false;
+		var right = Math.random() > 0.5;
+		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.Tender);
+		s.velocity = {x: right ? - SPEED.ship * 2 / 3 : SPEED.ship * 2 / 3, y: 0};
+		s.health = 1;
+		return s;
+	},
+	10: function () {
+		if (Math.random() < 0.3) return false;
+		var right = Math.random() > 0.5;
+		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.ship3);
+		s.addBehavior(Battleship);
+		s.velocity = {x: right ? - SPEED.ship * 2 / 3 : SPEED.ship * 2 / 3, y: 0};
+		s.health = 3;
+		return s;
+	},
+	5: function () {
+		if (Math.random() < 0.2) return false; // chance to not spawn
+		var right = Math.random() > 0.5;
+		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.Cutter);
+		s.velocity = {x: right ? - SPEED.ship * 1.5 : SPEED.ship * 1.5, y: 0};
+		s.health = 1;
+		return s;
+	},
+	1.4: function () {
+		var right = Math.random() > 0.5;
+		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.ship2);
+		s.addBehavior(Frigate);
+		s.velocity = {x: right ? - SPEED.ship : SPEED.ship, y: 0};
+		s.health = 1;
+		return s;
+	}
+}
+
+function buyShips (dt) {
+
+		this.DOMAIN = 10 + (Math.min(1, score / 1000) * 54);
+		if (this.interval === undefined) this.interval = 0;
+
+		this.interval += dt;
+		if (this.interval <= 2 + Math.random()) return;
+
+	//if (Math.random() * 100 < 0.5 && this.fg.entities.filter( function (r) { r.family == "enemy" && r.h > 40}).length < 10 ) {
+		var x = Math.random() * this.DOMAIN;
+		var y = Math.pow(2, x / 10);
+		this.interval = 0;
+
+		for (var i = costs.length - 1; i >= 0; i--) {
+			var cost = costs[i];
+			if (y > cost) {
+				var s = shipCost[cost]();
+
+				if (s) {
+				//this.money -= cost;
+					console.log(y, this.DOMAIN);
+
+
+	//				var ships = [Resources.ship2, Resources.ship3, Resources.monitor];
+					s.addBehavior(Flip);
+					s.addBehavior(SeaSpray);
+					s.addBehavior(Animate);
+					s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
+					s.addBehavior(Velocity);
+					//s.addBehavior(PeriodicCannon, {interval: 2});
+					s.addBehavior(Die, {duration: 1});
+					s.setVertices([
+						{x: -13, y: -6},
+						{x: 13, y: -6},
+						{x: 13, y: 4},
+						{x: -13, y: 4}
+					]);
+					s.setCollision(Polygon);
+					s.collision.onHandle = function(object, other) {
+						if (other == player && object.health > 0) {
+							other.health -= 1;
+							object.health = 0;
+							gameWorld.playSound(Resources.hit);
+						}
+					}
+					
+					var offsetY = s.h > 64 ?  16 * GLOBALS.scale : 12 * GLOBALS.scale;
+					s.offset = {x: 0, y: - offsetY};
+					s.family = "enemy";
+
+					this.fg.add(s);
+					return;
+				}
+			}
+		}
+
+}
+
 var shake;
 
 var onStart = function () {
 
 	var scene = this;
+
+	this.money = 0;
+	this.buyShips = buyShips;
 
 	scene.musicLoop = function () {
 		scene.soundtrack = gameWorld.playSound(Resources.soundtrack);
@@ -229,6 +336,7 @@ var onStart = function () {
 	player.addBehavior(Wrap, {min: {x: 0, y: 0}, max: {x: CONFIG.width, y: CONFIG.height}});
 	player.addBehavior(Velocity);
 	player.addBehavior(Flip);
+	player.addBehavior(Cooldown);
 	player.addBehavior(Die, {duration: 1});
 	player.addBehavior(SeaSpray);
 	player.addBehavior(Lose);
@@ -240,7 +348,7 @@ var onStart = function () {
 	]);
 	player.setCollision(Polygon);
 	player.family = "player";
-	player.health = 1;
+	player.health = 10;
 	//player.addBehavior(Mirror);
 	player.offset = {x: 0, y: -12 * GLOBALS.scale};
 
@@ -270,13 +378,14 @@ var onStart = function () {
 	this._gamepad.buttons.lt.onEnd = function () {
 	}
 	this._gamepad.buttons.a.onStart = function () {
+		if (player.cooldown >= 0) return;
+
 		var exp = Object.create(Explosion).init(player.x, player.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
 		fg.add(exp);
 
 		addCannon(player, {x: 0, y: SPEED.ship});
-		addCannon(player, {x: SPEED.ship * Math.cos(PI / 2 + PI / 6), y: SPEED.ship * Math.sin(PI / 2 + PI / 6)});
-		addCannon(player, {x: SPEED.ship * Math.cos(PI / 2 - PI / 6), y: SPEED.ship * Math.sin(PI / 2 - PI / 6)});
-
+		player.cooldown = 1;
+	
 		//console.log(Resources.cannon);
 		gameWorld.playSound(Resources.cannon);
 
@@ -287,6 +396,27 @@ var onStart = function () {
 
 	this.touch = {x: undefined, y: undefined, timestamp: undefined};
 	var t = this;
+	this.onKeyDown = function (e) {
+		console.log('hey');
+		if (e.keyCode == 32) {
+			if (player.cooldown >= 0) return;
+
+			var exp = Object.create(Explosion).init(player.x, player.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
+			fg.add(exp);
+
+			addCannon(player, {x: 0, y: SPEED.ship});
+			player.cooldown = 1;
+		
+			//console.log(Resources.cannon);
+			gameWorld.playSound(Resources.cannon);
+
+			shake.start();
+		} else if (e.keyCode == 37 ) {
+			player.velocity.x = -SPEED.ship;
+		} else if (e.keyCode == 39) {
+			player.velocity.x = SPEED.ship;
+		}
+	}	
 	this.onTouchStart = function (e) {
 
 		if (!fullscreen) requestFullScreen();
@@ -294,7 +424,6 @@ var onStart = function () {
 		t.touch.timestamp = new Date();
 		t.touch.x = e.changedTouches[0].pageX, this.touch.y = e.changedTouches[0].pageY;
 
-		shake.start();
 	}
 	this.onTouchEnd = function (e) {
 		var currentTimeStamp = new Date();
@@ -302,15 +431,18 @@ var onStart = function () {
 		var x = e.changedTouches[0].pageX, y = e.changedTouches[0].pageY;
 		var dx = x - t.touch.x;
 		if (Math.abs(dx) < 100) {
+			if (player.cooldown >= 0) return;
+
 			var exp = Object.create(Explosion).init(player.x, player.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
 			fg.add(exp);
 
 			addCannon(player, {x: 0, y: SPEED.ship});
-			addCannon(player, {x: SPEED.ship * Math.cos(PI / 2 + PI / 6), y: SPEED.ship * Math.sin(PI / 2 + PI / 6)});
-			addCannon(player, {x: SPEED.ship * Math.cos(PI / 2 - PI / 6), y: SPEED.ship * Math.sin(PI / 2 - PI / 6)});
-
+			player.cooldown = 1;
+		
 			//console.log(Resources.cannon);
 			gameWorld.playSound(Resources.cannon);
+
+			shake.start();
 		} else {
 			if (dx > 0) {
 				player.velocity.x = SPEED.ship;
@@ -327,7 +459,7 @@ var onStart = function () {
 
 var onUpdate = function (dt) {
 	if (Resources.soundtrack && !this.soundtrack) {
-		this.musicLoop();
+		//this.musicLoop();
 	}
 
 	this._gamepad.update(dt);
@@ -342,42 +474,7 @@ var onUpdate = function (dt) {
 
 	//console.log(scoreText);
 
-
-	if (Math.random() * 100 < 0.5 && this.fg.entities.filter( function (r) { r.family == "enemy" && r.h > 40}).length < 10 ) {
-		var right = Math.random() > 0.5;
-		var ships = [Resources.ship2, Resources.ship3, Resources.monitor];
-		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, choose(ships));
-		s.velocity = {x: right ? - SPEED.ship : SPEED.ship, y: 0};
-		s.addBehavior(Flip);
-		s.addBehavior(SeaSpray);
-		s.addBehavior(Animate);
-		s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
-		s.addBehavior(Velocity);
-		//s.addBehavior(PeriodicCannon, {interval: 2});
-		s.addBehavior(Die, {duration: 1});
-		s.setVertices([
-			{x: -13, y: -6},
-			{x: 13, y: -6},
-			{x: 13, y: 4},
-			{x: -13, y: 4}
-		]);
-		s.setCollision(Polygon);
-		s.collision.onHandle = function(object, other) {
-			if (other == player && object.health > 0) {
-				other.health -= 1;
-				object.health = 0;
-				gameWorld.playSound(Resources.hit);
-			}
-		}
-		
-		var offsetY = s.h > 64 ?  16 * GLOBALS.scale : 12 * GLOBALS.scale;
-		s.offset = {x: 0, y: - offsetY};
-		s.family = "enemy";
-		s.health = 1;
-
-		this.fg.add(s);
-	}
-
+	this.buyShips(dt);
 };
 
 var onEnd = function () {
