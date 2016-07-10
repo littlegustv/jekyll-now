@@ -186,3 +186,19 @@ Cooldown.update = function (dt) {
 Cooldown.start = function () {
   this.entity.cooldown = 0;
 }
+
+var HighLight = Object.create(Behavior);
+HighLight.start = function () {
+  this.time = 0;
+  this.duration = this.duration || 1;
+}
+HighLight.update = function (dt) {
+  if (this.time == undefined) this.start();
+  if (this.entity.frame == 1) {
+    this.time += dt;
+    if (this.time > this.duration) {
+      this.time = 0;
+      this.entity.frame = 0;
+    }
+  }
+}

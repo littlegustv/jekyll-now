@@ -4,6 +4,40 @@ var player;
 var other;
 var debug;
 
+var defaultShoot = function () {
+	if (player.cooldown >= 0) return;
+
+	var exp = Object.create(Explosion).init(player.x, player.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
+	player.layer.add(exp);
+
+	addCannon(player, {x: 0, y: SPEED.ship});
+	player.cooldown = 1;
+
+	//console.log(Resources.cannon);
+	gameWorld.playSound(Resources.cannon);
+
+	shake.start();
+}
+
+var doubleShoot = function () {
+	if (player.cooldown >= 0) return;
+
+	var exp = Object.create(Explosion).init(player.x, player.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
+	player.layer.add(exp);
+
+	addCannon(player, {x: Math.cos(PI / 2 - PI / 6) * SPEED.ship, y: Math.sin(PI / 2 - PI / 6) * SPEED.ship}, {x: 48, y: 0});
+	addCannon(player, {x: Math.cos(PI / 2 + PI / 6) * SPEED.ship, y:  Math.sin(PI / 2 + PI / 6) * SPEED.ship}, {x: -48, y: 0});
+
+	player.cooldown = 1.4;
+
+	//console.log(Resources.cannon);
+	gameWorld.playSound(Resources.cannon);
+
+	shake.start();	
+}
+
+var currentShoot = defaultShoot;
+
 var onscreen; // hacky! this will be a function shortly!
 
 var score = 0;
@@ -346,6 +380,7 @@ var onStart = function () {
 		{x: 13, y: 4},
 		{x: -13, y: 4}
 	]);
+	player.shoot = currentShoot;
 	player.setCollision(Polygon);
 	player.family = "player";
 	player.health = 10;
@@ -363,6 +398,15 @@ var onStart = function () {
 		//wave.opacity = 0.9;
 		fg.add(wave);
 	}
+
+	var menuButton = Object.create(Sprite).init(24, 24, Resources.icon_menu);
+	menuButton.behaviors = [];
+	menuButton.addBehavior(HighLight, {duration: 0.5});
+	menuButton.family = 'button';
+	menuButton.trigger = function () {
+		gameWorld.setScene(0);
+	};
+	fg.add(menuButton);
 
 	this._gamepad = Object.create(Gamepad).init();
 	this._gamepad.aleft.onUpdate = function (dt) {
@@ -396,21 +440,27 @@ var onStart = function () {
 
 	this.touch = {x: undefined, y: undefined, timestamp: undefined};
 	var t = this;
+
+	this.onClick = function (e) {
+		var b = fg.onButton(e.offsetX, e.offsetY);
+		if (b) {
+			if (b.trigger) b.trigger();
+			return;
+		}
+	}
+	this.onMouseMove = function (e) {
+		var b = fg.onButton(e.offsetX, e.offsetY);
+		if (b) {
+			if (b.trigger) {
+				b.frame = 1;
+			}
+			return;
+		}
+	}
+
 	this.onKeyDown = function (e) {
-		console.log('hey');
 		if (e.keyCode == 32) {
-			if (player.cooldown >= 0) return;
-
-			var exp = Object.create(Explosion).init(player.x, player.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
-			fg.add(exp);
-
-			addCannon(player, {x: 0, y: SPEED.ship});
-			player.cooldown = 1;
-		
-			//console.log(Resources.cannon);
-			gameWorld.playSound(Resources.cannon);
-
-			shake.start();
+			player.shoot();
 		} else if (e.keyCode == 37 ) {
 			player.velocity.x = -SPEED.ship;
 		} else if (e.keyCode == 39) {
@@ -426,6 +476,12 @@ var onStart = function () {
 
 	}
 	this.onTouchEnd = function (e) {
+		var b = fg.onButton(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+		if (b) {
+			if (b.trigger) b.trigger();
+			return;
+		}
+
 		var currentTimeStamp = new Date();
 		var duration = (currentTimeStamp - t.touch.timestamp) / 1000;
 		var x = e.changedTouches[0].pageX, y = e.changedTouches[0].pageY;

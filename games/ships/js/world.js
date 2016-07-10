@@ -91,21 +91,29 @@ var World = {
 			// strip off quotation marks and .json extension
 			var sceneName = sceneData[i].substring(0, sceneData[i].length - 5);
 			var s = Object.create(Scene).init(sceneName);
-			s.world = this;
 			this.scenes.push(s);
 
 			if (sceneName == CONFIG.startScene) {
 				this.setScene(i);
+				this.scene.onStart();
 				this.progressBar();
 			}
 		}
 	},
 	setScene: function (n) {
+		if (this.scenes[n].reload) {
+			this.scenes[n] = Object.create(Scene).init(this.scenes[n].name);
+		}
 		this.scene = this.scenes[n];
 		this.addEventListeners(this.scene);
 	},
 	addEventListeners: function (scene) {
 		var t = this;
+		var c = this.canvas;
+		this.canvas = this.canvas.cloneNode();
+		this.ctx = this.canvas.getContext('2d');
+		this.ctx.imageSmoothingEnabled = false;
+		c.parentNode.replaceChild(this.canvas, c);
 		if (scene.ready) {
 			if (scene.onClick) this.canvas.addEventListener('click', scene.onClick);
 			if (scene.onMouseMove) this.canvas.addEventListener('mousemove', scene.onMouseMove);

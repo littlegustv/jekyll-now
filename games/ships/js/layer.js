@@ -30,6 +30,16 @@ var Layer = {
     }
     ctx.restore();
   },
+  onButton: function (x, y) {
+    for (var i = 0; i < this.entities.length; i++) {
+      if (this.entities[i].family == 'button') {
+        var e = this.entities[i];
+        if (x >= e.x - e.w/2 && x <= e.x + e.w/2 && y >= e.y - e.h/2 && y <= e.y + e.h/2) {
+          return e;
+        }
+      }
+    }
+  },
   update: function (dt) {
     // update
     this.camera.update(dt);

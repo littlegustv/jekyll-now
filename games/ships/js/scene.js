@@ -38,7 +38,7 @@ var Scene = {
 		request.open("GET", "scenes/" + this.name + ".json", true);
 		request.onload = function () {
 			t.data = JSON.parse(request.response);
-			t.width = t.data.width, t.height = t.data.height;
+			t.width = t.data.width, t.height = t.data.height, t.reload = t.data.reload;
 			if (t.data.script) {
 				t.resourceCount += 1;
 				t.loadBehavior(t.data.script)
