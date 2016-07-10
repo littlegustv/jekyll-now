@@ -9,14 +9,17 @@ var onStart = function () {
   fg.add(text);
 
 
-  var doubleButton = Object.create(Sprite).init(64, 64, Resources.ship2);
-  doubleButton.behaviors = [];
-  doubleButton.addBehavior(HighLight, {duration: 0.5});
-  doubleButton.family = 'button';
+  var doubleButton = Object.create(Button).init(64, 64, Resources.icon_upgrade);
   doubleButton.trigger = function () {
     currentShoot = doubleShoot;
   };
   fg.add(doubleButton);
+
+  var scatterButton = Object.create(Button).init(128, 64, Resources.icon_upgrade);
+  scatterButton.trigger = function () {
+    currentShoot = scatterShoot;
+  };
+  fg.add(scatterButton);
 
   this.layers.push(fg);
 
@@ -25,6 +28,8 @@ var onStart = function () {
     if (b) {
       if (b.trigger) b.trigger();
       return;
+    } else {
+      gameWorld.setScene(1, true);
     }
   }
   this.onMouseMove = function (e) {
@@ -41,9 +46,6 @@ var onStart = function () {
     gameWorld.setScene(1, true);
     if (!fullscreen) requestFullScreen();
   }
-  this.onClick = function (e) {
-    gameWorld.setScene(1, true);
-  };
   
 }
 

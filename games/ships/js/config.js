@@ -157,4 +157,70 @@ var RESOURCES = []; /* = [
 	{path: "bomb.png", frames: 3, speed: 0.3}
 ];*/
 
+
+var defaultShoot = function () {
+  if (this.cooldown >= 0) return;
+
+  var exp = Object.create(Explosion).init(this.x, this.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
+  this.layer.add(exp);
+
+  var direction = this.family == "player" ? 1 : -1;
+  addCannon(this, {x: 0, y: direction * SPEED.ship});
+  this.cooldown = 1;
+
+  //console.log(Resources.cannon);
+  gameWorld.playSound(Resources.cannon);
+
+  shake.start();
+}
+
+var doubleShoot = function () {
+  if (this.cooldown >= 0) return;
+
+  var exp = Object.create(Explosion).init(this.x, this.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
+  this.layer.add(exp);
+
+  var direction = this.family == "player" ? 1 : -1;
+  addCannon(this, {x: Math.cos(PI / 2 - PI / 6) * SPEED.ship, y: direction * Math.sin(PI / 2 - PI / 6) * SPEED.ship}, {x: 16, y: 0});
+  addCannon(this, {x: Math.cos(PI / 2 + PI / 6) * SPEED.ship, y:  direction * Math.sin(PI / 2 + PI / 6) * SPEED.ship}, {x: -16, y: 0});
+
+  this.cooldown = 1.4;
+
+  //console.log(Resources.cannon);
+  gameWorld.playSound(Resources.cannon);
+
+  shake.start();  
+}
+
+var scatterShoot = function () {
+  if (this.cooldown >= 0) return;
+
+  var exp = Object.create(Explosion).init(this.x, this.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
+  this.layer.add(exp);
+
+  var direction = this.family == "player" ? 1 : -1;
+  for (var i = 0; i < 10; i++) {
+
+    var b = Object.create(Bullet).init(this.x + Math.random() * 16 - 8, this.y + Math.random() * direction * 8, 4, 4);
+    var theta = Math.PI / 2 + Math.random() * Math.PI / 3 - Math.PI / 6;
+    b.velocity = {x: direction * 1.5 * SPEED.ship * Math.cos(theta), y: direction * 1.5 * SPEED.ship * Math.sin(theta)};
+    b.family = this.family;
+    b.setVertices();
+    b.addBehavior(Velocity);
+    b.offset = {x: 0, y: -12 * GLOBALS.scale};
+    b.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height}})
+    
+    var exp = Object.create(Explosion).init(b.x, b.y, 4 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
+    this.layer.add(exp);
+
+    this.layer.add(b);
+  }
+
+  gameWorld.playSound(Resources.scatter);
+
+  this.cooldown = 1.8;
+}
+
+var currentShoot = defaultShoot;
+
 var debug = {};

@@ -4,40 +4,6 @@ var player;
 var other;
 var debug;
 
-var defaultShoot = function () {
-	if (player.cooldown >= 0) return;
-
-	var exp = Object.create(Explosion).init(player.x, player.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
-	player.layer.add(exp);
-
-	addCannon(player, {x: 0, y: SPEED.ship});
-	player.cooldown = 1;
-
-	//console.log(Resources.cannon);
-	gameWorld.playSound(Resources.cannon);
-
-	shake.start();
-}
-
-var doubleShoot = function () {
-	if (player.cooldown >= 0) return;
-
-	var exp = Object.create(Explosion).init(player.x, player.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
-	player.layer.add(exp);
-
-	addCannon(player, {x: Math.cos(PI / 2 - PI / 6) * SPEED.ship, y: Math.sin(PI / 2 - PI / 6) * SPEED.ship}, {x: 48, y: 0});
-	addCannon(player, {x: Math.cos(PI / 2 + PI / 6) * SPEED.ship, y:  Math.sin(PI / 2 + PI / 6) * SPEED.ship}, {x: -48, y: 0});
-
-	player.cooldown = 1.4;
-
-	//console.log(Resources.cannon);
-	gameWorld.playSound(Resources.cannon);
-
-	shake.start();	
-}
-
-var currentShoot = defaultShoot;
-
 var onscreen; // hacky! this will be a function shortly!
 
 var score = 0;
@@ -51,45 +17,19 @@ Sprite.z = 1, TiledBackground.z = 1;
 
 function addCannon (entity, velocity, offset) {
 	offset = offset || {x: 0, y: 0};
-	var cb = Object.create(Sprite).init(entity.x + offset.x, entity.y + offset.y, Resources.cannonball);
-	//cb.addBehavior(Velocity);
-	cb.setCollision(Polygon);
+	var cb = Object.create(Cannon).init(0,0,Resources.cannonball);
+  cb.x = entity.x + offset.x, cb.y = entity.y  + offset.y + 12 * GLOBALS.scale;
+  cb.velocity = velocity;
+  cb.family = entity.family;
 	cb.addBehavior(Velocity);
-	cb.collision.onHandle = function (object, other) {
-		if (other.health > 0) {
-			//console.log('hey!');
-			var e = Object.create(Explosion).init(other.x, other.y - 1, other.w / 2, 20, 'rgba(240,200,100,0.4)');
-			other.layer.add(e);
-			combo += 1;
-			score += combo * 10;
-			comboTimer = 0;
-
-			other.health -= 1;
-			gameWorld.playSound(Resources.hit)
-		}
-		object.alive = false;
-	};
 	cb.addBehavior(Trail, {
 		createParticle: function (x, y) { return Object.create(Entity).init(x, y, 8, 8) },
 		duration: 5,
 		interval: 0.02
 	});
+  cb.offset = {x: 0, y: -12 * GLOBALS.scale};
 	cb.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height}})
-
-	cb.x = entity.x, cb.y = entity.y + 12 * GLOBALS.scale;
-	cb.offset = {x: 0, y: -12 * GLOBALS.scale};
-	//cb.start = {x: player.x, y: player.y};
-	cb.velocity = velocity;
-	cb.family = entity.family;
-	cb.setVertices([
-		{x: 0, y: -10},
-		{x: 2, y: -12},
-		{x: 0, y: -14},
-		{x: -2, y: -12},
-	]);
-	cb.z = 1;
 	entity.layer.add(cb);
-
 }
 
 function notFriendly (callback) {
@@ -220,7 +160,7 @@ var shipCost = {
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.monitor);
 		s.velocity = {x: right ? - SPEED.ship / 2 : SPEED.ship / 2, y: 0};
-		s.health = 2;
+		s.health = 20;
 		return s;
 	},
 	15: function () {
@@ -228,7 +168,7 @@ var shipCost = {
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.Tender);
 		s.velocity = {x: right ? - SPEED.ship * 2 / 3 : SPEED.ship * 2 / 3, y: 0};
-		s.health = 1;
+		s.health = 10;
 		return s;
 	},
 	10: function () {
@@ -237,7 +177,7 @@ var shipCost = {
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.ship3);
 		s.addBehavior(Battleship);
 		s.velocity = {x: right ? - SPEED.ship * 2 / 3 : SPEED.ship * 2 / 3, y: 0};
-		s.health = 3;
+		s.health = 30;
 		return s;
 	},
 	5: function () {
@@ -245,7 +185,7 @@ var shipCost = {
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.Cutter);
 		s.velocity = {x: right ? - SPEED.ship * 1.5 : SPEED.ship * 1.5, y: 0};
-		s.health = 1;
+		s.health = 10;
 		return s;
 	},
 	1.4: function () {
@@ -253,7 +193,7 @@ var shipCost = {
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.ship2);
 		s.addBehavior(Frigate);
 		s.velocity = {x: right ? - SPEED.ship : SPEED.ship, y: 0};
-		s.health = 1;
+		s.health = 10;
 		return s;
 	}
 }
@@ -383,7 +323,7 @@ var onStart = function () {
 	player.shoot = currentShoot;
 	player.setCollision(Polygon);
 	player.family = "player";
-	player.health = 10;
+	player.health = 20;
 	//player.addBehavior(Mirror);
 	player.offset = {x: 0, y: -12 * GLOBALS.scale};
 
@@ -404,7 +344,7 @@ var onStart = function () {
 	menuButton.addBehavior(HighLight, {duration: 0.5});
 	menuButton.family = 'button';
 	menuButton.trigger = function () {
-		gameWorld.setScene(0);
+		gameWorld.setScene(2);
 	};
 	fg.add(menuButton);
 
