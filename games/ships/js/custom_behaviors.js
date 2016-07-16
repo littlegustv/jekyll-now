@@ -42,6 +42,7 @@ Trail.update = function (dt) {
   if (this.time > this.interval) {
     this.time = 0;
     var p = this.createParticle(this.entity.x, this.entity.y - 12 * GLOBALS.scale);
+    p.z = 10;
     p.health = 0;
     p.opacity = 0.3;
     p.addBehavior(FadeOut, {duration: 1});
@@ -49,7 +50,7 @@ Trail.update = function (dt) {
   }
 }
 Trail.createParticle = function (x, y) {
-  return Object.create(Entity).init(x,y,32,32);
+  return Object.create(Entity).init(x + Math.random() * 16 - 8,y + Math.random() * 16 - 8,32,32);
 }
 Trail.start = function () {
   this.time = 0;
@@ -79,6 +80,9 @@ Flip.update = function (dt) {
   } else {
     this.entity.mirrored = true;
   }
+}
+Flip.transform = function (ctx) {
+  if (this.entity.mirrored) ctx.scale(-1, 1);
 }
 
 var Die = Object.create(Behavior);
@@ -123,7 +127,7 @@ Climb.update = function (dt) {
   if (this.entity.x > this.max.x) {
     this.entity.velocity.x *= -1;
     this.entity.x = this.max.x;
-    if (this.entity.y > 116)
+    if (this.entity.y > 116) 
       this.entity.y = this.entity.y - 32 * GLOBALS.scale / 2;
   }
   if (this.entity.x < this.min.x) {
@@ -199,6 +203,18 @@ HighLight.update = function (dt) {
     if (this.time > this.duration) {
       this.time = 0;
       this.entity.frame = 0;
+    }
+  }
+}
+
+var Reload = Object.create(Behavior);
+Reload.drawAfter = function (ctx) {
+  if (this.entity.cooldown && this.entity.maxCooldown) {
+    if (this.entity.cooldown >= 0) {
+      ctx.fillStyle = "black";
+      ctx.fillRect(this.entity.x - this.entity.w / 2, this.entity.y - this.entity.h, this.entity.w, 4 * GLOBALS.scale);
+      ctx.fillStyle = "white";
+      ctx.fillRect(this.entity.x - this.entity.w / 2 + 1* GLOBALS.scale, this.entity.y - this.entity.h + 1 * GLOBALS.scale, (this.entity.w - 2 * GLOBALS.scale) * (1 - this.entity.cooldown / this.entity.maxCooldown), 4 * GLOBALS.scale - 2 * GLOBALS.scale);
     }
   }
 }

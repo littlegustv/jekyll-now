@@ -47,6 +47,12 @@ var onStart = function () {
   fg.add(ship);
   fg.add(wave);
 
+  this.onKeyDown = function (e) {
+    if (e.keyCode == 13) {
+      gameWorld.setScene(1, true);
+    }
+  }
+
   this.onTouchStart = function (e) {
     gameWorld.setScene(1, true);
     if (!fullscreen) requestFullScreen();

@@ -4,7 +4,9 @@ var World = {
 	init: function () {
 		this.height = CONFIG.height, this.width = CONFIG.width;
 		this.createCanvas();
+		this.createDebug();
 		this.scenes = [];
+		this.time = 0;
 		this.scene = undefined;
 //		this.loadScenes();
 		this.loadGameInfo();
@@ -14,6 +16,14 @@ var World = {
 		var newTime = new Date();
 		var dt = ( newTime - this.startTime ) / 1000;
 		this.startTime = newTime;
+
+		this.time += dt;
+		if (this.time > 1) {
+			if (CONFIG.debug) this.debug.style.display = "block";
+			else this.debug.style.display = "none";
+			this.time = 0;
+			this.debug.innerHTML = Math.floor(1 / dt) + " fps";
+		}
 
 		this.update(dt);
 		this.draw();
@@ -30,6 +40,11 @@ var World = {
 		this.ctx = this.canvas.getContext("2d");
 		// FIX ME: cross-browser
 		this.ctx.imageSmoothingEnabled = false;
+	},
+	createDebug: function () {
+		this.debug = document.createElement("div");
+		this.debug.setAttribute("class", "debug");
+		document.body.appendChild(this.debug);
 	},
 	update: function (dt) {
 		debug.fps = Math.floor(100 / dt) / 100;

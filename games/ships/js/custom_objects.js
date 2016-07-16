@@ -2,12 +2,12 @@
   Cannon.setCollision(Polygon);
   Cannon.collision.onHandle = function (object, other) {
     if (other.health > 0) {
-      var e = Object.create(Explosion).init(other.x, other.y - 1, other.w / 2, 20, 'rgba(240,200,100,0.4)');
-      other.layer.add(e);
+      object.layer.add(smoke(other.x, other.y + GLOBALS.scale * 4));
 
       other.health -= 10;
       gameWorld.playSound(Resources.hit)
-    } else {
+    } 
+    if (other.health <= 0) {
       combo += 1;
       score += combo * 10;
       comboTimer = 0;
@@ -20,7 +20,7 @@
     {x: 0, y: -14},
     {x: -2, y: -12},
   ]);
-  Cannon.z = 1;
+  Cannon.z = 15;
 
   var Bullet = Object.create(Entity);
   Bullet.setCollision(Polygon);
@@ -29,7 +29,8 @@
     if (other.health > 0) {
       other.health -= 1;
       gameWorld.playSound(Resources.hit)
-    } else {
+    } 
+    if (other.health <= 0) {
       combo += 1;
       comboTimer = 0;
       score += combo * 10;
@@ -49,4 +50,3 @@
     this.addBehavior(HighLight, {duration: 0.5});
     return this;
   }
-

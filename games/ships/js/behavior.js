@@ -12,7 +12,11 @@ var Behavior = {
 	},
 	end: function () {
 	},
+	transform: function (ctx) {
+	},
 	draw: function (ctx) {
+	},
+	drawAfter: function (ctx) {
 	}
 }
 

@@ -158,15 +158,30 @@ var RESOURCES = []; /* = [
 ];*/
 
 
+var smoke = function (x, y) {
+  var createSmoke = function (x, y) {
+    var e = Object.create(Entity).init(x + Math.random() * 32 - 16, y + Math.random() * 32 - 16, 16, 16);
+    e.color = 'white';
+    e.opacity = 0.9;
+    e.addBehavior(Velocity);
+    e.velocity = {x: Math.random() * SPEED.ship - SPEED.ship / 2, y: Math.random() * SPEED.ship - SPEED.ship / 2};
+    e.addBehavior(FadeOut, {duration: 0.2});
+    return e;
+  }
+  var s = Object.create(Particles).init(x, y, createSmoke, 0.01, 20);
+  return s;
+}
+
 var defaultShoot = function () {
+  this.maxCooldown = 1;
   if (this.cooldown >= 0) return;
 
-  var exp = Object.create(Explosion).init(this.x, this.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
-  this.layer.add(exp);
+  //var exp = Object.create(Explosion).init(this.x, this.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
+  this.layer.add(smoke(this.x, this.y + GLOBALS.scale * 4));
 
   var direction = this.family == "player" ? 1 : -1;
   addCannon(this, {x: 0, y: direction * SPEED.ship});
-  this.cooldown = 1;
+  this.cooldown = this.maxCooldown;
 
   //console.log(Resources.cannon);
   gameWorld.playSound(Resources.cannon);
@@ -175,17 +190,16 @@ var defaultShoot = function () {
 }
 
 var doubleShoot = function () {
+  this.maxCooldown = 1.4;
   if (this.cooldown >= 0) return;
 
-  var exp = Object.create(Explosion).init(this.x, this.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
-  this.layer.add(exp);
+  this.layer.add(smoke(this.x, this.y + GLOBALS.scale * 4));
 
   var direction = this.family == "player" ? 1 : -1;
   addCannon(this, {x: Math.cos(PI / 2 - PI / 6) * SPEED.ship, y: direction * Math.sin(PI / 2 - PI / 6) * SPEED.ship}, {x: 16, y: 0});
   addCannon(this, {x: Math.cos(PI / 2 + PI / 6) * SPEED.ship, y:  direction * Math.sin(PI / 2 + PI / 6) * SPEED.ship}, {x: -16, y: 0});
 
-  this.cooldown = 1.4;
-
+  this.cooldown = this.maxCooldown;
   //console.log(Resources.cannon);
   gameWorld.playSound(Resources.cannon);
 
@@ -193,10 +207,10 @@ var doubleShoot = function () {
 }
 
 var scatterShoot = function () {
+  this.maxCooldown = 1.8;
   if (this.cooldown >= 0) return;
 
-  var exp = Object.create(Explosion).init(this.x, this.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
-  this.layer.add(exp);
+  this.layer.add(smoke(this.x, this.y + GLOBALS.scale * 4));
 
   var direction = this.family == "player" ? 1 : -1;
   for (var i = 0; i < 10; i++) {
@@ -209,16 +223,13 @@ var scatterShoot = function () {
     b.addBehavior(Velocity);
     b.offset = {x: 0, y: -12 * GLOBALS.scale};
     b.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height}})
-    
-    var exp = Object.create(Explosion).init(b.x, b.y, 4 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
-    this.layer.add(exp);
 
     this.layer.add(b);
   }
 
   gameWorld.playSound(Resources.scatter);
 
-  this.cooldown = 1.8;
+  this.cooldown = this.maxCooldown;
 }
 
 var currentShoot = defaultShoot;

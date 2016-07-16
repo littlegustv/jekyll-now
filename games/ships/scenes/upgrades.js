@@ -2,6 +2,10 @@ var fullscreen = false;
 
 var onStart = function () {
 
+  var scene = this;
+
+  this.mouse = {x: -1, y: -1};
+
   var fg_camera = Object.create(Camera).init(0, 0);
   var fg = Object.create(Layer).init(fg_camera);
 
@@ -22,9 +26,11 @@ var onStart = function () {
   fg.add(scatterButton);
 
   this.layers.push(fg);
+  this.fg = fg;
 
   this.onClick = function (e) {
-    var b = fg.onButton(e.offsetX, e.offsetY);
+    scene.mouse = {x: e.offsetX, y: e.offsetY};    
+    var b = fg.onButton(scene.mouse.x, scene.mouse.y);
     if (b) {
       if (b.trigger) b.trigger();
       return;
@@ -32,14 +38,9 @@ var onStart = function () {
       gameWorld.setScene(1, true);
     }
   }
+
   this.onMouseMove = function (e) {
-    var b = fg.onButton(e.offsetX, e.offsetY);
-    if (b) {
-      if (b.trigger) {
-        b.frame = 1;
-      }
-      return;
-    }
+    scene.mouse = {x: e.offsetX, y: e.offsetY};
   }
 
   this.onTouchStart = function (e) {
@@ -50,6 +51,13 @@ var onStart = function () {
 }
 
 var onUpdate = function (dt) { 
+  var b = this.fg.onButton(this.mouse.x, this.mouse.y);
+  if (b) {
+    if (b.trigger) {
+      b.frame = 1;
+    }
+    return;
+  }
 };
 
 var onEnd = function () {

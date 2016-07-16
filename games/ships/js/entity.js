@@ -3,6 +3,7 @@ var Entity = {
 	opacity: 1,
 	angle: 0,
 	alive: true,
+	z: 1,
 	behaviors: [],
 	init: function (x, y, w, h) {
 		this.behaviors = [];
@@ -18,16 +19,25 @@ var Entity = {
 		ctx.save();
 		ctx.translate(this.x, this.y);
 		ctx.rotate(this.angle);
+		for (var i = 0; i < this.behaviors.length; i++) {
+			this.behaviors[i].transform(ctx);
+		}
 		ctx.translate(-this.x, -this.y);
 		ctx.globalAlpha = this.opacity;
-
 		for (var i = 0; i < this.behaviors.length; i++) {
 			this.behaviors[i].draw(ctx);
 		}
-		ctx.fillStyle = this.color || "black";
-		ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+		this.onDraw(ctx);
+		for (var i = 0; i < this.behaviors.length; i++) {
+			this.behaviors[i].drawAfter(ctx);
+		}
+
 		ctx.globalAlpha = 1;
 		ctx.restore();
+	},
+	onDraw: function (ctx) {
+		ctx.fillStyle = this.color || "black";
+		ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
 	},
 	setVertices: function (vertices) {
 		if (vertices) {
@@ -112,36 +122,11 @@ Sprite.init = function (x, y, sprite) {
 	}
 	return this;
 };
-Sprite.draw = function (ctx) {
-	ctx.save();
-	ctx.translate(this.x, this.y);
-	ctx.rotate(this.angle);
-	if (this.mirrored) ctx.scale(-1, 1);
-	ctx.translate(-this.x, -this.y);
-
-	ctx.globalAlpha = this.opacity;
-	for (var i = 0; i < this.behaviors.length; i++) {
-		this.behaviors[i].draw(ctx);
-	}
+Sprite.onDraw = function (ctx) {
 	ctx.drawImage(this.sprite.image, 
 		this.frame * this.sprite.w, this.animation * this.sprite.h, 
 		this.sprite.w, this.sprite.h, 
 		Math.round(this.x - this.w / 2 + this.offset.x), this.y - Math.round(this.h / 2) + this.offset.y, this.w, this.h);
-	ctx.restore();
-	ctx.globalAlpha = 1;
-	
-	if (this.health && this.maxHealth) {
-		ctx.fillStyle = "black";
-		var size = this.w / this.maxHealth;
-		for (var  i = 0; i < this.maxHealth; i++) {
-			if (i < this.health) {
-				ctx.fillStyle = "black";
-			} else {
-				ctx.fillStyle = "gray";
-			}
-			ctx.fillRect(this.x - this.w / 2 + i * size, this.y + this.h / 2, size - 1, size);
-		}
-	}
 
 	if (CONFIG.debug) {
 		ctx.strokeStyle = "red";
@@ -167,8 +152,6 @@ Sprite.draw = function (ctx) {
 		}
 		ctx.fillStyle = "red";
 		ctx.fillText(Math.floor(this.x) + ", " + Math.floor(this.y), this.x, this.y);
-		//ctx.strokeRect(this.getBoundX(), this.getBoundY(), this.w, this.h);
-		//ctx.strokeRect(this.x - 1, this.y - 1, 2, 2);
 	}
 };
 Sprite.setFrame = function (frame) {
@@ -194,8 +177,7 @@ TiledBackground.init = function (x, y, w, h, sprite) {
 	this.behaviors = [];
 	return this;
 };
-TiledBackground.draw = function (ctx) {
-	ctx.globalAlpha = this.opacity;
+TiledBackground.onDraw = function (ctx) {
 	for (var i = 0; i < this.w; i += this.sprite.w * GLOBALS.scale) {
 		for (var j = 0; j < this.h; j += this.sprite.h * GLOBALS.scale) {
 			ctx.drawImage(this.sprite.image, 
@@ -204,7 +186,6 @@ TiledBackground.draw = function (ctx) {
 				Math.round(this.x - this.w / 2) + i, this.y - Math.round(this.h / 2) + j, this.sprite.w * GLOBALS.scale, this.sprite.h * GLOBALS.scale);
 		}
 	}
-	ctx.globalAlpha = 1;
 	if (CONFIG.debug) {
 		ctx.strokeStyle = "red";
 		ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
@@ -239,11 +220,15 @@ Text.init = function (x, y, text, format) {
 	this.size = format.size || 40;
 	this.color = format.color || "black";
 	this.align = format.align || "center";
+	this.behaviors = [];
 	return this;
 };
 Text.update = function (dt) {
+	for (var i = 0; i < this.behaviors.length; i++) {
+		this.behaviors[i].update(dt);
+	}
 };
-Text.draw = function (ctx) {
+Text.onDraw = function (ctx) {
 	ctx.textAlign = this.align;
 	ctx.fillStyle = this.color;
 	ctx.font = "900 " + this.size + "px " + "Visitor";

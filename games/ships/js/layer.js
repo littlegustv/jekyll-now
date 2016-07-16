@@ -27,6 +27,10 @@ var Layer = {
 
     for (var i = 0; i < entities.length; i++) {
       entities[i].draw(ctx);
+      if (CONFIG.debug) {
+        ctx.font = "24px Visitor";
+        ctx.fillText(i + ", z: " + entities[i].z, entities[i].x, entities[i].y);
+      }
     }
     ctx.restore();
   },

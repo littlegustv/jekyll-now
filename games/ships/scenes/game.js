@@ -15,6 +15,22 @@ var scoreText;
 
 Sprite.z = 1, TiledBackground.z = 1;
 
+var splash = function (ship) {
+	var createSplash = function (x, y) {
+	  var colors = ["#1d66bc", "#4a97d6", "white"]
+		var s = Object.create(Entity).init(x, y, 12 * GLOBALS.scale, 6 * GLOBALS.scale);
+		s.color = choose(colors);
+		s.angle = Math.random() * Math.PI / 3 - Math.PI / 6;
+		s.addBehavior(FadeOut, {duration: 1.3});
+		s.addBehavior(Velocity);
+		s.velocity = {x: 0, y: SPEED.ship / 10};
+		return s;
+	}
+	var spl = Object.create(Particles).init(ship.x, ship.y - 1, createSplash, 0.1);
+	spl.addBehavior(Follow, {target: ship, offset: {x: 0, y: 0}});
+	return spl;
+}
+
 function addCannon (entity, velocity, offset) {
 	offset = offset || {x: 0, y: 0};
 	var cb = Object.create(Cannon).init(0,0,Resources.cannonball);
@@ -22,13 +38,27 @@ function addCannon (entity, velocity, offset) {
   cb.velocity = velocity;
   cb.family = entity.family;
 	cb.addBehavior(Velocity);
-	cb.addBehavior(Trail, {
+	cb.z = 1;
+	/*cb.addBehavior(Trail, {
 		createParticle: function (x, y) { return Object.create(Entity).init(x, y, 8, 8) },
 		duration: 5,
 		interval: 0.02
-	});
+	});*/
+	var trail = function (x, y) {
+		var t = Object.create(Entity).init(x + Math.random() * 8 - 4, y + Math.random() * 16 - 8, 6, 18);
+		t.z = 10;
+		t.color = "white";
+    t.health = 0;
+    t.opacity = 0.3;
+    t.addBehavior(FadeOut, {duration: 1});
+    return t;
+	}
+	var traileffect = Object.create(Particles).init(cb.x, cb.y, trail, 0.02);
+	traileffect.addBehavior(Follow, {target: cb, offset: {x: 0, y: (entity.family == "player" ? -32 : -8)}});
+	entity.layer.add(traileffect);
+
   cb.offset = {x: 0, y: -12 * GLOBALS.scale};
-	cb.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height}})
+	cb.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height - cb.offset.y + 100}})
 	entity.layer.add(cb);
 }
 
@@ -48,111 +78,6 @@ function doDamage (d) {
 	if (this.health <= 0) this.alive = false;
 }
 
-var ExplosionParticle = Object.create(Entity);
-ExplosionParticle.init = function (x, y, r, clr) {
-	this.x = x, this.y = y, this.radius = r, this.duration = 1, this.time = 0, this.color = clr;
-	return this;
-}
-ExplosionParticle.update = function (dt) {
-	this.time += dt;
-	if (this.time >= this.duration) this.alive = false;
-	this.opacity = Math.sin(PI * this.time / this.duration);
-}
-ExplosionParticle.draw = function (ctx) {
-	ctx.globalAlpha = this.opactiy;
-	ctx.beginPath();
-	ctx.arc(this.x, this.y, this.radius, 0, PI * 2, true);
-	ctx.fillStyle = this.color;
-	ctx.fill();
-	ctx.globalAlpha = 1;
-}
-
-var Explosion = Object.create(Entity);
-Explosion.init = function (x, y, radius, max, color) {
-	this.particles = [], this.x = x, this.y = y, this.radius = radius, this.max = max, this.count = 0, this.color = color;
-	return this;
-}
-Explosion.update = function (dt) {
-	if (this.count >= this.max) this.alive = false;
-	else {
-		if (Math.random() < 0.7) {
-			var e = Object.create(ExplosionParticle).init(
-				this.x + Math.random() * this.radius / 2 - this.radius / 2, 
-				this.y + Math.random() * this.radius / 2 - this.radius / 2, 
-				Math.random() * this.radius / 2, 
-				this.color
-			);
-			this.particles.push(e);
-			this.count++;
-		}
-		for (var i = 0; i < this.particles.length; i++) {
-			this.particles[i].update(dt);
-		}
-		for (var i = 0; i < this.particles.length; i++) {
-			if (!this.particles[i].alive) this.particles.splice(i, 1);
-		}
-	}
-}
-Explosion.draw = function (ctx) {
-	for (var i = 0; i < this.particles.length; i++) {
-		this.particles[i].draw(ctx);
-	}
-}
-
-var SprayParticle = Object.create(ExplosionParticle);
-SprayParticle.init = function (x, y, radius, velocity, color) {
-	this.x = x, this.alive = true, this.y = y - Math.random(), this.radius = radius, this.duration = 0.5, this.time = 0, this.velocity = velocity, this.color = color, this.opacity = 0.5;
-	return this;
-}
-SprayParticle.draw = function (ctx) {
-	ctx.globalAlpha = this.opacity;
-	ctx.beginPath();
-	ctx.arc(this.x, this.y, this.radius, 0, 2 * PI, true);
-	ctx.closePath();
-	ctx.fillStyle = this.color;
-	ctx.fill();
-	ctx.globalAlpha = 1;
-}
-SprayParticle.oldUpdate = SprayParticle.update;
-SprayParticle.update = function (dt) {
-	this.oldUpdate(dt);
-	this.x += dt * this.velocity.x;
-	this.y += dt * this.velocity.y;
-	this.velocity.y += dt * 200;
-}
-// /SprayParticle.addBehavior(Velocity);
-
-var Spray = Object.create(Explosion);
-Spray.update = function (dt) {
-  var colors = ["#1d66bc", "#4a97d6", "white"]
-	if (this.max === false);
-	else if (this.count >= this.max && this.particles.length <= 0) this.alive = false;
-	
-	if (this.max === false || this.count < this.max) {
-		if (Math.random() < 0.7) {
-			var theta = 3 * PI / 2 + Math.random() * PI / 3 - PI / 6;
-			var e = Object.create(SprayParticle).init(
-				this.x + Math.random() * this.radius - this.radius / 2, 
-				this.y + Math.random() * this.radius - this.radius / 2, 
-				Math.random() * this.radius / 3, 
-				{x: SPEED.ship * Math.cos(theta), y: SPEED.ship * Math.sin(theta)},
-				choose(colors)
-			);
-			this.particles.push(e);
-			this.count++;
-		}
-	}
-	for (var i = 0; i < this.particles.length; i++) {
-		this.particles[i].update(dt);
-	}
-	for (var i = 0; i < this.particles.length; i++) {
-		if (!this.particles[i].alive) this.particles.splice(i, 1);
-	}
-	for (var i = 0; i < this.behaviors.length; i++) {
-		this.behaviors[i].update(dt);
-	}
-}
-
 var costs = [1.4, 5, 10, 15, 40];
 var shipCost = {
 	40: function () {
@@ -169,6 +94,24 @@ var shipCost = {
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.Tender);
 		s.velocity = {x: right ? - SPEED.ship * 2 / 3 : SPEED.ship * 2 / 3, y: 0};
 		s.health = 10;
+		var healEffect = function (x, y) {
+			var t = Object.create(Text).init(
+				x + Math.random() * GLOBALS.scale * 12 - GLOBALS.scale * 6,
+				y + Math.random() * GLOBALS.scale * 12 - GLOBALS.scale * 6,
+				"+",
+				{color: "#00FF00", size: 14});
+			t.addBehavior(FadeOut, {duration: 0.5});
+			t.addBehavior(Velocity);
+			t.velocity = {x: 0, y: -SPEED.ship / 4};
+			return t;
+		}
+		var healing = Object.create(Particles).init(s.x, s.y, healEffect, 0.05);
+		healing.z = 20;
+		healing.addBehavior(Follow, {target: s, offset: {x: 0, y: -24}});
+		// really awkward here!!
+		setTimeout(function () {
+			s.layer.add(healing);
+		}, 200);
 		return s;
 	},
 	10: function () {
@@ -218,12 +161,12 @@ function buyShips (dt) {
 
 				if (s) {
 				//this.money -= cost;
-					console.log(y, this.DOMAIN);
+					//console.log(y, this.DOMAIN);
 
 
 	//				var ships = [Resources.ship2, Resources.ship3, Resources.monitor];
 					s.addBehavior(Flip);
-					s.addBehavior(SeaSpray);
+					//s.addBehavior(SeaSpray);
 					s.addBehavior(Animate);
 					s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
 					s.addBehavior(Velocity);
@@ -248,7 +191,10 @@ function buyShips (dt) {
 					s.offset = {x: 0, y: - offsetY};
 					s.family = "enemy";
 
+					var spl = splash(s);
+
 					this.fg.add(s);
+					this.fg.add(spl);
 					return;
 				}
 			}
@@ -310,9 +256,11 @@ var onStart = function () {
 	player.addBehavior(Wrap, {min: {x: 0, y: 0}, max: {x: CONFIG.width, y: CONFIG.height}});
 	player.addBehavior(Velocity);
 	player.addBehavior(Flip);
+	player.addBehavior(Reload);
 	player.addBehavior(Cooldown);
 	player.addBehavior(Die, {duration: 1});
-	player.addBehavior(SeaSpray);
+	//player.addBehavior(SeaSpray);
+	player.velocity = {x: SPEED.ship, y: 0};
 	player.addBehavior(Lose);
 	player.setVertices([
 		{x: -13, y: -2},
@@ -327,14 +275,17 @@ var onStart = function () {
 	//player.addBehavior(Mirror);
 	player.offset = {x: 0, y: -12 * GLOBALS.scale};
 
+	var spl = splash(player);
+
 	fg.add(player);
+	fg.add(spl);
 
 	this.layers.push(fg);
 	this.fg = fg;
 	
 	for (var i = 4; i < 13; i++) {
 		var wave = Object.create(TiledBackground).init(0, i * GLOBALS.scale * 32 / 2, this.width * 3, GLOBALS.scale * 32, Resources.wave_tile1);
-		wave.addBehavior(Shift, {field: 'x', constant: 1, time: Math.random() * Math.PI}); 			
+		wave.addBehavior(Shift, {field: 'x', constant: 1, time: Math.random() * Math.PI});
 		//wave.opacity = 0.9;
 		fg.add(wave);
 	}
