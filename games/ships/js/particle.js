@@ -6,6 +6,7 @@ Particles.init = function (x, y, createParticle, rate, max, random) {
   this.rate = rate, this.max = max || 0, this.random = random || 1;
   this.time = 0;
   this.count = 0;
+  this.offset = {x: 0, y: 0};
   return this;
 }
 Particles.update = function (dt) {
@@ -14,7 +15,7 @@ Particles.update = function (dt) {
     if (this.particles.length <= 0) this.alive = false;
   }
   else if (this.time > this.rate && Math.random() <= this.random) {
-    this.particles.push(this.createParticle(this.x, this.y));
+    this.particles.push(this.createParticle(this.x + this.offset.x, this.y + this.offset.y));
     this.count += 1;
     this.time = 0;
   }

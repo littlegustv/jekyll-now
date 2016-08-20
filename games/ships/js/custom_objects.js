@@ -1,6 +1,10 @@
   var Cannon = Object.create(Sprite);
+  Cannon.is_projectile = true;
   Cannon.setCollision(Polygon);
   Cannon.collision.onHandle = function (object, other) {
+    if (other.no_collide || other.is_projectile) {
+      return;
+    }
     if (other.health > 0) {
       object.layer.add(smoke(other.x, other.y + GLOBALS.scale * 4));
 
@@ -14,6 +18,7 @@
     }
     object.alive = false;
   };
+  Cannon.projectile_ignore = true;
   Cannon.setVertices([
     {x: 0, y: -10},
     {x: 2, y: -12},
@@ -25,6 +30,7 @@
   var Bullet = Object.create(Entity);
   Bullet.setCollision(Polygon);
   Bullet.collision.onHandle = function (object, other) {
+    if (other.no_collide) return;
     console.log('a hit!');
     if (other.health > 0) {
       other.health -= 1;
@@ -37,6 +43,7 @@
     }
     object.alive = false;
   };
+  Bullet.projectile_ignore = true;
 
   var Button = Object.create(Sprite);
   Button.behaviors = [];

@@ -13,17 +13,40 @@ var onStart = function () {
   fg.add(text);
 
 
-  var doubleButton = Object.create(Button).init(64, 64, Resources.icon_upgrade);
+  var doubleButton = Object.create(Button).init(64, 96, Resources.icon_upgrade);
   doubleButton.trigger = function () {
     currentShoot = doubleShoot;
   };
+  doubleButton.animation = 0;
   fg.add(doubleButton);
 
-  var scatterButton = Object.create(Button).init(128, 64, Resources.icon_upgrade);
+  var scatterButton = Object.create(Button).init(64, 160, Resources.icon_upgrade);
   scatterButton.trigger = function () {
     currentShoot = scatterShoot;
   };
+  scatterButton.animation = 3;
   fg.add(scatterButton);
+
+  var homingButton = Object.create(Button).init(64, 224, Resources.icon_upgrade);
+  homingButton.trigger = function () {
+    currentShoot = homingShoot;
+  };
+  homingButton.animation = 2;
+  fg.add(homingButton);
+
+  var defaultButton = Object.create(Button).init(64, 32, Resources.icon_upgrade);
+  defaultButton.trigger = function () {
+    currentShoot = defaultShoot;
+  };
+  defaultButton.animation = 1;
+  fg.add(defaultButton);
+
+  var bombardButton = Object.create(Button).init(64, 288, Resources.icon_upgrade);
+  bombardButton.trigger = function () {
+    currentShoot = bombardShoot;
+  };
+  bombardButton.animation = 4;
+  fg.add(bombardButton);
 
   this.layers.push(fg);
   this.fg = fg;

@@ -7,6 +7,7 @@ var World = {
 		this.createDebug();
 		this.scenes = [];
 		this.time = 0;
+		this.speed = 1;
 		this.scene = undefined;
 //		this.loadScenes();
 		this.loadGameInfo();
@@ -25,7 +26,7 @@ var World = {
 			this.debug.innerHTML = Math.floor(1 / dt) + " fps";
 		}
 
-		this.update(dt);
+		this.update(dt * this.speed);
 		this.draw();
 
 		var t = this;
@@ -239,7 +240,7 @@ var World = {
 	playSound: function(sound)
 	{
 		if (AudioContext) {
-			console.log(sound);
+			//console.log(sound);
 			var buffer = sound.buffer;
 			var source = this.audioContext.createBufferSource();
 			source.buffer = buffer;

@@ -100,9 +100,10 @@ Die.update = function (dt) {
 };
 Die.start = function () {
   if (this.entity.collision) {
-    this.entity.collision.onCheck = function (a, b) { return false };
+    this.entity.collision.onCheck = function (a, b) { console.log(1); return false };
   }
   this.time = 0;
+  this.duration = this.duration || 2;
 }
 
 var FadeOut = Object.create(Behavior);
@@ -115,12 +116,26 @@ FadeOut.update = function (dt) {
 };
 FadeOut.start = function () {
   if (this.entity.collision) {
-    this.entity.collision.onCheck = function (a, b) { return false };
+    this.entity.collision.onCheck = function (a, b) { console.log(2);  return false };
   }
   this.maxOpacity = this.entity.opacity;
   this.time = 0;
 }
 
+var FadeIn = Object.create(Behavior);
+FadeIn.update = function (dt) {
+    if (!this.time) this.start();
+    this.time += dt;
+
+    this.entity.opacity = clamp(this.maxOpacity * (this.time) / this.duration, 0, 1);
+};
+FadeIn.start = function () {
+  if (this.entity.collision) {
+    this.entity.collision.onCheck = function (a, b) { console.log(3);  return false };
+  }
+  this.maxOpacity = 1;
+  this.time = 0;
+}
 
 var Climb = Object.create(Behavior);
 Climb.update = function (dt) {
@@ -167,6 +182,17 @@ Shift.update = function (dt) {
 Shift.start = function () {
   this.time = 0;
   this.constant = this.constant || 1;
+}
+
+var Ease = Object.create(Behavior);
+Ease.update = function (dt) {
+  this.entity.x += 2 * dt * (this.destination.x - this.entity.x);
+  this.entity.y += 2 * dt * (this.destination.y - this.entity.y);  
+  if (Math.abs(this.entity.x - this.destination.x) < 1 && Math.abs(this.entity.y - this.destination.y) < 1 ) {
+    this.entity.x = this.destination.x;
+    this.entity.y = this.destination.y;
+    this.entity.removeBehavior(this);
+  }
 }
 
 var Oscillate = Object.create(Behavior);
@@ -216,5 +242,22 @@ Reload.drawAfter = function (ctx) {
       ctx.fillStyle = "white";
       ctx.fillRect(this.entity.x - this.entity.w / 2 + 1* GLOBALS.scale, this.entity.y - this.entity.h + 1 * GLOBALS.scale, (this.entity.w - 2 * GLOBALS.scale) * (1 - this.entity.cooldown / this.entity.maxCooldown), 4 * GLOBALS.scale - 2 * GLOBALS.scale);
     }
+  }
+}
+
+var Homing = Object.create(Behavior);
+Homing.update = function (dt) {
+  // y is minimum SPEED / 2
+  var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
+  this.entity.velocity.x = Math.cos(theta) * SPEED.ship;
+  this.entity.velocity.y = (this.entity.family == "enemy" ? -1 : 1) * SPEED.ship;
+}
+Homing.drawAfter = function (ctx) {
+  if (CONFIG.debug) {
+    ctx.beginPath();
+    ctx.moveTo(this.entity.x, this.entity.y);
+    ctx.lineTo(this.target.x, this.target.y);
+    ctx.strokeStyle = "orange";
+    ctx.stroke();
   }
 }

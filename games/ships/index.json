@@ -1,8 +1,6 @@
 {
   "scenes": [
-    "mainmenu.json",
-    "game.json",
-    "upgrades.json"
+    "game.json"
   ],
   "resources": [
     {"path": "ship1.png", "frames": 2, "speed": 0.5},
@@ -11,10 +9,11 @@
     {"path": "Cutter.png", "frames": 2, "speed": 0.3},
     {"path": "Tender.png", "frames": 2, "speed": 0.6},
     {"path": "icon_menu.png", "frames": 2},
-    {"path": "icon_upgrade.png", "frames": 3},
+    {"path": "icon_upgrade.png", "frames": 2, "animations": 5},
     {"path": "monitor.png"},
     {"path": "wave_tile1.png"},
     {"path": "cannonball.png"},
+    {"path": "bomb.png"},
     {"path": "soundtrack.ogg"},
     {"path": "cannon.ogg"},
     {"path": "scatter.ogg"},

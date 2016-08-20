@@ -64,7 +64,7 @@ var CONFIG = {
 	height: 360,
 	width: 640,
 	title: "My Game",
-	startScene: "mainmenu",
+	startScene: "game",
 	debug: false
 };
 
@@ -173,8 +173,8 @@ var smoke = function (x, y) {
 }
 
 var defaultShoot = function () {
-  this.maxCooldown = 1;
-  if (this.cooldown >= 0) return;
+  this.maxCooldown = 0.3;
+  if (this.cooldown > 0) return;
 
   //var exp = Object.create(Explosion).init(this.x, this.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
   this.layer.add(smoke(this.x, this.y + GLOBALS.scale * 4));
@@ -182,7 +182,6 @@ var defaultShoot = function () {
   var direction = this.family == "player" ? 1 : -1;
   addCannon(this, {x: 0, y: direction * SPEED.ship});
   this.cooldown = this.maxCooldown;
-
   //console.log(Resources.cannon);
   gameWorld.playSound(Resources.cannon);
 
@@ -228,6 +227,70 @@ var scatterShoot = function () {
   }
 
   gameWorld.playSound(Resources.scatter);
+
+  this.cooldown = this.maxCooldown;
+}
+
+var bombardShoot = function () {
+  this.maxCooldown = 4.0;
+  if (this.cooldown >= 0) return;
+
+  this.layer.add(smoke(this.x, this.y + GLOBALS.scale * 4));
+  var m = Object.create(Cannon).init(this.x, this.y, Resources.bomb);
+  m.family = this.family;
+
+  m.addBehavior(Velocity);
+  m.setVertices();
+  m.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height}})
+
+  m.velocity = {x: 0, y: (m.family == "enemy" ? -SPEED.ship / 2 : SPEED.ship/2)};
+
+  this.layer.add(m);
+
+  gameWorld.playSound(Resources.cannon);
+
+  this.cooldown = this.maxCooldown;
+}
+
+var homingShoot = function () {
+  this.maxCooldown = 3.0;
+  if (this.cooldown >= 0) return;
+
+  this.layer.add(smoke(this.x, this.y + GLOBALS.scale * 4));
+  var family = this.family;
+  var targets = this.layer.entities.filter( function (e) { 
+    if (!e.no_collide && !e.projectile_ignore)
+      return family == "enemy" ? e.family == "player" : e.family == "enemy";
+    else
+      return false;
+  });
+
+  var closest = undefined, closestDistance = 1000;
+  for (var i = 0; i < targets.length; i++) {
+    var d = distance(this.x, this.y, targets[i].x, targets[i].y);
+    if (d < closestDistance) {
+      closest = targets[i];
+      closestDistance = d;
+    }
+  }
+
+  var m = Object.create(Cannon).init(this.x, this.y, Resources.cannonball);
+  m.family = this.family;
+
+  if (closest) {
+    m.addBehavior(Homing, {target: closest});
+    console.log('yes', closest, m.angle, angle(m.x, m.y, closest.x, closest.y));
+  } else {
+    var direction = this.family == "player" ? 1 : -1;
+    m.velocity = {x: 0, y: direction * SPEED.ship}; 
+  }
+  m.addBehavior(Velocity);
+  m.setVertices();
+  m.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height}})
+ 
+  this.layer.add(m);
+
+  gameWorld.playSound(Resources.cannon);
 
   this.cooldown = this.maxCooldown;
 }

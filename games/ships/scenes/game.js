@@ -1,5 +1,23 @@
 // name: 'salvage'
 
+var fullscreen = false;
+
+function requestFullScreen () {
+// we've made the attempt, at least
+  fullscreen = true;
+  var body = document.documentElement;
+  if (body.requestFullscreen) {
+    body.requestFullscreen();
+  } else if (body.webkitRequestFullscreen) {
+    body.webkitRequestFullscreen();
+  } else if (body.mozRequestFullscreen) {
+    body.mozRequestFullscreen();
+  } else if (body.msRequestFullscreen) {
+    body.msRequestFullscreen();
+  }
+}
+
+
 var player;
 var other;
 var debug;
@@ -9,7 +27,7 @@ var onscreen; // hacky! this will be a function shortly!
 var score = 0;
 var combo = 0;
 var comboTimer = 0;
-var comboMax = 2;
+var comboMax = 4;
 var comboText;
 var scoreText;
 
@@ -38,7 +56,6 @@ function addCannon (entity, velocity, offset) {
   cb.velocity = velocity;
   cb.family = entity.family;
 	cb.addBehavior(Velocity);
-	cb.z = 1;
 	/*cb.addBehavior(Trail, {
 		createParticle: function (x, y) { return Object.create(Entity).init(x, y, 8, 8) },
 		duration: 5,
@@ -46,18 +63,29 @@ function addCannon (entity, velocity, offset) {
 	});*/
 	var trail = function (x, y) {
 		var t = Object.create(Entity).init(x + Math.random() * 8 - 4, y + Math.random() * 16 - 8, 6, 18);
-		t.z = 10;
 		t.color = "white";
     t.health = 0;
     t.opacity = 0.3;
     t.addBehavior(FadeOut, {duration: 1});
     return t;
 	}
-	var traileffect = Object.create(Particles).init(cb.x, cb.y, trail, 0.02);
-	traileffect.addBehavior(Follow, {target: cb, offset: {x: 0, y: (entity.family == "player" ? -32 : -8)}});
+	var traileffect = Object.create(Particles).init(cb.x, cb.y - 2, trail, 0.02);
+	if (entity.family == "enemy") {
+		traileffect.offset = {x: 0, y: -48};
+		cb.y = entity.y - 1;
+		cb.offset = {x: 0, y: 0};
+		cb.setVertices([
+	    {x: 0, y: -10 + 6 * GLOBALS.scale},
+	    {x: 2, y: -12 + 6 * GLOBALS.scale},
+	    {x: 0, y: -14 + 6 * GLOBALS.scale},
+	    {x: -2, y: -12 + 6 * GLOBALS.scale},
+	  ]);
+	} else {
+	  cb.offset = {x: 0, y: -12 * GLOBALS.scale};
+	}
+	traileffect.addBehavior(Follow, {target: cb, offset: {x: 0, y: (entity.family == "player" ? -32 : 56)}});
 	entity.layer.add(traileffect);
 
-  cb.offset = {x: 0, y: -12 * GLOBALS.scale};
 	cb.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height - cb.offset.y + 100}})
 	entity.layer.add(cb);
 }
@@ -66,6 +94,7 @@ function notFriendly (callback) {
 	return function (object, other) {
 		if (other.family == object.family) return false;
 		else if (!other.family || !object.family) return false;
+		else if (other.no_collide || object.no_collide) return false;
 		return callback.call(this, object, other);
 	}
 }
@@ -78,22 +107,23 @@ function doDamage (d) {
 	if (this.health <= 0) this.alive = false;
 }
 
-var costs = [1.4, 5, 10, 15, 40];
 var shipCost = {
-	40: function () {
+	20: function () {
 		if (Math.random() < 0.5) return false;
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.monitor);
 		s.velocity = {x: right ? - SPEED.ship / 2 : SPEED.ship / 2, y: 0};
-		s.health = 20;
+		s.health = 20, s.maxHealth = 20;
+		s.addBehavior(Submarine);
 		return s;
 	},
-	15: function () {
+	4: function () {
 		if (Math.random() < 0.7) return false;
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.Tender);
 		s.velocity = {x: right ? - SPEED.ship * 2 / 3 : SPEED.ship * 2 / 3, y: 0};
-		s.health = 10;
+		s.health = 10, s.maxHealth = 10;
+		s.addBehavior(Tender);
 		var healEffect = function (x, y) {
 			var t = Object.create(Text).init(
 				x + Math.random() * GLOBALS.scale * 12 - GLOBALS.scale * 6,
@@ -114,32 +144,34 @@ var shipCost = {
 		}, 200);
 		return s;
 	},
-	10: function () {
+	16: function () {
 		if (Math.random() < 0.3) return false;
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.ship3);
 		s.addBehavior(Battleship);
 		s.velocity = {x: right ? - SPEED.ship * 2 / 3 : SPEED.ship * 2 / 3, y: 0};
-		s.health = 30;
+		s.health = 30, s.maxHealth = 30;
 		return s;
 	},
-	5: function () {
+	2: function () {
 		if (Math.random() < 0.2) return false; // chance to not spawn
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.Cutter);
 		s.velocity = {x: right ? - SPEED.ship * 1.5 : SPEED.ship * 1.5, y: 0};
-		s.health = 10;
+		s.health = 10, s.maxHealth = 10;
 		return s;
 	},
-	1.4: function () {
+	1: function () {
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.ship2);
 		s.addBehavior(Frigate);
 		s.velocity = {x: right ? - SPEED.ship : SPEED.ship, y: 0};
-		s.health = 10;
+		s.health = 10, s.maxHealth = 10;
 		return s;
 	}
 }
+var costs = Object.keys(shipCost).map( function (e) { return Number(e) });
+console.log(costs);
 
 function buyShips (dt) {
 
@@ -171,6 +203,8 @@ function buyShips (dt) {
 					s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
 					s.addBehavior(Velocity);
 					//s.addBehavior(PeriodicCannon, {interval: 2});
+
+					s.addBehavior(Cooldown);
 					s.addBehavior(Die, {duration: 1});
 					s.setVertices([
 						{x: -13, y: -6},
@@ -222,7 +256,7 @@ var onStart = function () {
 
 	Polygon.onCheck = notFriendly(Polygon.onCheck);
 
-	var fg_camera = Object.create(Camera).init(0, 0);
+	var fg_camera = Object.create(Camera).init(0, -216);
 	shake = fg_camera.addBehavior(Shake, {duration: 0.3, magnitude: 3});
 
 	var fg = Object.create(Layer).init(fg_camera);
@@ -233,22 +267,24 @@ var onStart = function () {
 			else return a.y - b.y 
 		});
 	}
-/*
-	var Mirror = Object.create(Behavior);
-	Mirror.draw = function (ctx) {
-    ctx.scale(-1, 1);
-	}*/
 
-	scoreText = Object.create(Text).init(30, 30, "Score: " + score, {align: "left"});
-	comboText = Object.create(Text).init(CONFIG.width - 30, 30, "Combo: " + combo, {align: "right"});
-	
-	fg.add(scoreText);
-	fg.add(comboText);
+	var ui_camera = Object.create(Camera).init(0, 0);
+	var ui = Object.create(Layer).init(ui_camera);
+
+	scoreText = Object.create(Text).init(12, 30, "Score: " + score, {align: "left", size: 64, color: "rgba(0,0,0,0.4)"});
+	comboText = Object.create(Text).init(CONFIG.width - 4, 30, "Combo: " + combo, {align: "right", size: 64, color: "rgba(0,0,0,0.4)"});
+	scoreText.opacity = 0, comboText.opacity = 0;
+
+	var titleText = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 16, "7 Deadly Seas", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} );
+
+	ui.add(titleText);
+	ui.add(scoreText);
+	ui.add(comboText);
 
 	var Lose = Object.create(Behavior);
 	Lose.end = function () {
 		console.log('ending');
-		gameWorld.setScene(2);
+		//gameWorld.setScene(2);
 	}
 
 	player = Object.create(Sprite).init(100, 116, Resources.ship1);
@@ -256,7 +292,7 @@ var onStart = function () {
 	player.addBehavior(Wrap, {min: {x: 0, y: 0}, max: {x: CONFIG.width, y: CONFIG.height}});
 	player.addBehavior(Velocity);
 	player.addBehavior(Flip);
-	player.addBehavior(Reload);
+//	player.addBehavior(Reload);
 	player.addBehavior(Cooldown);
 	player.addBehavior(Die, {duration: 1});
 	//player.addBehavior(SeaSpray);
@@ -281,15 +317,17 @@ var onStart = function () {
 	fg.add(spl);
 
 	this.layers.push(fg);
+	this.layers.push(ui);
 	this.fg = fg;
 	
 	for (var i = 4; i < 13; i++) {
 		var wave = Object.create(TiledBackground).init(0, i * GLOBALS.scale * 32 / 2, this.width * 3, GLOBALS.scale * 32, Resources.wave_tile1);
 		wave.addBehavior(Shift, {field: 'x', constant: 1, time: Math.random() * Math.PI});
-		//wave.opacity = 0.9;
+		//wave.opacity = 0.3;
 		fg.add(wave);
 	}
 
+	/*
 	var menuButton = Object.create(Sprite).init(24, 24, Resources.icon_menu);
 	menuButton.behaviors = [];
 	menuButton.addBehavior(HighLight, {duration: 0.5});
@@ -298,6 +336,7 @@ var onStart = function () {
 		gameWorld.setScene(2);
 	};
 	fg.add(menuButton);
+	*/
 
 	this._gamepad = Object.create(Gamepad).init();
 	this._gamepad.aleft.onUpdate = function (dt) {
@@ -349,9 +388,20 @@ var onStart = function () {
 		}
 	}
 
+	this.do_start = function () {
+		this.started = true;
+		fg_camera.addBehavior(Ease, {destination: {x: 0, y: 0}});
+		scoreText.addBehavior(FadeIn, {duration: 0.5});
+		comboText.addBehavior(FadeIn, {duration: 0.5});
+		titleText.addBehavior(FadeOut, {duration: 0.5});
+	}
+
 	this.onKeyDown = function (e) {
 		if (e.keyCode == 32) {
-			player.shoot();
+			if (t.started)
+				player.shoot();
+			else
+				t.do_start();
 		} else if (e.keyCode == 37 ) {
 			player.velocity.x = -SPEED.ship;
 		} else if (e.keyCode == 39) {
@@ -409,19 +459,21 @@ var onUpdate = function (dt) {
 		//this.musicLoop();
 	}
 
-	this._gamepad.update(dt);
+	if (this.started) {
+		this._gamepad.update(dt);
 
-	comboTimer += dt;
-	if (comboTimer > comboMax) {
-		combo = 0;
-		comboTimer = 0;
+		comboTimer += dt;
+		if (comboTimer > comboMax) {
+			combo = 0;
+			comboTimer = 0;
+		}
+		scoreText.text = "Score: " + score;
+		comboText.text = "Combo: " + combo;
+
+		//console.log(scoreText);
+
+		this.buyShips(dt);
 	}
-	scoreText.text = "Score: " + score;
-	comboText.text = "Combo: " + combo;
-
-	//console.log(scoreText);
-
-	this.buyShips(dt);
 };
 
 var onEnd = function () {
