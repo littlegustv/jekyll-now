@@ -35,7 +35,7 @@ Sprite.z = 1, TiledBackground.z = 1;
 
 var splash = function (ship) {
 	var createSplash = function (x, y) {
-	  var colors = ["#1d66bc", "#4a97d6", "white"]
+	  var colors = ["#4d6b89", "#829eab", "white"]
 		var s = Object.create(Entity).init(x, y, 12 * GLOBALS.scale, 6 * GLOBALS.scale);
 		s.color = choose(colors);
 		s.angle = Math.random() * Math.PI / 3 - Math.PI / 6;
@@ -63,7 +63,7 @@ function addCannon (entity, velocity, offset) {
 	});*/
 	var trail = function (x, y) {
 		var t = Object.create(Entity).init(x + Math.random() * 8 - 4, y + Math.random() * 16 - 8, 6, 18);
-		t.color = "white";
+		t.color = entity.family == "player" ? "white" : "#833D1B";
     t.health = 0;
     t.opacity = 0.3;
     t.addBehavior(FadeOut, {duration: 1});
@@ -310,6 +310,7 @@ var onStart = function () {
 	player.health = 20;
 	//player.addBehavior(Mirror);
 	player.offset = {x: 0, y: -12 * GLOBALS.scale};
+	player.opacity = 0.75;
 
 	var spl = splash(player);
 
