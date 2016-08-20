@@ -68,6 +68,7 @@ var Entity = {
 	},
 	removeBehavior: function (obj) {
 		var i = this.behaviors.indexOf(obj);
+		obj.end();
 		this.behaviors.splice(i, 1);
 	},
 	start: function () {

@@ -24,8 +24,14 @@ var debug;
 
 var onscreen; // hacky! this will be a function shortly!
 
+var first_game = true;
+
 var score = 0;
 var combo = 0;
+
+var highscore = 0;
+var highcombo = 0;
+
 var comboTimer = 0;
 var comboMax = 4;
 var comboText;
@@ -63,9 +69,11 @@ function addCannon (entity, velocity, offset) {
 	});*/
 	var trail = function (x, y) {
 		var t = Object.create(Entity).init(x + Math.random() * 8 - 4, y + Math.random() * 16 - 8, 6, 18);
+		t.w = cb.w;
+		t.h = cb.h * 2;
 		t.color = entity.family == "player" ? "white" : "#833D1B";
     t.health = 0;
-    t.opacity = 0.3;
+    t.opacity = 0.5 * (cb.opacity / 2.0);
     t.addBehavior(FadeOut, {duration: 1});
     return t;
 	}
@@ -80,6 +88,7 @@ function addCannon (entity, velocity, offset) {
 	    {x: 0, y: -14 + 6 * GLOBALS.scale},
 	    {x: -2, y: -12 + 6 * GLOBALS.scale},
 	  ]);
+		cb.addBehavior(Horizon, {horizon: 166});
 	} else {
 	  cb.offset = {x: 0, y: -12 * GLOBALS.scale};
 	}
@@ -242,6 +251,9 @@ var onStart = function () {
 
 	var scene = this;
 
+	this.started = -1;
+	this.layers = [];
+
 	this.money = 0;
 	this.buyShips = buyShips;
 
@@ -275,9 +287,21 @@ var onStart = function () {
 	comboText = Object.create(Text).init(CONFIG.width - 4, 30, "Combo: " + combo, {align: "right", size: 64, color: "rgba(0,0,0,0.4)"});
 	scoreText.opacity = 0, comboText.opacity = 0;
 
-	var titleText = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 16, "7 Deadly Seas", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} );
+	var titleTexts = [];
+	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 124, "Seven", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} ));
+	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 68, "Deadly", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} ));
+	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 12, "Seas", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} ));
 
-	ui.add(titleText);
+	if (!first_game) {
+		var sc = Object.create(Text).init(48, CONFIG.height - 48, "Score: " + score, {size: 48, align: "left", color: "rgba(100,0,0,0.5)"} );
+		titleTexts.push(sc);
+	} else {
+		titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 48, "Press SPACE to start.", {size: 48, align: "center", color: "black"}));
+	}
+
+	titleTexts.forEach(function (e) {
+		ui.add(e);
+	});
 	ui.add(scoreText);
 	ui.add(comboText);
 
@@ -285,6 +309,9 @@ var onStart = function () {
 	Lose.end = function () {
 		console.log('ending');
 		//gameWorld.setScene(2);
+		first_game = false;
+		scene.started = -1;
+		t.onStart();
 	}
 
 	player = Object.create(Sprite).init(100, 116, Resources.ship1);
@@ -390,19 +417,28 @@ var onStart = function () {
 	}
 
 	this.do_start = function () {
-		this.started = true;
-		fg_camera.addBehavior(Ease, {destination: {x: 0, y: 0}});
+		var ease = Object.create(Ease);
+		ease.end = function () {
+			t.started = 1;
+		}
+		t.started = 0;
+		score = 0;
+		combo = 0;
+		fg_camera.addBehavior(ease, {destination: {x: 0, y: 0}});
 		scoreText.addBehavior(FadeIn, {duration: 0.5});
 		comboText.addBehavior(FadeIn, {duration: 0.5});
-		titleText.addBehavior(FadeOut, {duration: 0.5});
+		titleTexts.forEach( function (e) {
+			e.addBehavior(FadeOut, {duration: 0.5});
+		});
 	}
 
 	this.onKeyDown = function (e) {
 		if (e.keyCode == 32) {
-			if (t.started)
+			if (t.started == 1)
 				player.shoot();
-			else
+			else if (t.started == -1)
 				t.do_start();
+			else {}
 		} else if (e.keyCode == 37 ) {
 			player.velocity.x = -SPEED.ship;
 		} else if (e.keyCode == 39) {
@@ -460,16 +496,17 @@ var onUpdate = function (dt) {
 		//this.musicLoop();
 	}
 
-	if (this.started) {
-		this._gamepad.update(dt);
+	this._gamepad.update(dt);
+	scoreText.text = "Score: " + score;
+	comboText.text = "Combo: " + combo;
+
+	if (this.started == 1) {
 
 		comboTimer += dt;
 		if (comboTimer > comboMax) {
 			combo = 0;
 			comboTimer = 0;
 		}
-		scoreText.text = "Score: " + score;
-		comboText.text = "Combo: " + combo;
 
 		//console.log(scoreText);
 

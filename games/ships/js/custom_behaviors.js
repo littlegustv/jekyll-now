@@ -186,8 +186,8 @@ Shift.start = function () {
 
 var Ease = Object.create(Behavior);
 Ease.update = function (dt) {
-  this.entity.x += 2 * dt * (this.destination.x - this.entity.x);
-  this.entity.y += 2 * dt * (this.destination.y - this.entity.y);  
+  this.entity.x += 4 * dt * (this.destination.x - this.entity.x);
+  this.entity.y += 4 * dt * (this.destination.y - this.entity.y);  
   if (Math.abs(this.entity.x - this.destination.x) < 1 && Math.abs(this.entity.y - this.destination.y) < 1 ) {
     this.entity.x = this.destination.x;
     this.entity.y = this.destination.y;
@@ -259,5 +259,23 @@ Homing.drawAfter = function (ctx) {
     ctx.lineTo(this.target.x, this.target.y);
     ctx.strokeStyle = "orange";
     ctx.stroke();
+  }
+}
+
+var Horizon = Object.create(Behavior);
+Horizon.update = function (dt) {
+  if (this.entity.y < this.horizon) {
+    this.entity.h -= 2 * dt;
+    this.entity.w -= 2 * dt;
+    this.entity.x += dt;
+    this.entity.velocity.y += dt * 200;
+    if (this.entity.velocity.y >= 0) {
+      //add splash particle here once(?)
+      this.entity.opacity -= 1 * dt;
+      this.entity.z = -20;
+      this.entity.collision.onCheck = function (o, p) { return false; };
+    } else {
+    }
+    if (this.entity.opacity <= 0) this.entity.alive = false;
   }
 }
