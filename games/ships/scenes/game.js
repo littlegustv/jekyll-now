@@ -39,6 +39,30 @@ var scoreText;
 
 Sprite.z = 1, TiledBackground.z = 1;
 
+function addFlames(ship) {
+	var createFlame = function (x, y) {
+		if (ship.health / ship.maxHealth < 0.5) {
+			var s = Object.create(Sprite).init(x + Math.random() * 32 - 16, y - 6, Resources.flame);
+			s.addBehavior(FadeOut, {duration: 0.6});
+			s.addBehavior(Velocity);
+			s.velocity = {x: 0, y: - SPEED.ship / 10};
+			s.velocity.x = ship.velocity.x;
+			return s;
+		} else if (ship.health / ship.maxHealth < 1) {
+			var s = Object.create(Entity).init(x + Math.random() * 48 - 24, y - 6, Math.random() * 10 + 6, Math.random() * 10 + 6);
+			s.opacity = Math.random() / 2 + 0.3;
+			s.addBehavior(FadeOut, {duration: 0.6});
+			s.addBehavior(Velocity);
+			s.velocity = {x: 0, y: - SPEED.ship / 2};
+			return s;
+		}
+	}
+	var flames = Object.create(Particles).init(ship.x, ship.y, createFlame, 0.05);
+	flames.addBehavior(Follow, {target: ship, offset: {x: 0, y: -2}});
+	return flames;
+}
+
+
 var splash = function (ship) {
 	var createSplash = function (x, y) {
 	  var colors = ["#4d6b89", "#829eab", "white"]
@@ -85,6 +109,7 @@ function addCannon (entity, velocity, offset) {
 		cb.setVertices([
 	    {x: 0, y: -10 + 6 * GLOBALS.scale},
 	    {x: 2, y: -12 + 6 * GLOBALS.scale},
+
 	    {x: 0, y: -14 + 6 * GLOBALS.scale},
 	    {x: -2, y: -12 + 6 * GLOBALS.scale},
 	  ]);
@@ -235,7 +260,9 @@ function buyShips (dt) {
 					s.family = "enemy";
 
 					var spl = splash(s);
+					var f = addFlames(s);
 
+					this.fg.add(f);
 					this.fg.add(s);
 					this.fg.add(spl);
 					return;
@@ -314,11 +341,20 @@ var onStart = function () {
 		t.onStart();
 	}
 
+	var HealOverTime = Object.create(Behavior);
+	HealOverTime.update = function (dt) {
+		if (!this.rate) this.rate = 1;
+		if (this.entity.cooldown <= 0 && this.entity.health > 0 && this.entity.health < this.entity.maxHealth) {
+			this.entity.health += this.rate * dt;
+		}
+	}
+
 	player = Object.create(Sprite).init(100, 116, Resources.ship1);
 	player.addBehavior(Animate);
 	player.addBehavior(Wrap, {min: {x: 0, y: 0}, max: {x: CONFIG.width, y: CONFIG.height}});
 	player.addBehavior(Velocity);
 	player.addBehavior(Flip);
+	player.addBehavior(HealOverTime, {rate: 2});
 //	player.addBehavior(Reload);
 	player.addBehavior(Cooldown);
 	player.addBehavior(Die, {duration: 1});
@@ -334,13 +370,23 @@ var onStart = function () {
 	player.shoot = currentShoot;
 	player.setCollision(Polygon);
 	player.family = "player";
-	player.health = 20;
+	player.health = 20, player.maxHealth = 20;
 	//player.addBehavior(Mirror);
 	player.offset = {x: 0, y: -12 * GLOBALS.scale};
 	player.opacity = 0.75;
 
 	var spl = splash(player);
+	var f = addFlames(player);
 
+	for (var i = 0; i < Math.random() * 3 + 3; i++ ) {
+		var cloud = Object.create(Sprite).init(Math.random() * (CONFIG.width - 96) + 48, Math.random() * (CONFIG.height - 96) - CONFIG.height / 2, Resources.cloud );
+		cloud.addBehavior(Wrap, {min: {x: 0, y: -CONFIG.height}, max: {x: CONFIG.width, y: CONFIG.height}});
+		cloud.addBehavior(Velocity);
+		cloud.velocity = {x: Math.random() * SPEED.ship / 4 - SPEED.ship / 8, y: 0};
+		fg.add(cloud);
+	}
+
+	fg.add(f);
 	fg.add(player);
 	fg.add(spl);
 

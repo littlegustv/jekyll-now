@@ -100,7 +100,7 @@ Die.update = function (dt) {
 };
 Die.start = function () {
   if (this.entity.collision) {
-    this.entity.collision.onCheck = function (a, b) { console.log(1); return false };
+    this.entity.collision.onCheck = function (a, b) { return false };
   }
   this.time = 0;
   this.duration = this.duration || 2;

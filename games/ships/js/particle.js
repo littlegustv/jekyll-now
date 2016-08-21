@@ -15,9 +15,12 @@ Particles.update = function (dt) {
     if (this.particles.length <= 0) this.alive = false;
   }
   else if (this.time > this.rate && Math.random() <= this.random) {
-    this.particles.push(this.createParticle(this.x + this.offset.x, this.y + this.offset.y));
-    this.count += 1;
-    this.time = 0;
+    var p = this.createParticle(this.x + this.offset.x, this.y + this.offset.y);
+    if (p) {
+      this.particles.push(p);
+      this.count += 1;
+      this.time = 0;
+    }
   }
   for (var i = 0; i < this.particles.length; i++) {
     this.particles[i].update(dt);
