@@ -160,9 +160,10 @@ var RESOURCES = []; /* = [
 
 var smoke = function (x, y) {
   var createSmoke = function (x, y) {
-    var e = Object.create(Entity).init(x + Math.random() * 32 - 16, y + Math.random() * 32 - 16, 16, 16);
-    e.color = 'white';
-    e.opacity = 0.9;
+    var e = Object.create(Sprite).init(x + Math.random() * 32 - 16, y + Math.random() * 32 - 16, Resources.smoke);
+    //var e = Object.create(Entity).init(x + Math.random() * 32 - 16, y + Math.random() * 32 - 16, 16, 16);
+    //e.color = 'white';
+    e.opacity = Math.random() / 2 + 0.5;
     e.addBehavior(Velocity);
     e.velocity = {x: Math.random() * SPEED.ship - SPEED.ship / 2, y: Math.random() * SPEED.ship - SPEED.ship / 2};
     e.addBehavior(FadeOut, {duration: 0.2});

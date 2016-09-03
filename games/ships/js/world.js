@@ -11,11 +11,21 @@ var World = {
 		this.scene = undefined;
 //		this.loadScenes();
 		this.loadGameInfo();
+		var t = this;
+		window.addEventListener("focus", function (e) {
+			if (t.audioContext.resume) t.audioContext.resume();
+			t.startTime = new Date();
+			t.speed = 1;
+		});
+		window.addEventListener("blur", function (e) {
+			if (t.audioContext.suspend) t.audioContext.suspend();
+			t.speed = 0;
+		});
 		return this;
 	},
 	step: function () {
 		var newTime = new Date();
-		var dt = ( newTime - this.startTime ) / 1000;
+		var dt = this.speed * ( newTime - this.startTime ) / 1000;
 		this.startTime = newTime;
 
 		this.time += dt;
@@ -26,7 +36,7 @@ var World = {
 			this.debug.innerHTML = Math.floor(1 / dt) + " fps";
 		}
 
-		this.update(dt * this.speed);
+		this.update(dt);
 		this.draw();
 
 		var t = this;

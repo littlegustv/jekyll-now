@@ -10,6 +10,7 @@
     {"path": "Tender.png", "frames": 2, "speed": 0.6},
     {"path": "flame.png", "frames": 5, "speed": 0.2},
     {"path": "monitor.png"},
+    {"path": "smoke.png"},
     {"path": "cloud.png"},
     {"path": "wave_tile1.png"},
     {"path": "cannonball.png"},
@@ -17,6 +18,7 @@
     {"path": "cannon.ogg"},
     {"path": "scatter.ogg"},
     {"path": "smallHit.ogg"},
+    {"path": "swosh.ogg"},
     {"path": "hit.ogg"}
   ],
   "fontFamily": "Visitor"

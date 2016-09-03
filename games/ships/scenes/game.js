@@ -49,7 +49,8 @@ function addFlames(ship) {
 			s.velocity.x = ship.velocity.x;
 			return s;
 		} else if (ship.health / ship.maxHealth < 1) {
-			var s = Object.create(Entity).init(x + Math.random() * 48 - 24, y - 6, Math.random() * 10 + 6, Math.random() * 10 + 6);
+			var s = Object.create(Sprite).init(x + Math.random() * 48 - 24, y - 6, Resources.smoke);
+			//var s = Object.create(Entity).init(x + Math.random() * 48 - 24, y - 6, Math.random() * 10 + 6, Math.random() * 10 + 6);
 			s.opacity = Math.random() / 2 + 0.3;
 			s.addBehavior(FadeOut, {duration: 0.6});
 			s.addBehavior(Velocity);
@@ -332,10 +333,10 @@ var onStart = function () {
 	ui.add(scoreText);
 	ui.add(comboText);
 
+	
+
 	var Lose = Object.create(Behavior);
 	Lose.end = function () {
-		console.log('ending');
-		//gameWorld.setScene(2);
 		first_game = false;
 		scene.started = -1;
 		t.onStart();
@@ -357,7 +358,7 @@ var onStart = function () {
 	player.addBehavior(HealOverTime, {rate: 2});
 //	player.addBehavior(Reload);
 	player.addBehavior(Cooldown);
-	player.addBehavior(Die, {duration: 1});
+	player.addBehavior(DieFanfare, {duration: 4});
 	//player.addBehavior(SeaSpray);
 	player.velocity = {x: SPEED.ship, y: 0};
 	player.addBehavior(Lose);
@@ -470,6 +471,7 @@ var onStart = function () {
 		t.started = 0;
 		score = 0;
 		combo = 0;
+		gameWorld.playSound(Resources.swosh);
 		fg_camera.addBehavior(ease, {destination: {x: 0, y: 0}});
 		scoreText.addBehavior(FadeIn, {duration: 0.5});
 		comboText.addBehavior(FadeIn, {duration: 0.5});
@@ -539,7 +541,7 @@ var onStart = function () {
 
 var onUpdate = function (dt) {
 	if (Resources.soundtrack && !this.soundtrack) {
-		//this.musicLoop();
+		this.musicLoop();
 	}
 
 	this._gamepad.update(dt);

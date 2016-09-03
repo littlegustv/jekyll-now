@@ -106,6 +106,39 @@ Die.start = function () {
   this.duration = this.duration || 2;
 }
 
+var DieFanfare = Object.create(Behavior);
+DieFanfare.update = function (dt) {
+  if (this.entity.health <= 0) {
+    if (!this.time) this.start();
+    this.time += dt;
+    if (this.time >= this.duration) this.entity.alive = false;
+    this.entity.velocity = {x: this.entity.velocity.x / 100, y: 0};
+    this.entity.opacity = (this.duration - this.time) / this.duration;    
+    if (Math.random() * 100 < 7) {
+      var f = Object.create(Sprite).init(this.entity.x, this.entity.y -2, Resources.cannonball);
+      f.addBehavior(Velocity);
+      f.velocity = {x: (Math.random() - 0.5) * SPEED.ship, y: - SPEED.ship * 0.6 }
+      gameWorld.playSound(Resources.scatter);
+      //this.entity.layer.add(f);
+
+      var smoke = Object.create(Particles).init(this.entity.x, this.entity.y - 2, function (x, y) {
+        var s = Object.create(Sprite).init(x, y, Resources.smoke);
+        s.addBehavior(Velocity);
+        s.velocity = {x: (Math.random() - 0.5) * SPEED.ship, y: - SPEED.ship * 0.6 };
+        return s;
+      }, 0.01, 20);
+      this.entity.layer.add(smoke);
+    }
+  }
+}
+DieFanfare.start = function () {
+  if (this.entity.collision) {
+    this.entity.collision.onCheck = function (a, b) { return false };
+  }
+  this.time = 0;
+  this.duration = this.duration || 4;
+}
+
 var FadeOut = Object.create(Behavior);
 FadeOut.update = function (dt) {
     if (!this.time) this.start();
