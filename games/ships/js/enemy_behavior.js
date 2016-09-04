@@ -1,12 +1,17 @@
 var Frigate = Object.create(Behavior);
 Frigate.update = function (dt) {
   if (!this.entity.shoot) this.start();
-  if (Math.random() * 1000 < 10) {
+  if (this.entity.cooldown <= 0) {
     this.entity.shoot();
+    this.entity.cooldown = Math.random() * 3 + 3;
+  }
+  else {
+    this.entity.cooldown -= dt;
   }
 }
 Frigate.start = function () {
   this.entity.shoot = defaultShoot;
+  this.entity.cooldown = Math.random() * 3 + 3;
 }
 
 var Battleship = Object.create(Behavior);

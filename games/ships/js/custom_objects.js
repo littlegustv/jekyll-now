@@ -11,10 +11,26 @@
       other.health -= 10;
       gameWorld.playSound(Resources.hit)
     } 
-    if (other.health <= 0) {
+    if (other.health <= 0 && other.family != "player") {
       combo += 1;
       score += combo * 10;
       comboTimer = 0;
+      var t = Object.create(Text).init(
+        other.x,
+        other.y - GLOBALS.scale * 6,
+        combo + "X",
+      {color: "#FFFFFF", size: 54});
+      t.addBehavior(FadeOut, {duration: 4});
+      t.z = 20;
+      var t2 = Object.create(Text).init(
+        other.x - 3,
+        other.y - GLOBALS.scale * 6 - 3,
+        combo + "X",
+      {color: "#000000", size: 54});
+      t2.addBehavior(FadeOut, {duration: 4});
+      t2.z = 19;
+      other.layer.add(t);
+      other.layer.add(t2);
     }
     object.alive = false;
   };
@@ -26,24 +42,6 @@
     {x: -2, y: -12},
   ]);
   Cannon.z = 15;
-
-  var Bullet = Object.create(Entity);
-  Bullet.setCollision(Polygon);
-  Bullet.collision.onHandle = function (object, other) {
-    if (other.no_collide) return;
-    console.log('a hit!');
-    if (other.health > 0) {
-      other.health -= 1;
-      gameWorld.playSound(Resources.hit)
-    } 
-    if (other.health <= 0) {
-      combo += 1;
-      comboTimer = 0;
-      score += combo * 10;
-    }
-    object.alive = false;
-  };
-  Bullet.projectile_ignore = true;
 
   var Button = Object.create(Sprite);
   Button.behaviors = [];

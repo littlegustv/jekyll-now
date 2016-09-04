@@ -34,7 +34,7 @@ var highcombo = 0;
 
 var comboTimer = 0;
 var comboMax = 4;
-var comboText;
+//var comboText;
 var scoreText;
 
 Sprite.z = 1, TiledBackground.z = 1;
@@ -290,6 +290,11 @@ var onStart = function () {
 		scene.soundtrack.onended = scene.musicLoop;
 	}
 
+	scene.oceanLoop = function () {
+		scene.ocean = gameWorld.playSound(Resources.ocean);
+		scene.ocean.onended = scene.oceanLoop;
+	}
+
 	this.onClick = function (e) {
 		console.log(e.offsetX, e.offsetY);
 	}
@@ -312,8 +317,8 @@ var onStart = function () {
 	var ui = Object.create(Layer).init(ui_camera);
 
 	scoreText = Object.create(Text).init(12, 30, "Score: " + score, {align: "left", size: 64, color: "rgba(0,0,0,0.4)"});
-	comboText = Object.create(Text).init(CONFIG.width - 4, 30, "Combo: " + combo, {align: "right", size: 64, color: "rgba(0,0,0,0.4)"});
-	scoreText.opacity = 0, comboText.opacity = 0;
+	//comboText = Object.create(Text).init(CONFIG.width - 4, 30, "Combo: " + combo, {align: "right", size: 64, color: "rgba(0,0,0,0.4)"});
+	scoreText.opacity = 0;//, comboText.opacity = 0;
 
 	var titleTexts = [];
 	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 124, "Seven", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} ));
@@ -331,7 +336,7 @@ var onStart = function () {
 		ui.add(e);
 	});
 	ui.add(scoreText);
-	ui.add(comboText);
+	//ui.add(comboText);
 
 	
 
@@ -358,7 +363,7 @@ var onStart = function () {
 	player.addBehavior(HealOverTime, {rate: 2});
 //	player.addBehavior(Reload);
 	player.addBehavior(Cooldown);
-	player.addBehavior(DieFanfare, {duration: 4});
+	player.addBehavior(DieFanfare);
 	//player.addBehavior(SeaSpray);
 	player.velocity = {x: SPEED.ship, y: 0};
 	player.addBehavior(Lose);
@@ -383,6 +388,7 @@ var onStart = function () {
 		var cloud = Object.create(Sprite).init(Math.random() * (CONFIG.width - 96) + 48, Math.random() * (CONFIG.height - 96) - CONFIG.height / 2, Resources.cloud );
 		cloud.addBehavior(Wrap, {min: {x: 0, y: -CONFIG.height}, max: {x: CONFIG.width, y: CONFIG.height}});
 		cloud.addBehavior(Velocity);
+		cloud.z = -2;
 		cloud.velocity = {x: Math.random() * SPEED.ship / 4 - SPEED.ship / 8, y: 0};
 		fg.add(cloud);
 	}
@@ -436,7 +442,7 @@ var onStart = function () {
 		player.cooldown = 1;
 	
 		//console.log(Resources.cannon);
-		gameWorld.playSound(Resources.cannon);
+		//gameWorld.playSound(Resources.cannon);
 
 		shake.start();
 	}
@@ -474,7 +480,7 @@ var onStart = function () {
 		gameWorld.playSound(Resources.swosh);
 		fg_camera.addBehavior(ease, {destination: {x: 0, y: 0}});
 		scoreText.addBehavior(FadeIn, {duration: 0.5});
-		comboText.addBehavior(FadeIn, {duration: 0.5});
+		//comboText.addBehavior(FadeIn, {duration: 0.5});
 		titleTexts.forEach( function (e) {
 			e.addBehavior(FadeOut, {duration: 0.5});
 		});
@@ -541,12 +547,16 @@ var onStart = function () {
 
 var onUpdate = function (dt) {
 	if (Resources.soundtrack && !this.soundtrack) {
-		this.musicLoop();
+		//this.musicLoop();
+	}
+
+	if (Resources.ocean && !this.ocean) {
+		this.oceanLoop();
 	}
 
 	this._gamepad.update(dt);
 	scoreText.text = "Score: " + score;
-	comboText.text = "Combo: " + combo;
+	//comboText.text = "Combo: " + combo;
 
 	if (this.started == 1) {
 

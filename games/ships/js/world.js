@@ -247,15 +247,17 @@ var World = {
 		};
 		request.send();
 	},
-	playSound: function(sound)
+	playSound: function(sound, volume)
 	{
 		if (AudioContext) {
+			var volume = volume || 1;
 			//console.log(sound);
 			var buffer = sound.buffer;
 			var source = this.audioContext.createBufferSource();
 			source.buffer = buffer;
 			
 			source.connect(this.audioContext.gn);
+			this.audioContext.gn.gain.value = volume;
 			this.audioContext.gn.connect(this.audioContext.destination);
 			source.start(0);
 			

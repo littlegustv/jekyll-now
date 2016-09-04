@@ -15,8 +15,13 @@
     {"path": "wave_tile1.png"},
     {"path": "cannonball.png"},
     {"path": "soundtrack.ogg"},
+    {"path": "firework1.ogg"},
+    {"path": "firework2.ogg"},
+    {"path": "firework3.ogg"},
+    {"path": "firework4.ogg"},
     {"path": "cannon.ogg"},
     {"path": "scatter.ogg"},
+    {"path": "ocean.ogg"},
     {"path": "smallHit.ogg"},
     {"path": "swosh.ogg"},
     {"path": "hit.ogg"}

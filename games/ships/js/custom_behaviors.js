@@ -1,7 +1,8 @@
 var Follow = Object.create(Behavior);
 Follow.update = function (dt) {
-  this.entity.x = this.target.x + this.offset.x;
-  this.entity.y = this.target.y + this.offset.y;
+  this.entity.x = this.target.x + (this.offset.x || 0);
+  this.entity.y = this.target.y + (this.offset.y || 0);
+  this.entity.z = this.target.z + (this.offset.z || 0);
   if (this.target.alive == false) this.entity.alive = false;
 }
 
@@ -106,28 +107,50 @@ Die.start = function () {
   this.duration = this.duration || 2;
 }
 
+var Firework = Object.create(Behavior);
+Firework.update = function (dt) {
+  this.duration -= dt;
+  if (this.duration <= 0) {
+    this.end();
+    this.entity.alive = false;
+  }
+}
+Firework.end = function () {
+  var healEffect = function (x, y) {
+    var color = choose(["red", "green", "blue", "yellow", "pink", "cyan"])
+    var t = Object.create(Entity).init( x + Math.random() * GLOBALS.scale * 12 - GLOBALS.scale * 6,
+      y + Math.random() * GLOBALS.scale * 12 - GLOBALS.scale * 6, GLOBALS.scale * 3, GLOBALS.scale * 3);
+    t.color = color;
+    t.addBehavior(FadeOut, {duration: 0.5});
+    t.addBehavior(Velocity);
+    var theta = Math.floor(Math.random() * 12) * Math.PI / 6;
+    t.velocity = {x: Math.cos(theta) * SPEED.ship / 3, y: Math.sin(theta) * SPEED.ship / 3};
+    return t;
+  }
+  var healing = Object.create(Particles).init(this.entity.x, this.entity.y, healEffect, 0, 10, 1);
+  healing.z = 20;
+  this.entity.layer.add(healing);
+}
+
 var DieFanfare = Object.create(Behavior);
 DieFanfare.update = function (dt) {
   if (this.entity.health <= 0) {
     if (!this.time) this.start();
     this.time += dt;
     if (this.time >= this.duration) this.entity.alive = false;
-    this.entity.velocity = {x: this.entity.velocity.x / 100, y: 0};
-    this.entity.opacity = (this.duration - this.time) / this.duration;    
-    if (Math.random() * 100 < 7) {
-      var f = Object.create(Sprite).init(this.entity.x, this.entity.y -2, Resources.cannonball);
+    this.entity.velocity = {x: this.entity.velocity.x / 100, y: 5};
+    if (Math.random() * 100 < 4) {
+      var f = Object.create(Entity).init(this.entity.x, this.entity.y -2, 6, 6);
+      f.family = "neutral";
       f.addBehavior(Velocity);
-      f.velocity = {x: (Math.random() - 0.5) * SPEED.ship, y: - SPEED.ship * 0.6 }
-      gameWorld.playSound(Resources.scatter);
-      //this.entity.layer.add(f);
-
-      var smoke = Object.create(Particles).init(this.entity.x, this.entity.y - 2, function (x, y) {
-        var s = Object.create(Sprite).init(x, y, Resources.smoke);
-        s.addBehavior(Velocity);
-        s.velocity = {x: (Math.random() - 0.5) * SPEED.ship, y: - SPEED.ship * 0.6 };
-        return s;
-      }, 0.01, 20);
-      this.entity.layer.add(smoke);
+      f.addBehavior(Accelerate);
+      f.z = this.entity.z;
+      f.velocity = {x: (Math.random() - 0.5) * SPEED.ship, y: - SPEED.ship * 0.8 }
+      f.acceleration = {x: 0, y: 100};
+      f.addBehavior(Firework, {duration: 1});
+      var v = Math.floor(Math.random() * 4) + 1;
+      gameWorld.playSound(Resources["firework" + v]);
+      this.entity.layer.add(f);
     }
   }
 }
@@ -136,7 +159,8 @@ DieFanfare.start = function () {
     this.entity.collision.onCheck = function (a, b) { return false };
   }
   this.time = 0;
-  this.duration = this.duration || 4;
+  this.entity.z = -1;
+  this.duration = this.duration || 6;
 }
 
 var FadeOut = Object.create(Behavior);

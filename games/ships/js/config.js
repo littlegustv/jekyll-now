@@ -184,7 +184,7 @@ var defaultShoot = function () {
   addCannon(this, {x: 0, y: direction * SPEED.ship});
   this.cooldown = this.maxCooldown;
   //console.log(Resources.cannon);
-  gameWorld.playSound(Resources.cannon);
+  gameWorld.playSound(Resources.cannon, 1 - Math.abs(this.y - 100) / CONFIG.height);
 
   shake.start();
 }
