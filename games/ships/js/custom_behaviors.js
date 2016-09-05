@@ -256,11 +256,13 @@ var Oscillate = Object.create(Behavior);
 Oscillate.update = function (dt) {
   if (!this.time) this.start();
   this.time += dt;
-  this.entity[this.field] = this.constant * Math.sin(this.time);
+  this.object[this.field] = this.constant * Math.sin(this.time) + this.initial;
 }
 Oscillate.start = function () {
-  this.time = 0;
+  this.time = this.time || 0;
   this.constant = this.constant || 1;
+  this.initial = this.initial || 0;
+  this.object = this.object || this.entity;
 }
 
 var Cooldown = Object.create(Behavior);

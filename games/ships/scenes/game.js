@@ -309,7 +309,8 @@ var onStart = function () {
 		//console.log('ordering');
 		return this.entities.sort(function (a, b) { 
 			if (a.z && b.z && b.z != a.z) return a.z - b.z;
-			else return a.y - b.y 
+			else if (a.y && b.y && a.y != b.y) return a.y - b.y;
+			else return a.x - b.x;
 		});
 	}
 
@@ -324,6 +325,27 @@ var onStart = function () {
 	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 124, "Seven", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} ));
 	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 68, "Deadly", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} ));
 	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 12, "Seas", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} ));
+
+	var r = 48;
+	var last = undefined, first = undefined;
+	for (var i = 0; i < 12; i++) {
+		var theta = Math.PI * 2 / 10;
+		var e = Object.create(Sprite).init(100 + i* r, 240, Resources.monster);
+		console.log(e.y);
+		e.animation = i == 0 ? 0 : (i == 11 ? 2 : 1);
+		e.offset = {x: 0, y: Math.cos(i * theta) * r};
+		e.addBehavior(Oscillate, {field: "y", constant: 48, time: theta * i, initial: 0, object: e.offset});
+		/**
+			ANGLE doesn't work so well with offset!
+		**/
+
+		e.addBehavior(Velocity);
+		e.velocity = {x: - SPEED.ship / 3, y: 0};
+		e.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
+		
+		last = e;
+		fg.add(e);
+	}
 
 	if (!first_game) {
 		var sc = Object.create(Text).init(48, CONFIG.height - 48, "Score: " + score, {size: 48, align: "left", color: "rgba(100,0,0,0.5)"} );
