@@ -330,15 +330,18 @@ var onStart = function () {
 	var last = undefined, first = undefined;
 	for (var i = 0; i < 12; i++) {
 		var theta = Math.PI * 2 / 10;
-		var e = Object.create(Sprite).init(100 + i* r, 240, Resources.monster);
+		var e = Object.create(Sprite).init(100 + i* r, 252, Resources.monster);
 		console.log(e.y);
 		e.animation = i == 0 ? 0 : (i == 11 ? 2 : 1);
 		e.offset = {x: 0, y: Math.cos(i * theta) * r};
-		e.addBehavior(Oscillate, {field: "y", constant: 48, time: theta * i, initial: 0, object: e.offset});
+		e.addBehavior(Oscillate, {field: "y", constant: 32, time: theta * i, initial: 0, object: e.offset});
 		/**
 			ANGLE doesn't work so well with offset!
 		**/
+		if (last)
+			e.addBehavior(Face, {target: last, offsetAngle: 0});
 
+		e.addBehavior(Flip);
 		e.addBehavior(Velocity);
 		e.velocity = {x: - SPEED.ship / 3, y: 0};
 		e.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});

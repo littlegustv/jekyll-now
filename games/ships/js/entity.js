@@ -1,5 +1,6 @@
 var Entity = {
 	velocity: {x: 0, y: 0},
+	offset: {x: 0, y: 0},
 	opacity: 1,
 	angle: 0,
 	alive: true,
@@ -18,7 +19,14 @@ var Entity = {
 	draw: function (ctx) {
 		ctx.save();
 		ctx.translate(this.x, this.y);
+		ctx.translate(this.offset.x, this.offset.y);
 		ctx.rotate(this.angle);
+		if (this.blend) {
+			console.log('blending!')
+			ctx.globalCompositeOperation = this.blend;
+		} else {
+			ctx.globalCompositeOperation = "normal";
+		}
 		for (var i = 0; i < this.behaviors.length; i++) {
 			this.behaviors[i].transform(ctx);
 		}
@@ -127,7 +135,7 @@ Sprite.onDraw = function (ctx) {
 	ctx.drawImage(this.sprite.image, 
 		this.frame * this.sprite.w, this.animation * this.sprite.h, 
 		this.sprite.w, this.sprite.h, 
-		Math.round(this.x - this.w / 2 + this.offset.x), this.y - Math.round(this.h / 2) + this.offset.y, this.w, this.h);
+		Math.round(this.x - this.w / 2), this.y - Math.round(this.h / 2), this.w, this.h);
 
 	if (CONFIG.debug) {
 		ctx.strokeStyle = "red";

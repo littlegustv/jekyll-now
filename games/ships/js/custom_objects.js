@@ -7,8 +7,8 @@
     }
     if (other.health > 0) {
       object.layer.add(smoke(other.x, other.y + GLOBALS.scale * 4));
-
       other.health -= 10;
+      other.addBehavior(Flash, {duration: 0.4});
       gameWorld.playSound(Resources.hit)
     } 
     if (other.health <= 0 && other.family != "player") {

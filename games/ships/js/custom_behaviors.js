@@ -132,6 +132,21 @@ Firework.end = function () {
   this.entity.layer.add(healing);
 }
 
+var Flash = Object.create(Behavior);
+Flash.update = function (dt) {
+  if (!this.time) this.start();
+  this.time += dt;
+  if (this.time >= this.duration) {
+    this.entity.removeBehavior(this);
+    this.entity.blend = "normal";
+  }
+}
+Flash.start = function () {
+  this.duration = this.duration || 1;
+  this.time = 0;
+  this.entity.blend = "screen";
+}
+
 var DieFanfare = Object.create(Behavior);
 DieFanfare.update = function (dt) {
   if (this.entity.health <= 0) {
@@ -149,7 +164,7 @@ DieFanfare.update = function (dt) {
       f.acceleration = {x: 0, y: 100};
       f.addBehavior(Firework, {duration: 1});
       var v = Math.floor(Math.random() * 4) + 1;
-      gameWorld.playSound(Resources["firework" + v]);
+      //gameWorld.playSound(Resources["firework" + v]);
       this.entity.layer.add(f);
     }
   }
@@ -249,6 +264,16 @@ Ease.update = function (dt) {
     this.entity.x = this.destination.x;
     this.entity.y = this.destination.y;
     this.entity.removeBehavior(this);
+  }
+}
+
+var Face = Object.create(Behavior);
+Face.update = function (dt) {
+  this.time = this.time || 0;
+  this.time += dt;
+  if (this.target) {
+    this.entity.angle = angle(this.entity.x + this.entity.offset.x, this.entity.y + this.entity.offset.y, 
+      this.target.x + this.target.offset.x, this.target.y + this.target.offset.y) + (this.offsetAngle || 0);
   }
 }
 
