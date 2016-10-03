@@ -203,6 +203,9 @@ var World = {
 					console.log("loaded sound");
 				}*/
 			}
+			else if (ext == ".wav") {
+				this.loadOGG(res, name);
+			}
 			else if (ext == ".js") {
 				var request = new XMLHttpRequest();
 				request.open("GET", "res/" + res, true);
@@ -257,7 +260,7 @@ var World = {
 			source.buffer = buffer;
 			
 			source.connect(this.audioContext.gn);
-			this.audioContext.gn.gain.value = volume;
+			//this.audioContext.gn.gain.value = volume;
 			this.audioContext.gn.connect(this.audioContext.destination);
 			source.start(0);
 			

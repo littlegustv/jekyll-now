@@ -36,22 +36,33 @@
   };
   Cannon.projectile_ignore = true;
   Cannon.setVertices([
-    {x: 0, y: -10},
-    {x: 2, y: -12},
-    {x: 0, y: -14},
-    {x: -2, y: -12},
+    {x: 0, y: 2},
+    {x: 2, y: 0},
+    {x: 0, y: -2},
+    {x: -2, y: 0},
   ]);
-  Cannon.z = 15;
 
-  var Button = Object.create(Sprite);
+  var Button = Object.create(Entity);
   Button.behaviors = [];
   Button.family = 'button';
-  Button.highlight = function () { this.frame = 1 };
-  Button.select = function () { this.frame = 2; };
-  Button.super_init = Button.init;
-  Button.init = function (x, y, sprite) {
-    this.super_init(x, y, sprite);
-    this.behaviors = [];
-    this.addBehavior(HighLight, {duration: 0.5});
+  Button.trigger = function () {};
+  Button.hover = function () {};
+  Button.check = function (x, y) {
+    if (x > this.x - this.w / 2 && x < this.x + this.w / 2) {
+      if (y > this.y - this.h / 2 && y < this.y + this.h / 2) {
+        return true;
+      }
+    }
+    return false;
+  };
+  Button.draw = function (ctx) {
+    if (CONFIG.debug) {
+      ctx.fillStyle = "green";
+      ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+    }
+  }
+  Button.init = function (x, y, w, h, object) {
+    this.object = object;
+    this.x = x, this.y = y, this.w = w, this.h = h;
     return this;
   }

@@ -217,13 +217,13 @@ SalvageAI.update = function (dt) {
       this.entity.velocity.x =  (dx - this.entity.x);
       this.entity.velocity.y =  (dy - this.entity.y);
     }*/
-  } else if (this.node && !onscreen(this.node.x, this.node.y)) { // lead to node - good!
+/*  } else if (this.node && !onscreen(this.node.x, this.node.y)) { // lead to node - good!
 
     //var p = this.player, n = this.node;
     if (this.entity.pathfind.target != this.node) {
       this.entity.pathfind.new(this.node);
     }
-  } else if (this.node && this.node.health >= this.node.maxHealth) {
+  }*/ else if (this.node && this.node.health >= this.node.maxHealth) {
 
     var t = this;
     this.createGoal(function () {

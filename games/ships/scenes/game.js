@@ -1,6 +1,7 @@
-// name: 'salvage'
-
 var fullscreen = false;
+var muted = false, paused = false;
+
+// mobile needs to be able to be fullscreened
 
 function requestFullScreen () {
 // we've made the attempt, at least
@@ -17,12 +18,13 @@ function requestFullScreen () {
   }
 }
 
-
+// DEBUG VARIABLES (global so accessible in console)
 var player;
 var other;
 var debug;
 
-var onscreen; // hacky! this will be a function shortly!
+// score variables
+// FIX ME: add localstorage memory
 
 var first_game = true;
 
@@ -37,7 +39,7 @@ var comboMax = 4;
 //var comboText;
 var scoreText;
 
-Sprite.z = 1, TiledBackground.z = 1;
+// functions to add particle effects to ship objects
 
 function addFlames(ship) {
 	var createFlame = function (x, y) {
@@ -64,7 +66,7 @@ function addFlames(ship) {
 }
 
 
-var splash = function (ship) {
+function addSplashes (ship) {
 	var createSplash = function (x, y) {
 	  var colors = ["#4d6b89", "#829eab", "white"]
 		var s = Object.create(Entity).init(x, y, 12 * GLOBALS.scale, 6 * GLOBALS.scale);
@@ -80,19 +82,19 @@ var splash = function (ship) {
 	return spl;
 }
 
+// adds a single cannonball, or does it?
+
 function addCannon (entity, velocity, offset) {
 	offset = offset || {x: 0, y: 0};
-	var cb = Object.create(Cannon).init(0,0,Resources.cannonball);
-  cb.x = entity.x + offset.x, cb.y = entity.y  + offset.y + 12 * GLOBALS.scale;
+	var cb = Object.create(Cannon).init(entity.x, entity.family == "enemy" ? entity.y - 1 : entity.y + 1, Resources.cannonball);
+  cb.z = 10;
   cb.velocity = velocity;
   cb.family = entity.family;
 	cb.addBehavior(Velocity);
-	/*cb.addBehavior(Trail, {
-		createParticle: function (x, y) { return Object.create(Entity).init(x, y, 8, 8) },
-		duration: 5,
-		interval: 0.02
-	});*/
-	var trail = function (x, y) {
+	
+	if (entity.family == "enemy") cb.addBehavior(Horizon, {horizon: 166});
+
+	var addTrails = function (x, y) {
 		var t = Object.create(Entity).init(x + Math.random() * 8 - 4, y + Math.random() * 16 - 8, 6, 18);
 		t.w = cb.w;
 		t.h = cb.h * 2;
@@ -102,27 +104,21 @@ function addCannon (entity, velocity, offset) {
     t.addBehavior(FadeOut, {duration: 1});
     return t;
 	}
-	var traileffect = Object.create(Particles).init(cb.x, cb.y - 2, trail, 0.02);
-	if (entity.family == "enemy") {
-		traileffect.offset = {x: 0, y: -48};
-		cb.y = entity.y - 1;
-		cb.offset = {x: 0, y: 0};
-		cb.setVertices([
-	    {x: 0, y: -10 + 6 * GLOBALS.scale},
-	    {x: 2, y: -12 + 6 * GLOBALS.scale},
 
-	    {x: 0, y: -14 + 6 * GLOBALS.scale},
-	    {x: -2, y: -12 + 6 * GLOBALS.scale},
-	  ]);
-		cb.addBehavior(Horizon, {horizon: 166});
-	} else {
-	  cb.offset = {x: 0, y: -12 * GLOBALS.scale};
-	}
-	traileffect.addBehavior(Follow, {target: cb, offset: {x: 0, y: (entity.family == "player" ? -32 : 56)}});
+	var traileffect = Object.create(Particles).init(cb.x, cb.y - 2, addTrails, 0.02);
+	traileffect.z = 9;
+	traileffect.addBehavior(Follow, {target: cb, offset: {x: 0, y: 0 }});
 	entity.layer.add(traileffect);
 
+	traileffect.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height - cb.offset.y + 100}})
 	cb.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height - cb.offset.y + 100}})
 	entity.layer.add(cb);
+
+	var bang = Object.create(Sprite).init(cb.x, cb.y, Resources[choose(["bang", "boom", "pow"])]);
+	bang.z = 9;
+	bang.addBehavior(FadeOut, {duration: 1});
+	entity.layer.add(bang);
+	return cb;
 }
 
 function notFriendly (callback) {
@@ -143,7 +139,7 @@ function doDamage (d) {
 }
 
 var shipCost = {
-	20: function () {
+	1.1: function () {
 		if (Math.random() < 0.5) return false;
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.monitor);
@@ -152,7 +148,7 @@ var shipCost = {
 		s.addBehavior(Submarine);
 		return s;
 	},
-	4: function () {
+	10: function () {
 		if (Math.random() < 0.7) return false;
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.Tender);
@@ -179,7 +175,7 @@ var shipCost = {
 		}, 200);
 		return s;
 	},
-	16: function () {
+	20: function () {
 		if (Math.random() < 0.3) return false;
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.ship3);
@@ -188,7 +184,7 @@ var shipCost = {
 		s.health = 30, s.maxHealth = 30;
 		return s;
 	},
-	2: function () {
+	30: function () {
 		if (Math.random() < 0.2) return false; // chance to not spawn
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.Cutter);
@@ -196,17 +192,57 @@ var shipCost = {
 		s.health = 10, s.maxHealth = 10;
 		return s;
 	},
-	1: function () {
+	1.3: function () {
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.ship2);
 		s.addBehavior(Frigate);
 		s.velocity = {x: right ? - SPEED.ship : SPEED.ship, y: 0};
 		s.health = 10, s.maxHealth = 10;
 		return s;
+	},
+	60: function () {
+		if (Math.random() > 0.2) return;
+		console.log('adding monster');
+		var r = 48;
+		var last = undefined, first = undefined;
+		var monster = [];
+		for (var i = 0; i < 12; i++) {
+			var theta = Math.PI * 2 / 10;
+			var e = Object.create(Sprite).init(CONFIG.width + i* r, 252, Resources.monster);
+			e.animation = i == 0 ? 0 : (i == 11 ? 2 : 1);
+			e.offset = {x: 0, y: Math.cos(i * theta) * r};
+			e.addBehavior(Oscillate, {field: "y", constant: 32, time: theta * i, initial: 0, object: e.offset});
+			e.addBehavior(Monster);
+			/**
+				ANGLE doesn't work so well with offset!
+			**/
+			e.setCollision(Polygon);
+			e.collision.onHandle = function(object, other) {
+				if (other == player && object.health > 0) {
+					other.health -= 1;
+					object.health = 0;
+					gameWorld.playSound(Resources.hit);
+				}
+			}
+			e.addBehavior(Die, {duration: 1});
+
+			e.family = "enemy";
+			e.health = 11;
+			if (last)
+				e.addBehavior(Face, {target: last, offsetAngle: 0});
+
+			e.addBehavior(Flip);
+			e.addBehavior(Velocity);
+			e.velocity = {x: - SPEED.ship / 3, y: 0};
+			e.addBehavior(Climb, {min: {x: -40}, max: {x: CONFIG.width + 40}});
+			
+			last = e;
+			monster.push(e);
+		}
+		return monster;
 	}
 }
 var costs = Object.keys(shipCost).map( function (e) { return Number(e) });
-console.log(costs);
 
 function buyShips (dt) {
 
@@ -226,19 +262,18 @@ function buyShips (dt) {
 			if (y > cost) {
 				var s = shipCost[cost]();
 
+				if (Array.isArray(s)) {
+					for (var j = 0; j < s.length; j++) {
+						this.fg.add(s[j]);
+					}
+					return;
+				}
+
 				if (s) {
-				//this.money -= cost;
-					//console.log(y, this.DOMAIN);
-
-
-	//				var ships = [Resources.ship2, Resources.ship3, Resources.monitor];
 					s.addBehavior(Flip);
-					//s.addBehavior(SeaSpray);
 					s.addBehavior(Animate);
 					s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
 					s.addBehavior(Velocity);
-					//s.addBehavior(PeriodicCannon, {interval: 2});
-
 					s.addBehavior(Cooldown);
 					s.addBehavior(Die, {duration: 1});
 					s.setVertices([
@@ -260,7 +295,7 @@ function buyShips (dt) {
 					s.offset = {x: 0, y: - offsetY};
 					s.family = "enemy";
 
-					var spl = splash(s);
+					var spl = addSplashes(s);
 					var f = addFlames(s);
 
 					this.fg.add(f);
@@ -278,6 +313,7 @@ var shake;
 var onStart = function () {
 
 	var scene = this;
+	Polygon.onCheck = notFriendly(Polygon.onCheck);
 
 	this.started = -1;
 	this.layers = [];
@@ -286,7 +322,17 @@ var onStart = function () {
 	this.buyShips = buyShips;
 
 	scene.musicLoop = function () {
-		scene.soundtrack = gameWorld.playSound(Resources.soundtrack);
+		if (score == 0 || combo == 0) {
+			scene.soundtrack = gameWorld.playSound(Resources.soundtrack1);
+		} else if (combo <= 2) {
+			scene.soundtrack = gameWorld.playSound(Resources.soundtrack3);			
+		} else if (combo <= 5) {
+			scene.soundtrack = gameWorld.playSound(Resources.soundtrack2);
+		} else if (combo <= 8) {
+			scene.soundtrack = gameWorld.playSound(Resources.soundtrack4);
+		} else {
+			scene.soundtrack = gameWorld.playSound(Resources.soundtrack5);
+		}
 		scene.soundtrack.onended = scene.musicLoop;
 	}
 
@@ -299,14 +345,12 @@ var onStart = function () {
 		console.log(e.offsetX, e.offsetY);
 	}
 
-	Polygon.onCheck = notFriendly(Polygon.onCheck);
 
 	var fg_camera = Object.create(Camera).init(0, -216);
 	shake = fg_camera.addBehavior(Shake, {duration: 0.3, magnitude: 3});
 
 	var fg = Object.create(Layer).init(fg_camera);
 	fg.drawOrder = function () {
-		//console.log('ordering');
 		return this.entities.sort(function (a, b) { 
 			if (a.z && b.z && b.z != a.z) return a.z - b.z;
 			else if (a.y && b.y && a.y != b.y) return a.y - b.y;
@@ -317,7 +361,7 @@ var onStart = function () {
 	var ui_camera = Object.create(Camera).init(0, 0);
 	var ui = Object.create(Layer).init(ui_camera);
 
-	scoreText = Object.create(Text).init(12, 30, "Score: " + score, {align: "left", size: 64, color: "rgba(0,0,0,0.4)"});
+	scoreText = Object.create(Text).init(2, 12, "Score: " + score, {size: 24, align: "left", color: "rgba(0,0,0,0.4)"});
 	//comboText = Object.create(Text).init(CONFIG.width - 4, 30, "Combo: " + combo, {align: "right", size: 64, color: "rgba(0,0,0,0.4)"});
 	scoreText.opacity = 0;//, comboText.opacity = 0;
 
@@ -325,30 +369,6 @@ var onStart = function () {
 	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 124, "Seven", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} ));
 	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 68, "Deadly", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} ));
 	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 12, "Seas", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} ));
-
-	var r = 48;
-	var last = undefined, first = undefined;
-	for (var i = 0; i < 12; i++) {
-		var theta = Math.PI * 2 / 10;
-		var e = Object.create(Sprite).init(100 + i* r, 252, Resources.monster);
-		console.log(e.y);
-		e.animation = i == 0 ? 0 : (i == 11 ? 2 : 1);
-		e.offset = {x: 0, y: Math.cos(i * theta) * r};
-		e.addBehavior(Oscillate, {field: "y", constant: 32, time: theta * i, initial: 0, object: e.offset});
-		/**
-			ANGLE doesn't work so well with offset!
-		**/
-		if (last)
-			e.addBehavior(Face, {target: last, offsetAngle: 0});
-
-		e.addBehavior(Flip);
-		e.addBehavior(Velocity);
-		e.velocity = {x: - SPEED.ship / 3, y: 0};
-		e.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
-		
-		last = e;
-		fg.add(e);
-	}
 
 	if (!first_game) {
 		var sc = Object.create(Text).init(48, CONFIG.height - 48, "Score: " + score, {size: 48, align: "left", color: "rgba(100,0,0,0.5)"} );
@@ -363,7 +383,48 @@ var onStart = function () {
 	ui.add(scoreText);
 	//ui.add(comboText);
 
-	
+	var mute_text = Object.create(Text).init(CONFIG.width - 48, 12, "SOUND OFF", {size: 24, color: "rgba(0,0,0,0.4)"});
+	ui.add(mute_text);
+
+	var mute_button = Object.create(Button).init(CONFIG.width - 48, 12, 96, 18);
+  mute_button.trigger = function () {
+  	if (muted)
+	  	mute_text.text = "SOUND OFF";
+	  else
+	  	mute_text.text = "SOUND ON";
+    muted = !muted;
+  };
+  mute_button.hover = function () {
+  	mute_text.color = "rgba(150,150,150,0.6)";
+  };
+  mute_button.unhover = function () {
+  	mute_text.color = "rgba(0,0,0,0.4)";
+  };
+  ui.add(mute_button);
+
+  this.buttons = [];
+  this.buttons.push(mute_button);
+
+  var pause_text = Object.create(Text).init(CONFIG.width - 160, 12, "PAUSE", {size: 24, color: "rgba(0,0,0,0.4)"});
+  ui.add(pause_text);
+
+	var pause_button = Object.create(Button).init(CONFIG.width - 160, 12, 96, 18, pause_text);
+  pause_button.trigger = function () {
+  	if (paused)
+  		pause_text.text = "PAUSE";
+  	else
+  		pause_text.text = "RESUME";
+    paused = !paused;
+  };
+  pause_button.hover = function () {
+  	console.log('mmm');
+  	pause_text.color = "rgba(150,150,150,0.6)";
+  };
+  pause_button.unhover = function () {
+  	pause_text.color = "rgba(0,0,0,0.4)";
+  };
+  ui.add(pause_button);
+  this.buttons.push(pause_button);
 
 	var Lose = Object.create(Behavior);
 	Lose.end = function () {
@@ -404,9 +465,9 @@ var onStart = function () {
 	player.health = 20, player.maxHealth = 20;
 	//player.addBehavior(Mirror);
 	player.offset = {x: 0, y: -12 * GLOBALS.scale};
-	player.opacity = 0.75;
+	player.opacity = 1;//0.75;
 
-	var spl = splash(player);
+	var spl = addSplashes(player);
 	var f = addFlames(player);
 
 	for (var i = 0; i < Math.random() * 3 + 3; i++ ) {
@@ -428,21 +489,10 @@ var onStart = function () {
 	
 	for (var i = 4; i < 13; i++) {
 		var wave = Object.create(TiledBackground).init(0, i * GLOBALS.scale * 32 / 2, this.width * 3, GLOBALS.scale * 32, Resources.wave_tile1);
-		wave.addBehavior(Shift, {field: 'x', constant: 1, time: Math.random() * Math.PI});
+		wave.addBehavior(Oscillate, {field: "x", constant: 32, time: Math.random() * Math.PI, initial: 0, object: wave});
 		//wave.opacity = 0.3;
 		fg.add(wave);
 	}
-
-	/*
-	var menuButton = Object.create(Sprite).init(24, 24, Resources.icon_menu);
-	menuButton.behaviors = [];
-	menuButton.addBehavior(HighLight, {duration: 0.5});
-	menuButton.family = 'button';
-	menuButton.trigger = function () {
-		gameWorld.setScene(2);
-	};
-	fg.add(menuButton);
-	*/
 
 	this._gamepad = Object.create(Gamepad).init();
 	this._gamepad.aleft.onUpdate = function (dt) {
@@ -478,18 +528,9 @@ var onStart = function () {
 	var t = this;
 
 	this.onClick = function (e) {
-		var b = fg.onButton(e.offsetX, e.offsetY);
+		var b = ui.onButton(e.offsetX, e.offsetY);
 		if (b) {
 			if (b.trigger) b.trigger();
-			return;
-		}
-	}
-	this.onMouseMove = function (e) {
-		var b = fg.onButton(e.offsetX, e.offsetY);
-		if (b) {
-			if (b.trigger) {
-				b.frame = 1;
-			}
 			return;
 		}
 	}
@@ -568,11 +609,22 @@ var onStart = function () {
 	this.onTouchMove = function (e) {
 		e.preventDefault();
 	}
+
+	this.onMouseMove = function (e) {
+		e.preventDefault();
+		for (var i = 0; i < t.buttons.length; i++) {
+			if (t.buttons[i].check(e.offsetX, e.offsetY)) {
+				t.buttons[i].hover();
+			} else {
+				t.buttons[i].unhover();
+			}
+		}
+	}
 };
 
 var onUpdate = function (dt) {
-	if (Resources.soundtrack && !this.soundtrack) {
-		//this.musicLoop();
+	if (Resources.soundtrack1 && !this.soundtrack) {
+		this.musicLoop();
 	}
 
 	if (Resources.ocean && !this.ocean) {

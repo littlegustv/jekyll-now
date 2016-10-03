@@ -22,7 +22,6 @@ var Entity = {
 		ctx.translate(this.offset.x, this.offset.y);
 		ctx.rotate(this.angle);
 		if (this.blend) {
-			console.log('blending!')
 			ctx.globalCompositeOperation = this.blend;
 		} else {
 			ctx.globalCompositeOperation = "normal";
@@ -63,6 +62,12 @@ var Entity = {
 				{d: d, theta: Math.PI + th},
 				{d: d, theta: 2 * Math.PI - th}
 			];
+		}
+	},
+	offsetVertices: function () {
+		for (var i = 0; i < this.vertices.length; i++) {
+			this.vertices[i].x += this.offset.x;
+			this.vertices[i].y += this.offset.y;
 		}
 	},
 	setCollision: function (collision) {
@@ -194,12 +199,12 @@ TiledBackground.onDraw = function (ctx) {
 				this.sprite.w, this.sprite.h, 
 				Math.round(this.x - this.w / 2) + i, this.y - Math.round(this.h / 2) + j, this.sprite.w * GLOBALS.scale, this.sprite.h * GLOBALS.scale);
 		}
-	}
+	}/*
 	if (CONFIG.debug) {
 		ctx.strokeStyle = "red";
 		ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
 		ctx.strokeRect(this.x - 2, this.y - 2, 4, 4);
-	}
+	}*/
 };
 
 var Camera = Object.create(Entity);

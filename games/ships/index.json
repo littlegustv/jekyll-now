@@ -5,6 +5,8 @@
   "resources": [
     {"path": "ship1.png", "frames": 2, "speed": 0.5},
     {"path": "monster.png", "frames": 1, "speed": 0.5, "animations": 3},
+    {"path": "mute.png", "frames": 2, "speed": 10.5, "animations": 2},
+    {"path": "pause.png", "frames": 2, "speed": 10.5, "animations": 2},
     {"path": "ship2.png", "frames": 2, "speed": 0.5},
     {"path": "ship3.png", "frames": 2, "speed": 0.8},
     {"path": "Cutter.png", "frames": 2, "speed": 0.3},
@@ -15,17 +17,24 @@
     {"path": "cloud.png"},
     {"path": "wave_tile1.png"},
     {"path": "cannonball.png"},
-    {"path": "soundtrack.ogg"},
+    {"path": "bang.png"},
+    {"path": "pow.png"},
+    {"path": "boom.png"},
+    {"path": "soundtrack1.ogg"},
+    {"path": "soundtrack2.ogg"},
+    {"path": "soundtrack3.ogg"},
+    {"path": "soundtrack4.ogg"},
+    {"path": "soundtrack5.ogg"},
     {"path": "firework1.ogg"},
     {"path": "firework2.ogg"},
     {"path": "firework3.ogg"},
     {"path": "firework4.ogg"},
-    {"path": "cannon.ogg"},
+    {"path": "cannon.wav"},
     {"path": "scatter.ogg"},
     {"path": "ocean.ogg"},
     {"path": "smallHit.ogg"},
     {"path": "swosh.ogg"},
-    {"path": "hit.ogg"}
+    {"path": "hit.wav"}
   ],
   "fontFamily": "Visitor"
 }

@@ -190,67 +190,26 @@ var defaultShoot = function () {
 }
 
 var doubleShoot = function () {
-  this.maxCooldown = 1.4;
   if (this.cooldown >= 0) return;
+
+  if (!this.shot) this.shot = 0;
 
   this.layer.add(smoke(this.x, this.y + GLOBALS.scale * 4));
 
-  var direction = this.family == "player" ? 1 : -1;
-  addCannon(this, {x: Math.cos(PI / 2 - PI / 6) * SPEED.ship, y: direction * Math.sin(PI / 2 - PI / 6) * SPEED.ship}, {x: 16, y: 0});
-  addCannon(this, {x: Math.cos(PI / 2 + PI / 6) * SPEED.ship, y:  direction * Math.sin(PI / 2 + PI / 6) * SPEED.ship}, {x: -16, y: 0});
+  var theta = - Math.PI / 3 - this.shot * Math.PI / 8;
+  addCannon(this, {x: Math.cos(theta) * SPEED.ship, y: Math.sin(theta) * SPEED.ship}, {x: 16, y: 0});
+  //addCannon(this, {x: Math.cos(PI / 2 + PI / 6) * SPEED.ship, y:  -1 * Math.sin(PI / 2 + PI / 6) * SPEED.ship}, {x: -16, y: 0});
 
   this.cooldown = this.maxCooldown;
   //console.log(Resources.cannon);
   gameWorld.playSound(Resources.cannon);
 
-  shake.start();  
-}
+  shake.start();
+  
+  this.shot += 1;
+  this.cooldown = 0.5;
 
-var scatterShoot = function () {
-  this.maxCooldown = 1.8;
-  if (this.cooldown >= 0) return;
-
-  this.layer.add(smoke(this.x, this.y + GLOBALS.scale * 4));
-
-  var direction = this.family == "player" ? 1 : -1;
-  for (var i = 0; i < 10; i++) {
-
-    var b = Object.create(Bullet).init(this.x + Math.random() * 16 - 8, this.y + Math.random() * direction * 8, 4, 4);
-    var theta = Math.PI / 2 + Math.random() * Math.PI / 3 - Math.PI / 6;
-    b.velocity = {x: direction * 1.5 * SPEED.ship * Math.cos(theta), y: direction * 1.5 * SPEED.ship * Math.sin(theta)};
-    b.family = this.family;
-    b.setVertices();
-    b.addBehavior(Velocity);
-    b.offset = {x: 0, y: -12 * GLOBALS.scale};
-    b.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height}})
-
-    this.layer.add(b);
-  }
-
-  gameWorld.playSound(Resources.scatter);
-
-  this.cooldown = this.maxCooldown;
-}
-
-var bombardShoot = function () {
-  this.maxCooldown = 4.0;
-  if (this.cooldown >= 0) return;
-
-  this.layer.add(smoke(this.x, this.y + GLOBALS.scale * 4));
-  var m = Object.create(Cannon).init(this.x, this.y, Resources.bomb);
-  m.family = this.family;
-
-  m.addBehavior(Velocity);
-  m.setVertices();
-  m.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height}})
-
-  m.velocity = {x: 0, y: (m.family == "enemy" ? -SPEED.ship / 2 : SPEED.ship/2)};
-
-  this.layer.add(m);
-
-  gameWorld.playSound(Resources.cannon);
-
-  this.cooldown = this.maxCooldown;
+  if (this.shot == 5) { this.shot = undefined; this.cooldown = 4; }
 }
 
 var homingShoot = function () {
@@ -275,21 +234,21 @@ var homingShoot = function () {
     }
   }
 
-  var m = Object.create(Cannon).init(this.x, this.y, Resources.cannonball);
-  m.family = this.family;
+  var m = addCannon(this, {x: 0, y: 0});
+  m.angle = 3 * Math.PI / 2;
+  //Object.create(Cannon).init(this.x, this.y, Resources.cannonball);
+  //m.family = this.family;
 
   if (closest) {
     m.addBehavior(Homing, {target: closest});
-    console.log('yes', closest, m.angle, angle(m.x, m.y, closest.x, closest.y));
   } else {
     var direction = this.family == "player" ? 1 : -1;
-    m.velocity = {x: 0, y: direction * SPEED.ship}; 
+    m.velocity = {x: 0, y: -1 * SPEED.ship}; 
   }
-  m.addBehavior(Velocity);
+  //m.addBehavior(Velocity);
   m.setVertices();
-  m.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height}})
  
-  this.layer.add(m);
+//  this.layer.add(m);
 
   gameWorld.playSound(Resources.cannon);
 

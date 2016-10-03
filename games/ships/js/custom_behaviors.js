@@ -211,13 +211,13 @@ FadeIn.start = function () {
 
 var Climb = Object.create(Behavior);
 Climb.update = function (dt) {
-  if (this.entity.x > this.max.x) {
+  if (this.entity.x > this.max.x && this.entity.velocity.x > 0) {
     this.entity.velocity.x *= -1;
     this.entity.x = this.max.x;
     if (this.entity.y > 116) 
       this.entity.y = this.entity.y - 32 * GLOBALS.scale / 2;
   }
-  if (this.entity.x < this.min.x) {
+  if (this.entity.x < this.min.x && this.entity.velocity.x < 0) {
     this.entity.velocity.x *= -1;
     this.entity.x = this.min.x;
     if (this.entity.y > 116)
@@ -332,9 +332,12 @@ Reload.drawAfter = function (ctx) {
 var Homing = Object.create(Behavior);
 Homing.update = function (dt) {
   // y is minimum SPEED / 2
-  var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
-  this.entity.velocity.x = Math.cos(theta) * SPEED.ship;
-  this.entity.velocity.y = (this.entity.family == "enemy" ? -1 : 1) * SPEED.ship;
+  if (this.entity.y >= this.target.y) {
+    var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
+    this.entity.angle = (this.entity.angle - theta) / 2;
+    this.entity.velocity.x = Math.cos(this.entity.angle) * SPEED.ship;
+    this.entity.velocity.y = (this.entity.family == "enemy" ? -1 : 1) * SPEED.ship;
+  }
 }
 Homing.drawAfter = function (ctx) {
   if (CONFIG.debug) {
@@ -353,10 +356,11 @@ Horizon.update = function (dt) {
     this.entity.w -= 2 * dt;
     this.entity.x += dt;
     this.entity.velocity.y += dt * 200;
-    if (this.entity.velocity.y >= 0) {
+    if (this.entity.velocity.y >= -40) {
+      console.log('what garbage')
+      this.entity.z = -10;
       //add splash particle here once(?)
       this.entity.opacity -= 1 * dt;
-      this.entity.z = -20;
       this.entity.collision.onCheck = function (o, p) { return false; };
     } else {
     }

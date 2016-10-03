@@ -17,9 +17,7 @@ Frigate.start = function () {
 var Battleship = Object.create(Behavior);
 Battleship.update = function (dt) {
   if (!this.entity.shoot) this.start();
-  if (Math.random() * 1000 < 1) {
-    this.entity.shoot();
-  }
+  this.entity.shoot();
 }
 Battleship.start = function () {
   this.entity.shoot = doubleShoot;
@@ -53,7 +51,6 @@ Submarine.update = function (dt) {
   }
 }
 Submarine.start = function () {
-  console.log("starting submarine")
   this.time = 0;
   this.surface = {x: 0, y: 24};
   this.entity.offset = {x: 0, y: 0};
@@ -81,4 +78,15 @@ Tender.drawAfter = function (ctx) {
   ctx.globalAlpha = 0.1;
   ctx.fill();
   ctx.globalAlpha = 1;
+}
+
+var Monster = Object.create(Behavior);
+Monster.update = function (dt) {
+  if (this.entity.offset.y > this.entity.h / 4) {
+    this.entity.opacity = 0.2;
+    this.entity.no_collide = true;
+  } else {
+    this.entity.opacity = 1;
+    this.entity.no_collide = false;
+  }
 }
