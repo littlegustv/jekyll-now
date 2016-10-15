@@ -357,7 +357,6 @@ Horizon.update = function (dt) {
     this.entity.x += dt;
     this.entity.velocity.y += dt * 200;
     if (this.entity.velocity.y >= -40) {
-      console.log('what garbage')
       this.entity.z = -10;
       //add splash particle here once(?)
       this.entity.opacity -= 1 * dt;

@@ -28,6 +28,8 @@ var debug;
 
 var first_game = true;
 
+var enemies = [];
+
 var score = 0;
 var combo = 0;
 
@@ -139,8 +141,8 @@ function doDamage (d) {
 }
 
 var shipCost = {
-	1.1: function () {
-		if (Math.random() < 0.5) return false;
+	12: function () {
+		console.log('submarine');
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.monitor);
 		s.velocity = {x: right ? - SPEED.ship / 2 : SPEED.ship / 2, y: 0};
@@ -148,35 +150,18 @@ var shipCost = {
 		s.addBehavior(Submarine);
 		return s;
 	},
-	10: function () {
-		if (Math.random() < 0.7) return false;
+	3: function () {
+		console.log('tender');
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.Tender);
 		s.velocity = {x: right ? - SPEED.ship * 2 / 3 : SPEED.ship * 2 / 3, y: 0};
 		s.health = 10, s.maxHealth = 10;
+		s.addHeal = true;
 		s.addBehavior(Tender);
-		var healEffect = function (x, y) {
-			var t = Object.create(Text).init(
-				x + Math.random() * GLOBALS.scale * 12 - GLOBALS.scale * 6,
-				y + Math.random() * GLOBALS.scale * 12 - GLOBALS.scale * 6,
-				"+",
-				{color: "#00FF00", size: 14});
-			t.addBehavior(FadeOut, {duration: 0.5});
-			t.addBehavior(Velocity);
-			t.velocity = {x: 0, y: -SPEED.ship / 4};
-			return t;
-		}
-		var healing = Object.create(Particles).init(s.x, s.y, healEffect, 0.05);
-		healing.z = 20;
-		healing.addBehavior(Follow, {target: s, offset: {x: 0, y: -24}});
-		// really awkward here!!
-		setTimeout(function () {
-			s.layer.add(healing);
-		}, 200);
 		return s;
 	},
-	20: function () {
-		if (Math.random() < 0.3) return false;
+	6: function () {
+		console.log('battleship');
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.ship3);
 		s.addBehavior(Battleship);
@@ -184,15 +169,16 @@ var shipCost = {
 		s.health = 30, s.maxHealth = 30;
 		return s;
 	},
-	30: function () {
-		if (Math.random() < 0.2) return false; // chance to not spawn
+	2: function () {
+		console.log('cutter');
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.Cutter);
 		s.velocity = {x: right ? - SPEED.ship * 1.5 : SPEED.ship * 1.5, y: 0};
 		s.health = 10, s.maxHealth = 10;
 		return s;
 	},
-	1.3: function () {
+	1: function () {
+		console.log('frigate');
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.ship2);
 		s.addBehavior(Frigate);
@@ -200,8 +186,7 @@ var shipCost = {
 		s.health = 10, s.maxHealth = 10;
 		return s;
 	},
-	60: function () {
-		if (Math.random() > 0.2) return;
+	1800: function () {
 		console.log('adding monster');
 		var r = 48;
 		var last = undefined, first = undefined;
@@ -243,69 +228,91 @@ var shipCost = {
 	}
 }
 var costs = Object.keys(shipCost).map( function (e) { return Number(e) });
+var K = 10;
+
+var queue = [];
 
 function buyShips (dt) {
 
-		this.DOMAIN = 10 + (Math.min(1, score / 1000) * 54);
-		if (this.interval === undefined) this.interval = 0;
+	this.addShips(dt);
+	if (queue.length > 3) return;
 
-		this.interval += dt;
-		if (this.interval <= 2 + Math.random()) return;
+	var weight = 0;
+	for (var i = 0; i < enemies.length; i++) {
+		if (enemies[i].alive && enemies[i].weight) {
+			weight += enemies[i].weight;
+		}
+	}
+	if (weight < Math.log(score / 10 + 1) + K) {
+		var cost = costs[Math.min(Math.floor(Math.random() * Math.log(score / 10 + 1)), Math.floor(Math.random() * costs.length))];
+		var s = shipCost[cost]();
+		s.weight = cost;
+		queue.push(s);
+		//enemies.push(s);
+	}
+}
+function addShips (dt) {
 
-	//if (Math.random() * 100 < 0.5 && this.fg.entities.filter( function (r) { r.family == "enemy" && r.h > 40}).length < 10 ) {
-		var x = Math.random() * this.DOMAIN;
-		var y = Math.pow(2, x / 10);
-		this.interval = 0;
+	this.cooldown -= dt;
+	if (this.cooldown > 0) return;
+	
+	this.cooldown = 2;
+	var s = queue.shift(0);
 
-		for (var i = costs.length - 1; i >= 0; i--) {
-			var cost = costs[i];
-			if (y > cost) {
-				var s = shipCost[cost]();
-
-				if (Array.isArray(s)) {
-					for (var j = 0; j < s.length; j++) {
-						this.fg.add(s[j]);
-					}
-					return;
-				}
-
-				if (s) {
-					s.addBehavior(Flip);
-					s.addBehavior(Animate);
-					s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
-					s.addBehavior(Velocity);
-					s.addBehavior(Cooldown);
-					s.addBehavior(Die, {duration: 1});
-					s.setVertices([
-						{x: -13, y: -6},
-						{x: 13, y: -6},
-						{x: 13, y: 4},
-						{x: -13, y: 4}
-					]);
-					s.setCollision(Polygon);
-					s.collision.onHandle = function(object, other) {
-						if (other == player && object.health > 0) {
-							other.health -= 1;
-							object.health = 0;
-							gameWorld.playSound(Resources.hit);
-						}
-					}
-					
-					var offsetY = s.h > 64 ?  16 * GLOBALS.scale : 12 * GLOBALS.scale;
-					s.offset = {x: 0, y: - offsetY};
-					s.family = "enemy";
-
-					var spl = addSplashes(s);
-					var f = addFlames(s);
-
-					this.fg.add(f);
-					this.fg.add(s);
-					this.fg.add(spl);
-					return;
-				}
+	if (s) {
+		enemies.push(s);
+		s.addBehavior(Flip);
+		s.addBehavior(Animate);
+		s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
+		s.addBehavior(Velocity);
+		s.addBehavior(Cooldown);
+		s.addBehavior(Die, {duration: 1});
+		s.setVertices([
+			{x: -13, y: -6},
+			{x: 13, y: -6},
+			{x: 13, y: 4},
+			{x: -13, y: 4}
+		]);
+		s.setCollision(Polygon);
+		s.collision.onHandle = function(object, other) {
+			if (other == player && object.health > 0) {
+				other.health -= 1;
+				object.health = 0;
+				gameWorld.playSound(Resources.hit);
 			}
 		}
 
+		if (s.addHeal) {
+			var healEffect = function (x, y) {
+			var t = Object.create(Text).init(
+				x + Math.random() * GLOBALS.scale * 12 - GLOBALS.scale * 6,
+				y + Math.random() * GLOBALS.scale * 12 - GLOBALS.scale * 6,
+				"+",
+				{color: "#00FF00", size: 14});
+				t.addBehavior(FadeOut, {duration: 0.5});
+				t.addBehavior(Velocity);
+				t.velocity = {x: 0, y: -SPEED.ship / 4};
+				return t;
+			}
+			var healing = Object.create(Particles).init(s.x, s.y, healEffect, 0.05);
+			healing.z = 20;
+			healing.addBehavior(Follow, {target: s, offset: {x: 0, y: -24}});
+			this.fg.add(healing);
+		}
+		
+		var offsetY = s.h > 64 ?  16 * GLOBALS.scale : 12 * GLOBALS.scale;
+		s.offset = {x: 0, y: - offsetY};
+		s.family = "enemy";
+
+		var spl = addSplashes(s);
+		var f = addFlames(s);
+
+		this.fg.add(f);
+		this.fg.add(s);
+		this.fg.add(spl);
+		return;
+	}
+	
 }
 
 var shake;
@@ -320,6 +327,8 @@ var onStart = function () {
 
 	this.money = 0;
 	this.buyShips = buyShips;
+	this.addShips = addShips;
+	this.cooldown = 0;
 
 	scene.musicLoop = function () {
 		if (score == 0 || combo == 0) {
@@ -388,11 +397,15 @@ var onStart = function () {
 
 	var mute_button = Object.create(Button).init(CONFIG.width - 48, 12, 96, 18);
   mute_button.trigger = function () {
-  	if (muted)
+  	if (gameWorld.muted) {
 	  	mute_text.text = "SOUND OFF";
-	  else
+			gameWorld.audioContext.gn.gain.value = 1;
+	  }
+	  else {
 	  	mute_text.text = "SOUND ON";
-    muted = !muted;
+			gameWorld.audioContext.gn.gain.value = 0;
+	  }
+    gameWorld.muted = !gameWorld.muted;
   };
   mute_button.hover = function () {
   	mute_text.color = "rgba(150,150,150,0.6)";
@@ -410,14 +423,19 @@ var onStart = function () {
 
 	var pause_button = Object.create(Button).init(CONFIG.width - 160, 12, 96, 18, pause_text);
   pause_button.trigger = function () {
-  	if (paused)
+  	if (gameWorld.paused) {
+  		gameWorld.startTime = new Date();
   		pause_text.text = "PAUSE";
-  	else
+  		if (!gameWorld.muted) 
+  			gameWorld.audioContext.gn.gain.value = 1;
+  	}
+  	else {
+			gameWorld.audioContext.gn.gain.value = 0;
   		pause_text.text = "RESUME";
-    paused = !paused;
+  	}
+    gameWorld.paused = !gameWorld.paused;
   };
   pause_button.hover = function () {
-  	console.log('mmm');
   	pause_text.color = "rgba(150,150,150,0.6)";
   };
   pause_button.unhover = function () {

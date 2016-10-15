@@ -9,6 +9,8 @@ var World = {
 		this.time = 0;
 		this.speed = 1;
 		this.scene = undefined;
+		this.paused = false;
+		this.muted = false;
 //		this.loadScenes();
 		this.loadGameInfo();
 		var t = this;
@@ -24,6 +26,11 @@ var World = {
 		return this;
 	},
 	step: function () {
+		var t = this;
+		if (this.paused) {
+			window.requestAnimationFrame( function () { t.step() });
+			return;
+		}
 		var newTime = new Date();
 		var dt = this.speed * ( newTime - this.startTime ) / 1000;
 		this.startTime = newTime;
@@ -39,7 +46,6 @@ var World = {
 		this.update(dt);
 		this.draw();
 
-		var t = this;
 
 		window.requestAnimationFrame(function() { t.step() });
 	},
