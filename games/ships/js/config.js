@@ -177,6 +177,8 @@ var defaultShoot = function () {
   this.maxCooldown = 0.3;
   if (this.cooldown > 0) return;
 
+  if (this.health <= 0 || !this.alive) return;
+
   //var exp = Object.create(Explosion).init(this.x, this.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
   this.layer.add(smoke(this.x, this.y + GLOBALS.scale * 4));
 
@@ -193,6 +195,8 @@ var doubleShoot = function () {
   if (this.cooldown >= 0) return;
 
   if (!this.shot) this.shot = 0;
+
+  if (this.health <= 0 || !this.alive) return;
 
   this.layer.add(smoke(this.x, this.y + GLOBALS.scale * 4));
 
@@ -215,6 +219,9 @@ var doubleShoot = function () {
 var homingShoot = function () {
   this.maxCooldown = 3.0;
   if (this.cooldown >= 0) return;
+
+
+  if (this.health <= 0 || !this.alive) return;
 
   this.layer.add(smoke(this.x, this.y + GLOBALS.scale * 4));
   var family = this.family;

@@ -392,6 +392,22 @@ var onStart = function () {
 	ui.add(scoreText);
 	//ui.add(comboText);
 
+	var more_text = Object.create(Text).init(64, 12, "SEE MORE?", {size: 24, color: "rgba(0,0,0,0.4)"});
+	ui.add(more_text);
+
+	var more_button = Object.create(Button).init(64, 12, 96, 18);
+  more_button.trigger = function () {
+  	window.open("http://littlegustv.github.io/games");
+  };
+  more_button.hover = function () {
+  	more_text.color = "rgba(150,150,150,0.6)";
+  };
+  more_button.unhover = function () {
+  	more_text.color = "rgba(0,0,0,0.4)";
+  };
+  ui.add(more_button);
+
+
 	var mute_text = Object.create(Text).init(CONFIG.width - 48, 12, "SOUND OFF", {size: 24, color: "rgba(0,0,0,0.4)"});
 	ui.add(mute_text);
 
@@ -417,6 +433,7 @@ var onStart = function () {
 
   this.buttons = [];
   this.buttons.push(mute_button);
+  this.buttons.push(more_button);
 
   var pause_text = Object.create(Text).init(CONFIG.width - 160, 12, "PAUSE", {size: 24, color: "rgba(0,0,0,0.4)"});
   ui.add(pause_text);
@@ -568,6 +585,8 @@ var onStart = function () {
 		titleTexts.forEach( function (e) {
 			e.addBehavior(FadeOut, {duration: 0.5});
 		});
+		more_button.addBehavior(ease, {destination: {x: 0, y: -100}});
+		more_text.addBehavior(ease, {destination: {x: 0, y: -100}});
 	}
 
 	this.onKeyDown = function (e) {
