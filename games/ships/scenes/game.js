@@ -234,6 +234,7 @@ var queue = [];
 
 function buyShips (dt) {
 
+	if (player.health <= 0) return;
 	this.addShips(dt);
 	if (queue.length > 3) return;
 
@@ -263,7 +264,7 @@ function addShips (dt) {
 		enemies.push(s);
 		s.addBehavior(Flip);
 		s.addBehavior(Animate);
-		s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
+		s.climb = s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
 		s.addBehavior(Velocity);
 		s.addBehavior(Cooldown);
 		s.addBehavior(Die, {duration: 1});
@@ -383,10 +384,11 @@ var onStart = function () {
 		var sc = Object.create(Text).init(48, CONFIG.height - 48, "Score: " + score, {size: 48, align: "left", color: "rgba(100,0,0,0.5)"} );
 		titleTexts.push(sc);
 	} else {
-		titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 48, "Press SPACE to start.", {size: 48, align: "center", color: "black"}));
+		titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 48, "Press SPACE to start.", {size: 48, align: "center", color: "rgba(100,100,100,0.7)"}));
 	}
 
 	titleTexts.forEach(function (e) {
+		e.addBehavior(Oscillate, {field: "y", constant: 12, initial: e.y, rate: 1.6, time: 0, object: e});
 		ui.add(e);
 	});
 	ui.add(scoreText);
