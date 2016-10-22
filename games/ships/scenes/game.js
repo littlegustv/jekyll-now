@@ -141,7 +141,7 @@ function doDamage (d) {
 }
 
 var shipCost = {
-	12: function () {
+	13: function () {
 		console.log('submarine');
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.monitor);
@@ -186,7 +186,7 @@ var shipCost = {
 		s.health = 10, s.maxHealth = 10;
 		return s;
 	},
-	1800: function () {
+	14: function () {
 		console.log('adding monster');
 		var r = 48;
 		var last = undefined, first = undefined;
@@ -196,7 +196,7 @@ var shipCost = {
 			var e = Object.create(Sprite).init(CONFIG.width + i* r, 252, Resources.monster);
 			e.animation = i == 0 ? 0 : (i == 11 ? 2 : 1);
 			e.offset = {x: 0, y: Math.cos(i * theta) * r};
-			e.addBehavior(Oscillate, {field: "y", constant: 32, time: theta * i, initial: 0, object: e.offset});
+			e.addBehavior(Oscillate, {field: "y", constant: 32, time: theta * i, rate: 1, initial: 0, object: e.offset});
 			e.addBehavior(Monster);
 			/**
 				ANGLE doesn't work so well with offset!
@@ -213,13 +213,17 @@ var shipCost = {
 
 			e.family = "enemy";
 			e.health = 11;
-			if (last)
+			if (last) {
 				e.addBehavior(Face, {target: last, offsetAngle: 0});
+			} else {
+				e.addBehavior(Flip);
+			}
 
-			e.addBehavior(Flip);
+
 			e.addBehavior(Velocity);
 			e.velocity = {x: - SPEED.ship / 3, y: 0};
 			e.addBehavior(Climb, {min: {x: -40}, max: {x: CONFIG.width + 40}});
+			e.weight = 1;
 			
 			last = e;
 			monster.push(e);
@@ -228,15 +232,12 @@ var shipCost = {
 	}
 }
 var costs = Object.keys(shipCost).map( function (e) { return Number(e) });
-var K = 10;
+var K = 20;
 
 var queue = [];
 
 function buyShips (dt) {
 
-	if (player.health <= 0) return;
-	this.addShips(dt);
-	if (queue.length > 3) return;
 
 	var weight = 0;
 	for (var i = 0; i < enemies.length; i++) {
@@ -245,6 +246,9 @@ function buyShips (dt) {
 		}
 	}
 	if (weight < Math.log(score / 10 + 1) + K) {
+		this.addShips(dt);
+		if (queue.length > 3) return;
+		if (player.health <= 0) return;
 		var cost = costs[Math.min(Math.floor(Math.random() * Math.log(score / 10 + 1)), Math.floor(Math.random() * costs.length))];
 		var s = shipCost[cost]();
 		s.weight = cost;
@@ -258,60 +262,67 @@ function addShips (dt) {
 	if (this.cooldown > 0) return;
 	
 	this.cooldown = 2;
-	var s = queue.shift(0);
+	var ship = queue.shift(0);
 
-	if (s) {
-		enemies.push(s);
-		s.addBehavior(Flip);
-		s.addBehavior(Animate);
-		s.climb = s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
-		s.addBehavior(Velocity);
-		s.addBehavior(Cooldown);
-		s.addBehavior(Die, {duration: 1});
-		s.setVertices([
-			{x: -13, y: -6},
-			{x: 13, y: -6},
-			{x: 13, y: 4},
-			{x: -13, y: 4}
-		]);
-		s.setCollision(Polygon);
-		s.collision.onHandle = function(object, other) {
-			if (other == player && object.health > 0) {
-				other.health -= 1;
-				object.health = 0;
-				gameWorld.playSound(Resources.hit);
-			}
+	if (Array.isArray(ship)) {
+		for (var i = 0; i < ship.length; i++) {
+			this.fg.add(ship[i]);
+			enemies.push(ship[i]);
 		}
+	}
 
-		if (s.addHeal) {
-			var healEffect = function (x, y) {
-			var t = Object.create(Text).init(
-				x + Math.random() * GLOBALS.scale * 12 - GLOBALS.scale * 6,
-				y + Math.random() * GLOBALS.scale * 12 - GLOBALS.scale * 6,
-				"+",
-				{color: "#00FF00", size: 14});
-				t.addBehavior(FadeOut, {duration: 0.5});
-				t.addBehavior(Velocity);
-				t.velocity = {x: 0, y: -SPEED.ship / 4};
-				return t;
+	else if (ship) {
+			var s = ship;
+			enemies.push(s);
+			s.addBehavior(Flip);
+			s.addBehavior(Animate);
+			s.climb = s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
+			s.addBehavior(Velocity);
+			s.addBehavior(Cooldown);
+			s.addBehavior(Die, {duration: 1});
+			s.setVertices([
+				{x: -13, y: -6},
+				{x: 13, y: -6},
+				{x: 13, y: 4},
+				{x: -13, y: 4}
+			]);
+			s.setCollision(Polygon);
+			s.collision.onHandle = function(object, other) {
+				if (other == player && object.health > 0) {
+					other.health -= 1;
+					object.health = 0;
+					gameWorld.playSound(Resources.hit);
+				}
 			}
-			var healing = Object.create(Particles).init(s.x, s.y, healEffect, 0.05);
-			healing.z = 20;
-			healing.addBehavior(Follow, {target: s, offset: {x: 0, y: -24}});
-			this.fg.add(healing);
-		}
-		
-		var offsetY = s.h > 64 ?  16 * GLOBALS.scale : 12 * GLOBALS.scale;
-		s.offset = {x: 0, y: - offsetY};
-		s.family = "enemy";
 
-		var spl = addSplashes(s);
-		var f = addFlames(s);
+			if (s.addHeal) {
+				var healEffect = function (x, y) {
+				var t = Object.create(Text).init(
+					x + Math.random() * GLOBALS.scale * 12 - GLOBALS.scale * 6,
+					y + Math.random() * GLOBALS.scale * 12 - GLOBALS.scale * 6,
+					"+",
+					{color: "#00FF00", size: 14});
+					t.addBehavior(FadeOut, {duration: 0.5});
+					t.addBehavior(Velocity);
+					t.velocity = {x: 0, y: -SPEED.ship / 4};
+					return t;
+				}
+				var healing = Object.create(Particles).init(s.x, s.y, healEffect, 0.05);
+				healing.z = 20;
+				healing.addBehavior(Follow, {target: s, offset: {x: 0, y: -24}});
+				this.fg.add(healing);
+			}
+			
+			var offsetY = s.h > 64 ?  16 * GLOBALS.scale : 12 * GLOBALS.scale;
+			s.offset = {x: 0, y: - offsetY};
+			s.family = "enemy";
 
-		this.fg.add(f);
-		this.fg.add(s);
-		this.fg.add(spl);
-		return;
+			var spl = addSplashes(s);
+			var f = addFlames(s);
+
+			this.fg.add(f);
+			this.fg.add(s);
+			this.fg.add(spl);
 	}
 	
 }

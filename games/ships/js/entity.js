@@ -41,6 +41,10 @@ var Entity = {
 
 		ctx.globalAlpha = 1;
 		ctx.restore();
+		this.drawDebug(ctx);
+	},
+	drawDebug: function (ctx) {
+		return
 	},
 	onDraw: function (ctx) {
 		ctx.fillStyle = this.color || "black";
@@ -141,7 +145,8 @@ Sprite.onDraw = function (ctx) {
 		this.frame * this.sprite.w, this.animation * this.sprite.h, 
 		this.sprite.w, this.sprite.h, 
 		Math.round(this.x - this.w / 2), this.y - Math.round(this.h / 2), this.w, this.h);
-
+};
+Sprite.drawDebug = function (ctx) {
 	if (CONFIG.debug) {
 		ctx.strokeStyle = "red";
 		if (this.getVertices) {
@@ -166,8 +171,14 @@ Sprite.onDraw = function (ctx) {
 		}
 		ctx.fillStyle = "red";
 		ctx.fillText(Math.floor(this.x) + ", " + Math.floor(this.y), this.x, this.y);
+
+		ctx.beginPath();
+		ctx.moveTo(this.x, this.y);
+		ctx.strokeStyle = "blue";
+		ctx.lineTo(this.x + 200 * Math.cos(this.angle), this.y + 200 * Math.sin(this.angle));
+		ctx.stroke();
 	}
-};
+}
 Sprite.setFrame = function (frame) {
 	if (frame == "random") {
 		this.frame = Math.floor(Math.random() * this.maxFrame);
