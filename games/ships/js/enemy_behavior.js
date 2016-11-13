@@ -83,10 +83,35 @@ Tender.drawAfter = function (ctx) {
 var Monster = Object.create(Behavior);
 Monster.update = function (dt) {
   if (this.entity.offset.y > this.entity.h / 4) {
-    this.entity.opacity = 0.2;
+    //this.entity.opacity = 0.2;
     this.entity.no_collide = true;
   } else {
-    this.entity.opacity = 1;
+    //this.entity.opacity = 1;
     this.entity.no_collide = false;
   }
+}
+
+var MonsterDie = Object.create(Behavior);
+MonsterDie.update = function (dt) {
+  if (this.entity.health <= 0 && !this.started) {
+    this.start();
+  }
+  if (this.entity.health <= 0) {
+    var all_dead = true;
+    for (var i = 0; i < this.entity.monster.length; i++) {
+      if (this.entity.monster[i].health > 0) all_dead = false;
+    }
+    if (all_dead) {
+      this.entity.velocity.x = 0;
+      this.entity.removeBehavior(this);
+      this.entity.addBehavior(FadeOut, {duration: 2});
+    }
+  }
+}
+MonsterDie.start = function () {
+  this.started = true;
+  if (this.entity.collision) {
+    this.entity.collision.onCheck = function (a, b) { return false };
+  }
+  this.entity.animation = (this.entity.animation + 3);
 }

@@ -158,10 +158,12 @@ DieFanfare.start = function () {
     var s = this.entity.layer.entities[i];
     if (s.climb)
       s.removeBehavior(s.climb);
-    if (s.weight) {
+    if (s.weight && s.name != "monster") {
       s.velocity.x = 0, s.velocity.y = 0;
       s.addBehavior(Oscillate, {field: "x", constant: 128, time: 0, initial: 0, object: s.velocity, rate: 3});
       s.cooldown = 200;
+    } else if (s.name == "monster") {
+      s.velocity.x = 0;
     }
   }
 }
@@ -267,11 +269,12 @@ Face.update = function (dt) {
 
 var Oscillate = Object.create(Behavior);
 Oscillate.update = function (dt) {
-  if (!this.time) this.start();
+  if (!this.started) this.start();
   this.time += this.rate * dt;
   this.object[this.field] = this.constant * Math.sin(this.time) + this.initial;
 }
 Oscillate.start = function () {
+  this.started = true;
   this.time = this.time || 0;
   this.constant = this.constant || 1;
   this.initial = this.initial || 0;

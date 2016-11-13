@@ -1,6 +1,8 @@
 var fullscreen = false;
 var muted = false, paused = false;
 
+var controls = "";
+
 // mobile needs to be able to be fullscreened
 
 function requestFullScreen () {
@@ -199,7 +201,7 @@ var shipCost = {
 		var monster = [];
 		for (var i = 0; i < 12; i++) {
 			var theta = Math.PI * 2 / 10;
-			var e = Object.create(Sprite).init(CONFIG.width + i* r, 252, Resources.monster);
+			var e = Object.create(Sprite).init(CONFIG.width + i* r, 116 + 7 * GLOBALS.scale * 16, Resources.monster);
 			e.animation = i == 0 ? 0 : (i == 11 ? 2 : 1);
 			e.offset = {x: 0, y: Math.cos(i * theta) * r};
 			e.addBehavior(Oscillate, {field: "y", constant: 32, time: theta * i, rate: 1, initial: 0, object: e.offset});
@@ -210,15 +212,17 @@ var shipCost = {
 			e.setCollision(Polygon);
 			e.collision.onHandle = function(object, other) {
 				if (other == player && object.health > 0) {
-					other.health -= 1;
+					other.health = 0;
 					object.health = 0;
 					gameWorld.playSound(Resources.hit);
 				}
 			}
-			e.addBehavior(Die, {duration: 1});
+			e.addBehavior(MonsterDie, {duration: 1});
 
+			e.name = "monster";
 			e.family = "enemy";
 			e.health = 11;
+			e.maxHealth = 11;
 			if (last) {
 				e.addBehavior(Face, {target: last, offsetAngle: 0});
 			} else {
@@ -232,6 +236,7 @@ var shipCost = {
 			e.weight = 1;
 			
 			last = e;
+			e.monster = monster;
 			monster.push(e);
 		}
 		return monster;
@@ -244,7 +249,7 @@ var queue = [];
 
 function buyShips (dt) {
 
-
+	if (CONFIG.no_buy) return;
 	var weight = 0;
 	for (var i = 0; i < enemies.length; i++) {
 		if (enemies[i].alive && enemies[i].weight) {
@@ -296,7 +301,7 @@ function addShips (dt) {
 			s.setCollision(Polygon);
 			s.collision.onHandle = function(object, other) {
 				if (other == player && object.health > 0) {
-					other.health -= 1;
+					other.health = 0;
 					object.health = 0;
 					gameWorld.playSound(Resources.hit);
 				}
@@ -414,8 +419,8 @@ var onStart = function () {
 	var ui_camera = Object.create(Camera).init(0, 0);
 	ui = Object.create(Layer).init(ui_camera);
 
-	scoreText = Object.create(Text).init(2, 12, "Score: " + score, {size: 24, align: "left", color: "rgba(0,0,0,0.4)"});
-	//comboText = Object.create(Text).init(CONFIG.width - 4, 30, "Combo: " + combo, {align: "right", size: 64, color: "rgba(0,0,0,0.4)"});
+	scoreText = Object.create(Text).init(2, 12, "Score: " + score, {size: 24, align: "left", color: "black"});
+	//comboText = Object.create(Text).init(CONFIG.width - 4, 30, "Combo: " + combo, {align: "right", size: 64, color: "black"});
 	scoreText.opacity = 0;//, comboText.opacity = 0;
 
 	var titleTexts = [];
@@ -426,25 +431,29 @@ var onStart = function () {
 		score += Math.floor(timer) * 10;
 		var sc = Object.create(Text).init(48, CONFIG.height - 48, "Score: " + score, {size: 48, align: "left", color: "rgba(100,0,0,0.5)"} );
 		//sc.addBehavior(FadeOut, {duration: 5.5});
-		titleTexts.push(sc);
+		ui.add(sc);
 
 		if (score > highscore) 
     {
       var highScoreText = Object.create(Text).init(
         CONFIG.width / 2,
-        CONFIG.height / 2 + 8,
-        "NEW HIGH SCORE! " + score + "x",
-      {color: "rgba(100,0,0,0.5)", size: 48, align: "center"});
-      highScoreText.addBehavior(FadeOut, {duration: 3.5});
+        0,
+        "NEW HIGH SCORE!",
+      {color: "black", size: 48, align: "center"});
+      highScoreText.addBehavior(FadeOut, {duration: 7});
+			highScoreText.addBehavior(Oscillate, {field: "y", constant: 32, time: 0, rate: 1, initial: 0});
       highScoreText.z = 20;
-      titleTexts.push(highScoreText);
+      ui.add(highScoreText);
       highscore = score;
       saveData();
     }
 
 		var timebonustext = Object.create(Text).init(48, CONFIG.height - 72, "Time Bonus: " + Math.floor(timer) * 10 + "!", {size: 36, align: "left", color: "rgba(100,30,0,0.5)"});
 		//timebonustext.addBehavior(FadeOut, {duration: 5.5});
-		titleTexts.push(timebonustext);
+		ui.add(timebonustext);
+
+		var highScoreNumberText = Object.create(Text).init(CONFIG.width - 48, CONFIG.height - 48, "Best: " + highscore, {size: 45, align: "right", color: "rgba(100,0,0,0.5)"});
+		ui.add(highScoreNumberText);
 	}
 	
 	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 84, "to start", {size: 36, align: "center", color: "rgba(0,0,0,0.7)"}));
@@ -460,7 +469,7 @@ var onStart = function () {
 	ui.add(scoreText);
 	//ui.add(comboText);
 
-	var more_text = Object.create(Text).init(64, 12, "SEE MORE?", {size: 24, color: "rgba(0,0,0,0.4)"});
+	var more_text = Object.create(Text).init(64, 12, "SEE MORE?", {size: 24, color: "black"});
 	ui.add(more_text);
 
 	var more_button = Object.create(Button).init(64, 12, 96, 18);
@@ -471,12 +480,12 @@ var onStart = function () {
   	more_text.color = "rgba(150,150,150,0.6)";
   };
   more_button.unhover = function () {
-  	more_text.color = "rgba(0,0,0,0.4)";
+  	more_text.color = "black";
   };
   ui.add(more_button);
 
 
-	var mute_text = Object.create(Text).init(CONFIG.width - 48, 12, "SOUND OFF", {size: 24, color: "rgba(0,0,0,0.4)"});
+	var mute_text = Object.create(Text).init(CONFIG.width - 48, 12, "SOUND OFF", {size: 24, color: "black"});
 	ui.add(mute_text);
 
 	mute_button = Object.create(Button).init(CONFIG.width - 48, 12, 96, 18);
@@ -495,7 +504,7 @@ var onStart = function () {
   	mute_text.color = "rgba(150,150,150,0.6)";
   };
   mute_button.unhover = function () {
-  	mute_text.color = "rgba(0,0,0,0.4)";
+  	mute_text.color = "black";
   };
   ui.add(mute_button);
 
@@ -503,7 +512,7 @@ var onStart = function () {
   this.buttons.push(mute_button);
   this.buttons.push(more_button);
 
-  var pause_text = Object.create(Text).init(CONFIG.width - 160, 12, "PAUSE", {size: 24, color: "rgba(0,0,0,0.4)"});
+  var pause_text = Object.create(Text).init(CONFIG.width - 160, 12, "PAUSE", {size: 24, color: "black"});
   ui.add(pause_text);
 
 	pause_button = Object.create(Button).init(CONFIG.width - 160, 12, 96, 18, pause_text);
@@ -524,7 +533,7 @@ var onStart = function () {
   	pause_text.color = "rgba(150,150,150,0.6)";
   };
   pause_button.unhover = function () {
-  	pause_text.color = "rgba(0,0,0,0.4)";
+  	pause_text.color = "black";
   };
   ui.add(pause_button);
   this.buttons.push(pause_button);
@@ -592,7 +601,7 @@ var onStart = function () {
 	
 	for (var i = 4; i < 13; i++) {
 		var wave = Object.create(TiledBackground).init(0, i * GLOBALS.scale * 32 / 2, this.width * 3, GLOBALS.scale * 32, Resources.wave_tile1);
-		wave.addBehavior(Oscillate, {field: "x", constant: 32, time: Math.random() * Math.PI, initial: 0, object: wave});
+		var w = wave.addBehavior(Oscillate, {field: "x", constant: 32, time: Math.random() * Math.PI, initial: Math.floor(Math.random() * 32), object: wave});
 		//wave.opacity = 0.3;
 		fg.add(wave);
 	}
@@ -607,6 +616,7 @@ var onStart = function () {
 
 	this._gamepad.buttons.a.onStart = function (dt) {
 		if (t.started == -1) {
+			controls = "gamepad";
 			t.do_start();
 			return 
 		} else {
@@ -624,6 +634,7 @@ var onStart = function () {
 			return;
 		}
 		if (t.started == -1) {
+			controls = "keyboard";
 			t.do_start();
 			return 
 		} /*else {
@@ -651,14 +662,70 @@ var onStart = function () {
 		});
 		more_button.addBehavior(ease, {destination: {x: 0, y: -100}});
 		more_text.addBehavior(ease, {destination: {x: 0, y: -100}});
+
+		// 'new game'
+		if (highscore == 0) {
+			var tutorial_shoot_text = Object.create(Text).init(CONFIG.width - 32, CONFIG.height / 5, "TO SHOOT", {align: "right", size: 32, color: "black"});
+			tutorial_shoot_text.addBehavior(FadeOut, {duration: 10});
+
+			var tutorial_move_text = Object.create(Text).init(32, CONFIG.height / 5, "TO CHANGE DIRECTION", {align: "left", size: 32, color: "black"});
+			tutorial_move_text.addBehavior(FadeOut, {duration: 10});
+
+			ui.add(tutorial_move_text);
+			ui.add(tutorial_shoot_text);
+
+			if (controls == "gamepad") {
+				var gamepad_shoot_text = Object.create(Text).init(CONFIG.width - 32, CONFIG.height / 5 - 16, "PRESS  ", {align: "right", size: 32, color: "black"});
+				gamepad_shoot_text.addBehavior(FadeOut, {duration: 10});
+
+				var gamepad_shoot_icon = Object.create(Sprite).init(CONFIG.width - 48, CONFIG.height / 5 - 24, Resources.a);
+				gamepad_shoot_icon.addBehavior(FadeOut, {duration: 10});
+
+				var gamepad_move_text = Object.create(Text).init(32, CONFIG.height / 5 - 16, "USE", {align: "left", size: 32, color: "black"});
+				gamepad_move_text.addBehavior(FadeOut, {duration: 10});
+
+				var gamepad_move_icon = Object.create(Sprite).init(96, CONFIG.height / 5 - 32, Resources.lstick);
+				gamepad_move_icon.addBehavior(Animate);
+				gamepad_move_icon.addBehavior(FadeOut, {duration: 10});
+
+				ui.add(gamepad_shoot_text);
+				ui.add(gamepad_shoot_icon);
+				ui.add(gamepad_move_text);
+				ui.add(gamepad_move_icon);
+
+			} else if (controls == "touch") {
+				var touch_shoot_text = Object.create(Text).init(CONFIG.width - 32, CONFIG.height / 5 - 16, "TAP SCREEN", {align: "right", size: 32, color: "black"});
+				touch_shoot_text.addBehavior(FadeOut, {duration: 10});
+
+				var touch_move_text = Object.create(Text).init(32, CONFIG.height / 5 - 16, "SWIPE LEFT/RIGHT", {align: "left", size: 32, color: "black"});
+				touch_move_text.addBehavior(FadeOut, {duration: 10});
+
+				ui.add(touch_shoot_text);
+				ui.add(touch_move_text);
+
+			} else if (controls == "keyboard" ) {
+
+				var keyboard_shoot_text = Object.create(Text).init(CONFIG.width - 32, CONFIG.height / 5 - 16, "PRESS SPACE", {align: "right", size: 32, color: "black"});
+				keyboard_shoot_text.addBehavior(FadeOut, {duration: 10});
+
+				var keyboard_move_text = Object.create(Text).init(32, CONFIG.height / 5 - 16, "USE ARROW KEYS", {align: "left", size: 32, color: "black"});
+				keyboard_move_text.addBehavior(FadeOut, {duration: 10});
+
+				ui.add(keyboard_shoot_text);
+				ui.add(keyboard_move_text);
+
+			}
+		}
 	}
 
 	this.onKeyDown = function (e) {
 		if (e.keyCode == 32) {
 			if (t.started == 1)
 				player.shoot();
-			else if (t.started == -1)
-				t.do_start();
+			else if (t.started == -1) {
+				controls = "keyboard";
+				t.do_start();				
+			}
 			else {}
 		} else if (e.keyCode == 37 ) {
 			player.velocity.x = -SPEED.ship;
@@ -688,6 +755,7 @@ var onStart = function () {
 		if (Math.abs(dx) < 100) {
 			if (t.started == -1)
 			{
+				controls = "touch";
 				t.do_start();
 				return;
 			} else {
@@ -740,10 +808,11 @@ var onUpdate = function (dt) {
 			if (combo > highcombo) {
 				var highComboText = Object.create(Text).init(
 	        CONFIG.width / 2,
-	        CONFIG.height / 2 - 24,
+	        0,
 	        "NEW BEST COMBO! " + combo + "x",
-	      {color: "rgba(0,0,0,0.9)", size: 48, align: "center"});
-	      highComboText.addBehavior(FadeOut, {duration: 1.5});
+	      {color: "black", size: 48, align: "center"});
+	      highComboText.addBehavior(FadeOut, {duration: 7});
+				highComboText.addBehavior(Oscillate, {field: "y", constant: 32, time: 0, rate: 1, initial: 0});
 	      highComboText.z = 20;
 	      ui.add(highComboText);				
 	      highcombo = combo;

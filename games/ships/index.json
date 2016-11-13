@@ -4,7 +4,7 @@
   ],
   "resources": [
     {"path": "ship1.png", "frames": 2, "speed": 0.5},
-    {"path": "monster.png", "frames": 1, "speed": 0.5, "animations": 3},
+    {"path": "monster.png", "frames": 1, "speed": 0.5, "animations": 6},
     {"path": "mute.png", "frames": 2, "speed": 10.5, "animations": 2},
     {"path": "pause.png", "frames": 2, "speed": 10.5, "animations": 2},
     {"path": "ship2.png", "frames": 2, "speed": 0.5},
@@ -15,6 +15,7 @@
     {"path": "monitor.png"},
     {"path": "smoke.png"},
     {"path": "a.png"},
+    {"path": "lstick.png", "frames": 4, "speed": 1},
     {"path": "cloud.png"},
     {"path": "wave_tile1.png"},
     {"path": "cannonball.png"},

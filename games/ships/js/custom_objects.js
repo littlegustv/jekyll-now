@@ -2,6 +2,9 @@
   Cannon.is_projectile = true;
   Cannon.setCollision(Polygon);
   Cannon.collision.onHandle = function (object, other) {
+    if (other.name == "monster") {
+      console.log("monster", other.health, other.no_collide);
+    }
     if (other.no_collide || other.is_projectile) {
       return;
     }
