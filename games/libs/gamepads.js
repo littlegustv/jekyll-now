@@ -49,13 +49,15 @@ var Gamepad = {
     return this;
   },
   update: function (dt) {
+    if (!navigator.getGamepads) return;
   	var gp = navigator.getGamepads();
     for (var i = 0; i < gp.length; i++) {
     	var pad = gp[i];
       if (pad) {
       	for (var j = 0; j < pad.buttons.length; j++) {
         	var b = this.buttons[mapping[j]];
-        	if (pad.buttons[j].pressed) {
+          if (!b) {}
+        	else if (pad.buttons[j].pressed) {
           	if (b.active) b.update(dt);
             else b.start();
           } else {

@@ -222,7 +222,7 @@ TiledBackground.onDraw = function (ctx) {
 			ctx.drawImage(this.sprite.image, 
 				this.frame * this.sprite.w, 0, 
 				this.sprite.w, this.sprite.h, 
-				Math.round(this.x - this.w / 2) + i, this.y - Math.round(this.h / 2) + j, this.sprite.w * GLOBALS.scale, this.sprite.h * GLOBALS.scale);
+				Math.floor(this.x - this.w / 2) + i, this.y - Math.floor(this.h / 2) + j, this.sprite.w * GLOBALS.scale, this.sprite.h * GLOBALS.scale);
 		}
 	}/*
 	if (CONFIG.debug) {

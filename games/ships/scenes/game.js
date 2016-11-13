@@ -150,7 +150,7 @@ function doDamage (d) {
 
 var shipCost = {
 	13: function () {
-		console.log('submarine');
+		//console.log('submarine');
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.monitor);
 		s.velocity = {x: right ? - SPEED.ship / 2 : SPEED.ship / 2, y: 0};
@@ -159,7 +159,7 @@ var shipCost = {
 		return s;
 	},
 	3: function () {
-		console.log('tender');
+		//console.log('tender');
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.Tender);
 		s.velocity = {x: right ? - SPEED.ship * 2 / 3 : SPEED.ship * 2 / 3, y: 0};
@@ -169,7 +169,7 @@ var shipCost = {
 		return s;
 	},
 	6: function () {
-		console.log('battleship');
+		//console.log('battleship');
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.ship3);
 		s.addBehavior(Battleship);
@@ -178,7 +178,7 @@ var shipCost = {
 		return s;
 	},
 	2: function () {
-		console.log('cutter');
+		//console.log('cutter');
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.Cutter);
 		s.velocity = {x: right ? - SPEED.ship * 1.5 : SPEED.ship * 1.5, y: 0};
@@ -186,7 +186,7 @@ var shipCost = {
 		return s;
 	},
 	1: function () {
-		console.log('frigate');
+		//console.log('frigate');
 		var right = Math.random() > 0.5;
 		var s = Object.create(Sprite).init(right ? CONFIG.width : 0, 116 + 7 * GLOBALS.scale * 16, Resources.ship2);
 		s.addBehavior(Frigate);
@@ -195,7 +195,7 @@ var shipCost = {
 		return s;
 	},
 	14: function () {
-		console.log('adding monster');
+		//console.log('adding monster');
 		var r = 48;
 		var last = undefined, first = undefined;
 		var monster = [];
@@ -399,11 +399,6 @@ var onStart = function () {
 		scene.ocean.onended = scene.oceanLoop;
 	}
 
-	this.onClick = function (e) {
-		console.log(e.offsetX, e.offsetY);
-	}
-
-
 	var fg_camera = Object.create(Camera).init(0, -216);
 	shake = fg_camera.addBehavior(Shake, {duration: 0.3, magnitude: 3});
 
@@ -427,11 +422,21 @@ var onStart = function () {
 	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 94, "Seven", {size: 96, align: "center", color: "rgba(0,0,0,0.8)"} ));
 	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 48, "Deadly Seas", {size: 96, align: "center", color: "rgba(0,0,0,0.8)"} ));
 
+	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 72, "to start", {size: 36, align: "center", color: "rgba(0,0,0,0.7)"}));
+	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 16, "press SPACE", {size: 24, align: "center", color: "rgba(0,0,0,0.7)"}));
+	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 32, "TOUCH anywhere", {size: 24, align: "center", color: "rgba(0,0,0,0.7)"}));
+	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 48, "press   ", {size: 24, align: "center", color: "rgba(0,0,0,0.85)"}));
+	titleTexts.push(Object.create(Sprite).init(CONFIG.width / 2 + 24, CONFIG.height / 2 + 44, Resources.a));
+
+	titleTexts.forEach(function (e) {
+		e.addBehavior(Oscillate, {field: "y", constant: 12, initial: e.y, rate: 1.6, time: 0, object: e});
+	});	
+
 	if (!first_game) {
 		score += Math.floor(timer) * 10;
-		var sc = Object.create(Text).init(48, CONFIG.height - 48, "Score: " + score, {size: 48, align: "left", color: "rgba(100,0,0,0.5)"} );
+		var sc = Object.create(Text).init(48, CONFIG.height - 32, "Score: " + score, {size: 48, align: "left", color: "rgba(100,0,0,0.5)"} );
 		//sc.addBehavior(FadeOut, {duration: 5.5});
-		ui.add(sc);
+		titleTexts.push(sc);
 
 		if (score > highscore) 
     {
@@ -448,22 +453,16 @@ var onStart = function () {
       saveData();
     }
 
-		var timebonustext = Object.create(Text).init(48, CONFIG.height - 72, "Time Bonus: " + Math.floor(timer) * 10 + "!", {size: 36, align: "left", color: "rgba(100,30,0,0.5)"});
+		var timebonustext = Object.create(Text).init(48, CONFIG.height - 56, "Time Bonus: " + Math.floor(timer) * 10 + "!", {size: 36, align: "left", color: "rgba(100,30,0,0.5)"});
 		//timebonustext.addBehavior(FadeOut, {duration: 5.5});
-		ui.add(timebonustext);
+		titleTexts.push(timebonustext);
 
-		var highScoreNumberText = Object.create(Text).init(CONFIG.width - 48, CONFIG.height - 48, "Best: " + highscore, {size: 45, align: "right", color: "rgba(100,0,0,0.5)"});
-		ui.add(highScoreNumberText);
+		var highScoreNumberText = Object.create(Text).init(CONFIG.width - 32, CONFIG.height - 32, "Best: " + highscore, {size: 45, align: "right", color: "rgba(100,0,0,0.5)"});
+		titleTexts.push(highScoreNumberText);
 	}
 	
-	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 84, "to start", {size: 36, align: "center", color: "rgba(0,0,0,0.7)"}));
-	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 16, "press SPACE", {size: 24, align: "center", color: "rgba(0,0,0,0.7)"}));
-	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 32, "TOUCH anywhere", {size: 24, align: "center", color: "rgba(0,0,0,0.7)"}));
-	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 48, "press   ", {size: 24, align: "center", color: "rgba(0,0,0,0.85)"}));
-	titleTexts.push(Object.create(Sprite).init(CONFIG.width / 2 + 24, CONFIG.height / 2 + 44, Resources.a));
 
 	titleTexts.forEach(function (e) {
-		e.addBehavior(Oscillate, {field: "y", constant: 12, initial: e.y, rate: 1.6, time: 0, object: e});
 		ui.add(e);
 	});
 	ui.add(scoreText);
@@ -628,6 +627,9 @@ var onStart = function () {
 	this.touch = {x: undefined, y: undefined, timestamp: undefined};
 
 	this.onClick = function (e) {
+		if (!e.offsetX) {
+			e.offsetX = e.clientX - e.originalTarget.offsetLeft, e.offsetY = e.clientY - e.originalTarget.offsetTop;
+		}
 		var b = ui.onButton(e.offsetX, e.offsetY);
 		if (b) {
 			if (b.trigger) b.trigger();
@@ -660,6 +662,7 @@ var onStart = function () {
 		titleTexts.forEach( function (e) {
 			e.addBehavior(FadeOut, {duration: 0.5});
 		});
+
 		more_button.addBehavior(ease, {destination: {x: 0, y: -100}});
 		more_text.addBehavior(ease, {destination: {x: 0, y: -100}});
 

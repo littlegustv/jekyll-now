@@ -8,7 +8,8 @@ var AudioContext = window.AudioContext || window.webkitAudioContext;
 if (AudioContext) AudioContext.createGain = AudioContext.createGain || AudioContext.createGainNode;
 
 var service, tracker;
-if (analytics && chrome.runtime.getManifest) {
+if (typeof chrome === 'undefined') {}
+else if (analytics && chrome && chrome.runtime.getManifest) {
 	service = analytics.getService('platforms');
   tracker = service.getTracker('UA-65874667-3');
   tracker.sendAppView('MainView');
@@ -456,7 +457,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		load: function () {
 			this.newGame = true;
 			if (this.setupStorage()) {
-				if (chrome && chrome.storage) {
+				if (typeof chrome !== 'undefined' && chrome.storage) {
 					var t = this;
 					chrome.storage.local.get('platformSaveData', function (r) { 
 						t.loadData(r);

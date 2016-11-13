@@ -13,16 +13,6 @@ var World = {
 		this.muted = false;
 //		this.loadScenes();
 		this.loadGameInfo();
-		var t = this;
-		window.addEventListener("focus", function (e) {
-			if (t.audioContext.resume) t.audioContext.resume();
-			t.startTime = new Date();
-			t.speed = 1;
-		});
-		window.addEventListener("blur", function (e) {
-			if (t.audioContext.suspend) t.audioContext.suspend();
-			t.speed = 0;
-		});
 		return this;
 	},
 	step: function () {
@@ -55,8 +45,12 @@ var World = {
 		document.body.appendChild(this.canvas);
 		//this.canvas.fullscreenElement ();
 		this.ctx = this.canvas.getContext("2d");
-		// FIX ME: cross-browser
+		
+		this.ctx.mozImageSmoothingEnabled = false;
+		this.ctx.webkitImageSmoothingEnabled = false;
+		this.ctx.msImageSmoothingEnabled = false;
 		this.ctx.imageSmoothingEnabled = false;
+
 	},
 	createDebug: function () {
 		this.debug = document.createElement("div");
@@ -144,7 +138,12 @@ var World = {
 		var c = this.canvas;
 		this.canvas = this.canvas.cloneNode();
 		this.ctx = this.canvas.getContext('2d');
+		
+		this.ctx.mozImageSmoothingEnabled = false;
+		this.ctx.webkitImageSmoothingEnabled = false;
+		this.ctx.msImageSmoothingEnabled = false;
 		this.ctx.imageSmoothingEnabled = false;
+		
 		c.parentNode.replaceChild(this.canvas, c);
 		if (scene.ready) {
 			if (scene.onClick) this.canvas.addEventListener('click', scene.onClick);
@@ -174,6 +173,16 @@ var World = {
 		if (AudioContext) {
 			this.audioContext = new AudioContext();
 			this.audioContext.gn = this.audioContext.createGain();
+			var t = this;
+			window.addEventListener("focus", function (e) {
+				if (t.audioContext.resume) t.audioContext.resume();
+				t.startTime = new Date();
+				t.speed = 1;
+			});
+			window.addEventListener("blur", function (e) {
+				if (t.audioContext.suspend) t.audioContext.suspend();
+				t.speed = 0;
+			});
 		}
 	},
 	/* FIX ME: loads image, sound and data assets into global Resources array -> is there a better place to do this? */
@@ -224,6 +233,7 @@ var World = {
 		}
 	},
 	loadOGG: function (res, name) {
+		var w = this;
 		// cant play ogg, load mp3
 		if (name == "soundtrack" || name == "soundtrackFast") {
 			this.progressBar();
