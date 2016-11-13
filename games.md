@@ -6,11 +6,11 @@ permalink: /games/
 
 <div class="row">
     <div class="col-sm-4">
-        <a href="https://chrome.google.com/webstore/detail/the-floor-is-the-surface/jchcncpjpoecmkienhdmgnicbmmgdoai"><img src="{{ site.baseurl }}/images/surfaceofsun.png" alt="" class="img img-thumbnail"></a>
+        <a href="http://www.kongregate.com/games/littlegustv/the-floor-is-the-surface-of-the-sun"><img src="{{ site.baseurl }}/images/surfaceofsun.png" alt="" class="img img-thumbnail"></a>
     </div>
     <div class="col-sm-6">
-        <h4><a href="https://chrome.google.com/webstore/detail/the-floor-is-the-surface/jchcncpjpoecmkienhdmgnicbmmgdoai">The Floor is the Surface of the Sun</a></h4>
-        <p>An genuinely complete puzzle game, whatever you might think of it.  Try in for FREE on the Google Chrome Web Store, if you like!</p>
+        <h4><a href="http://www.kongregate.com/games/littlegustv/the-floor-is-the-surface-of-the-sun">The Floor is the Surface of the Sun</a></h4>
+        <p>An genuinely complete puzzle game, whatever you might think of it.  Try in for FREE on the Kongregate.com, if you like!</p>
         <b>Published 04-30-2016</b>
     </div>
 </div>

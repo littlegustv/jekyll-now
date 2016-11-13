@@ -1,6 +1,6 @@
 var mapping = ["a", "b", "x", "y", "lb", "rb", "lt", "rt", "back", "start", "ls", "rs", "dup", "ddown", "dleft", "dright"];
 
-var Button = {
+var GamepadButton = {
 	init: function (name, gamepad) {
   	this.active = false;
     this.duration = 0;
@@ -42,7 +42,7 @@ var Gamepad = {
 	init: function () {
   	this.buttons = {}
     for (var i = 0; i < mapping.length; i++) {
-    	this.buttons[mapping[i]] = Object.create(Button).init(mapping[i], this);   
+    	this.buttons[mapping[i]] = Object.create(GamepadButton).init(mapping[i], this);   
     }
     this.aleft = Object.create(Axis).init('aleft', this);
     this.aright = Object.create(Axis).init('aright', this);

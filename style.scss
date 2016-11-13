@@ -63,6 +63,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
+  -webkit-column-span: all; 
+  column-span: all;
+  text-align: center;
+  font-variant: small-caps;
   font-size: 30px;
   a {
     color: inherit;
@@ -242,40 +246,7 @@ img {
     margin: 3px 0;
   }
 }
-/*
-nav {
-  float: right;
-  margin-top: 23px; // @TODO: Vertically middle align
-  font-family: $helveticaNeue;
-  font-size: 18px;
-  width: 100px;
-  text-align: right;
-  @include mobile {
-     float: none;
-     margin-top: 0px;
-     margin-bottom: 4px;
-     display: block;
-     font-size: 16px;
-     width: 100%;
-  }
 
-  a {
-    margin-left: 20px;
-    color: white;
-    text-align: right;
-    font-weight: 300;
-    letter-spacing: 1px;
-
-    @include mobile {
-      margin: 0 10px;
-      color: $blue;
-    }
-  }
-}
-*/
-//
-// .main
-//
 
 #main
 {
@@ -290,7 +261,7 @@ nav {
 }
 .post-row {
   padding: 20px 40px 20px 40px;
-  background-color: #68B8C3;
+  background-color: #eee;
 }
 .post-row:after {
     content: '';
@@ -305,7 +276,7 @@ nav {
   -o-transform: rotate(1deg);
   transform: perspective(999px) rotate(1deg);
     background-color:inherit;
-  border-bottom: 10px solid #222222;
+    border-bottom: 2px solid #222;
   box-shadow: 0px 5px 10px 0px rgba(0,0,0,0.2);
 }
 .post-row:nth-child(even):after {
@@ -315,22 +286,29 @@ nav {
   -o-transform: rotate(-1deg);
   transform: perspective(999px) rotate(-1deg);
 }
-.post-row:nth-child(3n + 2):after {
-    background-color: #222222;
-}
 
 .post-row:nth-child(3n+1) {
-  background-color: #FFF2AE;  
+  background-color: #f8f8f8;  
 }
 .post-row:nth-child(3n+1):after {
   /*border-bottom: 8px dashed #649D03;*/
   box-shadow: 0px 6px 6px 0px rgba(0,0,0,0.3);
 }
 .post-row:nth-child(3n+2) {
-  background-color: #649D03  
+  background-color: #ffffff  
 }
 
 .post {
+  column-count: 3;
+  -webkit-column-count: 3;
+  -moz-column-count: 3;
+  -ms-column-count: 3;
+  -o-column-count: 3;
+  column-width: 300px;
+  -webkit-column-width: 300px;
+  -moz-column-width: 300px;
+  -ms-column-width: 300px;
+  -o-column-width: 300px;
 }
 
 .wrapper-footer {
@@ -345,237 +323,14 @@ footer {
   text-align: center;
 }
 
-/*
-
-horizontal panels
-
-*/
-.grid {
-  margin-top: 10px;
-}
-.grid-sizer, .grid-item {
-  width: calc(25% - 10px);
-}
-
-.navbar-inverse {
-  z-index: 200;
-}
-
-.label-post {
-  background-color: #649D03
-}
-
-.panel-post {
-  border-color: #68B8C3;
-}
-
-.panel-post > .panel-heading {
-  background-color: #68B8C3;
-}
-
-.panel-post:nth-child(3n + 1) {
-  border-color: #649D03;
-}
-.panel-post:nth-child(3n + 1) > .panel-heading {
-  background-color: #649D03;
-}
-
-.panel-post:nth-child(3n + 2) {
-  border-color: #FF685C;
-}
-.panel-post:nth-child(3n + 2) > .panel-heading {
-  background-color: #FF685C;
-}
-
-.panel.panel-horizontal {
-    display:table;
-    width:100%;
-    margin: 10px 0px 10px 0px;
-}
-.panel.panel-horizontal > .panel-heading, .panel.panel-horizontal > .panel-body, .panel.panel-horizontal > .panel-footer {
-    display:table-cell;
-}
-.panel.panel-horizontal > .panel-heading, .panel.panel-horizontal > .panel-footer {
-    width: 25%;
-    border:0;
-    vertical-align: middle;
-}
-.panel.panel-horizontal > .panel-heading {
-    border-right: 1px solid #ddd;
-    border-top-right-radius: 0;
-    border-bottom-left-radius: 4px;
-}
-.panel.panel-horizontal > .panel-heading.panel-heading-right {
-    border-left: 1px solid #ddd;
-    border-right: 0px solid transparent;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 4px;
-}
-.panel.panel-horizontal > .panel-footer {
-    border-left: 1px solid #ddd;
-    border-top-left-radius: 0;
-    border-bottom-right-radius: 4px;
-}
-
 .affix {
     top: 0;
     width: 100%;
+    z-index: 1000;
 }
 .affix + .container-fluid {
-    padding-top: 70px;
+    padding-top: 50px;
 }
-
-
-/*FLIP!*/
-
-.flip-container
-{
-    perspective: 1000;
-    -webkit-perspective: 1000;
-    -moz-perspective: 1000;
-    -ms-perspective: 1000;
-    float: left;
-    margin: 20px;
-    position: relative;
-    z-index: 10;
-    transition: z-index 0.6s;
-    -webkit-transition: z-index 0.6s;
-    -moz-transition: z-index 0.6s;
-    -ms-transition: z-index 0.6s;
-    @include mobile
-    {
-    	margin-left:0px;
-    	margin-right:0px;
-    }
-}
-
-.flip-container:hover
-{
-	z-index: 999;
-}
-
-.flip-container:hover .flipper, .flip-container.hover .flipper {
-    transform: rotateY(180deg);
-    -webkit-transform: rotateY(180deg);
-    -moz-transform: rotateY(180deg);
-    -ms-transform: rotateY(180deg);
-}
-.flip-container:nth-child(odd) .back
-{
-	transform-origin: calc(25% + -10px) 50%;;
-	-webkit-transform-origin: calc(25% + -10px) 50%;;
-	-moz-transform-origin: calc(25% + -10px) 50%;;
-	-ms-transform-origin: calc(25% + -10px) 50%;
-}
-.flip-container, .front, .back {
-	width: 330px;
-	height: 260px;
-}
-.flip-container:nth-child(2n + 2) .front
-{
-	background: #AA3939;
-}
-.flip-container:nth-child(3n + 3) .front {
-	background: #226666;
-}
-
-/* flip speed goes here */
-.flipper {
-	transition: 0.6s;
-	-webkit-transition: 0.6s;
-	-moz-transition: 0.6s;
-	-ms-transition: 0.6s;
-	transform-style: preserve-3d;
-	-webkit-transform-style: preserve-3d;
-	-moz-transform-style: preserve-3d;
-	-ms-transform-style: preserve-3d;
-	position: relative;
-}
-
-/* hide back of pane during swap */
-.front, .back {
-	backface-visibility: hidden;
-	position: absolute;
-	top: 0;
-	left: 0;
-}
-.front
-{
-	box-sizing: border-box;
-	color: white;
-	padding: 20px;
-	*background: url('http://upload.wikimedia.org/wikipedia/commons/a/a2/Marx_old.jpg');
-	background: #7A9F35;
-	background-size: cover;
-	z-index: 2;
-	/* for firefox 31 */
-	transform: rotateY(0deg);
-	-webkit-transform: rotateY(0deg);
-	-moz-transform: rotateY(0deg);
-	-ms-transform: rotateY(0deg);
-	box-shadow: 7px 8px 15px -2px rgba(0,0,0,0.2);
-}
-
-/* back, initially hidden pane */
-.back {
-	width: 700px;
-	padding: 20px;
-	transform: rotateY(180deg);
-	-webkit-transform: rotateY(180deg);
-	-moz-transform: rotateY(180deg);
-	-ms-transform: rotateY(180deg);
-	background: #FFFFFF;
-}
-
-/*	PARALLAX!@	*/
-
-.parallax {
-    height: 100vh;
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-perspective: 1px;
-    -ms-perspective: 1px;
-    -moz-perspective: 1px;
-    perspective: 1px;
-    -webkit-perspective-origin-x: 100%;
-    -moz-perspective-origin-x: 100%;
-    -ms-perspective-origin-x: 100%;
-    perspective-origin-x: 100%;
-}
-
-.parallax__layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    transform-origin-x: 100%;
-    -webkit-transform-origin-x: 100%;
-    -ms-transform-origin-x: 100%;
-    -moz-transform-origin-x: 100%;
-    //DEMO STYLES?
-    padding: 65vh 0;
-}
-
-.parallax__layer--base {
-    -webkit-transform: translateZ(0);
-    -moz-transform: translateZ(0);
-    -ms-transform: translateZ(0);
-    transform: translateZ(0);
-}
-
-.parallax__layer--back {
-    -webkit-transform: translateZ(-1px) scale(2);
-    -moz-transform: translateZ(-1px) scale(2);
-    -ms-transform: translateZ(-1px) scale(2);
-    transform: translateZ(-1px) scale(2);
-  background: url("http://artobserved.com/artimages/2013/02/Roy-Lichtenstein-Whaam-1963-Tate-Modernjpg.jpg");
-  background-repeat: no-repeat;
-  background-size: 100% 70vh;
-}
-
-
 
 // Settled on moving the import of syntax highlighting to the bottom of the CSS
 // ... Otherwise it really bloats up the top of the CSS file and makes it difficult to find the start

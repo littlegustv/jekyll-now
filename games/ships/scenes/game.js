@@ -23,6 +23,8 @@ var player;
 var other;
 var debug;
 
+var pause_button, mute_button;
+
 // score variables
 // FIX ME: add localstorage memory
 
@@ -32,6 +34,8 @@ var enemies = [];
 
 var score = 0;
 var combo = 0;
+var timer = 0;
+var lastimer = 0;
 
 var highscore = 0;
 var highcombo = 0;
@@ -40,6 +44,7 @@ var comboTimer = 0;
 var comboMax = 4;
 //var comboText;
 var scoreText;
+var ui; // ui layer
 
 // functions to add particle effects to ship objects
 
@@ -94,7 +99,7 @@ function addCannon (entity, velocity, offset) {
   cb.family = entity.family;
 	cb.addBehavior(Velocity);
 	
-	if (entity.family == "enemy") cb.addBehavior(Horizon, {horizon: 166});
+	if (entity.family == "enemy") cb.addBehavior(Horizon, {horizon: 116});
 
 	var addTrails = function (x, y) {
 		var t = Object.create(Entity).init(x + Math.random() * 8 - 4, y + Math.random() * 16 - 8, 6, 18);
@@ -113,7 +118,8 @@ function addCannon (entity, velocity, offset) {
 	entity.layer.add(traileffect);
 
 	traileffect.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height - cb.offset.y + 100}})
-	cb.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height - cb.offset.y + 100}})
+	var cr = cb.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height - cb.offset.y + 100}})
+	//console.log(cr);
 	entity.layer.add(cb);
 
 	var bang = Object.create(Sprite).init(cb.x, cb.y, Resources[choose(["bang", "boom", "pow"])]);
@@ -251,7 +257,8 @@ function buyShips (dt) {
 		if (player.health <= 0) return;
 		var cost = costs[Math.min(Math.floor(Math.random() * Math.log(score / 10 + 1)), Math.floor(Math.random() * costs.length))];
 		var s = shipCost[cost]();
-		s.weight = cost;
+		s.weight = 1//;ost / 2;
+		s.points = cost;
 		queue.push(s);
 		//enemies.push(s);
 	}
@@ -329,7 +336,30 @@ function addShips (dt) {
 
 var shake;
 
+function loadData(source) {
+	if (localStorage && localStorage.shipsData) {
+		var data = JSON.parse(localStorage.shipsData);
+		highscore = data.highscore;
+		highcombo = data.highcombo;
+	} else {
+		console.log("No stored information found.");
+	}
+}
+
+function saveData() {
+	if (localStorage) {
+		localStorage.setItem("shipsData", JSON.stringify({highscore: highscore, highcombo: highcombo}));
+	}
+}
+
 var onStart = function () {
+
+	// load from storage, if exists
+	//saveData = JSON.stringify(saveData);
+
+	loadData();
+
+	queue = [];
 
 	var scene = this;
 	Polygon.onCheck = notFriendly(Polygon.onCheck);
@@ -344,12 +374,14 @@ var onStart = function () {
 
 	scene.musicLoop = function () {
 		if (score == 0 || combo == 0) {
-			scene.soundtrack = gameWorld.playSound(Resources.soundtrack1);
-		} else if (combo <= 2) {
-			scene.soundtrack = gameWorld.playSound(Resources.soundtrack3);			
+			scene.soundtrack = gameWorld.playSound(Resources.soundtrack0);
 		} else if (combo <= 5) {
+			scene.soundtrack = gameWorld.playSound(Resources.soundtrack1);			
+		} else if (combo <= 10) {
 			scene.soundtrack = gameWorld.playSound(Resources.soundtrack2);
-		} else if (combo <= 8) {
+		} else if (combo <= 14) {
+			scene.soundtrack = gameWorld.playSound(Resources.soundtrack3);
+		} else if (combo <= 18) {
 			scene.soundtrack = gameWorld.playSound(Resources.soundtrack4);
 		} else {
 			scene.soundtrack = gameWorld.playSound(Resources.soundtrack5);
@@ -380,23 +412,46 @@ var onStart = function () {
 	}
 
 	var ui_camera = Object.create(Camera).init(0, 0);
-	var ui = Object.create(Layer).init(ui_camera);
+	ui = Object.create(Layer).init(ui_camera);
 
 	scoreText = Object.create(Text).init(2, 12, "Score: " + score, {size: 24, align: "left", color: "rgba(0,0,0,0.4)"});
 	//comboText = Object.create(Text).init(CONFIG.width - 4, 30, "Combo: " + combo, {align: "right", size: 64, color: "rgba(0,0,0,0.4)"});
 	scoreText.opacity = 0;//, comboText.opacity = 0;
 
 	var titleTexts = [];
-	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 124, "Seven", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} ));
-	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 68, "Deadly", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} ));
-	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 12, "Seas", {size: 96, align: "center", color: "rgba(0,0,0,0.4)"} ));
+	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 94, "Seven", {size: 96, align: "center", color: "rgba(0,0,0,0.8)"} ));
+	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 48, "Deadly Seas", {size: 96, align: "center", color: "rgba(0,0,0,0.8)"} ));
 
 	if (!first_game) {
+		score += Math.floor(timer) * 10;
 		var sc = Object.create(Text).init(48, CONFIG.height - 48, "Score: " + score, {size: 48, align: "left", color: "rgba(100,0,0,0.5)"} );
+		//sc.addBehavior(FadeOut, {duration: 5.5});
 		titleTexts.push(sc);
-	} else {
-		titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 48, "Press SPACE to start.", {size: 48, align: "center", color: "rgba(100,100,100,0.7)"}));
+
+		if (score > highscore) 
+    {
+      var highScoreText = Object.create(Text).init(
+        CONFIG.width / 2,
+        CONFIG.height / 2 + 8,
+        "NEW HIGH SCORE! " + score + "x",
+      {color: "rgba(100,0,0,0.5)", size: 48, align: "center"});
+      highScoreText.addBehavior(FadeOut, {duration: 3.5});
+      highScoreText.z = 20;
+      titleTexts.push(highScoreText);
+      highscore = score;
+      saveData();
+    }
+
+		var timebonustext = Object.create(Text).init(48, CONFIG.height - 72, "Time Bonus: " + Math.floor(timer) * 10 + "!", {size: 36, align: "left", color: "rgba(100,30,0,0.5)"});
+		//timebonustext.addBehavior(FadeOut, {duration: 5.5});
+		titleTexts.push(timebonustext);
 	}
+	
+	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 84, "to start", {size: 36, align: "center", color: "rgba(0,0,0,0.7)"}));
+	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 16, "press SPACE", {size: 24, align: "center", color: "rgba(0,0,0,0.7)"}));
+	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 32, "TOUCH anywhere", {size: 24, align: "center", color: "rgba(0,0,0,0.7)"}));
+	titleTexts.push(Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 + 48, "press   ", {size: 24, align: "center", color: "rgba(0,0,0,0.85)"}));
+	titleTexts.push(Object.create(Sprite).init(CONFIG.width / 2 + 24, CONFIG.height / 2 + 44, Resources.a));
 
 	titleTexts.forEach(function (e) {
 		e.addBehavior(Oscillate, {field: "y", constant: 12, initial: e.y, rate: 1.6, time: 0, object: e});
@@ -424,7 +479,7 @@ var onStart = function () {
 	var mute_text = Object.create(Text).init(CONFIG.width - 48, 12, "SOUND OFF", {size: 24, color: "rgba(0,0,0,0.4)"});
 	ui.add(mute_text);
 
-	var mute_button = Object.create(Button).init(CONFIG.width - 48, 12, 96, 18);
+	mute_button = Object.create(Button).init(CONFIG.width - 48, 12, 96, 18);
   mute_button.trigger = function () {
   	if (gameWorld.muted) {
 	  	mute_text.text = "SOUND OFF";
@@ -451,7 +506,7 @@ var onStart = function () {
   var pause_text = Object.create(Text).init(CONFIG.width - 160, 12, "PAUSE", {size: 24, color: "rgba(0,0,0,0.4)"});
   ui.add(pause_text);
 
-	var pause_button = Object.create(Button).init(CONFIG.width - 160, 12, 96, 18, pause_text);
+	pause_button = Object.create(Button).init(CONFIG.width - 160, 12, 96, 18, pause_text);
   pause_button.trigger = function () {
   	if (gameWorld.paused) {
   		gameWorld.startTime = new Date();
@@ -542,6 +597,7 @@ var onStart = function () {
 		fg.add(wave);
 	}
 
+	var t = this;
 	this._gamepad = Object.create(Gamepad).init();
 	this._gamepad.aleft.onUpdate = function (dt) {
 		if (Math.abs(this.x) > 0.3) {
@@ -549,31 +605,17 @@ var onStart = function () {
 		}
 	}
 
-	this._gamepad.buttons.lt.onUpdate = function (dt) {
-	}
-	this._gamepad.buttons.lt.onStart = function () {
-	}
-	this._gamepad.buttons.lt.onEnd = function () {
-	}
-	this._gamepad.buttons.a.onStart = function () {
-		if (player.cooldown >= 0) return;
-
-		var exp = Object.create(Explosion).init(player.x, player.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
-		fg.add(exp);
-
-		addCannon(player, {x: 0, y: SPEED.ship});
-		player.cooldown = 1;
-	
-		//console.log(Resources.cannon);
-		//gameWorld.playSound(Resources.cannon);
-
-		shake.start();
-	}
-	this._gamepad.buttons.rt.onEnd = function () {	
+	this._gamepad.buttons.a.onStart = function (dt) {
+		if (t.started == -1) {
+			t.do_start();
+			return 
+		} else {
+			player.shoot();
+			return;
+		}
 	}
 
 	this.touch = {x: undefined, y: undefined, timestamp: undefined};
-	var t = this;
 
 	this.onClick = function (e) {
 		var b = ui.onButton(e.offsetX, e.offsetY);
@@ -581,6 +623,13 @@ var onStart = function () {
 			if (b.trigger) b.trigger();
 			return;
 		}
+		if (t.started == -1) {
+			t.do_start();
+			return 
+		} /*else {
+			player.shoot();
+			return;
+		}*/
 	}
 
 	this.do_start = function () {
@@ -591,6 +640,8 @@ var onStart = function () {
 		t.started = 0;
 		score = 0;
 		combo = 0;
+		lastimer = timer;
+		timer = 0;
 		gameWorld.playSound(Resources.swosh);
 		fg_camera.addBehavior(ease, {destination: {x: 0, y: 0}});
 		scoreText.addBehavior(FadeIn, {duration: 0.5});
@@ -620,7 +671,7 @@ var onStart = function () {
 		if (!fullscreen) requestFullScreen();
 
 		t.touch.timestamp = new Date();
-		t.touch.x = e.changedTouches[0].pageX, this.touch.y = e.changedTouches[0].pageY;
+		t.touch.x = e.changedTouches[0].pageX, t.touch.y = e.changedTouches[0].pageY;
 
 	}
 	this.onTouchEnd = function (e) {
@@ -635,18 +686,14 @@ var onStart = function () {
 		var x = e.changedTouches[0].pageX, y = e.changedTouches[0].pageY;
 		var dx = x - t.touch.x;
 		if (Math.abs(dx) < 100) {
-			if (player.cooldown >= 0) return;
-
-			var exp = Object.create(Explosion).init(player.x, player.y + GLOBALS.scale * 4, 12 * GLOBALS.scale, 40, "rgba(255,255,255,0.2)");
-			fg.add(exp);
-
-			addCannon(player, {x: 0, y: SPEED.ship});
-			player.cooldown = 1;
-		
-			//console.log(Resources.cannon);
-			gameWorld.playSound(Resources.cannon);
-
-			shake.start();
+			if (t.started == -1)
+			{
+				t.do_start();
+				return;
+			} else {
+				player.shoot();
+				return;
+			}
 		} else {
 			if (dx > 0) {
 				player.velocity.x = SPEED.ship;
@@ -673,6 +720,7 @@ var onStart = function () {
 };
 
 var onUpdate = function (dt) {
+	timer += dt;
 	if (Resources.soundtrack1 && !this.soundtrack) {
 		this.musicLoop();
 	}
@@ -689,13 +737,26 @@ var onUpdate = function (dt) {
 
 		comboTimer += dt;
 		if (comboTimer > comboMax) {
+			if (combo > highcombo) {
+				var highComboText = Object.create(Text).init(
+	        CONFIG.width / 2,
+	        CONFIG.height / 2 - 24,
+	        "NEW BEST COMBO! " + combo + "x",
+	      {color: "rgba(0,0,0,0.9)", size: 48, align: "center"});
+	      highComboText.addBehavior(FadeOut, {duration: 1.5});
+	      highComboText.z = 20;
+	      ui.add(highComboText);				
+	      highcombo = combo;
+				saveData();
+			}
 			combo = 0;
 			comboTimer = 0;
 		}
 
 		//console.log(scoreText);
 
-		this.buyShips(dt);
+		if (player.health > 0)
+			this.buyShips(dt);
 	}
 };
 

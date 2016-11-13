@@ -5,6 +5,7 @@ var Entity = {
 	angle: 0,
 	alive: true,
 	z: 1,
+	points: 1,
 	behaviors: [],
 	init: function (x, y, w, h) {
 		this.behaviors = [];
@@ -121,6 +122,19 @@ var Entity = {
 //		this.y += dt * this.velocity.y;
 	}
 };
+
+var Circle =Object.create(Entity);
+Circle.init = function(x, y, radius) {
+	this.x = x, this.y = y, this.radius = radius;
+	return this;
+}
+Circle.onDraw = function (ctx) {
+	ctx.moveTo(this.x, this.y);
+	ctx.beginPath();
+	ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+	ctx.fillStyle = this.color;
+	ctx.fill();
+}
 
 var Sprite = Object.create(Entity);
 Sprite.acceleration = {x: 0, y: 0};

@@ -13,24 +13,34 @@
     } 
     if (other.health <= 0 && other.family != "player") {
       combo += 1;
-      score += combo * 10;
+      score += combo * other.points * 10;
       comboTimer = 0;
+      
+      var moreScore = Object.create(Text).init(
+        scoreText.x,
+        scoreText.y + GLOBALS.scale * 6,
+        "+" + combo * other.points * 10,
+      {color: "rgba(0,0,0,0.4)", size: 24, align: "left"});
+      moreScore.addBehavior(FadeOut, {duration: 1.5});
+      moreScore.z = 20;
+      ui.add(moreScore);
+
       var t = Object.create(Text).init(
         other.x,
         other.y - GLOBALS.scale * 6,
-        combo + "X",
-      {color: "#FFFFFF", size: 54});
+        combo + "x",
+      {color: "#FFFFFF", size: 34});
       t.addBehavior(FadeOut, {duration: 4});
       t.z = 20;
-      var t2 = Object.create(Text).init(
+      /*var t2 = Object.create(Text).init(
         other.x - 3,
         other.y - GLOBALS.scale * 6 - 3,
         combo + "X",
       {color: "#000000", size: 54});
       t2.addBehavior(FadeOut, {duration: 4});
-      t2.z = 19;
-      other.layer.add(t);
-      other.layer.add(t2);
+      t2.z = 19;*/
+      ui.add(t);
+      //ui.layer.add(t2);
     }
     object.alive = false;
   };
