@@ -77,9 +77,9 @@ function addFlames(ship) {
 
 function addSplashes (ship) {
 	var createSplash = function (x, y) {
-	  var colors = ["#4d6b89", "#829eab", "white"]
-		var s = Object.create(Entity).init(x, y, 12 * GLOBALS.scale, 6 * GLOBALS.scale);
-		s.color = choose(colors);
+//	  var colors = ["#4d6b89", "#829eab", "white"]
+		var s = Object.create(Sprite).init(x, y, Resources.splash);
+	//	s.color = choose(colors);
 		s.angle = Math.random() * Math.PI / 3 - Math.PI / 6;
 		s.addBehavior(FadeOut, {duration: 1.3});
 		s.addBehavior(Velocity);
@@ -434,7 +434,7 @@ var onStart = function () {
 
 	if (!first_game) {
 		score += Math.floor(timer) * 10;
-		var sc = Object.create(Text).init(48, CONFIG.height - 32, "Score: " + score, {size: 48, align: "left", color: "rgba(100,0,0,0.5)"} );
+		var sc = Object.create(Text).init(48, CONFIG.height - 32, "Score: " + score, {size: 48, align: "left", color: "white"} );
 		//sc.addBehavior(FadeOut, {duration: 5.5});
 		titleTexts.push(sc);
 
@@ -453,11 +453,11 @@ var onStart = function () {
       saveData();
     }
 
-		var timebonustext = Object.create(Text).init(48, CONFIG.height - 56, "Time Bonus: " + Math.floor(timer) * 10 + "!", {size: 36, align: "left", color: "rgba(100,30,0,0.5)"});
+		var timebonustext = Object.create(Text).init(48, CONFIG.height - 56, "Time Bonus: " + Math.floor(timer) * 10 + "!", {size: 36, align: "left", color: "white"});
 		//timebonustext.addBehavior(FadeOut, {duration: 5.5});
 		titleTexts.push(timebonustext);
 
-		var highScoreNumberText = Object.create(Text).init(CONFIG.width - 32, CONFIG.height - 32, "Best: " + highscore, {size: 45, align: "right", color: "rgba(100,0,0,0.5)"});
+		var highScoreNumberText = Object.create(Text).init(CONFIG.width - 32, CONFIG.height - 32, "Best: " + highscore, {size: 45, align: "right", color: "white"});
 		titleTexts.push(highScoreNumberText);
 	}
 	
