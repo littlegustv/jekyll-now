@@ -3,6 +3,17 @@ var muted = false, paused = false;
 
 var controls = "";
 
+// kongregate API
+
+var kongregate;
+
+kongregateAPI.loadAPI(function(){
+  kongregate = kongregateAPI.getAPI();
+  // You can now access the Kongregate API with:
+  // kongregate.services.getUsername(), etc
+  // Proceed with loading your game...
+});
+
 // mobile needs to be able to be fullscreened
 
 function requestFullScreen () {
@@ -450,6 +461,7 @@ var onStart = function () {
       highScoreText.z = 20;
       ui.add(highScoreText);
       highscore = score;
+      kongregate.stats.submit('Score', highscore);
       saveData();
     }
 
@@ -646,6 +658,9 @@ var onStart = function () {
 	}
 
 	this.do_start = function () {
+		 var username = kongregate.services.getUsername(); 
+	  console.log('Kongregate username changed to: ' + username);
+
 		var ease = Object.create(Ease);
 		ease.end = function () {
 			t.started = 1;
