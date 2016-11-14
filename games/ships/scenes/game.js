@@ -658,8 +658,10 @@ var onStart = function () {
 	}
 
 	this.do_start = function () {
-		 var username = kongregate.services.getUsername(); 
-	  console.log('Kongregate username changed to: ' + username);
+		//var username = kongregate.services.getUsername(); 
+	  //console.log('Kongregate username changed to: ' + username);
+
+	  enemies = [];
 
 		var ease = Object.create(Ease);
 		ease.end = function () {
@@ -737,6 +739,7 @@ var onStart = function () {
 	}
 
 	this.onKeyDown = function (e) {
+		e.preventDefault();
 		if (e.keyCode == 32) {
 			if (t.started == 1)
 				player.shoot();
@@ -750,6 +753,7 @@ var onStart = function () {
 		} else if (e.keyCode == 39) {
 			player.velocity.x = SPEED.ship;
 		}
+		return false;
 	}	
 	this.onTouchStart = function (e) {
 
