@@ -1,9 +1,12 @@
 // CONSTANTS
 
-var LANE_SIZE = 32, MAX_SPEED = 200, THRESHOLD = 2.5, INTERVAL = 2.5, LANE_OFFSET = 128;
+var LANE_SIZE = 32, MAX_SPEED = 200, THRESHOLD = 2.5, ROAD_SPEED = 160, LANE_OFFSET = 128;
 
 var onStart = function () {
+  this.layers = [];
 
+  var t = this;
+  this.distance = 0;
   this.interval = 0;
 
   var bg_camera = Object.create(Camera).init(0, 0);
@@ -11,6 +14,8 @@ var onStart = function () {
 
   var fg_camera = Object.create(Camera).init(0, 0);
   var fg = Object.create(Layer).init(fg_camera);
+  t.fg = fg;
+
   fg.drawOrder = function () {
     return this.entities.sort(function (a, b) { 
       if (a.z && b.z && b.z != a.z) return a.z - b.z;
@@ -18,56 +23,89 @@ var onStart = function () {
       else return a.x - b.x;
     });
   }
-  this.fg = fg;
+  //this.fg = fg;
 
   for (var i = 0; i < 2; i ++) {  
-    var o = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, (CONFIG.height + 4 * LANE_SIZE) / 2, CONFIG.width + LANE_SIZE, CONFIG.height - 4 * LANE_SIZE, Resources.road);
-    bg.add(o);
+    var road = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, (CONFIG.height + 3 * LANE_SIZE) / 2, CONFIG.width + LANE_SIZE, CONFIG.height - 5 * LANE_SIZE, Resources.road);
+    bg.add(road);
 
     var ground = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, 3.5 * LANE_SIZE, CONFIG.width + LANE_SIZE, LANE_SIZE / 2, Resources.ground);
     bg.add(ground);
+
+    var ground_low = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, 11 * LANE_SIZE, CONFIG.width + LANE_SIZE, LANE_SIZE / 2, Resources.ground);
+    fg.add(ground_low);
+    ground_low.addBehavior(Velocity);
+    ground_low.addBehavior(Wrap, {min: {x: -CONFIG.width / 2, y: 0}, max: {x: CONFIG.width + CONFIG.width / 2, y: CONFIG.height}});
+    ground_low.velocity = {x: -1 * ROAD_SPEED, y: 0};
   }
 
-  var b2 = Object.create(Sprite).init(Math.floor(Math.random() * CONFIG.width), 2.75 * LANE_SIZE, Resources.building2);
+  // temporary!!!
+  var b2 = Object.create(Sprite).init(Math.floor(Math.random() * CONFIG.width / 48) * 48, 2.75 * LANE_SIZE, Resources.building2);
   bg.add(b2);
-  var b3 = Object.create(Sprite).init(Math.floor(Math.random() * CONFIG.width), 2.75 * LANE_SIZE, Resources.box);
+  var b3 = Object.create(Sprite).init(b2.x + 96, 2.75 * LANE_SIZE, Resources.box);
   bg.add(b3);
-  var b4 = Object.create(Sprite).init(Math.floor(Math.random() * CONFIG.width), 2.75 * LANE_SIZE, Resources.cathedral);
+  var b4 = Object.create(Sprite).init(b2.x - 96, 2.75 * LANE_SIZE, Resources.cathedral);
+  bg.add(b4);
+  var b4 = Object.create(Sprite).init(b2.x - 192, 2.75 * LANE_SIZE, Resources.house);
   bg.add(b4); 
 
+  // make BG scroll, using velocity
   for (var i = 0; i < bg.entities.length; i++) {
     bg.entities[i].addBehavior(Velocity);
     bg.entities[i].addBehavior(Wrap, {min: {x: -CONFIG.width / 2, y: 0}, max: {x: CONFIG.width + CONFIG.width / 2, y: CONFIG.height}});
-    bg.entities[i].velocity = {x: -140, y: 0};
+    bg.entities[i].velocity = {x: -1 * ROAD_SPEED, y: 0};
   }
-  // make all BG elements scroll, wrap
-
-
-  // move to separate, parallax layer
-
 
   var player = Object.create(Sprite).init(64, CONFIG.height / 2, Resources.accent);
   player.addBehavior(Velocity);
-  player.addBehavior(Bound, {min: {x: 0, y: 4 * LANE_SIZE}, max: {x: CONFIG.width, y: CONFIG.height}});
+  player.addBehavior(Bound, {min: {x: 0, y: 4 * LANE_SIZE}, max: {x: CONFIG.width, y: CONFIG.height - LANE_SIZE}});
   player.velocity = {x: 0, y: 0};
+  player.setVertices([{x: -8, y: 6},
+    {x: 8, y: 6},
+    {x: 8, y: 12},
+    {x: -8, y: 12}
+  ]);
+  player.setCollision(Polygon);
+  player.collision.onHandle = function(object, other) {
+    gameWorld.setScene(0);
+    //t.onStart();
+  }
+  //CONFIG.player = player;
+  //CONFIG.debug = true;
+  //CONFIG.scene = this;
+
   var laning = player.addBehavior(LaneMovement, {lane_size: LANE_SIZE, max_speed: MAX_SPEED, threshold: THRESHOLD});
   fg.add(player);
 
   this.patterns = [
-    [{x: 20, y: 1}, {x: 10, y: 2}, {x: 0, y: 3}, {x: 160, y: 0}, {x: 170, y: 1}, {x: 180, y: 2}]
+    [
+      {x: 120, y: 1}, {x: 110, y: 2}, {x: 100, y: 3}, {x: 110, y: 4}, {x: 120, y: 5}, 
+      {x: 260, y: 0}, {x: 270, y: 1}, {x: 280, y: 2}, {x: 280, y: 4}, {x: 270, y: 5}, {x: 260, y: 6}
+    ],
+    [
+      {x: 100, y: 0}, {x: 210, y: 1}, {x: 100, y: 2}, {x: 210, y: 3}, {x: 100, y: 4}, {x: 210, y: 5}, {x: 100, y: 6}
+    ]
   ]
   this.loadPattern = function () {
-    var cars = ["accent", "fiesta", "figaro", "malibu", "outback", "porter cab", "prius"];
+    var cars = ["accent", "fiesta", "figaro", "outback", "porter cab", "prius"];
 
+    var max = 0;
     var pattern = choose(this.patterns);
     for (var i = 0; i < pattern.length; i++) {
       var c = Object.create(Sprite).init(CONFIG.width + pattern[i].x, pattern[i].y * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
+      c.setCollision(Polygon);
+      c.setVertices([{x: -8, y: 6},
+        {x: 8, y: 6},
+        {x: 8, y: 12},
+        {x: -8, y: 12}
+      ]);
       c.addBehavior(Velocity);
       c.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 1000, y: 1000}});
       c.velocity = {x: -180, y: 0};
-      this.fg.add(c);
+      t.fg.add(c);
+      max = Math.max(max, pattern[i].x);
     }
-
+    t.interval = max;
   }
 
   this.onKeyDown = function (e) {
@@ -97,9 +135,10 @@ var onStart = function () {
 };
 
 var onUpdate = function (dt) {
-  if (Math.floor(this.time / INTERVAL) * INTERVAL > this.interval) {
-    this.interval += INTERVAL;
-    this.loadPattern();
+  if (this.interval > 0) {
+    this.interval -= ROAD_SPEED * dt;
+  } else {
+    this.loadPattern();    
   }
 };
 

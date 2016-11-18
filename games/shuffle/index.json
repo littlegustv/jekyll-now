@@ -13,6 +13,7 @@
     {"path": "road.png"},
     {"path": "ground.png"},
     {"path": "cathedral.png"},
+    {"path": "house.png"},
     {"path": "building2.png"},
     {"path": "box.png"}
   ],
