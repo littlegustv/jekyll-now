@@ -284,3 +284,9 @@ Drop.end = function () {
 		this.entity.layer.add(d);
 	}
 }
+
+var Crop = Object.create(Behavior);
+Crop.update = function (dt) {
+  if (this.entity.x > this.max.x || this.entity.x < this.min.x) this.entity.alive = false;
+  if (this.entity.y > this.max.y || this.entity.y < this.min.y) this.entity.alive = false;
+}

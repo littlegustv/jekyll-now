@@ -28,12 +28,6 @@ Shake.start = function () {
   this.time = 0;
 }
 
-var Crop = Object.create(Behavior);
-Crop.update = function (dt) {
-  if (this.entity.x > this.max.x || this.entity.x < this.min.x) this.entity.alive = false;
-  if (this.entity.y > this.max.y || this.entity.y < this.min.y) this.entity.alive = false;
-}
-
 var Trail = Object.create(Behavior);
 Trail.update = function (dt) {
   if (!this.time) this.start();

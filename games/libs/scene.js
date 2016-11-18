@@ -2,6 +2,7 @@ var Scene = {
 	resourceCount: 1,
 	resourceLoadCount: 0,
 	init: function (name) {
+		this.time = 0;
 		this.name = name;
 		this.layers = [];
 		this.loadData();
@@ -75,6 +76,7 @@ var Scene = {
 	},
 	update: function (dt) {
 		// update
+		this.time += dt;
 		for (var i = 0; i < this.layers.length; i++) {
 			this.layers[i].update(dt);
 		}
