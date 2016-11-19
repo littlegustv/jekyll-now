@@ -1,6 +1,11 @@
 // CONSTANTS
 
+// first bug: setScene reloads (THIS) js file, you can see it keep adding script tags to the HTML :/
+
 var LANE_SIZE = 32, MAX_SPEED = 200, THRESHOLD = 2.5, ROAD_SPEED = 160, LANE_OFFSET = 128;
+
+var sign_texts = ["Hoboken", "Hackensack", "Camden", "Trenton"];
+var cars = ["accent", "fiesta", "figaro", "outback", "porter cab", "prius"];
 
 var onStart = function () {
   this.layers = [];
@@ -11,6 +16,7 @@ var onStart = function () {
 
   var bg_camera = Object.create(Camera).init(0, 0);
   var bg = Object.create(Layer).init(bg_camera);
+  this.bg = bg;
 
   var fg_camera = Object.create(Camera).init(0, 0);
   var fg = Object.create(Layer).init(fg_camera);
@@ -72,7 +78,7 @@ var onStart = function () {
   }
   //CONFIG.player = player;
   //CONFIG.debug = true;
-  //CONFIG.scene = this;
+  CONFIG.scene = this;
 
   var laning = player.addBehavior(LaneMovement, {lane_size: LANE_SIZE, max_speed: MAX_SPEED, threshold: THRESHOLD});
   fg.add(player);
@@ -84,10 +90,15 @@ var onStart = function () {
     ],
     [
       {x: 100, y: 0}, {x: 210, y: 1}, {x: 100, y: 2}, {x: 210, y: 3}, {x: 100, y: 4}, {x: 210, y: 5}, {x: 100, y: 6}
+    ],
+    [
+      {x: 100, y: 0}, {x: 120, y: 1}, {x: 140, y: 2}, {x: 160, y: 3}, {x: 180, y: 4}, {x: 200, y: 5}
+    ],
+    [
+      {x: 200, y: 1}, {x: 180, y: 2}, {x: 160, y: 3}, {x: 140, y: 4}, {x: 120, y: 5}, {x: 100, y: 6}
     ]
   ]
   this.loadPattern = function () {
-    var cars = ["accent", "fiesta", "figaro", "outback", "porter cab", "prius"];
 
     var max = 0;
     var pattern = choose(this.patterns);
@@ -138,8 +149,15 @@ var onUpdate = function (dt) {
   if (this.interval > 0) {
     this.interval -= ROAD_SPEED * dt;
   } else {
-    this.loadPattern();    
+    this.loadPattern();
+    if (Math.random() * 1000 <= 400) {
+      var rs = Object.create(RoadSign).init(CONFIG.width + 64, 2 * LANE_SIZE, choose(sign_texts));
+      rs.addBehavior(Velocity);
+      rs.velocity = {x: -ROAD_SPEED, y: 0};
+      this.bg.add(rs);
+    }
   }
+
 };
 
 var onEnd = function () {

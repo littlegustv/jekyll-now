@@ -6,6 +6,7 @@ var Entity = {
 	alive: true,
 	z: 1,
 	points: 1,
+	// this makes it a CLASS variable, which is maybe not a good idea, since that means unless it is initialized, adding a behavior adds it to ALL objects ofthat class
 	behaviors: [],
 	init: function (x, y, w, h) {
 		this.behaviors = [];
