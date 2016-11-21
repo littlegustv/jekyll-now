@@ -5,7 +5,7 @@
 var LANE_SIZE = 32, MAX_SPEED = 200, THRESHOLD = 2.5, ROAD_SPEED = 160, LANE_OFFSET = 128;
 
 var sign_texts = ["Hoboken", "Hackensack", "Camden", "Trenton"];
-var cars = ["accent", "fiesta", "figaro", "outback", "porter cab", "prius"];
+var cars = ["fiesta", "crossover", "outback", "sedan"];
 
 var onStart = function () {
   this.layers = [];
@@ -71,10 +71,26 @@ var onStart = function () {
     {x: 8, y: 12},
     {x: -8, y: 12}
   ]);
+  player.offset = {x: 0, y: -12};
+  this.player = player;
+
+  var endGame = function () {
+    for (var i = 0; i < bg.entities.length; i++) {
+      bg.entities[i].velocity.x = 0;
+      bg.entities[i].velocity.y = 0;
+    }
+    for (var i = 0; i < fg.entities.length; i++) {
+      fg.entities[i].velocity.x = 0;
+      fg.entities[i].velocity.y = 0;
+      if (fg.entities[i].oscillate) fg.entities[i].removeBehavior(fg.entities[i].oscillate);
+    }
+  }
+
   player.setCollision(Polygon);
   player.collision.onHandle = function(object, other) {
-    gameWorld.setScene(0);
-    //t.onStart();
+    player.crashed = true;
+    player.addBehavior(Crash, {duration: 2, callback: endGame});
+    player.collision.onHandle = function (object, other) {};
   }
   //CONFIG.player = player;
   //CONFIG.debug = true;
@@ -92,10 +108,11 @@ var onStart = function () {
       {x: 100, y: 0}, {x: 210, y: 1}, {x: 100, y: 2}, {x: 210, y: 3}, {x: 100, y: 4}, {x: 210, y: 5}, {x: 100, y: 6}
     ],
     [
-      {x: 100, y: 0}, {x: 120, y: 1}, {x: 140, y: 2}, {x: 160, y: 3}, {x: 180, y: 4}, {x: 200, y: 5}
+      {x: 200, y: 1}, {x: 180, y: 2}, {x: 160, y: 3}, {x: 140, y: 4}, {x: 120, y: 5}, {x: 100, y: 6},
+      {x: 340, y: 0}, {x: 360, y: 1}, {x: 380, y: 2}, {x: 400, y: 3}, {x: 420, y: 4}, {x: 440, y: 5}
     ],
     [
-      {x: 200, y: 1}, {x: 180, y: 2}, {x: 160, y: 3}, {x: 140, y: 4}, {x: 120, y: 5}, {x: 100, y: 6}
+      {x: 100, y: 0}, {x: 100, y: 1}, {x: 100, y: 4}, {x: 100, y: 5}, {x: 240, y: 5}, {x: 240, y: 6}, {x: 240, y: 3}, {x: 240, y: 2}
     ]
   ]
   this.loadPattern = function () {
@@ -105,14 +122,16 @@ var onStart = function () {
     for (var i = 0; i < pattern.length; i++) {
       var c = Object.create(Sprite).init(CONFIG.width + pattern[i].x, pattern[i].y * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
       c.setCollision(Polygon);
+      c.offset = {x: 0, y: -12};
       c.setVertices([{x: -8, y: 6},
         {x: 8, y: 6},
         {x: 8, y: 12},
         {x: -8, y: 12}
       ]);
       c.addBehavior(Velocity);
-      c.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 1000, y: 1000}});
+      c.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
       c.velocity = {x: -180, y: 0};
+      c.oscillate = c.addBehavior(Oscillate, {object: c.velocity, field: 'x', initial: -180, constant: 10, rate: Math.random()})
       t.fg.add(c);
       max = Math.max(max, pattern[i].x);
     }
@@ -148,7 +167,7 @@ var onStart = function () {
 var onUpdate = function (dt) {
   if (this.interval > 0) {
     this.interval -= ROAD_SPEED * dt;
-  } else {
+  } else if (!this.player.crashed) {
     this.loadPattern();
     if (Math.random() * 1000 <= 400) {
       var rs = Object.create(RoadSign).init(CONFIG.width + 64, 2 * LANE_SIZE, choose(sign_texts));

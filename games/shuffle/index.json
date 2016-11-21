@@ -1,12 +1,14 @@
 {
   "scenes": [
+    "menu.json",
     "game.json"
   ],
   "resources": [
     {"path": "accent.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "fiesta.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "figaro.png", "frames": 2, "speed": 0.5, "animations": 1},
-    {"path": "malibu.png", "frames": 2, "speed": 0.5, "animations": 1},
+    {"path": "sedan.png", "frames": 2, "speed": 0.5, "animations": 1},
+    {"path": "crossover.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "outback.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "porter cab.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "prius.png", "frames": 2, "speed": 0.5, "animations": 1},

@@ -129,7 +129,7 @@ var World = {
 	setScene: function (n) {
 		if (this.scenes[n].reload) {
 			this.scenes[n] = Object.create(Scene).init(this.scenes[n].name);
-		}
+		}	
 		this.scene = this.scenes[n];
 		this.addEventListeners(this.scene);
 	},

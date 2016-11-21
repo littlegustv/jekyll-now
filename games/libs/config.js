@@ -64,15 +64,7 @@ function distance (x1, y1, x2, y2) {
 	return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 }
 
-var CONFIG = {
-	height: 360,
-	width: 640,
-	title: "My Game",
-	startScene: "game",
-	debug: false
-};
-
- var GLOBALS = {
+var GLOBALS = {
 	scale: 2,
 	invulnerability: 0.3
 };

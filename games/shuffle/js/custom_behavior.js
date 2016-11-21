@@ -12,6 +12,7 @@ LaneMovement.setLane = function () {
 }
 LaneMovement.update = function (dt) {
   if (!this.started) this.start();
+  if (this.entity.crashed) return;
 
   if (this.entity.direction != 0) {
     this.entity.velocity.y = lerp(this.entity.velocity.y, this.entity.direction * this.max_speed, 0.5);
@@ -22,5 +23,24 @@ LaneMovement.update = function (dt) {
       this.entity.y = this.entity.lane;
       this.entity.lane = undefined;
     }
+  }
+}
+
+var Crash = Object.create(Behavior);
+Crash.start = function () {
+  this.duration = this.duration || 1;
+  if (this.callback) this.callback();
+  this.time = 0;
+}
+Crash.update = function (dt) {
+  if (!this.time) this.start();
+  this.time += dt;
+  if (this.time > this.duration) {
+    gameWorld.setScene(0);
+  } else if (Math.random() * 100 < 15) {
+    var c = Object.create(Circle).init(this.entity.x + Math.random() * 16 - 8, this.entity.y + Math.random() * 16 - 8, Math.random() * 16 + 16);
+    c.color = "white";
+    c.addBehavior(FadeOut, {duration: 1});
+    this.entity.layer.add(c);
   }
 }
