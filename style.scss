@@ -5,7 +5,7 @@
 // IMPORTS
 //
 
-@import "reset";
+// @import "reset";
 @import "variables";
 // Syntax highlighting @import is at the bottom of this file
 
@@ -18,16 +18,16 @@ html {
   /*overflow: hidden;*/
 }
 
+blockquote {
+  border-left: 5px solid rgba(0, 0, 0, 0.23);
+}
+
 body {
 	background: $white;
   /*font: 18px/1.4 $georgia;*/
   /*font: 18px/1.4 Oswald, sans-serif;*/
   font: 18px/1.4 Ubuntu, sans-serif;
   color: $darkGray;
-}
-
-.main-stuff {
-  background-color: #FFF2AE;
 }
 
 article {
