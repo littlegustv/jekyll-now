@@ -4,7 +4,7 @@ title: A Communist Critique of S.P.E.W.
 tags: communism causality socialism revolution harry-potter spew
 ---
 
-<img src="{{ site.baseurl }}/images/hp.png" title="The House-Elf Liberation Front" class="img-thumbnail" style="float: left; margin-right: 10px; margin-bottom: 50px"></img>
+<img src="{{ site.baseurl }}/images/hp.png" title="The House-Elf Liberation Front" class="img-thumbnail" style="margin-bottom: 10px"></img>
 
 It would be impossible for any conscientious communist not to sympathize with S.P.E.W., the Society for the Promotion of Elfish Welfare.  Oppression takes many forms but none seems so egregious as the historical and ongoing enslavement of house-elves in locations across the world.  However, it is also the humble and responsible duty of any dedicated communist to offer constructive feedback and, if necessary, criticism in order to help a worthwhile cause succeed.
 
