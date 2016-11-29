@@ -31,27 +31,23 @@
   </head>
 
   <body>
-    <div class="container-fluid headliner">
-        <div class="container">
-          <h1 class="site-name h1"><a href="{{ site.baseurl }}/">{{ site.name }}</a></h1>
-        </div>
+    <div class="container-fluid headliner text-right">
+      <h1 class="site-name h1">{{ site.name }}</h1>
     </div>
-    <div class="nav navbar-inverse affix container-fluid" data-spy="affix" data-offset-top="200">
-      <div class="container">
-        <div class='nav-header'>
-          <!--<a href="{{ site.baseurl }}/" class="site-avatar"><img src="{{ site.avatar }}" /></a>-->
+    <div class="nav navbar-inverse affix container-fluid" id="navbar" data-spy="affix" data-offset-top="150">
+      <div class='nav-header'>
+        <!--<a href="{{ site.baseurl }}/" class="site-avatar"><img src="{{ site.avatar }}" /></a>-->
 
-            <!--<p class="site-description">{{ site.description }}</p>-->
-        </div>
-        <ul class="nav navbar-nav">
-          <li><a href="{{ site.baseurl }}/index.html">Home</a></li>
-          <li><a href="{{ site.baseurl }}/games">Games</a></li>
-          <li><a href="{{ site.baseurl }}/apps">Apps</a></li>
-        </ul>
+          <!--<p class="site-description">{{ site.description }}</p>-->
       </div>
+      <ul class="nav navbar-nav">
+        <li><a href="{{ site.baseurl }}/index.html">Blog</a></li>
+        <li><a href="{{ site.baseurl }}/games">Games</a></li>
+        <li><a href="{{ site.baseurl }}/apps">Apps</a></li>
+      </ul>
     </div>
 
-    <div class="container-fluid main-stuff">
+    <div class="container container-narrow main-stuff">
       {{ content }}
     </div>
 

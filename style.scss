@@ -62,12 +62,13 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-h1 {
+h1, .h1 {
   -webkit-column-span: all; 
   column-span: all;
   text-align: center;
   font-variant: small-caps;
-  font-size: 30px;
+  font-size: 24px;
+  font-weight: bold;
   a {
     color: inherit;
   }
@@ -173,6 +174,10 @@ img {
 // .masthead
 //
 
+.container-narrow {
+  width: 800px;
+}
+
 .top-container
 {
    max-width: 100%;
@@ -255,13 +260,13 @@ img {
 }
 
 .headliner {
-    background: #F44336;
+    background: pink;
     color: #fff;
-    height: 200px;
+    height: 140px;
 }
+/*
 .post-row {
   padding: 20px 40px 20px 40px;
-  background-color: #eee;
 }
 .post-row:after {
     content: '';
@@ -291,15 +296,15 @@ img {
   background-color: #f8f8f8;  
 }
 .post-row:nth-child(3n+1):after {
-  /*border-bottom: 8px dashed #649D03;*/
   box-shadow: 0px 6px 6px 0px rgba(0,0,0,0.3);
 }
 .post-row:nth-child(3n+2) {
   background-color: #ffffff  
-}
+}*/
 
 .post {
-  column-count: 3;
+  font-family: Georgia, serif;
+  /*column-count: 3;
   -webkit-column-count: 3;
   -moz-column-count: 3;
   -ms-column-count: 3;
@@ -308,7 +313,12 @@ img {
   -webkit-column-width: 300px;
   -moz-column-width: 300px;
   -ms-column-width: 300px;
-  -o-column-width: 300px;
+  -o-column-width: 300px;*/
+}
+
+.post-row {
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #ccc;
 }
 
 .wrapper-footer {
@@ -328,8 +338,20 @@ footer {
     width: 100%;
     z-index: 1000;
 }
-.affix + .container-fluid {
+.affix + .container {
     padding-top: 50px;
+}
+.affix:after {
+  content: 'littleGustav';
+  position: absolute;
+  font-variant: small-caps;
+  right: 10px;
+  color: white;
+  display: block;
+  height: 50px;
+  font-size: 42px;
+  line-height: 50px;
+  font-weight: bold;
 }
 
 // Settled on moving the import of syntax highlighting to the bottom of the CSS
