@@ -1,0 +1,31 @@
+---
+layout: post
+title: A Communist Critique of S.P.E.W.
+tags: communism causality socialism revolution harry-potter spew
+---
+
+<img src="{{ site.baseurl }}/images/hp.png" title="The House-Elf Liberation Front" class="img-thumbnail" style="margin-bottom: 10px"></img>
+
+It would be impossible for any conscientious communist not to sympathize with S.P.E.W., the Society for the Promotion of Elfish Welfare.  Oppression takes many forms but none seems so egregious as the historical and ongoing enslavement of house-elves in locations across the world.  However, it is also the humble and responsible duty of any dedicated communist to offer constructive feedback and, if necessary, criticism in order to help a worthwhile cause succeed.
+
+Too many people dismiss Hermione Granger’s attempts to change her current social order.  This includes her friends, the larger wizarding community, and even many of the millions of readers who followed her activity, all of whom are equally real and not at all fictional.  In fact, this entire moment of her personal story seems at times like a simple satire of the activist who gets too carried away with her ideals, refusing to listen to reason.
+
+But it would be a mistake to leave it at that, or to accept whatever flaws in Hermione’s methods and political approach as some kind of personal defect or justification for the existing order.  Because the main problem with S.P.E.W. as an organization is not that it is too radical and extreme in its aims and methods, but rather that it shares too many assumptions with the established order that it is trying to oppose.
+
+It’s stated goal is not an easy one.  The unique quality of house-elf enslavement is that they seem to actively ‘want’ to remain enslaved.  There are exceptions, like Dobby or Kreacher, but even in the face of regular mistreatment a house elf remains loyal to their masters (or after dismissal, in the case of Winky).  Elves are not paid, and are not able to disobey, despite their personal feelings on the matter.  This is the trump card that opponents of S.P.E.W. play in order to justify the distasteful institution.
+
+Even in her opposition, Hermione accepts too much of this logic.  Her belief is that, in fact, elves do not want to be enslaved however much they might claim that they do.  If freed, they would be better off and would ultimately understand the value of freedom.  The exceptions to standard elf behavior are used to validate this, by showing that conflicts can arise between master and slave.  But this is as deep as the analysis goes.
+
+Both those for and against house-elf enslavement are trapped within a simplistic view of action and consequence that is at best something called ‘expressive causality’.  The house-elf situation is viewed in one of two lights.  Either it is the result of the inherent desires and behaviors of house-elves in their natural state, or it is the result of their enslavement and domination by wizards.  In a sense, this is the same way of looking at the situation: it is due to an essential quality, either volition or oppression.  Remove it, and everything else falls into place as it should - but everything hinges on that.
+
+Wizards supporting (or ignoring) elf enslavement see this essential quality of subservience as justification.  The elves are making a free ‘choice’ to be slaves, and they are doing it as a group.  The flip side is the view of S.P.E.W. - wizards enslave elves, imposing (as individual masters) their will on beings who would otherwise be happily free.  In both cases the results are seen as caused by the essential qualities and behaviors having their predictable consequences.
+
+The problem with this approach is that it is unable to deal with change.  Both sides of this view find it difficult to account for the ‘exceptions’ as anything other than that - a strange case to be ignored as an aberration.  Hermione believes that Winky will eventually ‘come round’ to believe that her freedom was a gift, not a punishment, while Ron Weasley considers Dobby and his enthusiasm an eccentricity, at best.  
+
+The structure and stability of house-elf society and expectations are taken as a given - either to be accepted or opposed - rather than something which is the product of the actions of house-elves and wizards.  The relation between the two groups - the institution of slavery - is rife with rules and magical laws, and has a very real influence.  This is unmistakable, but it is not all encompassing, nor should it be taken as such.  Furthermore, it is an institution created and maintained - historically and in the current time - by the actions of its participants.
+
+Individual actions, such as Dobby seeking freedom and payment for his work, or Kreacher disobeying and betraying Sirius - or Hermione seeking to free the elves of Hogwarts one at a time - do not change or even undermine the structures that are in place.  The accepted standard that an elf not just serves but adores their master is not shaken by the fact that Dobby does not conform to this standard.  The broader structures can indeed be changed, but not by a simple binary action by an individual - opting in or out, as they choose.
+
+Being able to act on a structure, and not just be ‘acted on’ is what allows an escape from the deadlock faced by S.P.E.W.  That most house-elves prefer their position is a ‘fact’, but facts are not the end point of all discussion.  Desires can change, relations can change, and a social structure of enslavement can change, but only when approached as such.  Hermione treats freedom as almost a force of nature, that will triumph on its own with just a little encouragement.  Likewise, most everyone she talks to believes the same about a house-elf’s sincere desire to be a slave.
+
+It is strange to view something like ‘freedom’ or ‘slavery’ as so completely impersonal, as though it were something from outside that acts upon us.  But this is not an uncommon way of looking at things.  There is a kind of objectivity to social forces, particularly when we only interact with them as individuals.  But changing our social reality is not about individual choices, it is about social ones - and it is not about accepting some kind of natural order, but about creating a human one.
