@@ -175,7 +175,7 @@ img {
 //
 
 .container-narrow {
-  width: 800px;
+  max-width: 800px;
 }
 
 .top-container
@@ -351,6 +351,20 @@ footer {
   height: 50px;
   font-size: 42px;
   line-height: 50px;
+  font-weight: bold;
+}
+
+.pagination {
+  position: absolute;
+  right: 0px;
+  background: #222;
+}
+
+.pagination li a {
+  color: white;
+  border: none;
+  background: none;
+  font-variant: small-caps;
   font-weight: bold;
 }
 

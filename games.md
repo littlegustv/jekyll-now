@@ -4,6 +4,18 @@ title: Games
 permalink: /games/
 ---
 
+<div class="row text-right">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-6">
+        <h4><a href="http://www.kongregate.com/games/littlegustv/seven-deadly-seas">Seven Deadly Seas</a></h4>
+        <p>How long can one doomed ship last against everything the unforgiving sea cares to throw at her?  Find out!</p>
+        <b>Published 11-13-2016</b>
+    </div>
+    <div class="col-sm-4">
+        <a href="http://www.kongregate.com/games/littlegustv/seven-deadly-seas"><img src="{{ site.baseurl }}/images/ships.png" alt="" class="img img-thumbnail"></a>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-sm-4">
         <a href="http://www.kongregate.com/games/littlegustv/the-floor-is-the-surface-of-the-sun"><img src="{{ site.baseurl }}/images/surfaceofsun.png" alt="" class="img img-thumbnail"></a>
@@ -60,5 +72,16 @@ permalink: /games/
             <a href="{{ site.baseurl }}/games/mezzanine">The Mezzanine</a>
         </h4>
         <p>In need of a major redesign, but the core concept is there if you are interested</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-3">
+        <a href="{{ site.baseurl }}/games/shuffle"><img src="{{ site.baseurl }}/images/shuffle1.png" alt="" class="img img-thumbnail"></a>
+    </div>
+    <div class="col-sm-6">
+        <h4>
+            <a href="{{ site.baseurl }}/games/shuffle">The Jersey Shuffle</a>
+        </h4>
+        <p>Latest ongoing project; a simple driving game, perhaps?</p>
     </div>
 </div>
