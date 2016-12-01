@@ -11,7 +11,8 @@ Who knew, that a simple adaptation of Edgar Allen Poe’s “The Pit and the Pen
 ####By A Constant Spinning Motion
 
 Revolution, says someone named “Merriam-Webster” is the action of moving around something in a path that is similar to a circle.  Not only are you constantly moving around in Super Hexagon, but your path roughly describes a hexagon.  A hexagon, as we all know, is the most similar shape to a circle that there is.
-Success is Always Premature
+
+####Success is Always Premature
 
 Rarely in a game of Super Hexagon, whether it lasts five seconds or fifty, are your greatest achievements prepared for.  When you reach that new high score, be it by reflexes, intuition, or some absurd burst of flow, it is almost impossible to reproduce right away.  You’ve reacted to new problems and situations, making choices by the microsecond, and it is impossible to understand and reproduce them at a single attempt.  Yet this does not diminish the value or importance of that first success.  It’s like someone once said - the proletariat is not in the position to seize power in any other way than “prematurely”.[1]
 
