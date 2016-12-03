@@ -58,3 +58,28 @@ gameWorld.addEventListeners = function (scene) {
 }
 
 }
+
+Scene.loadBehavior = function (script) {
+  var s = document.createElement("script");
+  s.type = "text/javascript";
+  s.src = "scenes/" + script;
+  s.id = this.name;
+
+  var old = document.getElementById(this.name);
+  if (old) {
+    old.parentElement.removeChild(old);
+  }
+  document.body.appendChild(s);
+
+
+  // FIX ME: cross browser support
+  var t = this;
+
+  s.onload = function () {
+    t.onStart = onStart;
+    t.onUpdate = onUpdate;
+    t.onEnd = onEnd;
+    t.onDraw = onDraw;
+    t.loadProgress();
+  };
+}

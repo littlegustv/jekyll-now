@@ -5,6 +5,7 @@
   ],
   "resources": [
     {"path": "accent.png", "frames": 2, "speed": 0.5, "animations": 1},
+    {"path": "car.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "fiesta.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "figaro.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "sedan.png", "frames": 2, "speed": 0.5, "animations": 1},
@@ -14,6 +15,7 @@
     {"path": "prius.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "road.png"},
     {"path": "ground.png"},
+    {"path": "trees.png"},
     {"path": "cathedral.png"},
     {"path": "house.png"},
     {"path": "building2.png"},

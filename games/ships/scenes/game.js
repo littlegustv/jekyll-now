@@ -754,7 +754,7 @@ var onStart = function () {
 			player.velocity.x = SPEED.ship;
 		}
 		return false;
-	}	
+	}
 	this.onTouchStart = function (e) {
 
 		if (!fullscreen) requestFullScreen();
