@@ -14,6 +14,7 @@
     {"path": "porter cab.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "prius.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "road.png"},
+    {"path": "a.png"},
     {"path": "ground.png"},
     {"path": "trees.png"},
     {"path": "cathedral.png"},

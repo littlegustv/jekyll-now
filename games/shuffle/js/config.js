@@ -6,9 +6,32 @@ var CONFIG = {
   debug: false
 };
 
+function requestFullScreen () {
+// we've made the attempt, at least
+  fullscreen = true;
+  var body = document.documentElement;
+  if (body.requestFullscreen) {
+    body.requestFullscreen();
+  } else if (body.webkitRequestFullscreen) {
+    body.webkitRequestFullscreen();
+  } else if (body.mozRequestFullscreen) {
+    body.mozRequestFullscreen();
+  } else if (body.msRequestFullscreen) {
+    body.msRequestFullscreen();
+  }
+}
+
 window.onload = function () {
 
-gameWorld.setScene = function (n) {
+gameWorld.difficulties = [
+  {roadSpeed: 100, handling: 160, sprite: "porter cab"},
+  {roadSpeed: 200, handling: 230, sprite: "figaro"},
+  {roadSpeed: 260, handling: 300, sprite: "accent"},
+]
+
+gameWorld.difficulty = 0;
+
+World.setScene = function (n) {
   if (this.scenes[n].reload) {
     this.scenes[n] = Object.create(Scene).init(this.scenes[n].name);
   }
@@ -17,7 +40,7 @@ gameWorld.setScene = function (n) {
   this.addEventListeners(this.scene);
 }
 
-gameWorld.removeEventListeners = function (scene) {
+World.removeEventListeners = function (scene) {
   if (scene && scene.ready) {
     if (scene.onClick) this.canvas.removeEventListener('click', scene.onClick);
     if (scene.onMouseMove) this.canvas.removeEventListener('mousemove', scene.onMouseMove);
@@ -35,7 +58,7 @@ gameWorld.removeEventListeners = function (scene) {
   }
 }
 
-gameWorld.addEventListeners = function (scene) {
+World.addEventListeners = function (scene) {
   if (scene.ready) {
     if (scene.onClick) this.canvas.addEventListener('click', scene.onClick);
     if (scene.onMouseMove) this.canvas.addEventListener('mousemove', scene.onMouseMove);
@@ -82,4 +105,20 @@ Scene.loadBehavior = function (script) {
     t.onDraw = onDraw;
     t.loadProgress();
   };
+}
+
+FadeOut.update = function (dt) {
+    if (!this.time) this.start();
+    this.time += dt;
+
+    if (this.time >= this.duration && this.remove) this.entity.alive = false;
+    this.entity.opacity = clamp(this.maxOpacity * (this.duration - this.time) / this.duration, 0, 1);
+};
+FadeOut.start = function () {
+  if (this.entity.collision) {
+    this.entity.collision.onCheck = function (a, b) { console.log(2);  return false };
+  }
+  this.maxOpacity = this.entity.opacity;
+  this.remove = this.remove === undefined ? true : this.remove;
+  this.time = 0;
 }

@@ -3,16 +3,16 @@
 // first bug: setScene reloads (THIS) js file, you can see it keep adding script tags to the HTML :/
 
 var LANE_SIZE = 32, MAX_SPEED = 200, THRESHOLD = 2.5, ROAD_SPEED = 160, LANE_OFFSET = 128;
+var fullscreen = false;
 
 var onStart = function () {
 
   this._gamepad = Object.create(Gamepad).init();
 
   this.layers = [];
+  this.delay = 0.25;
 
   var t = this;
-  this.distance = 0;
-  this.interval = 0;
 
   var bg_camera = Object.create(Camera).init(0, 0);
   var bg = Object.create(Layer).init(bg_camera);
@@ -31,6 +31,72 @@ var onStart = function () {
   var title3 = Object.create(Text).init(CONFIG.width / 2 - 80, CONFIG.height / 2 + 38, "Shuffle", {align: "left", size: 108, color: "black"});
   fg.add(title3);  
 
+  fg.add(Object.create(Text).init(2 * CONFIG.width / 3, CONFIG.height / 2 + 72, "Press Any Key", {size : 24, align: "left"}));
+  fg.add(Object.create(Text).init(2 * CONFIG.width / 3, CONFIG.height / 2 + 84, "Press     ", {size: 24, align: "left"}));
+  fg.add(Object.create(Text).init(2 * CONFIG.width / 3, CONFIG.height / 2 + 96, "Touch Anywhere", {size: 24, align: "left"}));
+  fg.add(Object.create(Text).init(2 * CONFIG.width / 3, CONFIG.height / 2 + 112, "To Begin...", {size: 32, align: "left"}));
+  fg.add(Object.create(Sprite).init(2 * CONFIG.width / 3 + 64, CONFIG.height / 2 + 80, Resources.a));
+
+  if (gameWorld.score) {
+    var scoreText = Object.create(Text).init(CONFIG.width / 2, 20, "You made it " + gameWorld.score + " miles!", {});
+    scoreText.addBehavior(FadeIn, {duration: 0.5});
+    fg.add(scoreText);
+  }
+
+  this.selectors = [];
+  this.selector_texts = [];
+
+  for (var i = 0; i < gameWorld.difficulties.length; i++) {
+    var theta = (Math.PI / 6) * (i - gameWorld.difficulty);
+    var dy = 96 * Math.sin(theta);
+    var dx = 96 * Math.cos(theta);
+    var d = Object.create(Sprite).init(72 + dx, CONFIG.height / 2 + dy, Resources[gameWorld.difficulties[i].sprite]);
+    d.opacity = (i == gameWorld.difficulty) ? 1 : 0.5;
+    d.w *= (i == gameWorld.difficulty) ? 1 : 0.8;
+    d.h *= (i == gameWorld.difficulty) ? 1 : 0.8;
+    d.z = 2;
+    this.selectors.push(d);
+    fg.add(d);
+
+    var st = [];
+    var handling_text = Object.create(Text).init(12, CONFIG.height / 2 - 12, "Handling", {align: "left", size: 24});
+    st.push(handling_text);
+    var h = Math.floor(10 * gameWorld.difficulties[i].handling / 500);
+    for (var j = 0; j < 10; j++) {
+      var e = Object.create(Entity).init(12 + j * 10, handling_text.y + 12, 8, 8);
+      e.color = j <= h ? "black" : "gray";
+      st.push(e);
+    }
+
+    var speed_text = Object.create(Text).init(12, CONFIG.height / 2 + 24, "Speed", {align: "left", size: 24});
+    st.push(speed_text);
+    var h = Math.floor(10 * gameWorld.difficulties[i].roadSpeed / 500);
+    for (var j = 0; j < 10; j++) {
+      var e = Object.create(Entity).init(12 + j * 10, speed_text.y + 12, 8, 8);
+      e.color = j <= h ? "black" : "gray";
+      st.push(e);
+    }
+
+    for (var j = 0; j < st.length; j++) {
+      var t1 = st[j];
+      t1.fadeOut = function () {
+        this.opacity = 0;
+      }
+      t1.fadeIn = function () {
+        this.opacity = 1;
+      }
+
+      if (i == gameWorld.difficulty) {
+        t1.opacity = 1;
+      } else {
+        t1.opacity = 0;
+      }
+      t1.z = 10;
+      fg.add(t1);
+    }
+    this.selector_texts.push(st);
+  }
+
   fg.drawOrder = function () {
     return this.entities.sort(function (a, b) { 
       if (a.z && b.z && b.z != a.z) return a.z - b.z;
@@ -39,6 +105,33 @@ var onStart = function () {
     });
   }
   //this.fg = fg;
+
+  this.doRefreshSelectors = false;
+  this.refreshSelectors = function () {
+    var lerpRate = 0.2;
+    for (var i = 0; i < this.selectors.length; i++) {
+      var theta = (Math.PI / 6) * (i - gameWorld.difficulty);
+      var dy = 96 * Math.sin(theta);
+      var dx = 96 * Math.cos(theta);
+      var d = this.selectors[i];
+      d.x = lerp(d.x, 72 + dx, lerpRate), d.y = lerp(d.y, CONFIG.height / 2 + dy, lerpRate);
+      if (i == gameWorld.difficulty) {
+        console.log('mhm');
+      }
+      d.opacity = (i == gameWorld.difficulty) ? 1 : 0.5;
+      d.w = lerp(d.w, d.sprite.w * GLOBALS.scale * ((i == gameWorld.difficulty) ? 1 : 0.8), lerpRate);
+      d.h = lerp(d.h, d.sprite.h * GLOBALS.scale * ((i == gameWorld.difficulty) ? 1 : 0.8), lerpRate);
+
+      // snap to if close enough
+      if (Math.abs(d.x - (72 + dx)) < 0.5) {
+        d.x = 72 + dx;
+        d.y = CONFIG.height / 2 + dy;
+        d.w = d.sprite.w * GLOBALS.scale * ((i == gameWorld.difficulty) ? 1 : 0.8);
+        d.h = d.sprite.h * GLOBALS.scale * ((i == gameWorld.difficulty) ? 1 : 0.8);
+        this.doRefreshSelectors = false;
+      }
+    }
+  }
 
   for (var i = 0; i < 2; i ++) {
 
@@ -58,12 +151,32 @@ var onStart = function () {
 
   this.onKeyDown = function (e) {
     e.preventDefault();
-    gameWorld.setScene(1);
+    if (e.keyCode == 38) {
+      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
+      gameWorld.difficulty = Math.max(0, gameWorld.difficulty - 1);
+      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
+      t.doRefreshSelectors = true;
+    } else if (e.keyCode == 40) {
+      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
+      gameWorld.difficulty = Math.min(gameWorld.difficulty + 1, gameWorld.difficulties.length - 1);  
+      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
+      t.doRefreshSelectors = true;
+    } else {
+      gameWorld.setScene(1);
+    }
     return false;
   }
 
   this._gamepad.buttons.a.onStart = function (dt) {
+    if (t.delay <= 0)
+      gameWorld.setScene(1);
+  }
+
+  this.onTouchStart = function (e) {
+
+    if (!fullscreen) requestFullScreen();
     gameWorld.setScene(1);
+
   }
 
   this.layers.push(bg);
@@ -71,7 +184,9 @@ var onStart = function () {
 };
 
 var onUpdate = function (dt) {
+  this.delay -= dt;
   this._gamepad.update(dt);
+  if (this.doRefreshSelectors) this.refreshSelectors();
 };
 
 var onEnd = function () {

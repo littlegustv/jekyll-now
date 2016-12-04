@@ -1,22 +1,27 @@
 // CONSTANTS
 
 // speeds... 300, 260 is quite fast!
+// 230, 200 is 'normal?'
 
 var LANE_SIZE = 32, MAX_SPEED = 230, THRESHOLD = 2.5, ROAD_SPEED = 200, LANE_OFFSET = 128;
 
-var sign_texts = ["Hoboken", "Hackensack", "Camden", "Trenton"];
+//var sign_texts = ["Hoboken", "Hackensack", "Camden", "Trenton"];
 var cars = ["car"];
 var buildings = ["building2", "box", "cathedral", "house"];
 
 var onStart = function () {
 
   this._gamepad = Object.create(Gamepad).init();
+  if (!gameWorld.score) gameWorld.score = 0;
 
   this.layers = [];
 
   this.miles = function () {
-    return Math.floor(100 * this.distance / (2 * 5280)) / 100;
+    return Math.floor(200 * this.distance / (2 * 5280)) / 100;
   }
+
+  MAX_SPEED = gameWorld.difficulties[gameWorld.difficulty].handling;
+  ROAD_SPEED = gameWorld.difficulties[gameWorld.difficulty].roadSpeed;
 
   var t = this;
   this.distance = 0;
@@ -51,7 +56,7 @@ var onStart = function () {
 
   for (var i = 0; i < 2; i ++) {  
     var trees = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, 2.5 * LANE_SIZE, CONFIG.width + LANE_SIZE, LANE_SIZE, Resources.trees);
-    trees.velocity = {x: - 3 * ROAD_SPEED / 4, y: 0};
+    trees.velocity = {x: - 3 * ROAD_SPEED, y: 0};
     trees.z = -10;
     bg.add(trees);
 
@@ -84,10 +89,10 @@ var onStart = function () {
     bg.entities[i].addBehavior(Velocity);
     bg.entities[i].addBehavior(Wrap, {min: {x: -CONFIG.width / 2, y: 0}, max: {x: CONFIG.width + CONFIG.width / 2, y: CONFIG.height}});
     if (!bg.entities[i].velocity.x)
-      bg.entities[i].velocity = {x: -1 * ROAD_SPEED, y: 0};
+      bg.entities[i].velocity = {x: -2 * ROAD_SPEED, y: 0};
   }
 
-  var player = Object.create(Sprite).init(64, CONFIG.height / 2, Resources.accent);
+  var player = Object.create(Sprite).init(64, CONFIG.height / 2, Resources[gameWorld.difficulties[gameWorld.difficulty].sprite]);
   player.addBehavior(Velocity);
   player.addBehavior(Bound, {min: {x: 0, y: 4 * LANE_SIZE}, max: {x: CONFIG.width, y: CONFIG.height - LANE_SIZE}});
   player.velocity = {x: 0, y: 0};
@@ -169,6 +174,10 @@ var onStart = function () {
 
   this.onKeyDown = function (e) {
     e.preventDefault();
+    if (player.crashed) {
+      gameWorld.setScene(0);
+      return false;
+    }
     if (e.keyCode == 38) {
       player.direction = -1;
       player.angle = Math.PI / 18 * -1;
@@ -195,6 +204,7 @@ var onStart = function () {
   this._gamepad = Object.create(Gamepad).init();
   this._gamepad.aleft.onUpdate = function (dt) {
     if (Math.abs(this.y) > 0.3) {
+      this.active = true;
       if (this.y < -0.3) {
         player.direction = -1;
         player.angle = Math.PI / 18 * -1;
@@ -202,9 +212,43 @@ var onStart = function () {
         player.direction = 1;
         player.angle = Math.PI / 18 * 1;
       }
-    } else {
-      //laning.setLane();
+    } else if (this.active) {
+      laning.setLane();
+      this.active = false;
     }
+  }
+  this._gamepad.buttons.a.onStart = function (dt) {
+    if (player.crashed) {
+      gameWorld.setScene(0);
+    }
+  }
+
+  this.touch = {x: 0, y: 0};
+  // on touch start, create a 'center point' that you swipe up or down from
+  this.onTouchStart = function (e) {
+    if (player.crashed) {
+      gameWorld.setScene(0);
+      return false;
+    }
+    t.touch.x = e.changedTouches[0].pageX, t.touch.y = e.changedTouches[0].pageY;
+  }
+  this.onTouchMove = function (e) {
+    var x = e.changedTouches[0].pageX, y = e.changedTouches[0].pageY;
+    var dy = y - player.y;
+    if (Math.abs(t.touch.y - y) < 10) {
+      laning.setLane();
+      return;
+    }
+    if (y > t.touch.y) {
+      player.direction = 1;
+      player.angle = Math.PI / 18 * 1;
+    } else {
+      player.direction = -1;
+      player.angle = Math.PI / 18 * -1;
+    }
+  }
+  this.onTouchEnd = function (e) {
+    laning.setLane();
   }
 
   this.layers.push(bg);
@@ -215,8 +259,10 @@ var onStart = function () {
 var onUpdate = function (dt) {
   this._gamepad.update(dt);
 
-  if (!this.player.crashed)
+  if (!this.player.crashed) {
     this.distance += ROAD_SPEED * dt;
+    gameWorld.score = this.miles();
+  }
 
   var spacing = 72;
   var distance_in_blocks = Math.floor(this.distance / spacing) * spacing;
@@ -225,7 +271,7 @@ var onUpdate = function (dt) {
     if (Math.random() * 100 < 40) {
       var b = Object.create(Sprite).init(CONFIG.width + 96, 2.75 * LANE_SIZE, Resources[choose(buildings)]);
       b.addBehavior(Velocity);
-      b.velocity = {x: - ROAD_SPEED, y: 0};
+      b.velocity = {x: -2 * ROAD_SPEED, y: 0};
       b.addBehavior(Crop, {min: {x: - CONFIG.width, y: 0}, max: {x: 2 * CONFIG.width, y: CONFIG.height}});
       b.z = 2;
       this.bg.add(b);
