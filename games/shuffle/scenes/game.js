@@ -173,29 +173,34 @@ var onStart = function () {
   }
 
   this.onKeyDown = function (e) {
-    e.preventDefault();
     if (player.crashed) {
+      e.preventDefault();
       gameWorld.setScene(0);
       return false;
     }
     if (e.keyCode == 38) {
+      e.preventDefault();
       player.direction = -1;
       player.angle = Math.PI / 18 * -1;
+      return false;
     } else if (e.keyCode == 40) {
+      e.preventDefault();
       player.direction = 1;
       player.angle = Math.PI / 18 * 1;
+      return false;
     }
-    return false;
   }
 
   this.onKeyUp = function (e) {
-    e.preventDefault();
     if (e.keyCode == 38) {
+      e.preventDefault();
       laning.setLane();
+      return false;
     } else if (e.keyCode == 40) {
+      e.preventDefault();
       laning.setLane();
+      return false;
     }
-    return false;
   }
 
   // gamepad!
@@ -234,7 +239,6 @@ var onStart = function () {
   }
   this.onTouchMove = function (e) {
     var x = e.changedTouches[0].pageX, y = e.changedTouches[0].pageY;
-    var dy = y - player.y;
     if (Math.abs(t.touch.y - y) < 10) {
       laning.setLane();
       return;

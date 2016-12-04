@@ -150,33 +150,73 @@ var onStart = function () {
   }
 
   this.onKeyDown = function (e) {
-    e.preventDefault();
     if (e.keyCode == 38) {
+      e.preventDefault();
       t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
       gameWorld.difficulty = Math.max(0, gameWorld.difficulty - 1);
       t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
       t.doRefreshSelectors = true;
+      return false;
     } else if (e.keyCode == 40) {
+      e.preventDefault();
       t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
       gameWorld.difficulty = Math.min(gameWorld.difficulty + 1, gameWorld.difficulties.length - 1);  
       t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
       t.doRefreshSelectors = true;
-    } else {
+      return false;
+    } else if (e.keyCode == 32) {
+      e.preventDefault();
       gameWorld.setScene(1);
+      return false;
     }
-    return false;
   }
 
   this._gamepad.buttons.a.onStart = function (dt) {
     if (t.delay <= 0)
       gameWorld.setScene(1);
   }
+  this._gamepad.aleft.onUpdate = function (dt) {
+    if (this.delay === undefined) this.delay = 0;
+    if (this.delay > 0) {
+      this.delay -= dt;
+      return;
+    }
+    if (this.y < -0.3) {
+      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
+      gameWorld.difficulty = Math.max(0, gameWorld.difficulty - 1);
+      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
+      this.delay = 0.3;
+      t.doRefreshSelectors = true;
+    } else if (this.y > 0.3) {
+      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
+      gameWorld.difficulty = Math.min(gameWorld.difficulty + 1, gameWorld.difficulties.length - 1);  
+      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
+      this.delay = 0.3;
+      t.doRefreshSelectors = true;
+    }
+  }
 
+  this.touch = {x: 0, y: 0, delay: 0};
   this.onTouchStart = function (e) {
-
     if (!fullscreen) requestFullScreen();
-    gameWorld.setScene(1);
-
+    t.touch.x = e.changedTouches[0].pageX, t.touch.y = e.changedTouches[0].pageY;
+  }
+  this.onTouchEnd = function (e) {
+    var x = e.changedTouches[0].pageX, y = e.changedTouches[0].pageY;
+    if (Math.abs(t.touch.y - y) < 10) {
+      gameWorld.setScene(1);
+      return;
+    } else if (y < t.touch.y) {
+      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
+      gameWorld.difficulty = Math.max(0, gameWorld.difficulty - 1);
+      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
+      t.doRefreshSelectors = true;    
+    } else {
+      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
+      gameWorld.difficulty = Math.min(gameWorld.difficulty + 1, gameWorld.difficulties.length - 1);  
+      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
+      t.doRefreshSelectors = true;    
+    }
   }
 
   this.layers.push(bg);
