@@ -116,7 +116,6 @@ var onStart = function () {
       var d = this.selectors[i];
       d.x = lerp(d.x, 72 + dx, lerpRate), d.y = lerp(d.y, CONFIG.height / 2 + dy, lerpRate);
       if (i == gameWorld.difficulty) {
-        console.log('mhm');
       }
       d.opacity = (i == gameWorld.difficulty) ? 1 : 0.5;
       d.w = lerp(d.w, d.sprite.w * GLOBALS.scale * ((i == gameWorld.difficulty) ? 1 : 0.8), lerpRate);

@@ -92,7 +92,7 @@ var onStart = function () {
       bg.entities[i].velocity = {x: -2 * ROAD_SPEED, y: 0};
   }
 
-  var player = Object.create(Sprite).init(64, CONFIG.height / 2, Resources[gameWorld.difficulties[gameWorld.difficulty].sprite]);
+  var player = Object.create(Sprite).init(64, CONFIG.height - 5 * LANE_SIZE/*CONFIG.height / 2*/, Resources[gameWorld.difficulties[gameWorld.difficulty].sprite]);
   player.addBehavior(Velocity);
   player.addBehavior(Bound, {min: {x: 0, y: 4 * LANE_SIZE}, max: {x: CONFIG.width, y: CONFIG.height - LANE_SIZE}});
   player.velocity = {x: 0, y: 0};
@@ -127,32 +127,103 @@ var onStart = function () {
   CONFIG.scene = this;
 
   var laning = player.addBehavior(LaneMovement, {lane_size: LANE_SIZE, max_speed: MAX_SPEED, threshold: THRESHOLD});
+  this.laning = laning;
   fg.add(player);
 
   this.patterns = [
-    [
+    // 'arrow < >'
+    function (lane) { return [
       {x: 120, y: 1}, {x: 110, y: 2}, {x: 100, y: 3}, {x: 110, y: 4}, {x: 120, y: 5}, 
       {x: 260, y: 0}, {x: 270, y: 1}, {x: 280, y: 2}, {x: 280, y: 4}, {x: 270, y: 5}, {x: 260, y: 6}
-    ],
-    [
+    ]},
+    // grid : - : -
+    function (lane) { return [
       {x: 100, y: 0}, {x: 210, y: 1}, {x: 100, y: 2}, {x: 210, y: 3}, {x: 100, y: 4}, {x: 210, y: 5}, {x: 100, y: 6}
-    ],
-    [
+    ]},
+    // slash / \
+    function (lane) { return [
       {x: 200, y: 1}, {x: 180, y: 2}, {x: 160, y: 3}, {x: 140, y: 4}, {x: 120, y: 5}, {x: 100, y: 6},
       {x: 340, y: 0}, {x: 360, y: 1}, {x: 380, y: 2}, {x: 400, y: 3}, {x: 420, y: 4}, {x: 440, y: 5}
-    ],
-    [
-      {x: 100, y: 0}, {x: 100, y: 1}, {x: 100, y: 4}, {x: 100, y: 5}, {x: 240, y: 5}, {x: 240, y: 6}, {x: 240, y: 3}, {x: 240, y: 2}
-    ],
-    [
+    ]},
+    // dashed grid | |
+    function (lane) { return [
+      {x: 100, y: 0}, {x: 100, y: 1}, {x: 100, y: 4}, {x: 100, y: 5}, {x: 200, y: 5}, {x: 200, y: 6}, {x: 200, y: 3}, {x: 200, y: 2}
+    ]},
+    // trick! 
+    function (lane) { return [
       {x: 100, y: 0}, {x: 100, y: 2}, {x: 160, y: 0}, {x: 160, y: 3}, {x: 100, y: 4}, {x: 100, y: 6}, {x: 160, y: 6}, 
       {x: 220, y: 1}, {x: 220, y: 3}, {x: 220, y: 5} 
-    ]
+    ]}
   ]
+
+  var PATTERN_COUNT = 4, MAX_LANE = 6;
+  this.patterns = function (lane) {
+    var pattern = [];
+    choice = Math.floor(Math.random() * PATTERN_COUNT);
+    switch (choice) {
+      case 0: // move two
+        var direction = Math.random() > 0.5 ? 2 : -2;
+        if (lane <= 1) direction = 2;
+        else if (lane >= MAX_LANE - 1) direction = -2;
+        for (var i = 0; i <= MAX_LANE; i++) {
+          if (lane + (direction * 1) != i) {
+            pattern.push({x: 120, y: i});
+          }
+        }
+        lane = lane + (direction * 1);      
+      break;
+      case 1: // move one, a lot?
+        for (var j = 100; j <= 300; j += 100) {          
+          var direction = Math.random() > 0.5 ? 1 : -1;
+          if (lane == 0) direction = 1;
+          else if (lane == MAX_LANE) direction = -1;
+          for (var i = 0; i <= MAX_LANE; i++) {
+            if (lane + (direction * 1) != i) {
+              pattern.push({x: j, y: i});
+            }
+          }
+          lane = lane + (direction * 1);
+        }
+      break;
+      case 2: // the whole thing
+        var goal = lane > MAX_LANE / 2 ? 0 : MAX_LANE;
+        for (var i = 0; i <= MAX_LANE; i++) {
+          if (i != goal)
+            pattern.push({x: 100 + (MAX_LANE - Math.abs(goal - i)) * 20, y: i});
+        }
+        lane = goal;
+      break;
+      case 3: // zig-zag?
+        for (var j = 100; j <= 480; j += 160) {          
+          var direction = Math.random() > 0.5 ? 3 : -3;
+          if (lane <= 2) direction = 3;
+          else if (lane >= MAX_LANE - 2) direction = -3;
+          var goal = lane + direction;
+          for (var i = 0; i <= MAX_LANE; i++) {
+            if (i != goal)
+              pattern.push({x: j + (MAX_LANE - Math.abs(lane - i)) * 20, y: i});
+          }
+          lane = goal;
+        }
+      break;
+      // ideas:
+      // 'syncopated' - one-offset with slight... delay, or change in 'rhythm' of lane switches
+      // 
+      default:
+      break;
+    }
+    return {pattern: pattern, lane: lane};
+  }
+
+  this.last_lane = 0;
+
   this.loadPattern = function () {
 
     var max = 0, min = 10000;
-    var pattern = choose(this.patterns);
+    //var pattern = choose(this.patterns)();
+    var info = this.patterns(this.last_lane);
+    var pattern = info.pattern;
+    this.last_lane = info.lane;
     for (var i = 0; i < pattern.length; i++) {
       var c = Object.create(Sprite).init(CONFIG.width + pattern[i].x, pattern[i].y * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
       c.setCollision(Polygon);
