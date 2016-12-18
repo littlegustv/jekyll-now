@@ -92,7 +92,7 @@ var onStart = function () {
       bg.entities[i].velocity = {x: -2 * ROAD_SPEED, y: 0};
   }
 
-  var player = Object.create(Sprite).init(64, CONFIG.height - 5 * LANE_SIZE/*CONFIG.height / 2*/, Resources[gameWorld.difficulties[gameWorld.difficulty].sprite]);
+  var player = Object.create(Sprite).init(64, /*CONFIG.height - 5 * LANE_SIZE*/CONFIG.height / 2, Resources[gameWorld.difficulties[gameWorld.difficulty].sprite]);
   player.addBehavior(Velocity);
   player.addBehavior(Bound, {min: {x: 0, y: 4 * LANE_SIZE}, max: {x: CONFIG.width, y: CONFIG.height - LANE_SIZE}});
   player.velocity = {x: 0, y: 0};
@@ -118,6 +118,8 @@ var onStart = function () {
 
   player.setCollision(Polygon);
   player.collision.onHandle = function(object, other) {
+    gameWorld.playSound(Resources.crash);
+    gameWorld.playSound(Resources.explode);
     player.crashed = true;
     player.addBehavior(Crash, {duration: 2, callback: endGame});
     player.collision.onHandle = function (object, other) {};
@@ -125,122 +127,77 @@ var onStart = function () {
   //CONFIG.player = player;
   //CONFIG.debug = true;
   CONFIG.scene = this;
-
+/*
+  var Tracks = Object.create(Behavior);
+  Tracks.update = function (dt) {
+    for (var i = 0; i < 2; i++) {
+      var e = Object.create(Entity).init(this.entity.x - 12 + i * 24, this.entity.y + 16, 4, 4);
+      e.color = "#111";
+      e.addBehavior(FadeOut, {duration: 3});
+      e.addBehavior(Velocity);
+      e.velocity = {x: -ROAD_SPEED, y: 0};
+      e.addBehavior(Crop, {min: {x: -100, y: 0,}, max: {x: 10000, y: 10000}});
+      e.z = -1;
+      t.fg.add(e);
+    }
+  };
+  player.addBehavior(Tracks, {});
+*/
   var laning = player.addBehavior(LaneMovement, {lane_size: LANE_SIZE, max_speed: MAX_SPEED, threshold: THRESHOLD});
   this.laning = laning;
   fg.add(player);
 
-  this.patterns = [
-    // 'arrow < >'
-    function (lane) { return [
-      {x: 120, y: 1}, {x: 110, y: 2}, {x: 100, y: 3}, {x: 110, y: 4}, {x: 120, y: 5}, 
-      {x: 260, y: 0}, {x: 270, y: 1}, {x: 280, y: 2}, {x: 280, y: 4}, {x: 270, y: 5}, {x: 260, y: 6}
-    ]},
-    // grid : - : -
-    function (lane) { return [
-      {x: 100, y: 0}, {x: 210, y: 1}, {x: 100, y: 2}, {x: 210, y: 3}, {x: 100, y: 4}, {x: 210, y: 5}, {x: 100, y: 6}
-    ]},
-    // slash / \
-    function (lane) { return [
-      {x: 200, y: 1}, {x: 180, y: 2}, {x: 160, y: 3}, {x: 140, y: 4}, {x: 120, y: 5}, {x: 100, y: 6},
-      {x: 340, y: 0}, {x: 360, y: 1}, {x: 380, y: 2}, {x: 400, y: 3}, {x: 420, y: 4}, {x: 440, y: 5}
-    ]},
-    // dashed grid | |
-    function (lane) { return [
-      {x: 100, y: 0}, {x: 100, y: 1}, {x: 100, y: 4}, {x: 100, y: 5}, {x: 200, y: 5}, {x: 200, y: 6}, {x: 200, y: 3}, {x: 200, y: 2}
-    ]},
-    // trick! 
-    function (lane) { return [
-      {x: 100, y: 0}, {x: 100, y: 2}, {x: 160, y: 0}, {x: 160, y: 3}, {x: 100, y: 4}, {x: 100, y: 6}, {x: 160, y: 6}, 
-      {x: 220, y: 1}, {x: 220, y: 3}, {x: 220, y: 5} 
-    ]}
-  ]
-
-  var PATTERN_COUNT = 4, MAX_LANE = 6;
-  this.patterns = function (lane) {
-    var pattern = [];
-    choice = Math.floor(Math.random() * PATTERN_COUNT);
-    switch (choice) {
-      case 0: // move two
-        var direction = Math.random() > 0.5 ? 2 : -2;
-        if (lane <= 1) direction = 2;
-        else if (lane >= MAX_LANE - 1) direction = -2;
-        for (var i = 0; i <= MAX_LANE; i++) {
-          if (lane + (direction * 1) != i) {
-            pattern.push({x: 120, y: i});
-          }
-        }
-        lane = lane + (direction * 1);      
-      break;
-      case 1: // move one, a lot?
-        for (var j = 100; j <= 300; j += 100) {          
-          var direction = Math.random() > 0.5 ? 1 : -1;
-          if (lane == 0) direction = 1;
-          else if (lane == MAX_LANE) direction = -1;
-          for (var i = 0; i <= MAX_LANE; i++) {
-            if (lane + (direction * 1) != i) {
-              pattern.push({x: j, y: i});
-            }
-          }
-          lane = lane + (direction * 1);
-        }
-      break;
-      case 2: // the whole thing
-        var goal = lane > MAX_LANE / 2 ? 0 : MAX_LANE;
-        for (var i = 0; i <= MAX_LANE; i++) {
-          if (i != goal)
-            pattern.push({x: 100 + (MAX_LANE - Math.abs(goal - i)) * 20, y: i});
-        }
-        lane = goal;
-      break;
-      case 3: // zig-zag?
-        for (var j = 100; j <= 480; j += 160) {          
-          var direction = Math.random() > 0.5 ? 3 : -3;
-          if (lane <= 2) direction = 3;
-          else if (lane >= MAX_LANE - 2) direction = -3;
-          var goal = lane + direction;
-          for (var i = 0; i <= MAX_LANE; i++) {
-            if (i != goal)
-              pattern.push({x: j + (MAX_LANE - Math.abs(lane - i)) * 20, y: i});
-          }
-          lane = goal;
-        }
-      break;
-      // ideas:
-      // 'syncopated' - one-offset with slight... delay, or change in 'rhythm' of lane switches
-      // 
-      default:
-      break;
-    }
-    return {pattern: pattern, lane: lane};
-  }
-
   this.last_lane = 0;
 
+  // - add 'tricks'; where there are 'two' destinations but only ONE is real
+  // - further jumble 'non-essential' cars
+  // - increase difficulty!
   this.loadPattern = function () {
+    var start = 100, lane = this.last_lane;
+    
+    // choose new lane
+    var destination = modulo(lane + Math.floor(Math.random() * 7), 7);
+    
+    // create 'fakes' -> up to... two?
+    var fakes = [];
+    var fake_chance = Math.random();
+    if (fake_chance < 0.4)
+      fakes.push(modulo(destination + Math.floor(Math.random() * 6) + 1, 7))
+    if (fake_chance < 0.2)  
+      fakes.push(modulo(destination + Math.floor(Math.random() * 6) + 1, 7))
+    
+    // choose the amount of space required (number of lanes * 20)
+    start += Math.abs(destination - lane) * 25;
+    for (var i = 0; i <= 6; i++) {
+      // fill in all the lanes except the destination with cars
+      if ((i > destination && i <= lane) || (i < destination && i >= lane)) {
+        // offset them appropriately
+        var x = start + Math.abs(destination - i) * 20;
+        // creates the car
+        
+      } else if (i != destination && fakes.indexOf(i) == -1) {
+        var x = start + (Math.floor(Math.random() * 4) - 2) * 15;
+      } else {
+        var x = undefined;
+      }
 
-    var max = 0, min = 10000;
-    //var pattern = choose(this.patterns)();
-    var info = this.patterns(this.last_lane);
-    var pattern = info.pattern;
-    this.last_lane = info.lane;
-    for (var i = 0; i < pattern.length; i++) {
-      var c = Object.create(Sprite).init(CONFIG.width + pattern[i].x, pattern[i].y * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
-      c.setCollision(Polygon);
-      c.offset = {x: 0, y: -12};
-      c.setVertices([{x: -8, y: 6},
-        {x: 8, y: 6},
-        {x: 8, y: 12},
-        {x: -8, y: 12}
-      ]);
-      c.addBehavior(Velocity);
-      c.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
-      c.velocity = {x: -(ROAD_SPEED + 20), y: 0};
-      t.fg.add(c);
-      max = Math.max(max, pattern[i].x);
-      min = Math.min(min, pattern[i].x);
+      if (x) {
+        var c = Object.create(Sprite).init(CONFIG.width + x, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
+        c.setCollision(Polygon);
+        c.offset = {x: 0, y: -12};
+        c.setVertices([{x: -8, y: 6},
+          {x: 8, y: 6},
+          {x: 8, y: 12},
+          {x: -8, y: 12}
+        ]);
+        c.addBehavior(Velocity);
+        c.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
+        c.velocity = {x: -(ROAD_SPEED + 20), y: 0};
+        this.fg.add(c);
+      }
     }
-    t.interval = max;
+    this.interval = start;
+    this.last_lane = destination;
   }
 
   this.onKeyDown = function (e) {
@@ -251,11 +208,15 @@ var onStart = function () {
     }
     if (e.keyCode == 38) {
       e.preventDefault();
+      //if (player.direction == 0)
+      //  gameWorld.playSound(Resources.pass);
       player.direction = -1;
       player.angle = Math.PI / 18 * -1;
       return false;
     } else if (e.keyCode == 40) {
       e.preventDefault();
+      //if (player.direction == 0)
+      //  gameWorld.playSound(Resources.pass);
       player.direction = 1;
       player.angle = Math.PI / 18 * 1;
       return false;
