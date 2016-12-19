@@ -4,7 +4,7 @@ title: The International Workingmen's Fellowship of the Rings
 tags: communism causality socialism revolution lotr hobbits marx
 ---
 
-<img src="{{ site.baseurl }}/images/fellowship.jpg" title="The Fellowship" class="img-thumbnail" style="margin-bottom: 10px; margin-left: 10px; max-width: 50%; float: left;"></img>
+<img src="{{ site.baseurl }}/images/fellowship.jpg" title="The Fellowship" class="img-thumbnail" style="margin-bottom: 10px; margin-right: 10px; max-width: 50%; float: left;"></img>
 
 It is no surprise that some of the most popular books of all time openly advocate communism and revolutionary ideas.  From “Quotations From Chairman Mao Tse-tung” to the “Communist Manifesto”, to the more modern Harry Potter series (which we have already discussed), it seems that when we turn to literature, communism is never far from our thoughts.
 
@@ -21,7 +21,7 @@ Or something like that.  I’m paraphrasing. The point is that while action is a
 <blockquote>“I wish it need not have happened in my time,” said Frodo.
 
 “So do I,” said Gandalf, “and so do all who live to see such times.  But that is not for them to decide.  All we have to decide is what to do with the time that is given us.” 
-  <footer class="blockquote-footer"> - The Shadow of the Past</footer>
+  <footer class="blockquote-footer">The Shadow of the Past</footer>
 </blockquote>
 
 ###On Karl Marx
@@ -36,7 +36,7 @@ There is a value in the call for ‘social justice’, as it is one way of confr
 
 <blockquote>
 “Many that live deserve death. And some that die deserve life. Can you give it to them? Then do not be too eager to deal out death in judgement.”
-  <footer class="blockquote-footer"> - The Shadow of the Past</footer>
+  <footer class="blockquote-footer">The Shadow of the Past</footer>
 </blockquote>
 
 ###On Intersectionality
@@ -45,7 +45,7 @@ For decades it seemed like the left was fracturing exponentially; unable to reco
 
 <blockquote>
 “But it is not your Shire,” said Gildor, “Others dwelt here before Hobbits were, and others will dwell here again when Hobbits are no more.  The wide world is all about you;  you can fence yourselves in, but you cannot for ever fence it out.”
-  <footer class="blockquote-footer"> - Three is Company</footer>
+  <footer class="blockquote-footer">Three is Company</footer>
 </blockquote>
 
 ###On Advice
@@ -56,7 +56,7 @@ We all know this.  But I’ll let Gildor do the talking:
 
 <blockquote>
 Elves seldom give unguarded advice, for advice is a dangerous gift, even from the wise to the wise, and all courses may run ill. But what would you? You have not told me all concerning yourself; and how then shall I choose better than you?
-  <footer class="blockquote-footer"> - Three is Company</footer>
+  <footer class="blockquote-footer">Three is Company</footer>
 </blockquote>
 
 ###On Socialism in One Country
@@ -67,7 +67,7 @@ Socialism in One Country is not enough.
 
 <blockquote>
   “...all such places will soon become islands under siege, if things go on as they are going”
-  <footer class="blockquote-footer"> - Many Meetings</footer>
+  <footer class="blockquote-footer">Many Meetings</footer>
 </blockquote>
 
 ###On The Transformation of Revolution
@@ -76,5 +76,5 @@ Revolutionary activity, by its nature, is the creation of something new.  As suc
 
 <blockquote>
 “...let folly be our cloak, [said Gandalf] a veil before the eyes of the Enemy! For he is very wise, and weighs all things to a nicety in the scales of his malice. But the only measure that he knows is desire, desire for power; and so he judges all hearts. Into his heart the thought will not enter that any will refuse it, that having the Ring we may seek to destroy it. If we seek this, we shall put him out of reckoning.”
-  <footer class="blockquote-footer"> - The Council of Elrond</footer>
+  <footer class="blockquote-footer">The Council of Elrond</footer>
 </blockquote>
