@@ -4,7 +4,7 @@ title: The International Workingmen's Fellowship of the Rings
 tags: communism causality socialism revolution lotr hobbits marx
 ---
 
-<img src="{{ site.baseurl }}/images/fellowship.jpg" title="The Fellowship" class="img-thumbnail" style="margin-bottom: 10px"></img>
+<img src="{{ site.baseurl }}/images/fellowship.jpg" title="The Fellowship" class="img-thumbnail" style="margin-bottom: 10px; margin-left: 10px; max-width: 50%; float: left;"></img>
 
 It is no surprise that some of the most popular books of all time openly advocate communism and revolutionary ideas.  From “Quotations From Chairman Mao Tse-tung” to the “Communist Manifesto”, to the more modern Harry Potter series (which we have already discussed), it seems that when we turn to literature, communism is never far from our thoughts.
 
@@ -26,8 +26,9 @@ Or something like that.  I’m paraphrasing. The point is that while action is a
 
 ###On Karl Marx
 
-<img src="{{ site.baseurl }}/images/marx.jpg" title="It's a trick!" class="img-thumbnail" style="margin-bottom: 10px"></img>
 Look at this rare illustration of 'Gandalf the Grey'.  Looks a lot like a certain German communist, don't you think?
+
+<img src="{{ site.baseurl }}/images/marx.jpg" title="It's a trick!" class="img-thumbnail" style="margin-bottom: 10px; width: 100%; border: none;"></img>
 
 ###On Justice
 
