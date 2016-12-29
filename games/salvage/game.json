@@ -1,0 +1,6 @@
+{
+  "resources": [
+    {"path": "viper.png", "frames": 4, "speed": 0.5, "animations": 2},
+    {"path": "asteroid.png"}
+  ]
+}
