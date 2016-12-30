@@ -3,6 +3,16 @@ function normalize (x1, y1, x2, y2) {
 	return {x: (x2 - x1) / d, y: (y2 - y1) / d};
 }
 
+function short_angle(a1, a2) {
+	var MAX = Math.PI * 2;	
+	var da = (a2 - a1) % MAX;
+	return 2 * da % MAX - da;
+}
+
+function lerp_angle (a1, a2, rate) {
+	return a1 + short_angle(a1, a2) * rate;
+}
+
 var HexPathfind = Object.create(Pathfind);
 // changed to check hex-grid based coordinates
 HexPathfind.start = function () {
@@ -105,21 +115,23 @@ HexPathfind.getNeighbors = function (node) {
 	return neighbors;
 }
 HexPathfind.update = function (dt) {
-	var rate = 5, desired_velocity = 100;
+	var rate = 15, desired_velocity = 100;
 	if (!this.target) return;
 	if (this.grid) {
 		if (this.route && this.route.length > 0) {
 			if (this.goal) {
 				this.entity.animation = 1;
 				var n = normalize(this.entity.x, this.entity.y, this.goal.x, this.goal.y);
-				this.entity.velocity.x = n.x * desired_velocity;
-				this.entity.velocity.y = n.y * desired_velocity;
-				this.entity.angle = lerp(this.entity.angle, angle(this.entity.x, this.entity.y, this.goal.x, this.goal.y), 2 * rate * dt);
+				this.entity.velocity.x = lerp(this.entity.velocity.x, n.x * desired_velocity, rate * dt);
+				this.entity.velocity.y = lerp(this.entity.velocity.y, n.y * desired_velocity, rate * dt);
+				this.entity.angle = lerp_angle(this.entity.angle, angle(this.entity.x, this.entity.y, this.goal.x, this.goal.y), rate * dt);
 
 				if (distance(this.entity.x, this.entity.y, this.goal.x, this.goal.y) < 4) {
-					this.entity.angle = angle(this.entity.x, this.entity.y, this.goal.x, this.goal.y);
+					if (this.route.length <= 1) {
+						this.entity.angle = angle(this.entity.x, this.entity.y, this.goal.x, this.goal.y);
+						this.entity.velocity = {x: 0, y: 0};
+					}
 					this.goal = undefined;
-					this.entity.velocity = {x: 0, y: 0};
 				}
 				//console.log(this.goal);
 			} else {
