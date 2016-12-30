@@ -120,6 +120,9 @@ s.onStart = function () {
   player.velocity = {x: 0, y: 0};
   // doesn't 'start' until we have a target
   player.pathfind.start();
+
+  var saucer = fg.add(Object.create(Sprite).init(256,96,Resources.saucer));
+  saucer.scale = 2;
 }
 s.onUpdate = function (dt) {
 	
