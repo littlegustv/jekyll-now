@@ -9,6 +9,37 @@ function toGrid (x, y) {
 			}
 		}
 
+Entity.draw = function (ctx) {
+  for (var i = 0; i < this.behaviors.length; i++) {
+    this.behaviors[i].draw(ctx);
+  }
+  ctx.save();
+  ctx.translate(this.x, this.y);
+  ctx.translate(this.offset.x, this.offset.y);
+  ctx.rotate(this.angle);
+  if (this.scale !== undefined) {
+    ctx.scale(this.scale, this.scale);
+  }
+  if (this.blend) {
+    ctx.globalCompositeOperation = this.blend;
+  } else {
+    ctx.globalCompositeOperation = "normal";
+  }
+  for (var i = 0; i < this.behaviors.length; i++) {
+    this.behaviors[i].transform(ctx);
+  }
+  ctx.translate(-this.x, -this.y);
+  ctx.globalAlpha = this.opacity;
+  this.onDraw(ctx);
+
+  ctx.globalAlpha = 1;
+  ctx.restore();
+  for (var i = 0; i < this.behaviors.length; i++) {
+    this.behaviors[i].drawAfter(ctx);
+  }
+  this.drawDebug(ctx);
+};
+
 var Hex = Object.create(Entity);
 Hex.init = function (x, y, radius) {
 	this.behaviors = [];
@@ -54,12 +85,12 @@ s.onStart = function () {
     obstacle.x += Math.floor(obstacle.y / 24) * 16;
     obstacle.scale = 2;
     obstacle.setVertices([
-      {x: -16, y: -16 / 2},
-      {x: 0, y: -16},
-      {x: 16, y: -16 / 2},
-      {x: 16, y: 16 / 2},
-      {x: 0, y: 16},
-      {x: -16, y: 16 / 2}
+      {x: -12, y: -12 / 2},
+      {x: 0, y: -12},
+      {x: 12, y: -12/ 2},
+      {x: 12, y: 12 / 2},
+      {x: 0, y: 12},
+      {x: -12, y: 12 / 2}
     ]);
     obstacle.obstacle = true;
     obstacle.setCollision(Polygon);
@@ -85,6 +116,8 @@ s.onStart = function () {
 		cell_size: 32,
 		target: undefined
 	});
+  player.addBehavior(Velocity);
+  player.velocity = {x: 0, y: 0};
   // doesn't 'start' until we have a target
   player.pathfind.start();
 }

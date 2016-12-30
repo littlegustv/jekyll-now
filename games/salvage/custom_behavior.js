@@ -1,3 +1,7 @@
+function normalize (x1, y1, x2, y2) {
+	var d = distance(x1, y1, x2, y2);
+	return {x: (x2 - x1) / d, y: (y2 - y1) / d};
+}
 
 var HexPathfind = Object.create(Pathfind);
 // changed to check hex-grid based coordinates
@@ -101,22 +105,27 @@ HexPathfind.getNeighbors = function (node) {
 	return neighbors;
 }
 HexPathfind.update = function (dt) {
-	var rate = 5;
+	var rate = 5, desired_velocity = 100;
 	if (!this.target) return;
 	if (this.grid) {
 		if (this.route && this.route.length > 0) {
 			if (this.goal) {
 				this.entity.animation = 1;
-				this.entity.x = lerp(this.entity.x, this.goal.x, rate * dt);
-				this.entity.y = lerp(this.entity.y, this.goal.y, rate * dt);
+				var n = normalize(this.entity.x, this.entity.y, this.goal.x, this.goal.y);
+				this.entity.velocity.x = n.x * desired_velocity;
+				this.entity.velocity.y = n.y * desired_velocity;
+				this.entity.angle = lerp(this.entity.angle, angle(this.entity.x, this.entity.y, this.goal.x, this.goal.y), 2 * rate * dt);
 
-				if (distance(this.entity.x, this.entity.y, this.goal.x, this.goal.y) < 1) this.goal = undefined;
+				if (distance(this.entity.x, this.entity.y, this.goal.x, this.goal.y) < 4) {
+					this.entity.angle = angle(this.entity.x, this.entity.y, this.goal.x, this.goal.y);
+					this.goal = undefined;
+					this.entity.velocity = {x: 0, y: 0};
+				}
 				//console.log(this.goal);
 			} else {
 				var next = this.route.pop();
 				if (next) {
 					this.goal = {x: next.y * GLOBALS.width / 2 + next.x * GLOBALS.width, y: next.y * GLOBALS.height};
-					this.entity.angle = angle(this.entity.x, this.entity.y, this.goal.x, this.goal.y);
 				}
 			}
 		} else {
