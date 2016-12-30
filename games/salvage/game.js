@@ -138,10 +138,24 @@ s.onKeyDown = function (e) {
   	s.player.movement.direction = {x: 0, y: -1};
   }
 }
+s.onMouseDown = function (e) {
+  e.preventDefault();
+  return false;
+}
 s.onClick = function (e) {
-	var t = toGrid(e.offsetX, e.offsetY);
-  s.player.pathfind.target = {x: GLOBALS.width * t.x + t.y * GLOBALS.width / 2, y: GLOBALS.height * t.y};
-  s.player.pathfind.route = null;
+  e.preventDefault();
+  if (e.button == 0) {
+    var t = toGrid(e.offsetX, e.offsetY);
+    s.player.pathfind.target = {x: GLOBALS.width * t.x + t.y * GLOBALS.width / 2, y: GLOBALS.height * t.y};
+    s.player.pathfind.route = null;
+  }
+  return false;
+}
+s.onMouseMove = function (e) {
+  if (e.button == 1) {
+    var t = toGrid(e.offsetX, e.offsetY);
+    s.player.angle = angle(s.player.x, s.player.y, GLOBALS.width * t.x + t.y * GLOBALS.width / 2, GLOBALS.height * t.y);
+  }
 }
 
 //CONFIG.debug = true;
