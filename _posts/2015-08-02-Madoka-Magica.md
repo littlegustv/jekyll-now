@@ -2,6 +2,7 @@
 layout: post
 title: Madoka Magica
 tags: anime existentialism madoka magica
+draft: true
 ---
 
 ![Image here](http://goodereader.s3.amazonaws.com/blog/uploads/images/Puella-Magi-Madoka-Magica.jpg "Madoka Magica")

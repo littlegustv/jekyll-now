@@ -2,6 +2,7 @@
 layout: post
 title: Lost, wicked and wrong in Hyper Light Drifter
 tags: game-review game-design
+draft: true
 ---
 
 ![Image Here]({{ site.baseurl }}/images/hyperlightdrifter.jpg "Trouble...")

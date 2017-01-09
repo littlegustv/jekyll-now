@@ -2,6 +2,7 @@
 layout: post
 title: Manipulation and Vulnerability in "Whiplash" and "Ex Machina"
 tags: whiplash ex-machina hegel master slave
+draft: true
 ---
 
 ![Image here](http://lynncinnamon.com/wp-content/uploads/2014/12/Whiplash-Scream.jpg "This is what it feels like.")

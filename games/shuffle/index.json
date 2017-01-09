@@ -1,10 +1,14 @@
 {
   "scenes": [
     "menu.json",
+    "exit.json",
     "game.json"
   ],
   "resources": [
     {"path": "accent.png", "frames": 2, "speed": 0.5, "animations": 1},
+    {"path": "roadster.png", "frames": 2, "speed": 0.5, "animations": 1},
+    {"path": "hatchback.png", "frames": 2, "speed": 0.5, "animations": 1},
+    {"path": "smart.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "car.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "fiesta.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "figaro.png", "frames": 2, "speed": 0.5, "animations": 1},
@@ -12,10 +16,12 @@
     {"path": "crossover.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "outback.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "porter cab.png", "frames": 2, "speed": 0.5, "animations": 1},
+    {"path": "truck.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "prius.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "road.png"},
     {"path": "a.png"},
     {"path": "ground.png"},
+    {"path": "wall.png"},
     {"path": "trees.png"},
     {"path": "crash.ogg"},
     {"path": "explode.ogg"},
@@ -24,7 +30,8 @@
     {"path": "cathedral.png"},
     {"path": "house.png"},
     {"path": "building2.png"},
-    {"path": "box.png"}
+    {"path": "box.png"},
+    {"path": "balloon.png"}
   ],
   "fontFamily": "Visitor"
 }

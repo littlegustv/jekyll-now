@@ -22,13 +22,10 @@ var onStart = function () {
   var fg = Object.create(Layer).init(fg_camera);
   t.fg = fg;
 
-  var title1 = Object.create(Text).init(CONFIG.width / 2 - 12, CONFIG.height / 2 - 12, "The", {align: "right", size: 48, color: "black"});
-  fg.add(title1);
-
-  var title2 = Object.create(Text).init(CONFIG.width / 2 - 12, CONFIG.height / 2 - 12, "Jersey", {align: "left", size: 96, color: "black"});
+  var title2 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 80, "auto-", {align: "right", size: 64, color: "black"});
   fg.add(title2);
 
-  var title3 = Object.create(Text).init(CONFIG.width / 2 - 80, CONFIG.height / 2 + 38, "Shuffle", {align: "left", size: 108, color: "black"});
+  var title3 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 80, "cars", {align: "left", size: 96, color: "black"});
   fg.add(title3);  
 
   fg.add(Object.create(Text).init(2 * CONFIG.width / 3, CONFIG.height / 2 + 72, "Press Any Key", {size : 24, align: "left"}));
@@ -51,6 +48,8 @@ var onStart = function () {
     var dy = 96 * Math.sin(theta);
     var dx = 96 * Math.cos(theta);
     var d = Object.create(Sprite).init(72 + dx, CONFIG.height / 2 + dy, Resources[gameWorld.difficulties[i].sprite]);
+    d.addBehavior(Locked);
+    d.level = i;
     d.opacity = (i == gameWorld.difficulty) ? 1 : 0.5;
     d.w *= (i == gameWorld.difficulty) ? 1 : 0.8;
     d.h *= (i == gameWorld.difficulty) ? 1 : 0.8;
@@ -165,14 +164,22 @@ var onStart = function () {
       return false;
     } else if (e.keyCode == 32) {
       e.preventDefault();
-      gameWorld.setScene(1);
+      if (gameWorld.difficulty <= gameWorld.unlocked)
+        gameWorld.setScene(1);
+      else {
+        //gameWorld.playSound(Resources.error);
+      }
       return false;
     }
   }
 
   this._gamepad.buttons.a.onStart = function (dt) {
     if (t.delay <= 0)
-      gameWorld.setScene(1);
+      if (gameWorld.difficulty <= gameWorld.unlocked)
+        gameWorld.setScene(1);
+      else {
+        //gameWorld.playSound(Resources.error);
+      }
   }
   this._gamepad.aleft.onUpdate = function (dt) {
     if (this.delay === undefined) this.delay = 0;
@@ -203,7 +210,11 @@ var onStart = function () {
   this.onTouchEnd = function (e) {
     var x = e.changedTouches[0].pageX, y = e.changedTouches[0].pageY;
     if (Math.abs(t.touch.y - y) < 10) {
-      gameWorld.setScene(1);
+      if (gameWorld.difficulty <= gameWorld.unlocked)
+        gameWorld.setScene(1);
+      else {
+        //gameWorld.playSound(Resources.error);
+      }
       return;
     } else if (y < t.touch.y) {
       t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });

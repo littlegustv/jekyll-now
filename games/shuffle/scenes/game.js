@@ -4,9 +4,10 @@
 // 230, 200 is 'normal?'
 
 var LANE_SIZE = 32, MAX_SPEED = 230, THRESHOLD = 2.5, ROAD_SPEED = 200, LANE_OFFSET = 128;
+var GOAL_DISTANCE = 0.01, goal_passed = false;
 
 //var sign_texts = ["Hoboken", "Hackensack", "Camden", "Trenton"];
-var cars = ["car"];
+var cars = ["smart"];
 var buildings = ["building2", "box", "cathedral", "house"];
 
 var onStart = function () {
@@ -66,24 +67,13 @@ var onStart = function () {
     var ground = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, 3.5 * LANE_SIZE, CONFIG.width + LANE_SIZE, LANE_SIZE / 2, Resources.ground);
     bg.add(ground);
 
-    var ground_low = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, 11 * LANE_SIZE, CONFIG.width + LANE_SIZE, LANE_SIZE / 2, Resources.ground);
+    var ground_low = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, 11 * LANE_SIZE - 8, CONFIG.width + LANE_SIZE, LANE_SIZE / 2, Resources.ground);
     fg.add(ground_low);
     ground_low.addBehavior(Velocity);
     ground_low.addBehavior(Wrap, {min: {x: -CONFIG.width / 2, y: 0}, max: {x: CONFIG.width + CONFIG.width / 2, y: CONFIG.height}});
     ground_low.velocity = {x: -1 * ROAD_SPEED, y: 0};
   }
 
-  // temporary!!!
-  /*
-  var b2 = Object.create(Sprite).init(Math.floor(Math.random() * CONFIG.width / 48) * 48, 2.75 * LANE_SIZE, Resources.building2);
-  bg.add(b2);
-  var b3 = Object.create(Sprite).init(b2.x + 96, 2.75 * LANE_SIZE, Resources.box);
-  bg.add(b3);
-  var b4 = Object.create(Sprite).init(b2.x - 96, 2.75 * LANE_SIZE, Resources.cathedral);
-  bg.add(b4);
-  var b4 = Object.create(Sprite).init(b2.x - 192, 2.75 * LANE_SIZE, Resources.house);
-  bg.add(b4); 
-*/
   // make BG scroll, using velocity
   for (var i = 0; i < bg.entities.length; i++) {
     bg.entities[i].addBehavior(Velocity);
@@ -118,11 +108,16 @@ var onStart = function () {
 
   player.setCollision(Polygon);
   player.collision.onHandle = function(object, other) {
-    gameWorld.playSound(Resources.crash);
-    gameWorld.playSound(Resources.explode);
-    player.crashed = true;
-    player.addBehavior(Crash, {duration: 2, callback: endGame});
-    player.collision.onHandle = function (object, other) {};
+    if (other.exit) {
+      console.log('exiting!');
+      gameWorld.setScene(2);
+    } else {
+      gameWorld.playSound(Resources.crash);
+      gameWorld.playSound(Resources.explode);
+      player.crashed = true;
+      player.addBehavior(Crash, {duration: 2, callback: endGame});
+      player.collision.onHandle = function (object, other) {};
+    }
   }
   //CONFIG.player = player;
   //CONFIG.debug = true;
@@ -154,7 +149,7 @@ var onStart = function () {
   // - increase difficulty!
   this.loadPattern = function () {
     var start = 100, lane = this.last_lane;
-    
+    var t = this;
     // choose new lane
     var destination = modulo(lane + Math.floor(Math.random() * 7), 7);
     
@@ -170,19 +165,38 @@ var onStart = function () {
     start += Math.abs(destination - lane) * 25;
     for (var i = 0; i <= 6; i++) {
       // fill in all the lanes except the destination with cars
+      var x = undefined;
       if ((i > destination && i <= lane) || (i < destination && i >= lane)) {
         // offset them appropriately
-        var x = start + Math.abs(destination - i) * 20;
+        x = start + Math.abs(destination - i) * 20;
         // creates the car
         
       } else if (i != destination && fakes.indexOf(i) == -1) {
-        var x = start + (Math.floor(Math.random() * 4) - 2) * 15;
-      } else {
-        var x = undefined;
+        x = start + (Math.floor(Math.random() * 4) - 2) * 15;
+      } else if (i != destination) {
+        // create exit, sometimes
+        if (Math.random() * 100 < 100) {
+          console.log('creating exit');
+          var exit = Object.create(Entity).init(CONFIG.width + start + (Math.floor(Math.random() * 4) - 2) * 15, i * LANE_SIZE + LANE_OFFSET, 2 * LANE_SIZE, LANE_SIZE);
+          exit.color = "red";
+          exit.setCollision(Polygon);
+          exit.exit = true;
+          exit.addBehavior(Velocity);
+          exit.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
+          exit.velocity = {x: -(ROAD_SPEED + 20), y: 0};
+          this.fg.add(exit);
+        }
       }
 
       if (x) {
-        var c = Object.create(Sprite).init(CONFIG.width + x, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
+        // unlocks next 'level' if passed!
+        if (gameWorld.difficulty < 2 && this.miles() > GOAL_DISTANCE && !this.goal_passed && Math.random() <= 0.3) {
+          var c = Object.create(Sprite).init(CONFIG.width + x, i * LANE_SIZE + LANE_OFFSET, Resources[gameWorld.difficulties[gameWorld.difficulty + 1].sprite]);
+          c.addBehavior(Unlock, {level: gameWorld.difficulty + 1});
+          this.goal_passed = true;
+        } else {
+          var c = Object.create(Sprite).init(CONFIG.width + x, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
+        }
         c.setCollision(Polygon);
         c.offset = {x: 0, y: -12};
         c.setVertices([{x: -8, y: 6},
@@ -298,6 +312,11 @@ var onUpdate = function (dt) {
   if (!this.player.crashed) {
     this.distance += ROAD_SPEED * dt;
     gameWorld.score = this.miles();
+  }
+
+  if (this.goal && this.distance > this.goal.x) {
+    console.log('passed goal!!');
+    this.goal = null;
   }
 
   var spacing = 72;

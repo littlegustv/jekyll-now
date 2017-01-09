@@ -2,6 +2,7 @@
 layout: post
 title: Intergalactic - The Development (Part 1)
 tags: development programming game-design
+draft: true
 ---
 Beginning development on a new project, which hopefully will not make me abandon older, unfinished projects.  This one is different, with more ambition maybe but also more of a plan.  So here's the idea so far.
 

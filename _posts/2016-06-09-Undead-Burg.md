@@ -2,6 +2,7 @@
 layout: post
 title: The Most Beautiful Place in the World - Undead Burg
 tags: game-review game-design dark souls level-design
+draft: true
 ---
 
 <img src="{{ site.baseurl }}/images/undeadburg.jpg" title="Undead Burg" class="img-thumbnail"></img>

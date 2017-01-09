@@ -2,6 +2,7 @@
 layout: post
 title: The Ugly American President
 tags: politics bernie sanders hillary clinton donald trump
+draft: true
 ---
 
 ![Image here]({{ site.baseurl }}/images/candidates.jpg "But Which Is It?")

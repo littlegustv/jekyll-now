@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Command-Line Blogging
+draft: true
 ---
 This post is written using VI, courtesy of the GIT bash tool on windows.  I am impressed, are you?
 

@@ -2,6 +2,7 @@
 layout: post
 title: Flight Control (Demo) Review
 tags: game-review game-design dark souls level-design
+draft: true
 ---
 
 <img src="{{ site.baseurl }}/images/flightcontrol.jpg" title="Is It A Plane?" class="img-thumbnail" style="float: right; margin-right: 10px;"></img>

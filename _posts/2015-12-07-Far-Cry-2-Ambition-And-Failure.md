@@ -2,6 +2,7 @@
 layout: post
 title: Some Constructive Feedback For Far-Cry 2
 tags: review video-game
+draft: true
 ---
 
 ![Image here](http://drh1.img.digitalriver.com/DRHM/Storefront/Company/ubi/images/screenshots/FCRY2_PC_screenshot_5.jpg "Saints Row 2")

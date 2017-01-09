@@ -2,6 +2,7 @@
 layout: post
 title: Was Undertale supposed to make me despise everyone, everywhere?
 tags: video-game characters behavior morality philosophy
+draft: true
 ---
 ![Image here](http://static.giantbomb.com/uploads/original/28/281548/2785613-screen+shot+2015-09-25+at+11.23.09+am.png "Undertale")
 

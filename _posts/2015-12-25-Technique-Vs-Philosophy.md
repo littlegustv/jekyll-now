@@ -2,6 +2,7 @@
 layout: post
 title: Technique is the enemy of philosophy
 tags: videogame film tv philosophy criticism
+draft: true
 ---
 
 ### How do you sleep at night, J.J Abrams?

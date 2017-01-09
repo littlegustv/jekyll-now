@@ -2,6 +2,7 @@
 layout: post
 title: Campaign Attacks and Weakness
 tags: politics bernie sanders hillary clinton donald trump
+draft: true
 ---
 
 <img src="{{ site.baseurl }}/images/campaign attacks.jpg" title="Friends Forever?" class="img-thumbnail"></img>

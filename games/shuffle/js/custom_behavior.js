@@ -44,3 +44,46 @@ Crash.update = function (dt) {
     this.entity.layer.add(c);
   }
 }
+
+var Colorize = Object.create(Behavior);
+Colorize.draw = function (ctx) {
+  if (!this.color) {
+    this.color = randomColor();
+  }
+  ctx.fillStyle = this.color;
+  ctx.fillRect(this.entity.x - this.w / 2, this.entity.y - this.h / 2, this.w, this.h);
+}
+
+// for some reason 'rope' is moveing with 'offset'; figure out why, maybe?
+var Rope = Object.create(Behavior);
+Rope.start = function () {
+  this.time = Math.random() * 2 * Math.PI;
+  if (!this.offset) this.offset = {x: 0, y: 0};
+}
+Rope.update = function (dt) {
+  if (!this.time) this.start();
+  this.time += dt;
+
+  // should figure out GOAL first (based on target, length and offset); then check distance and move towards it, yeah?
+  if (this.target && distance(this.entity.x, this.entity.y, this.target.x + this.offset.x, this.target.y + this.offset.y) > this.length) {
+    var vector = normalize((this.target.x + this.offset.x) - this.entity.x, (this.target.y + this.offset.y) - this.entity.y);
+    var goal = {x: (this.target.x + this.offset.x) + vector.x * this.length, y: (this.target.y + this.offset.y) + vector.y * this.length};
+    this.entity.x = lerp(this.entity.x, goal.x, dt);
+    this.entity.y = lerp(this.entity.y, goal.y, dt);
+  }
+}
+Rope.draw = function (ctx) {
+  ctx.fillStyle = this.color;
+  if (!this.target) {
+    for (var i = 0; i < this.length; i += (this.width - 1)) {
+      var x = this.time + 2 * Math.PI * i / this.length;
+      ctx.fillRect(this.entity.x - this.width / 2 + Math.sin(x) * 4, this.entity.y + i, this.width, this.width);  
+    }
+  } else {
+    var length = distance(this.entity.x, this.entity.y, this.target.x, this.target.y);
+    for (var i = 0; i < length; i += (this.width - 1)) {
+      var x = this.time + 2 * Math.PI * i / length;
+      ctx.fillRect(this.entity.x - this.width / 2 + Math.sin(x) * 4, this.entity.y + i, this.width, this.width);  
+    }
+  }
+}

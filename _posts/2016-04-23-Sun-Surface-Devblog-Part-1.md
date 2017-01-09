@@ -2,6 +2,7 @@
 layout: post
 title: DEVBLOG - (chrome web store fun!)
 tags: development programming game-design
+draft: true
 ---
 
 ![Image here]({{ site.baseurl }}/images/chrome_tile_3.png "Marquee?")

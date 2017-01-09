@@ -2,6 +2,7 @@
 layout: post
 title: The Lie of Non-Linear Games
 tags: video-game non-linear 
+draft: true
 ---
 
 ![Image here](http://vignette3.wikia.nocookie.net/thestanleyparable/images/f/f5/2013-10-19_00002.jpg/revision/latest?cb=20131020010337 "The Stanley Parable")
