@@ -76,6 +76,12 @@ var onStart = function () {
   fg.add(player);
   this.player = player;
 
+  var fade1 = Object.create(Entity).init(CONFIG.width / 2, CONFIG.height / 2, CONFIG.width, CONFIG.height);
+  fade1.addBehavior(FadeOut, {duration: 0.2});
+  fade1.z = 10;
+  fade1.color = "white";
+  fg.add(fade1);
+
   this.onKeyDown = function (e) {
     if (e.keyCode == 38) {
       e.preventDefault();

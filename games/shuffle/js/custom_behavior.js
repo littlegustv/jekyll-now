@@ -12,7 +12,10 @@ LaneMovement.setLane = function () {
 }
 LaneMovement.update = function (dt) {
   if (!this.started) this.start();
+  
+  // fix me: probably only need one of these...
   if (this.entity.crashed) return;
+  if (this.disabled) return;
 
   if (this.entity.direction != 0) {
     this.entity.velocity.y = lerp(this.entity.velocity.y, this.entity.direction * this.max_speed, 0.5);

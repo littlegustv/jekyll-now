@@ -73,26 +73,27 @@ Scene.loadBehavior = function (script) {
 // custom behavior to handle 'passing' a car => unlocking that 'difficulty'
 var Unlock = Object.create(Behavior);
 Unlock.update = function (dt) {
-  if (this.entity.x <= 0) {
+  if (this.entity.x <= 0 && gameWorld.unlocked < this.level) {
     // create some text
     var b = Object.create(Entity).init(CONFIG.width / 2, 24, CONFIG.width, 48);
     b.color = "#333";
     // fix me: add 'delay' to fadeout, yeah?
-    b.addBehavior(FadeOut, {duration: 2, delay: 4});
-    b.addBehavior(FadeIn, {duration: 2});
+    b.addBehavior(FadeOut, {duration: 1, delay: 2, remove: true, maxOpacity: 1});
+    b.addBehavior(FadeIn, {duration: 1});
     gameWorld.scene.ui.add(b);
 
     var t = Object.create(Text).init(CONFIG.width / 2, 32, "You unlocked    !", {align: "center", color: "white"});
-    t.addBehavior(FadeOut, {duration: 2, delay: 4});
-    t.addBehavior(FadeIn, {duration: 2});
+    t.addBehavior(FadeOut, {duration: 1, delay: 2, remove: true, maxOpacity: 1});
+    t.addBehavior(FadeIn, {duration: 1});
     gameWorld.scene.ui.add(t);
 
     var s = Object.create(Sprite).init(CONFIG.width / 2 + 112, 8, this.entity.sprite);
-    s.addBehavior(FadeOut, {duration: 2, delay: 4});
-    s.addBehavior(FadeIn, {duration: 2});
+    s.addBehavior(FadeOut, {duration: 1, delay: 2, remove: true, maxOpacity: 1});
+    s.addBehavior(FadeIn, {duration: 1});
     gameWorld.scene.ui.add(s);
 
     gameWorld.unlocked = this.level;
+    this.entity.alive = false;
   }
 }
 
@@ -106,20 +107,49 @@ Behavior.drawAfter = function (ctx) {
   }
 }
 
-FadeOut.update = function (dt) {
+var Delay = Object.create(Behavior);
+Delay.start = function () {
+  this.time = 0;
+}
+Delay.update = function (dt) {
+  if (this.time == undefined) this.start();
+
+  this.time += dt;
+  if (this.time > this.duration) {
+    this.callback();
+    this.entity.removeBehavior(this);
+  }
+}
+
+FadeIn.update = function (dt) {
     if (!this.time) this.start();
     this.time += dt;
+    if (this.time < this.duration) {
+      this.entity.opacity = clamp(this.maxOpacity * (this.time) / this.duration, 0, 1);      
+    }
+};
 
+FadeOut.update = function (dt) {
+    if (this.time === undefined) this.start();
+
+    if (this.delay && this.delay > 0) {
+      this.delay -= dt;
+      return;
+    }
+
+    this.time += dt;
     if (this.time >= this.duration && this.remove) this.entity.alive = false;
     this.entity.opacity = clamp(this.maxOpacity * (this.duration - this.time) / this.duration, 0, 1);
 };
 FadeOut.start = function () {
   if (this.entity.collision) {
-    this.entity.collision.onCheck = function (a, b) { console.log(2);  return false };
+    this.entity.collision.onCheck = function (a, b) { return false };
   }
-  this.maxOpacity = this.entity.opacity;
+  this.maxOpacity = this.maxOpacity || this.entity.opacity;
   this.remove = this.remove === undefined ? true : this.remove;
   this.time = 0;
+  this.delay = this.delay || 0;
+  console.log('start', this);
 }
 
 World.setScene = function (n, reload) {
@@ -131,3 +161,35 @@ World.setScene = function (n, reload) {
   this.scene = this.scenes[n];
   this.addEventListeners(this.scene);
 }
+
+/* some attempts at drawing performance improvements here...
+
+fps drops have vanished ... we'll come back to this?
+
+Entity.draw = function (ctx) {
+  ctx.save();
+  ctx.translate(this.x, this.y);
+  ctx.translate(this.offset.x, this.offset.y);
+  ctx.rotate(this.angle);
+  if (this.blend) {
+    ctx.globalCompositeOperation = this.blend;
+  } else {
+    ctx.globalCompositeOperation = "normal";
+  }
+  for (var i = 0; i < this.behaviors.length; i++) {
+    this.behaviors[i].transform(ctx);
+  }
+  ctx.translate(-this.x, -this.y);
+  ctx.globalAlpha = this.opacity;
+  for (var i = 0; i < this.behaviors.length; i++) {
+    this.behaviors[i].draw(ctx);
+  }
+  this.onDraw(ctx);
+  for (var i = 0; i < this.behaviors.length; i++) {
+    this.behaviors[i].drawAfter(ctx);
+  }
+  
+  ctx.globalAlpha = 1;
+  ctx.restore();
+  this.drawDebug(ctx);
+};*/

@@ -109,10 +109,20 @@ var onStart = function () {
 
   player.setCollision(Polygon);
   player.collision.onHandle = function(object, other) {
-    if (other.exit) {
-      other.alive = false;
-      console.log('exiting!');
-      gameWorld.setScene(2);
+    if (object.transition) return;
+    else if (other.exit) {
+        object.transition = true;
+        other.alive = false;
+        var fade1 = Object.create(Entity).init(CONFIG.width / 2, CONFIG.height / 2, CONFIG.width, CONFIG.height);
+        fade1.addBehavior(FadeIn, {duration: 0.4, maxOpacity: 1});
+        fade1.z = 10;
+        fade1.color = "white";
+        fade1.addBehavior(Delay, {duration: 1, callback: function () {
+          gameWorld.setScene(2);
+          fade1.alive = false;
+        }});
+        object.layer.add(fade1);
+      //}
     } else {
       gameWorld.playSound(Resources.crash);
       gameWorld.playSound(Resources.explode);
@@ -122,7 +132,7 @@ var onStart = function () {
     }
   }
   //CONFIG.player = player;
-  //CONFIG.debug = true;
+  CONFIG.debug = true;
   CONFIG.scene = this;
 /*
   var Tracks = Object.create(Behavior);
@@ -142,6 +152,7 @@ var onStart = function () {
 */
   var laning = player.addBehavior(LaneMovement, {lane_size: LANE_SIZE, max_speed: MAX_SPEED, threshold: THRESHOLD});
   this.laning = laning;
+  player.laning = laning;
   fg.add(player);
 
   this.last_lane = 0;
@@ -150,6 +161,9 @@ var onStart = function () {
   // - further jumble 'non-essential' cars
   // - increase difficulty!
   this.loadPattern = function () {
+    // not if we are 'exiting' the level...
+    if (this.player.transition) return;
+
     var start = 100, lane = this.last_lane;
     var t = this;
     // choose new lane
@@ -196,6 +210,7 @@ var onStart = function () {
           var c = Object.create(Sprite).init(CONFIG.width + x, i * LANE_SIZE + LANE_OFFSET, Resources[gameWorld.difficulties[gameWorld.difficulty + 1].sprite]);
           c.addBehavior(Unlock, {level: gameWorld.difficulty + 1});
           this.goal_passed = true;
+          console.log('once?');
         } else {
           var c = Object.create(Sprite).init(CONFIG.width + x, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
         }
@@ -340,6 +355,7 @@ var onUpdate = function (dt) {
     this.interval -= ROAD_SPEED * dt;
   } else if (!this.player.crashed) {
     this.loadPattern();
+      
     /*
     if (Math.random() * 1000 <= 400) {
       var rs = Object.create(RoadSign).init(CONFIG.width + 64, 2 * LANE_SIZE, choose(sign_texts));
