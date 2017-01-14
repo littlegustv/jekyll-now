@@ -3,6 +3,7 @@
 // speeds... 300, 260 is quite fast!
 // 230, 200 is 'normal?'
 
+// these variables are conflicting between 'exit' and 'game' - find a better place for them!!!
 var LANE_SIZE = 32, MAX_SPEED = 230, THRESHOLD = 2.5, ROAD_SPEED = 200, LANE_OFFSET = 128;
 var GOAL_DISTANCE = 0.01, goal_passed = false;
 
@@ -109,6 +110,7 @@ var onStart = function () {
   player.setCollision(Polygon);
   player.collision.onHandle = function(object, other) {
     if (other.exit) {
+      other.alive = false;
       console.log('exiting!');
       gameWorld.setScene(2);
     } else {

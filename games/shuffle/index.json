@@ -1,8 +1,8 @@
 {
   "scenes": [
     "menu.json",
-    "exit.json",
-    "game.json"
+    "game.json",
+    "exit.json"
   ],
   "resources": [
     {"path": "accent.png", "frames": 2, "speed": 0.5, "animations": 1},

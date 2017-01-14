@@ -55,6 +55,9 @@ Colorize.draw = function (ctx) {
 }
 
 // for some reason 'rope' is moveing with 'offset'; figure out why, maybe?
+
+// goal = target + offset; as long as entity != goal; lerp (or just always lerp?)
+
 var Rope = Object.create(Behavior);
 Rope.start = function () {
   this.time = Math.random() * 2 * Math.PI;
@@ -64,26 +67,54 @@ Rope.update = function (dt) {
   if (!this.time) this.start();
   this.time += dt;
 
+  if (this.target) {
+    this.entity.x = lerp(this.entity.x, this.target.x + this.offset.x, dt);
+    this.entity.y = lerp(this.entity.y, this.target.y + this.offset.y, dt);
+  }
+
   // should figure out GOAL first (based on target, length and offset); then check distance and move towards it, yeah?
-  if (this.target && distance(this.entity.x, this.entity.y, this.target.x + this.offset.x, this.target.y + this.offset.y) > this.length) {
+  /*if (this.target && distance(this.entity.x, this.entity.y, this.target.x + this.offset.x, this.target.y + this.offset.y) > this.length) {
     var vector = normalize((this.target.x + this.offset.x) - this.entity.x, (this.target.y + this.offset.y) - this.entity.y);
     var goal = {x: (this.target.x + this.offset.x) + vector.x * this.length, y: (this.target.y + this.offset.y) + vector.y * this.length};
-    this.entity.x = lerp(this.entity.x, goal.x, dt);
-    this.entity.y = lerp(this.entity.y, goal.y, dt);
-  }
+  }*/
 }
 Rope.draw = function (ctx) {
   ctx.fillStyle = this.color;
   if (!this.target) {
+    // no target, draw straight down
     for (var i = 0; i < this.length; i += (this.width - 1)) {
       var x = this.time + 2 * Math.PI * i / this.length;
       ctx.fillRect(this.entity.x - this.width / 2 + Math.sin(x) * 4, this.entity.y + i, this.width, this.width);  
     }
   } else {
-    var length = distance(this.entity.x, this.entity.y, this.target.x, this.target.y);
-    for (var i = 0; i < length; i += (this.width - 1)) {
-      var x = this.time + 2 * Math.PI * i / length;
-      ctx.fillRect(this.entity.x - this.width / 2 + Math.sin(x) * 4, this.entity.y + i, this.width, this.width);  
+    // target, draw to origin
+    var length = this.target.y - this.entity.y, width = this.target.x - this.entity.x, n = length / this.width;
+    for (var i = 0; i < n; i++) {
+//      var x = this.time + 2 * Math.PI * i / n;
+//      ctx.fillRect(this.entity.x + this.width * i / n + Math.sin(x) * 4, this.entity.y + i * this.width, this.width, this.width);  
+        ctx.fillRect(this.entity.x + width * i / n, this.entity.y + length * i / n, this.width, this.width);
     }
+  }
+}
+
+var Jump = Object.create(Behavior);
+Jump.start = function () {
+  console.log('starting!')
+  this.duration = this.duration || 1;
+  this.time = this.duration + 1;
+  this.constant = this.constant || 128;
+}
+Jump.update = function (dt) {
+  if (this.time == undefined) this.start();
+  if (this.time > this.duration) return;
+  else {
+    this.time += dt;
+    this.entity.y -= Math.sin(2 * Math.PI * this.time / this.duration) * this.constant * dt;
+  }
+}
+Jump.jump = function () {
+  if (this.time > this.duration) {
+    this.time = 0;
+    console.log('jumping');
   }
 }

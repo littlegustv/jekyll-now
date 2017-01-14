@@ -121,3 +121,13 @@ FadeOut.start = function () {
   this.remove = this.remove === undefined ? true : this.remove;
   this.time = 0;
 }
+
+World.setScene = function (n, reload) {
+  if (reload === false) {}
+  else if (this.scenes[n].reload) {
+    this.scenes[n] = Object.create(Scene).init(this.scenes[n].name, true);
+  }
+  this.removeEventListeners(this.scene);
+  this.scene = this.scenes[n];
+  this.addEventListeners(this.scene);
+}

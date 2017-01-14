@@ -2,7 +2,7 @@
 
 // first bug: setScene reloads (THIS) js file, you can see it keep adding script tags to the HTML :/
 
-var LANE_SIZE = 32, MAX_SPEED = 200, THRESHOLD = 2.5, ROAD_SPEED = 160, LANE_OFFSET = 128;
+var LANE_SIZE = 32, MAX_SPEED = 200, THRESHOLD = 2.5, ROAD_SPEED = 320, LANE_OFFSET = 128;
 var fullscreen = false;
 
 var onStart = function () {
@@ -12,6 +12,9 @@ var onStart = function () {
   this.layers = [];
 
   var t = this;
+
+  this.distance = 0;
+  this.max_distance = 2;
 
   var bg_camera = Object.create(Camera).init(0, 0);
   var bg = Object.create(Layer).init(bg_camera);
@@ -69,7 +72,9 @@ var onStart = function () {
     {x: 8, y: 12},
     {x: -8, y: 12}
   ]);
+  player.jump = player.addBehavior(Jump);
   fg.add(player);
+  this.player = player;
 
   this.onKeyDown = function (e) {
     if (e.keyCode == 38) {
@@ -77,6 +82,8 @@ var onStart = function () {
       return false;
     } else if (e.keyCode == 40) {
       e.preventDefault();
+      console.log('mhm!');
+      t.player.jump.jump();
       return false;
     } else if (e.keyCode == 32) {
       e.preventDefault();
@@ -102,16 +109,34 @@ var onStart = function () {
 
 var onUpdate = function (dt) {
   this._gamepad.update(dt);
+  this.distance += dt;
+  var t = this;
+  if (this.distance > this.max_distance && !this.exiting) {
+    var e = Object.create(Entity).init(CONFIG.width + 16, this.player.y, 16, 32);
+    e.addBehavior(Velocity);
+    e.velocity = {x: -ROAD_SPEED, y: 0};
+    e.setCollision(Polygon);
+    e.collision.onHandle = function (object, other) {
+      if (other == t.player) {
+        gameWorld.setScene(1, false);
+      }
+    }
+    e.z = 100;
+    e.color = "red";
+    this.exiting = true;
+    this.fg.add(e);
+  }
 
   if (Math.random() * 100 <= 1) {
-    var balloon = Object.create(Sprite).init(CONFIG.width + 4 * LANE_SIZE, 5 * LANE_SIZE, Resources.balloon);
+    var balloon = Object.create(Sprite).init(CONFIG.width + 4 * LANE_SIZE, 4 * LANE_SIZE, Resources.balloon);
     var color = randomColor();
     balloon.addBehavior(Velocity);
     balloon.velocity = {x: -ROAD_SPEED, y: 0};
-    balloon.rope = balloon.addBehavior(Rope, {length: 128, width: 4, color: color, offset: {x: Math.random() * -80, y: Math.random() * 16 - 8}});
+    // offset.y should be -64 or something, or however much higher the balloon IS than the car
+    balloon.rope = balloon.addBehavior(Rope, {length: 128, width: 4, color: color, offset: {x: Math.random() * 128 - 64, y: - Math.random() * 64 - 32}});
     balloon.addBehavior(Colorize, {color: color, h: balloon.h - 8, w: balloon.w - 8});
     balloon.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
-    balloon.addBehavior(Oscillate, {object: balloon.offset, field: "y", constant: 8, rate: 3, time: 0});
+    //balloon.addBehavior(Oscillate, {object: balloon.offset, field: "y", constant: 8, rate: 3, time: 0});
     balloon.setCollision(Polygon);
     balloon.setVertices(
       [
@@ -124,6 +149,7 @@ var onUpdate = function (dt) {
     balloon.collision.onHandle = function (object, other) {
       if (other.rope) return;
       object.rope.target = other;
+      // y velocity => some value, to make it 'float'
       object.velocity = {x: 0, y: 0};
     }
     this.fg.add(balloon);
