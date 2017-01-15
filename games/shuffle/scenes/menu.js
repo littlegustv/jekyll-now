@@ -22,10 +22,10 @@ var onStart = function () {
   var fg = Object.create(Layer).init(fg_camera);
   t.fg = fg;
 
-  var title2 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 80, "auto-", {align: "right", size: 64, color: "black"});
+  var title2 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 80, "Bad", {align: "right", size: 64, color: "black"});
   fg.add(title2);
 
-  var title3 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 80, "cars", {align: "left", size: 96, color: "black"});
+  var title3 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 80, "brakes", {align: "left", size: 96, color: "black"});
   fg.add(title3);  
 
   fg.add(Object.create(Text).init(2 * CONFIG.width / 3, CONFIG.height / 2 + 72, "Press Any Key", {size : 24, align: "left"}));

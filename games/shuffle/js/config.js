@@ -70,14 +70,37 @@ Scene.loadBehavior = function (script) {
   };
 }
 
+function goalMessage (layer) {
+  var b = Object.create(Entity).init(CONFIG.width / 2, 32, CONFIG.width, 64);
+  b.color = "#333";
+  b.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
+  b.addBehavior(FadeIn, {duration: 1});
+  layer.add(b);
+
+  var t = Object.create(Text).init(CONFIG.width / 2, 24, "Oh no! Your brakes have failed!" + (gameWorld.difficulty > 0 ? " (again)" : ""), {align: "center", color: "white", size: 36});
+  t.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
+  t.addBehavior(FadeIn, {duration: 1});
+  layer.add(t);
+
+  var t2 = Object.create(Text).init(CONFIG.width / 2, 50, "Get to the rescue car!       , one mile <away!></away!>", {align: "center", color: "white", size: 36});
+  t2.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
+  t2.addBehavior(FadeIn, {duration: 1, delay: 1, maxOpacity: 1});
+  t2.opacity = 0;
+  layer.add(t2);
+
+  var s = Object.create(Sprite).init(CONFIG.width / 2 + 160, 32, Resources[gameWorld.difficulties[(gameWorld.difficulty + 1) % gameWorld.difficulties.length].sprite]);
+  s.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
+  s.addBehavior(FadeIn, {duration: 1, delay: 1, maxOpacity: 1});
+  s.opacity = 0;
+  layer.add(s);
+}
+
 // custom behavior to handle 'passing' a car => unlocking that 'difficulty'
 var Unlock = Object.create(Behavior);
 Unlock.update = function (dt) {
   if (this.entity.x <= 0 && gameWorld.unlocked < this.level) {
-    // create some text
     var b = Object.create(Entity).init(CONFIG.width / 2, 24, CONFIG.width, 48);
     b.color = "#333";
-    // fix me: add 'delay' to fadeout, yeah?
     b.addBehavior(FadeOut, {duration: 1, delay: 2, remove: true, maxOpacity: 1});
     b.addBehavior(FadeIn, {duration: 1});
     gameWorld.scene.ui.add(b);
@@ -123,6 +146,12 @@ Delay.update = function (dt) {
 
 FadeIn.update = function (dt) {
     if (!this.time) this.start();
+
+    if (this.delay && this.delay > 0) {
+      this.delay -= dt;
+      return;
+    }
+    
     this.time += dt;
     if (this.time < this.duration) {
       this.entity.opacity = clamp(this.maxOpacity * (this.time) / this.duration, 0, 1);      
@@ -160,6 +189,27 @@ World.setScene = function (n, reload) {
   this.removeEventListeners(this.scene);
   this.scene = this.scenes[n];
   this.addEventListeners(this.scene);
+}
+
+// raindrop -> allow pausing of INDIVIDUAL layers (for n seconds)
+Layer.update = function (dt) {
+  if (this.paused > 0) {
+    this.paused -= dt;
+    return;
+  }
+  this.camera.update(dt);
+  for (var i = 0; i < this.entities.length; i++) {
+    this.entities[i].update(dt);
+  }
+  for (var i = 0; i < this.entities.length; i++) {
+    this.entities[i].checkCollisions(i, this.entities);
+  }
+  for (var i = 0; i < this.entities.length; i++) {
+    if (!this.entities[i].alive) {
+      this.entities[i].end();
+      this.entities.splice(i, 1);
+    }
+  }
 }
 
 /* some attempts at drawing performance improvements here...

@@ -28,7 +28,7 @@ LaneMovement.update = function (dt) {
     }
   }
 }
-
+/*
 var Crash = Object.create(Behavior);
 Crash.start = function () {
   this.duration = this.duration || 1;
@@ -46,7 +46,7 @@ Crash.update = function (dt) {
     c.addBehavior(FadeOut, {duration: 1});
     this.entity.layer.add(c);
   }
-}
+}*/
 
 var Colorize = Object.create(Behavior);
 Colorize.draw = function (ctx) {

@@ -5,7 +5,7 @@
 
 // these variables are conflicting between 'exit' and 'game' - find a better place for them!!!
 var LANE_SIZE = 32, MAX_SPEED = 230, THRESHOLD = 2.5, ROAD_SPEED = 200, LANE_OFFSET = 128;
-var GOAL_DISTANCE = 0.01, goal_passed = false;
+var GOAL_DISTANCE = 5280; // (one mile)
 
 //var sign_texts = ["Hoboken", "Hackensack", "Camden", "Trenton"];
 var cars = ["smart"];
@@ -27,6 +27,8 @@ var onStart = function () {
 
   var t = this;
   this.distance = 0;
+  this.tenth_distance = 0;
+  this.goal_distance = GOAL_DISTANCE;
   this.interval = 0;
   this.bg_interval = 0;
 
@@ -109,30 +111,31 @@ var onStart = function () {
 
   player.setCollision(Polygon);
   player.collision.onHandle = function(object, other) {
-    if (object.transition) return;
-    else if (other.exit) {
-        object.transition = true;
-        other.alive = false;
-        var fade1 = Object.create(Entity).init(CONFIG.width / 2, CONFIG.height / 2, CONFIG.width, CONFIG.height);
-        fade1.addBehavior(FadeIn, {duration: 0.4, maxOpacity: 1});
-        fade1.z = 10;
-        fade1.color = "white";
-        fade1.addBehavior(Delay, {duration: 1, callback: function () {
-          gameWorld.setScene(2);
-          fade1.alive = false;
-        }});
-        object.layer.add(fade1);
-      //}
-    } else {
+    if (other.rescue) {
+      gameWorld.playSound(Resources.beepbeep);
+      goalMessage(ui);
+      fg.paused = 3, bg.paused = 3;
+      object.sprite = other.sprite;
+      other.alive = false;
+      gameWorld.difficulty += 1;
+    }
+    else {
       gameWorld.playSound(Resources.crash);
       gameWorld.playSound(Resources.explode);
       player.crashed = true;
-      player.addBehavior(Crash, {duration: 2, callback: endGame});
+      //player.addBehavior(Crash, {duration: 2, callback: endGame});
       player.collision.onHandle = function (object, other) {};
+      endGame();
+      var expl = Object.create(Sprite).init(player.x, player.y + 1, Resources.explosion);
+      player.layer.add(expl);
+      expl.addBehavior(Delay, {duration: 1, callback: function () {
+        this.entity.alive = false;
+        gameWorld.setScene(0);
+      }})
     }
   }
   //CONFIG.player = player;
-  CONFIG.debug = true;
+  //CONFIG.debug = true;
   CONFIG.scene = this;
 /*
   var Tracks = Object.create(Behavior);
@@ -163,6 +166,7 @@ var onStart = function () {
   this.loadPattern = function () {
     // not if we are 'exiting' the level...
     if (this.player.transition) return;
+    if (this.fg.paused > 0) return;
 
     var start = 100, lane = this.last_lane;
     var t = this;
@@ -189,28 +193,15 @@ var onStart = function () {
         
       } else if (i != destination && fakes.indexOf(i) == -1) {
         x = start + (Math.floor(Math.random() * 4) - 2) * 15;
-      } else if (i != destination) {
-        // create exit, sometimes
-        if (Math.random() * 100 < 100) {
-          console.log('creating exit');
-          var exit = Object.create(Entity).init(CONFIG.width + start + (Math.floor(Math.random() * 4) - 2) * 15, i * LANE_SIZE + LANE_OFFSET, 2 * LANE_SIZE, LANE_SIZE);
-          exit.color = "red";
-          exit.setCollision(Polygon);
-          exit.exit = true;
-          exit.addBehavior(Velocity);
-          exit.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
-          exit.velocity = {x: -(ROAD_SPEED + 20), y: 0};
-          this.fg.add(exit);
-        }
       }
 
       if (x) {
         // unlocks next 'level' if passed!
-        if (gameWorld.difficulty < 2 && this.miles() > GOAL_DISTANCE && !this.goal_passed && Math.random() <= 0.3) {
-          var c = Object.create(Sprite).init(CONFIG.width + x, i * LANE_SIZE + LANE_OFFSET, Resources[gameWorld.difficulties[gameWorld.difficulty + 1].sprite]);
-          c.addBehavior(Unlock, {level: gameWorld.difficulty + 1});
-          this.goal_passed = true;
-          console.log('once?');
+        if (this.distance > this.goal_distance && Math.random() <= 0.3) {
+          var c = Object.create(Sprite).init(CONFIG.width + x, i * LANE_SIZE + LANE_OFFSET, Resources[gameWorld.difficulties[(gameWorld.difficulty + 1) % gameWorld.difficulties.length].sprite]);
+          c.rescue = true;
+          this.goal_distance += GOAL_DISTANCE;
+          //console.log('once?');
         } else {
           var c = Object.create(Sprite).init(CONFIG.width + x, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
         }
@@ -232,6 +223,9 @@ var onStart = function () {
   }
 
   this.onKeyDown = function (e) {
+    if (fg.paused > 0) fg.paused = 0;
+    if (bg.paused > 0) bg.paused = 0;
+
     if (player.crashed) {
       e.preventDefault();
       gameWorld.setScene(0);
@@ -321,6 +315,9 @@ var onStart = function () {
   this.layers.push(bg);
   this.layers.push(fg);
   this.layers.push(ui);
+
+  goalMessage(ui);
+  fg.paused = 3, bg.paused = 3;
 };
 
 var onUpdate = function (dt) {
@@ -349,6 +346,34 @@ var onUpdate = function (dt) {
       this.bg.add(b);
     }
   }
+
+  var t = Math.floor(this.distance / 528);
+  if (t > this.tenth_distance) {
+    // create sign
+    var sign_bg = Object.create(Entity).init(CONFIG.width, 96, 64, 48);
+    sign_bg.addBehavior(Velocity);
+    sign_bg.velocity = {x: -2 * ROAD_SPEED, y: 0};
+    sign_bg.addBehavior(Crop, {min: {x: - CONFIG.width, y: 0}, max: {x: 2 * CONFIG.width, y: CONFIG.height}});    
+    sign_bg.z = 2;
+    this.bg.add(sign_bg);
+    
+    var sign_text = Object.create(Text).init(CONFIG.width, 92, t/10, {align: "center", color: "white", size: 32});
+    sign_text.addBehavior(Velocity);
+    sign_text.velocity = {x: -2 * ROAD_SPEED, y: 0};
+    sign_text.addBehavior(Crop, {min: {x: - CONFIG.width, y: 0}, max: {x: 2 * CONFIG.width, y: CONFIG.height}});    
+    sign_text.z = 3;
+    this.bg.add(sign_text);
+
+    var sign_text2 = Object.create(Text).init(CONFIG.width, 108, "miles", {align: "center", color: "white", size: 24});
+    sign_text2.addBehavior(Velocity);
+    sign_text2.velocity = {x: -2 * ROAD_SPEED, y: 0};
+    sign_text2.addBehavior(Crop, {min: {x: - CONFIG.width, y: 0}, max: {x: 2 * CONFIG.width, y: CONFIG.height}});    
+    sign_text2.z = 3;
+    this.bg.add(sign_text2);
+
+    this.tenth_distance = t;
+  }
+
 
   this.odometer.text = this.miles() + " miles";
   if (this.interval > 0) {

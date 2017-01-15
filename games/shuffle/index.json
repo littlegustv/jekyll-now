@@ -1,37 +1,29 @@
 {
   "scenes": [
     "menu.json",
-    "game.json",
-    "exit.json"
+    "game.json"
   ],
   "resources": [
-    {"path": "accent.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "roadster.png", "frames": 2, "speed": 0.5, "animations": 1},
-    {"path": "hatchback.png", "frames": 2, "speed": 0.5, "animations": 1},
+    {"path": "hatchback.png", "frames": 2, "speed": 0.3, "animations": 1},
     {"path": "smart.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "car.png", "frames": 2, "speed": 0.5, "animations": 1},
-    {"path": "fiesta.png", "frames": 2, "speed": 0.5, "animations": 1},
-    {"path": "figaro.png", "frames": 2, "speed": 0.5, "animations": 1},
+    {"path": "explosion.png", "frames": 8, "speed": 0.08, "animations": 1},
     {"path": "sedan.png", "frames": 2, "speed": 0.5, "animations": 1},
-    {"path": "crossover.png", "frames": 2, "speed": 0.5, "animations": 1},
-    {"path": "outback.png", "frames": 2, "speed": 0.5, "animations": 1},
-    {"path": "porter cab.png", "frames": 2, "speed": 0.5, "animations": 1},
-    {"path": "truck.png", "frames": 2, "speed": 0.5, "animations": 1},
-    {"path": "prius.png", "frames": 2, "speed": 0.5, "animations": 1},
+    {"path": "truck.png", "frames": 2, "speed": 0.1, "animations": 1},
     {"path": "road.png"},
     {"path": "a.png"},
     {"path": "ground.png"},
-    {"path": "wall.png"},
     {"path": "trees.png"},
     {"path": "crash.ogg"},
     {"path": "explode.ogg"},
     {"path": "squeal.ogg"},
     {"path": "pass.ogg"},
+    {"path": "beepbeep.ogg"},
     {"path": "cathedral.png"},
     {"path": "house.png"},
     {"path": "building2.png"},
-    {"path": "box.png"},
-    {"path": "balloon.png"}
+    {"path": "box.png"}
   ],
   "fontFamily": "Visitor"
 }
