@@ -121,3 +121,12 @@ Jump.jump = function () {
     console.log('jumping');
   }
 }
+
+var TargetWrap = Object.create(Behavior);
+TargetWrap.update = function (dt) {
+  if (false) { //(this.entity.x > this.max.x) {
+    //this.entity.x = this.min.x + (this.entity.x - this.max.x);
+  } else if (this.entity.x < this.target.x - this.min.x) {
+    this.entity.x = this.target.x + this.max.x;
+  }
+}

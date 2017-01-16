@@ -2,7 +2,7 @@
 
 // first bug: setScene reloads (THIS) js file, you can see it keep adding script tags to the HTML :/
 
-var LANE_SIZE = 32, MAX_SPEED = 200, THRESHOLD = 2.5, ROAD_SPEED = 160, LANE_OFFSET = 128;
+var LANE_SIZE = 32, HANDLING = 200, THRESHOLD = 2.5, ROAD_SPEED = 160, LANE_OFFSET = 128;
 var fullscreen = false;
 
 var onStart = function () {

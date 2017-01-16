@@ -23,6 +23,11 @@ function requestFullScreen () {
   }
 }
 
+// check if n is between j and k
+function between(n, j, k) {
+  return ((n > j && n < k) || (n > k && n < j));
+}
+
 // push
 function randomColor () {
   return "#" + ("000000" + Math.floor(Math.random() * (Math.pow(256, 3) - 1)).toString(16)).slice(-6);
@@ -42,8 +47,8 @@ gameWorld.difficulties = [
   {roadSpeed: 320, handling: 360, sprite: "truck"},
 ]
 
-gameWorld.difficulty = 0;
-gameWorld.unlocked = 0;
+gameWorld.difficulty = 1;
+gameWorld.unlocked = 1;
 
 // push
 Scene.loadBehavior = function (script) {
@@ -179,6 +184,16 @@ FadeOut.start = function () {
   this.time = 0;
   this.delay = this.delay || 0;
   console.log('start', this);
+}
+
+Follow.update = function (dt) {
+  if (this.offset.x !== false)
+    this.entity.x = this.target.x + (this.offset.x || 0);
+  if (this.offset.y !== false)
+    this.entity.y = this.target.y + (this.offset.y || 0);
+  if (this.offset.z !== false)
+    this.entity.z = this.target.z + (this.offset.z || 0);
+  if (this.target.alive == false) this.entity.alive = false;
 }
 
 World.setScene = function (n, reload) {

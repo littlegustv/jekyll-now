@@ -4,7 +4,7 @@
 // 230, 200 is 'normal?'
 
 // these variables are conflicting between 'exit' and 'game' - find a better place for them!!!
-var LANE_SIZE = 32, MAX_SPEED = 230, THRESHOLD = 2.5, ROAD_SPEED = 200, LANE_OFFSET = 128;
+var LANE_SIZE = 32, HANDLING = 230, THRESHOLD = 2.5, ROAD_SPEED = 200, CAR_SPEED = 220, LANE_OFFSET = 128;
 var GOAL_DISTANCE = 5280; // (one mile)
 
 //var sign_texts = ["Hoboken", "Hackensack", "Camden", "Trenton"];
@@ -22,8 +22,9 @@ var onStart = function () {
     return Math.floor(200 * this.distance / (2 * 5280)) / 100;
   }
 
-  MAX_SPEED = gameWorld.difficulties[gameWorld.difficulty].handling;
+  HANDLING = gameWorld.difficulties[gameWorld.difficulty].handling;
   ROAD_SPEED = gameWorld.difficulties[gameWorld.difficulty].roadSpeed;
+  CAR_SPEED =  gameWorld.difficulties[gameWorld.difficulty].roadSpeed + 20;
 
   var t = this;
   this.distance = 0;
@@ -153,12 +154,17 @@ var onStart = function () {
   };
   player.addBehavior(Tracks, {});
 */
-  var laning = player.addBehavior(LaneMovement, {lane_size: LANE_SIZE, max_speed: MAX_SPEED, threshold: THRESHOLD});
+  var laning = player.addBehavior(LaneMovement, {lane_size: LANE_SIZE, max_speed: HANDLING, threshold: THRESHOLD});
   this.laning = laning;
   player.laning = laning;
   fg.add(player);
 
   this.last_lane = 0;
+
+  this.difficultyFormula = function () {
+    // pure 'base-line' possiblity = CAR_SPEED * LANE_SIZE / HANDLING (too hard, though!!)
+    return 1.5 * CAR_SPEED * LANE_SIZE / HANDLING;
+  }
 
   // - add 'tricks'; where there are 'two' destinations but only ONE is real
   // - further jumble 'non-essential' cars
@@ -168,43 +174,25 @@ var onStart = function () {
     if (this.player.transition) return;
     if (this.fg.paused > 0) return;
 
-    var start = 100, lane = this.last_lane;
+    var lane = this.last_lane;
     var t = this;
     // choose new lane
-    var destination = modulo(lane + Math.floor(Math.random() * 7), 7);
-    
-    // create 'fakes' -> up to... two?
-    var fakes = [];
-    var fake_chance = Math.random();
-    if (fake_chance < 0.4)
-      fakes.push(modulo(destination + Math.floor(Math.random() * 6) + 1, 7))
-    if (fake_chance < 0.2)  
-      fakes.push(modulo(destination + Math.floor(Math.random() * 6) + 1, 7))
-    
-    // choose the amount of space required (number of lanes * 20)
-    start += Math.abs(destination - lane) * 25;
+    var destination = this.NEXT || modulo(lane + Math.floor(Math.random() * 5 + 1), 7);
+    if (Math.random() < 0.1) {
+      var fake = modulo(destination + Math.floor(Math.random() * 4 + 2), 7);
+      if (destination == 0) this.NEXT = 1;
+      else if (destination == 6) this.NEXT = 5;
+      else this.NEXT = destination + (Math.random() > 0.5 ? 1 : -1);
+    } else {
+      this.NEXT = undefined;
+    }
+    var start = Math.abs(destination - lane) * this.difficultyFormula();
     for (var i = 0; i <= 6; i++) {
-      // fill in all the lanes except the destination with cars
-      var x = undefined;
-      if ((i > destination && i <= lane) || (i < destination && i >= lane)) {
-        // offset them appropriately
-        x = start + Math.abs(destination - i) * 20;
-        // creates the car
-        
-      } else if (i != destination && fakes.indexOf(i) == -1) {
-        x = start + (Math.floor(Math.random() * 4) - 2) * 15;
+      if (i == fake) {
+        // blank 'fake'
       }
-
-      if (x) {
-        // unlocks next 'level' if passed!
-        if (this.distance > this.goal_distance && Math.random() <= 0.3) {
-          var c = Object.create(Sprite).init(CONFIG.width + x, i * LANE_SIZE + LANE_OFFSET, Resources[gameWorld.difficulties[(gameWorld.difficulty + 1) % gameWorld.difficulties.length].sprite]);
-          c.rescue = true;
-          this.goal_distance += GOAL_DISTANCE;
-          //console.log('once?');
-        } else {
-          var c = Object.create(Sprite).init(CONFIG.width + x, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
-        }
+      else if (i != destination) {
+        var c = Object.create(Sprite).init(CONFIG.width + start, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
         c.setCollision(Polygon);
         c.offset = {x: 0, y: -12};
         c.setVertices([{x: -8, y: 6},
@@ -214,11 +202,18 @@ var onStart = function () {
         ]);
         c.addBehavior(Velocity);
         c.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
-        c.velocity = {x: -(ROAD_SPEED + 20), y: 0};
+        c.velocity = {x: -CAR_SPEED, y: 0};
         this.fg.add(c);
       }
     }
-    this.interval = start;
+    this.interval = start + 24;
+    var d = Object.create(Entity).init(CONFIG.width + this.interval / 2, CONFIG.height / 2, this.interval, CONFIG.height);
+    d.color = choose(["green", "red", "blue"]);
+    d.opacity = 0.4;
+    d.addBehavior(Velocity);
+    d.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
+    d.velocity = {x: -CAR_SPEED, y: 0};
+    this.fg.add(d);
     this.last_lane = destination;
   }
 
@@ -377,7 +372,7 @@ var onUpdate = function (dt) {
 
   this.odometer.text = this.miles() + " miles";
   if (this.interval > 0) {
-    this.interval -= ROAD_SPEED * dt;
+    this.interval -= CAR_SPEED * dt;
   } else if (!this.player.crashed) {
     this.loadPattern();
       
