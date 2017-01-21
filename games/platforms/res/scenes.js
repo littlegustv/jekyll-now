@@ -11,26 +11,60 @@
 						"x": -10, "y": 60, "h": 75, "w": 500, "color": "rgba(255,255,255,0.0)", "delay": 10
 					},
 					"border" : {"color" : "rgba(255,255,255,0.0)", "w": 0},
-					"contents": [
+					"contents": [					
 						{
-							"gridX": 246,
-							"gridY": 30,
-							"text": "the floor is the\nSURFACE of the SUN",
-							"type": "textblock",
+							"gridX": 250,
+							"gridY": 8,
+							"text": "the",
+							"type": "text",
 							"format": {
-								"size": 32,
+								"size": 48,
 								"align": "center",
-								"color": "gold"
+								"color": "white"
+							}
+						},
+						{
+							"gridX": 250,
+							"gridY": 32,
+							"text": "floor",
+							"type": "text",
+							"format": {
+								"size": 64,
+								"align": "center",
+								"color": "white"
+							}
+						},
+						{
+							"gridX": 250,
+							"gridY": 52,
+							"text": "is the",
+							"type": "text",
+							"format": {
+								"size": 48,
+								"align": "center",
+								"color": "white"
+							}
+						},				
+						{
+							"gridX": 250,
+							"gridY": 80,
+							"text": "surface",
+							"type": "text",
+							"format": {
+								"size": 64,
+								"align": "center",
+								"color": "white"
 							}
 						},					
 						{
 							"gridX": 250,
-							"gridY": 32,
-							"text": "the floor is the\nSURFACE of the SUN",
-							"type": "textblock",
+							"gridY": 100,
+							"text": "of the sun",
+							"type": "text",
 							"format": {
-								"size": 32,
-								"align": "center"
+								"size": 48,
+								"align": "center",
+								"color": "white"
 							}
 						}
 					]
@@ -125,17 +159,17 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 70, "h": 30, "w": 160, "color": "rgba(255,255,255,0.6)", "delay": 0
+						"x": -10, "y": 70, "h": 30, "w": 180, "color": "rgba(255,255,255,0.8)", "delay": 0
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
-							"gridX": 8,
+							"gridX": 18,
 							"gridY": 20,
 							"text": "^ press 'RUN'",
 							"type": "text",
 							"format": {
-								"size": 16,
+								"size": 28,
 								"align": "left"
 							}
 						}
@@ -188,7 +222,7 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 100, "y": 192, "h": 30, "w": 350, "color": "rgba(255,255,255,0.6)", "delay": 100
+						"x": 100, "y": 188, "h": 30, "w": 400, "color": "rgba(255,255,255,0.8)", "delay": 100
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
@@ -198,7 +232,7 @@
 							"text": "^ add platform: CLICK HERE",
 							"type": "text",
 							"format": {
-								"size": 16,
+								"size": 28,
 								"align": "left"
 							}
 						}
@@ -251,7 +285,7 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 172, "y": 192, "h": 30, "w": 280, "color": "rgba(255,255,255,0.6)", "delay": 100
+						"x": 172, "y": 192, "h": 30, "w": 380, "color": "rgba(255,255,255,0.8)", "delay": 100
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
@@ -261,7 +295,7 @@
 							"text": "^ remove: RIGHT-CLICK",
 							"type": "text",
 							"format": {
-								"size": 16,
+								"size": 28,
 								"align": "left"
 							}
 						}
@@ -303,7 +337,7 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 100, "y": 192, "h": 30, "w": 360, "color": "rgba(255,255,255,0.6)", "delay": 100
+						"x": 100, "y": 192, "h": 30, "w": 460, "color": "rgba(255,255,255,0.8)", "delay": 100
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
@@ -313,7 +347,7 @@
 							"text": "move MOUSE to TURN platform",
 							"type": "text",
 							"format": {
-								"size": 16,
+								"size": 28,
 								"align": "left"
 							}
 						}
@@ -348,22 +382,22 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 100, "h": 50, "w": 280, "color": "rgba(255,255,255,0.6)", "delay": 200
+						"x": -10, "y": 100, "h": 50, "w": 300, "color": "rgba(255,255,255,0.8)", "delay": 200
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
-							"gridX": 252,
+							"gridX": 280,
 							"gridY": 30,
 							"text": "  avoid OBSTACLES",
 							"type": "text",
 							"format": {
-								"size": 16,
+								"size": 28,
 								"align": "right"
 							}
 						},
 						{
-							"gridX": 0,
+							"gridX": 1,
 							"gridY": 0,
 							"type": "obstacle"
 						}
@@ -438,7 +472,7 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 90, "y": 60, "h": 30, "w": 380, "color": "rgba(255,255,255,0.6)", "delay": 100
+						"x": 90, "y": 60, "h": 30, "w": 480, "color": "rgba(255,255,255,0.8)", "delay": 100
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
@@ -448,7 +482,7 @@
 							"text": "use OBSTACLE to shorten jumps",
 							"type": "text",
 							"format": {
-								"size": 16,
+								"size": 28,
 								"align": "left"
 							}
 						}
@@ -560,7 +594,7 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 320, "y": 60, "h": 30, "w": 150, "color": "rgba(255,255,255,0.6)", "delay": 400
+						"x": 320, "y": 60, "h": 30, "w": 350, "color": "rgba(255,255,255,0.8)", "delay": 400
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
@@ -570,7 +604,7 @@
 							"text": "Good luck!",
 							"type": "text",
 							"format": {
-								"size": 16,
+								"size": 28,
 								"align": "left"
 							}
 						}
@@ -1126,7 +1160,7 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 220, "h": 50, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 500
+						"x": 0, "y": 220, "h": 50, "w": 500, "color": "rgba(255,255,255,0.8)", "delay": 500
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
@@ -1136,7 +1170,7 @@
 							"text": "an UNDERTOW spins your platform",
 							"type": "text",
 							"format": {
-								"size": 16,
+								"size": 28,
 								"align": "right"
 							}
 						},
@@ -1931,23 +1965,34 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 224, "h": 50, "w": 460, "color": "rgba(255,255,255,0.6)", "delay": 200
+						"x": 0, "y": 224, "h": 50, "w": 500, "color": "rgba(255,255,255,0.8)", "delay": 200
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
 						{
 							"gridX": 38,
 							"gridY": 30,
-							"text": "- a HOTSPOT turns a platform -> obstacle",
+							"text": "  a HOTSPOT turns a    to ",
 							"type": "text",
 							"format": {
-								"size": 14,
+								"size": 28,
 								"align": "left"
 							}
 						},
 						{
 							"type": "hotspot",
 							"gridX": 0,
+							"gridY": 0
+						},
+						{
+							"type": "platform",
+							"gridX": 8,
+							"gridY": 0,
+							"direction": "west"
+						},
+						{
+							"type": "obstacle",
+							"gridX": 10,
 							"gridY": 0
 						}
 					]
@@ -2857,7 +2902,7 @@
 				{
 					"type": "box",
 					"format": {
-						"x": 10, "y": 240, "h": 30, "w": 360, "color": "rgba(255,255,255,0.6)", "delay": 500
+						"x": 0, "y": 240, "h": 30, "w": 500, "color": "rgba(255,255,255,0.8)", "delay": 500
 					},
 					"border" : {"color" : "#18140c", "w": 4},
 					"contents": [
@@ -2867,7 +2912,7 @@
 							"text": "Specimen move when you do.",
 							"type": "text",
 							"format": {
-								"size": 16,
+								"size": 28,
 								"align": "left"
 							}
 						}

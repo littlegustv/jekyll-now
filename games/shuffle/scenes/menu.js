@@ -147,6 +147,13 @@ var onStart = function () {
     ground_low.velocity = {x: -1 * ROAD_SPEED / 2, y: 0};
   }
 
+  var block = Object.create(Entity).init(64, CONFIG.height / 2, 128, CONFIG.height);
+  block.blend = "difference";
+  block.color = "#ddd";
+  block.z = 10;
+  fg.add(block);
+
+
   this.onKeyDown = function (e) {
     if (e.keyCode == 38) {
       e.preventDefault();

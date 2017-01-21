@@ -1,8 +1,19 @@
+// y + 1 :
+
+// 3 point turn, bow & arrow, approach with care
+
+function lerp (current, goal, rate) {
+  return (1-rate)*current + rate*goal
+}
+
+function distance (x1, y1, x2, y2) {
+	return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+}
 
 var debug;
 var audioContext;
 var scale = 1;
-var fontFamily = "Frijole"
+var fontFamily = "Visitor"
 
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 if (AudioContext) AudioContext.createGain = AudioContext.createGain || AudioContext.createGainNode;
@@ -46,7 +57,7 @@ function modulo(n, p) {
 
 function playSound(sound)
 {
-	console.log(sound);
+//	console.log(sound);
 	if (AudioContext) {
 
 		var buffer = sound.buffer;
@@ -340,7 +351,6 @@ window.addEventListener("DOMContentLoaded", function () {
 			ctx.clearRect(0,0,canvas.width,canvas.height);
 			this.resourceLoadCount += 1;
 			if (this.resourceLoadCount >= this.resourceCount) {
-				this.addEventListeners();
 				this.begin();
 			}
 			//ctx.fillStyle = "#f4f0e8";
@@ -488,9 +498,10 @@ window.addEventListener("DOMContentLoaded", function () {
 			this.bg = {};
 			for (var i = -2; i <= 2 + canvas.height / (2 * GLOBALS.height); i++) {
 				var row = {};
-				for (var j = -i; j <= canvas.width / (2 * GLOBALS.width); j++) {
+				for (var j = -i - 1; j <= canvas.width / (2 * GLOBALS.width); j++) {
 					var o = Object.create(Cell).init(j, i, Resources.cell);
 					//o.blend = "overlay";
+					if (j + i <= 1 || j >= 11 || i < 1) o.opacity = 0.3;
 					o.frame = Math.floor(Math.random() * Resources.cell.frames);
 					o.maxFrameDelay = Math.floor(Math.random() * 4) * 500 + 2000;
 					o.frameDelay = Math.floor(Math.random() * 4) * 250;//row[j].maxFrameDelay;
@@ -562,6 +573,7 @@ window.addEventListener("DOMContentLoaded", function () {
 			var s = setInterval(function () {
 				if (t.ready) {
 					t.readyNow();
+					t.addEventListeners();
 					window.clearInterval(s);
 				}
 			}, 100);
@@ -624,6 +636,12 @@ window.addEventListener("DOMContentLoaded", function () {
 								t.animation = co.animation != undefined ? co.animation : 0;
 								t.offset = {x: e.x, y: e.y};
 								e.contents.push(t);
+								if (co.direction) {
+									var d = Object.create(Entity).init(co.gridX, co.gridY, Resources.directions);
+									d.offset = {x: e.x, y: e.y};
+									d.animation = co.animation != undefined ? co.animation : 0;
+									e.contents.push(d);
+								}
 							}
 						}
 						break;
@@ -707,7 +725,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				}
 			}
 			if (s.type == "cutscene") {
-				var t = Object.create(Text).init(0, 0, "<Continue>", {align: "center", size: 18});
+				var t = Object.create(Text).init(0, 0, "<Continue>", {align: "center", size: 20});
 				var skip = Object.create(TextButton).init(canvas.width / 2, canvas.height - 8, t);
 				var n = (s.uid + 1) % world.scenes.length;
 				skip.callback = function () { world.doScene(n) };
@@ -719,7 +737,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				//var b = Object.create(Button).init( 1, 0, Resources.reset);
 				//b.name = "retry";
 				//b.offset = {x: 0, y: -8};
-				var t_reset = Object.create(Text).init(0,0,"retry", {size: 14, align: "left"});
+				var t_reset = Object.create(Text).init(0,0,"retry", {size: 20, align: "left"});
 				var b = Object.create(TextButton).init(10, 38, t_reset);
 				b.callback = function () {
 					world.reset();
@@ -730,7 +748,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				//b.name = "walkthrough";
 				//b.offset = {x: 0, y: -8};
 				if (config.walkthrough) {
-					var t_walkthrough = Object.create(Text).init(0,0,"solution", {size: 14, align: "right"});
+					var t_walkthrough = Object.create(Text).init(0,0,"help!", {size: 20, align: "right"});
 					var b = Object.create(TextButton).init(470, 38, t_walkthrough);
 					b.target = config.walkthrough || "http://www.youtube.com";
 					b.callback = function () {
@@ -742,14 +760,14 @@ window.addEventListener("DOMContentLoaded", function () {
 //				var b = Object.create(Button).init( 2, 0, Resources.back);
 //				b.name = "undo";
 //				b.offset = {x: 0, y: -8};
-				var t_undo = Object.create(Text).init(0,0,"undo", {size: 14, align: "left"});
+				var t_undo = Object.create(Text).init(0,0,"undo", {size: 20, align: "left"});
 				var b = Object.create(TextButton).init(10, 20, t_undo);
 				b.callback = function () {
 					world.undo();
 				};
 				s.buttons.push(b);
 
-				var t_run = Object.create(Text).init(0,0,"run", {size: 14, align: "left"});
+				var t_run = Object.create(Text).init(0,0,"run", {size: 20, align: "left"});
 				var b = Object.create(TextButton).init(10, 56, t_run);
 	//			var b = Object.create(Button).init( 0, 0, Resources.play);
 	//			b.name = "run";
@@ -759,10 +777,10 @@ window.addEventListener("DOMContentLoaded", function () {
 					world.scene.platformsUsed = world.scene.count("platform");
 				};
 				s.buttons.push(b);
-				var t = Object.create(Text).init(canvas.width / 2, canvas.height - GLOBALS.height / 2, s.name, {size: 18});
+				var t = Object.create(Text).init(canvas.width / 2, canvas.height - GLOBALS.height / 2, s.name, {size: 24});
 				s.addEntity(t);
 
-				var t2 = Object.create(Text).init(canvas.width / 2, GLOBALS.border, s.name, {align: "center", size: 18});
+				var t2 = Object.create(Text).init(canvas.width / 2, GLOBALS.border, s.name, {align: "center", size: 24});
 				s.addEntity(t2);
 				s.par = t2;
 			}
@@ -771,39 +789,47 @@ window.addEventListener("DOMContentLoaded", function () {
 			}
 			if (s.name == "mainmenu") {
 
-				var t = Object.create(Text).init(canvas.width / 2,canvas.height / 2 + 16,"Continue", world.newGame ? {color: "#333333"}:{} );
+				var e = Object.create(Rectangle).init(canvas.width / 2, canvas.height / 3, canvas.width, canvas.height / 2);
+				e.color = "black";
+				e.z = -1;
+				s.entities.push(e);
+
+				var t = Object.create(Text).init(canvas.width / 2,canvas.height - 64,"- Continue -", world.newGame ? {color: "#333333"}:{} );
 				if (!world.newGame) {
 					world.load();
-					var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 22,t);
+					var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height - 64,t);
 					tb.callback = function () {
 						world.doScene(2);
 					};
+					tb.h -= 20;
 					s.buttons.push(tb);
 				} else {
 					s.entities.push(t);
 				}
 			
-				var t = Object.create(Text).init(0, 0,"New Game",{});
-				var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2 + 66,t);
+				var t = Object.create(Text).init(0, 0,"- New Game -",{});
+				var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height - 40,t);
 				tb.callback = function () {
 					world.clear();
 					world.doScene(3);
 				};
+				tb.h -= 20;
 				s.buttons.push(tb);
 
-				var t = Object.create(Text).init(0, 0,"Credits",{});
-				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height / 2 + 110,t);
+				var t = Object.create(Text).init(0, 0,"- Credits -",{});
+				var tb = Object.create(TextButton).init(canvas.width / 2,canvas.height - 16,t);
 				tb.callback = function () {
 					world.doScene(1);
 				};
+				tb.h -= 20;
 				s.buttons.push(tb);
 				//console.log(tb.x, tb.gridX);
 /*
 				var e = Object.create(Entity).init(3,3,Resources.temp);
 				e.animation = 0;
 				s.entities.push(e);*/
-				var t_mute = Object.create(Text).init(0,0,"mute", {size: 14, align: "right"});
-				var mute = Object.create(TextButton).init(470, 20, t_mute);
+				var t_mute = Object.create(Text).init(0,0,"mute", {size: 20, align: "right"});
+				var mute = Object.create(TextButton).init(470, 14, t_mute);
 				//var mute = Object.create(Button).init(12, 0, Resources.mute);
 				//mute.name = "mute";
 				if (AudioContext) {
@@ -834,7 +860,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				var b = Object.create(Button).init(12, 0, Resources.menu);
 				b.offset = {x: 0, y: -8};
 				b.name = "menu";*/
-				var t_menu = Object.create(Text).init(0,0,"menu", {size: 14, align: "right"});
+				var t_menu = Object.create(Text).init(0,0,"menu", {size: 20, align: "right"});
 				var b = Object.create(TextButton).init(470, 20, t_menu);
 				if (s.type == "level")
 					b.callback = function () {	world.doScene(2); };
@@ -855,13 +881,13 @@ window.addEventListener("DOMContentLoaded", function () {
 			else if (s.name == "stagemenu") {
 				var y = GLOBALS.border + 32, j = 0;
 				for (stage in this.stages) {
-					var title = Object.create(Text).init(canvas.width / 2, y, stage, {color: "#000000", align: "center", size: 18});
+					var title = Object.create(Text).init(canvas.width / 2, y, stage, {color: "#000000", align: "center", size: 28});
 					s.entities.push(title);
 					var sc = STAGES[STAGES.indexOf(stage) - 1];
 					var levels = this.scenes.filter(function (a) { return a.stage == stage && a.type == "level"; });
 					for (var i = 0; i < levels.length; i++) {
 						var w = this.scenes.indexOf(levels[i]);
-						if (!sc || this.stageComplete(sc)) {
+						if (true) { //(!sc || this.stageComplete(sc)) {   FIX ME: Remove this to re-enable unlock/lock
 							var tb;
 							if (!levels[i].score) {
 								tb = Object.create(Button).init(i - j, 2 * j + 2, Resources.empty);
@@ -982,6 +1008,8 @@ window.addEventListener("DOMContentLoaded", function () {
 		drawCursor: function (ctx) {
 			var m = this.toGrid(this.mouse.x, this.mouse.y);
 			if (m.y <= 0 || m.y >= 10) return;
+			if (m.y + m.x <= 1) return;
+			if (m.x >= 11) return;
 			if (!world.paused || world.scene.completed) return;
 			if (this.mouse.down) {
 				var p = this.getAt(m.x, m.y);
@@ -1046,8 +1074,10 @@ window.addEventListener("DOMContentLoaded", function () {
 			else {
 				dir = m.direction;
 			}
-
+			//console.log(m.y, m.x);
 			if (m.y <= 0 || m.y >= 10) return;
+			if (m.y + m.x <= 1) return;
+			if (m.x >= 11) return;
 			//if (!m.direction) dir = directions[this.mouse.angle];
 			//else dir = m.direction;
 			if (this.scene.addPlatform(m, dir)) {
@@ -1135,21 +1165,26 @@ window.addEventListener("DOMContentLoaded", function () {
 								world.paused = true;
 								world.scenes[this.uid].score = this.platformsUsed;
 								var n = (this.uid + 1) % world.scenes.length;
-								if (world.scenes[n].stage != this.stage && !world.stageComplete(this.stage)) {
-									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2, "<Next>", {size: 60});
+								var b = Object.create(Box).init({x: 0, y: canvas.height / 3, w: canvas.width, h: canvas.height / 3, color: "black"}, {}, {counter: 0, maxCount: 1000, type: "fade"});
+								this.entities.push(b);
+								if (false) { //(world.scenes[n].stage != this.stage && !world.stageComplete(this.stage)) { FIX ME: uncomment to restore 'locked' behavior
+									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2 - 24, "- Next -", {size: 60, color: "#ccc"});
 									t.z = 100;
+									//b.contents.push(t);
 									this.entities.push(t);
-									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2 - 16, "lockeclockedlockedlockedlockedlocked", {size: 20, color: "#EEEEEE"});
+									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2 - 32, "lockedlockeclockedlockedlockedlockedlocked", {size: 28, color: "red"});
 									t.z = 101;
+									//b.contents.push(t);
+
 									this.entities.push(t);
 								}
 								else {
 									// completed a level...
-									if (world.scenes[n].stage != this.stage && tracker.sendEvent) {
+									if (world.scenes[n].stage != this.stage && tracker && tracker.sendEvent) {
 										tracker.sendEvent('Complete', 'Stage', this.stage);
 									}
-									var t = Object.create(Text).init(0,0,"<Next>",{size: 60});
-									var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2, t);
+									var t = Object.create(Text).init(0,0,"- Next -",{size: 60, color: "#ccc"});
+									var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2 - 24, t);
 									tb.callback = function () {
 										world.doScene(n);
 									};
@@ -1157,10 +1192,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
 								}
 								if (world.scenes[this.uid].score <= this.max) {
-									var t2 = Object.create(Text).init(canvas.width / 2, canvas.height / 2 + 60, "Perfect!", {size: 72, color: "gold"}, 10, 300);
-									t2.z = 100;
-									this.entities.push(t2);
-									var t2 = Object.create(Text).init(canvas.width / 2 + 4, canvas.height / 2 + 64, "Perfect!", {size: 72, color: "black"}, 10, 320);
+									var t2 = Object.create(Text).init(canvas.width / 2, canvas.height / 2 + 40, "Perfect!", {size: 72, color: "gold"}, 10, 300);
 									t2.z = 100;
 									this.entities.push(t2);
 								}
@@ -1374,13 +1406,26 @@ window.addEventListener("DOMContentLoaded", function () {
 		}
 	};
 
+	var Rectangle = Object.create(Entity);
+	Rectangle.init = function (x, y, w, h) {
+		this.x = x, this.y = y, this.w = w, this.h = h;
+		return this;
+	}
+	Rectangle.draw = function (ctx) {
+		ctx.fillStyle = this.color || "black";
+		ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+	}
+	Rectangle.update =  function (dt) {
+		return;
+	}
+
 	var Box = Object.create(Entity);
 	Box.z = 1;
 	Box.init = function (format, border, transition) {
 		for (key in format) {
 			this[key] = format[key];
 		}
-		this.border = border;
+		this.border = undefined;
 		this.transition = transition || {type: "none", counter: 0, maxCount: 0};
 		this.contents = [];
 		return this;
@@ -1392,9 +1437,11 @@ window.addEventListener("DOMContentLoaded", function () {
 		}
 		ctx.fillStyle = this.color;
 		ctx.fillRect(this.x, this.y, this.w, this.h);
-		ctx.strokeStyle = this.border.color || "black";
-		ctx.lineWidth = this.border.w || 0;
-		ctx.strokeRect(this.x, this.y, this.w, this.h);
+		if (this.border) {
+			ctx.strokeStyle = this.border.color || "black";
+			ctx.lineWidth = this.border.w || 0;
+			ctx.strokeRect(this.x, this.y, this.w, this.h);
+		}
 		for (var  i = 0; i < this.contents.length; i++) {
 			this.contents[i].draw(ctx);
 		}
@@ -1444,7 +1491,7 @@ window.addEventListener("DOMContentLoaded", function () {
 		this.x = x; this.y = y - 8; this.text = text;
 		this.text.draw(ctx);
 		this.text.x = x, this.text.y = y;
-		this.w = ctx.measureText(this.text.text).width + 10, this.h = this.text.size + 4;
+		this.w = ctx.measureText(this.text.text).width + 10, this.h = this.text.size - 4;
 		this.x = this.x - (this.text.align == "right") * this.w / 2 + (this.text.align == "left") * this.w / 2;
 		this.color = this.text.color;
 		return this;
@@ -1530,7 +1577,7 @@ window.addEventListener("DOMContentLoaded", function () {
 	var Collectable = Object.create(Entity);
 	Collectable.type = "collectable";
 	Collectable.offset = {x: 0, y: -12};
-	Collectable.opacity = 0.8;
+	Collectable.opacity = 0.5;
 
 	var Cell = Object.create(Entity);
 	Cell.type = "cell";
@@ -1619,8 +1666,22 @@ window.addEventListener("DOMContentLoaded", function () {
 				for (var i = 0; i < e.length; i++) {
 					var ep = e[i].getPosition(), tp = this.getPosition();
 					if (Math.abs(ep.x - tp.x) < 10 && Math.abs(ep.y - tp.y) < 10) {
-						if (e[i].type == "collectable") { 
+						if (e[i].type == "collectable") {
 							var n = Object.create(Entity).init(world.scene.collected - 5, 10, e[i].sprite);
+							var np = n.getPosition();
+							var n = Object.create(Entity).init(ep.x, ep.y, e[i].sprite);
+							n.goal = {x: np.x, y: np.y};
+							n.update = function (dt) {
+								this.animate(dt);
+								if (distance(this.gridX, this.gridY, this.goal.x, this.goal.y) < 2) {
+									this.gridX = this.goal.x, this.gridY < this.goal.y;
+									this.update = function (dt) { this.animate(dt); };
+								}
+								this.gridX = lerp(this.gridX, this.goal.x, 3 * dt / 1000);								
+								this.gridY = lerp(this.gridY, this.goal.y, 3 * dt / 1000);
+							}
+							n.z = 1000000;
+							n.getPosition = function () { return {x: this.gridX, y: this.gridY, scale: 1 }; };
 							n.offset = {x: 0, y: -8};
 							n.animation = e[i].animation;
 							world.addEntity(n);
