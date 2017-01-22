@@ -4,38 +4,21 @@ title: Games
 permalink: /games/
 ---
 
-<div class="row text-right">
-    <div class="col-sm-2"></div>
-    <div class="col-sm-6">
-        <h4><a href="http://www.kongregate.com/games/littlegustv/seven-deadly-seas">Seven Deadly Seas</a></h4>
-        <p>How long can one doomed ship last against everything the unforgiving sea cares to throw at her?  Find out!</p>
-        <b>Published 11-13-2016</b>
-    </div>
-    <div class="col-sm-4">
-        <a href="http://www.kongregate.com/games/littlegustv/seven-deadly-seas"><img src="{{ site.baseurl }}/images/ships.png" alt="" class="img img-thumbnail"></a>
+<div class="row text-center">
+    <div class="col-sm-12">
+        <iframe frameborder="0" src="https://itch.io/embed/113463" width="552" height="167"></iframe>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-sm-4">
-        <a href="http://www.kongregate.com/games/littlegustv/the-floor-is-the-surface-of-the-sun"><img src="{{ site.baseurl }}/images/surfaceofsun.png" alt="" class="img img-thumbnail"></a>
-    </div>
-    <div class="col-sm-6">
-        <h4><a href="http://www.kongregate.com/games/littlegustv/the-floor-is-the-surface-of-the-sun">The Floor is the Surface of the Sun</a></h4>
-        <p>An genuinely complete puzzle game, whatever you might think of it.  Try in for FREE on the Kongregate.com, if you like!</p>
-        <b>Published 04-30-2016</b>
+<div class="row text-center">
+    <div class="col-sm-12">
+        <iframe frameborder="0" src="https://itch.io/embed/113492" width="552" height="167"></iframe>
     </div>
 </div>
 
-<div class="row text-right">
-    <div class="col-sm-2"></div>
-    <div class="col-sm-6">
-        <h4><a href="{{ site.baseurl }}/games/anarchopanda">Anarchopanda's Adventure</a></h4>
-        <p>Developed in Construct 2, a take on the problem of state repression and the avenues of resistance.</p>
-        <b>Completed 3-10-2014</b>
-    </div>
-    <div class="col-sm-4">
-        <a href="{{ site.baseurl }}/games/anarchopanda"><img src="{{ site.baseurl }}/images/anarchopanda.png" alt="" class="img img-thumbnail"></a>
+<div class="row text-center">
+    <div class="col-sm-12">
+        <iframe frameborder="0" src="https://itch.io/embed/22321" width="552" height="167"></iframe>
     </div>
 </div>
 
