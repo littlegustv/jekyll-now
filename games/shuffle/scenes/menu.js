@@ -8,11 +8,19 @@ var fullscreen = false;
 var onStart = function () {
 
   this._gamepad = Object.create(Gamepad).init();
+  var t = this;
+
+  if (!gameWorld.soundtrack) { 
+    gameWorld.musicLoop = function () {
+      gameWorld.soundtrack = gameWorld.playSound(Resources.soundtrack1);
+      gameWorld.soundtrack.onended = gameWorld.musicLoop;
+    }
+    gameWorld.musicLoop();
+  }
 
   this.layers = [];
+  this.buttons = [];
   this.delay = 0.25;
-
-  var t = this;
 
   var bg_camera = Object.create(Camera).init(0, 0);
   var bg = Object.create(Layer).init(bg_camera);
@@ -28,11 +36,66 @@ var onStart = function () {
   var title3 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 80, "brakes", {align: "left", size: 96, color: "black"});
   fg.add(title3);  
 
-  fg.add(Object.create(Text).init(2 * CONFIG.width / 3, CONFIG.height / 2 + 72, "Press Any Key", {size : 24, align: "left"}));
-  fg.add(Object.create(Text).init(2 * CONFIG.width / 3, CONFIG.height / 2 + 84, "Press     ", {size: 24, align: "left"}));
-  fg.add(Object.create(Text).init(2 * CONFIG.width / 3, CONFIG.height / 2 + 96, "Touch Anywhere", {size: 24, align: "left"}));
-  fg.add(Object.create(Text).init(2 * CONFIG.width / 3, CONFIG.height / 2 + 112, "To Begin...", {size: 32, align: "left"}));
-  fg.add(Object.create(Sprite).init(2 * CONFIG.width / 3 + 64, CONFIG.height / 2 + 80, Resources.a));
+  // buttons
+
+  var bg_block = Object.create(Entity).init(CONFIG.width - 56, CONFIG.height / 2 + 104, 112, 32);
+  bg_block.color = "#333";
+  bg_block.z = -1;
+  fg.add(bg_block);
+  fg.add(Object.create(Text).init(CONFIG.width - 4, CONFIG.height / 2 + 112, "BEGIN", {size: 42, align: "right", color: "white"}));
+
+  var begin_button = Object.create(Button).init(CONFIG.width - 56, CONFIG.height / 2 + 104, 112, 32);
+  begin_button.family = "button";
+  begin_button.trigger = function () {
+    gameWorld.setScene(1);
+  };
+  begin_button.hover = function () {
+    bg_block.color = "#999";
+  };
+  begin_button.unhover = function () {
+    bg_block.color = "#333";
+  };
+  this.buttons.push(begin_button);
+  fg.add(begin_button);
+
+  var mute_block = Object.create(Entity).init(CONFIG.width - 48, 18, 96, 32);
+  mute_block.color = "#333", mute_block.oldcolor = "#333";
+  mute_block.z = -1;
+  fg.add(mute_block);
+  var mute_text = Object.create(Text).init(CONFIG.width - 4, 26, "MUTE", {size: 42, align: "right", color: "white"});
+  fg.add(mute_text);
+
+  var mute_button = Object.create(Button).init(CONFIG.width - 48, 18, 96, 32);
+  mute_button.family = "button";
+  mute_button.set = function () {
+    if (gameWorld.muted && gameWorld.audioContext && gameWorld.audioContext.gn) {
+      mute_text.text = "UNMUTE";
+      mute_block.x = CONFIG.width - 64;
+      mute_block.w = 128;
+      gameWorld.audioContext.gn.gain.value = 0;
+    } else if (gameWorld.audioContext && gameWorld.audioContext.gn) {
+      mute_text.text = "MUTE";  
+      mute_block.x = CONFIG.width - 48;
+      mute_block.w = 96;    
+      gameWorld.audioContext.gn.gain.value = 1;
+    }
+  }
+  mute_button.set();
+  mute_button.trigger = function () {
+    gameWorld.muted = !gameWorld.muted;
+    mute_button.set();
+  };
+  mute_button.hover = function () {
+    if (mute_block.color != "#999") {
+      mute_block.oldcolor = mute_block.color;
+      mute_block.color = "#999";
+    }
+  };
+  mute_button.unhover = function () {
+    mute_block.color = mute_block.oldcolor;
+  };
+  this.buttons.push(mute_button);
+  fg.add(mute_button);
 
   if (gameWorld.score) {
     var scoreText = Object.create(Text).init(CONFIG.width / 2, 20, "You made it " + gameWorld.score + " miles!", {});
@@ -214,11 +277,24 @@ var onStart = function () {
     if (!fullscreen) requestFullScreen();
     t.touch.x = e.changedTouches[0].pageX, t.touch.y = e.changedTouches[0].pageY;
   }
+  this.onClick = function (e) {
+    var b = t.fg.onButton(e.offsetX, e.offsetY);
+    if (b) {
+      if (b.trigger) b.trigger();
+      return;
+    }
+  }
   this.onTouchEnd = function (e) {
     var x = e.changedTouches[0].pageX, y = e.changedTouches[0].pageY;
+    var b = t.fg.onButton(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+    if (b) {
+      if (b.trigger) b.trigger();
+      return;
+    }
     if (Math.abs(t.touch.y - y) < 10) {
-      if (gameWorld.difficulty <= gameWorld.unlocked)
-        gameWorld.setScene(1);
+      if (gameWorld.difficulty <= gameWorld.unlocked){
+        //gameWorld.setScene(1);        
+      }
       else {
         //gameWorld.playSound(Resources.error);
       }
@@ -235,10 +311,20 @@ var onStart = function () {
       t.doRefreshSelectors = true;    
     }
   }
+  this.onMouseMove = function (e) {
+    for (var i = 0; i < t.buttons.length; i++) {
+      if (t.buttons[i].check(e.offsetX, e.offsetY)) {
+        t.buttons[i].hover();
+      } else {
+        t.buttons[i].unhover();
+      }
+    }
+  }
 
   this.layers.push(bg);
   this.layers.push(fg);
 };
+
 
 var onUpdate = function (dt) {
   this.delay -= dt;

@@ -45,9 +45,9 @@ var onStart = function () {
   var ui = Object.create(Layer).init(ui_camera);
   this.ui = ui;
 
-  var odometer = Object.create(Text).init(20,20,"0 miles", {align: "left"});
+/*  var odometer = Object.create(Text).init(20,20,"0 miles", {align: "left"});
   ui.add(odometer);
-  t.odometer = odometer;
+  t.odometer = odometer;*/
 
   fg.drawOrder = function () {
     return this.entities.sort(function (a, b) { 
@@ -152,8 +152,51 @@ var onStart = function () {
       t.fg.add(e);
     }
   };
-  player.addBehavior(Tracks, {});
-*/
+  player.addBehavior(Tracks, {});*/
+
+  // buttons
+
+  this.buttons = [];
+
+  var mute_block = Object.create(Entity).init(CONFIG.width - 48, 18, 96, 32);
+  mute_block.color = "#333", mute_block.oldcolor = "#333";
+  mute_block.z = -1;
+  ui.add(mute_block);
+  var mute_text = Object.create(Text).init(CONFIG.width - 4, 26, "MUTE", {size: 42, align: "right", color: "white"});
+  ui.add(mute_text);
+
+  var mute_button = Object.create(Button).init(CONFIG.width - 48, 18, 96, 32);
+  mute_button.family = "button";
+  mute_button.set = function () {
+    if (gameWorld.muted && gameWorld.audioContext && gameWorld.audioContext.gn) {
+      mute_text.text = "UNMUTE";
+      mute_block.x = CONFIG.width - 64;
+      mute_block.w = 128;
+      gameWorld.audioContext.gn.gain.value = 0;
+    } else if (gameWorld.audioContext && gameWorld.audioContext.gn) {
+      mute_text.text = "MUTE";  
+      mute_block.x = CONFIG.width - 48;
+      mute_block.w = 96;    
+      gameWorld.audioContext.gn.gain.value = 1;
+    }
+  }
+  mute_button.set();
+  mute_button.trigger = function () {
+    gameWorld.muted = !gameWorld.muted;
+    this.set();
+  };
+  mute_button.hover = function () {
+    if (mute_block.color != "#999") {
+      mute_block.oldcolor = mute_block.color;
+      mute_block.color = "#999";
+    }
+  };
+  mute_button.unhover = function () {
+    mute_block.color = mute_block.oldcolor;
+  };
+  this.buttons.push(mute_button);
+  ui.add(mute_button);
+
   var laning = player.addBehavior(LaneMovement, {lane_size: LANE_SIZE, max_speed: HANDLING, threshold: THRESHOLD});
   this.laning = laning;
   player.laning = laning;
@@ -207,13 +250,14 @@ var onStart = function () {
       }
     }
     this.interval = start + 24;
+    /*
     var d = Object.create(Entity).init(CONFIG.width + this.interval / 2, CONFIG.height / 2, this.interval, CONFIG.height);
     d.color = choose(["green", "red", "blue"]);
     d.opacity = 0.4;
     d.addBehavior(Velocity);
     d.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
     d.velocity = {x: -CAR_SPEED, y: 0};
-    this.fg.add(d);
+    this.fg.add(d);*/
     this.last_lane = destination;
   }
 
@@ -278,6 +322,8 @@ var onStart = function () {
     if (player.crashed) {
       gameWorld.setScene(0);
     }
+    if (fg.paused > 0) fg.paused = 0;
+    if (bg.paused > 0) bg.paused = 0; 
   }
 
   this.touch = {x: 0, y: 0};
@@ -287,6 +333,12 @@ var onStart = function () {
       gameWorld.setScene(0);
       return false;
     }
+    var b = t.ui.onButton(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+    if (b) {
+      if (b.trigger) b.trigger();
+      return;
+    }
+
     t.touch.x = e.changedTouches[0].pageX, t.touch.y = e.changedTouches[0].pageY;
   }
   this.onTouchMove = function (e) {
@@ -305,6 +357,22 @@ var onStart = function () {
   }
   this.onTouchEnd = function (e) {
     laning.setLane();
+  }
+  this.onClick = function (e) {
+    var b = t.ui.onButton(e.offsetX, e.offsetY);
+    if (b) {
+      if (b.trigger) b.trigger();
+      return;
+    }
+  }
+  this.onMouseMove = function (e) {
+    for (var i = 0; i < t.buttons.length; i++) {
+      if (t.buttons[i].check(e.offsetX, e.offsetY)) {
+        t.buttons[i].hover();
+      } else {
+        t.buttons[i].unhover();
+      }
+    }    
   }
 
   this.layers.push(bg);
@@ -370,7 +438,7 @@ var onUpdate = function (dt) {
   }
 
 
-  this.odometer.text = this.miles() + " miles";
+//  this.odometer.text = this.miles() + " miles";
   if (this.interval > 0) {
     this.interval -= CAR_SPEED * dt;
   } else if (!this.player.crashed) {
