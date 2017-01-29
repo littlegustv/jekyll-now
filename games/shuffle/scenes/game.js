@@ -483,7 +483,7 @@ var onUpdate = function (dt) {
 
 
 //  this.odometer.text = this.miles() + " miles";
-  if (this.interval > 0) {
+  if (this.interval > 0 && this.fg.paused <= 0) {
     this.interval -= CAR_SPEED * dt;
   } else if (!this.player.crashed) {
     this.loadPattern();
