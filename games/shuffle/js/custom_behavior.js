@@ -130,3 +130,21 @@ TargetWrap.update = function (dt) {
     this.entity.x = this.target.x + this.max.x;
   }
 }
+
+var Trail = Object.create(Behavior);
+Trail.start = function () {
+  this.time = 0, this.count = 5, this.interval = 0.06, this.fade = 0.2, this.trail = [];
+}
+Trail.update = function (dt) {
+  if (this.time == undefined) this.start();
+  this.time += dt;
+  if (this.time >= this.interval && this.entity.velocity.y != 0) {
+    //console.log('yeah');
+    this.time = 0;
+    var e = Object.create(Sprite).init(this.entity.x, this.entity.y, this.entity.sprite);
+    e.opacity = 0.7;
+    e.offset = this.entity.offset;
+    e.addBehavior(FadeOut, {duration: 0.3, remove: true});
+    this.entity.layer.add(e);
+  }
+}

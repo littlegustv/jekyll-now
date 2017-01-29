@@ -75,7 +75,7 @@ Scene.loadBehavior = function (script) {
   };
 }
 
-function goalMessage (layer) {
+function goalMessage (layer, again) {
   var goal_messages = [];
   var b = Object.create(Entity).init(CONFIG.width / 2, 92, CONFIG.width + 128, 64);
   b.color = "darkcyan";
@@ -116,6 +116,24 @@ function goalMessage (layer) {
   s.opacity = 0;
   layer.add(s);
   goal_messages.push(s);
+
+  if (again) {
+    var a = Object.create(Entity).init(CONFIG.width / 2 + 100, 140, 200, 32);
+    a.addBehavior(FadeOut, {duration: 0.4, delay: 3, remove: true, maxOpacity: 1});
+    a.addBehavior(FadeIn, {duration: 0.4, delay: 0.7});
+    a.color = "tomato";
+    a.opacity = 0;
+    layer.add(a);
+    goal_messages.push(a);
+
+    var at = Object.create(Text).init(CONFIG.width / 2 + 100, 150, "(again!)", {align: "center", color: "white", size: 36});
+    at.addBehavior(FadeOut, {duration: 0.4, delay: 3, remove: true, maxOpacity: 1});
+    at.addBehavior(FadeIn, {duration: 0.4, delay: 0.7});
+    at.opacity = 0;
+    layer.add(at);
+    goal_messages.push(at);
+  }
+
   return goal_messages;
 }
 

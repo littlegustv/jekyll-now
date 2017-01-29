@@ -95,6 +95,7 @@ var onStart = function () {
     {x: 8, y: 12},
     {x: -8, y: 12}
   ]);
+  player.addBehavior(Trail, {});
   player.offset = {x: 0, y: -12};
   this.player = player;
 
@@ -114,10 +115,15 @@ var onStart = function () {
   player.collision.onHandle = function(object, other) {
     if (other.rescue) {
       gameWorld.playSound(Resources.beepbeep);
-      goalMessage(ui);
-      fg.paused = 3, bg.paused = 3;
+      var old_sprite = object.sprite, old_position = {x: object.x, y: object.y};
       object.sprite = other.sprite;
-      other.alive = false;
+      object.x = other.x, object.y = other.y;
+      other.sprite = old_sprite, other.x = old_position.x, other.y = old_position.y;
+      other.addBehavior(FadeOut, {duration: 0.5, remove: true});
+      object.addBehavior(Delay, {duration: 0.5, callback: function () {
+        fg.paused = 3, bg.paused = 3;
+        goalMessage(ui, true);
+      }});
       gameWorld.difficulty += 1;
     }
     else {
@@ -219,6 +225,28 @@ var onStart = function () {
 
     var lane = this.last_lane;
     var t = this;
+    if (this.distance >= this.goal_distance) {
+      console.log('what');
+      // should only happen once
+      this.goal_distance += GOAL_DISTANCE;
+      var s = Object.create(Sprite).init(CONFIG.width * 1.5, LANE_OFFSET + 3 * LANE_SIZE, Resources[gameWorld.difficulties[(gameWorld.difficulty + 1) % gameWorld.difficulties.length].sprite]);
+      s.rescue = true;
+      s.addBehavior(Velocity);
+      s.setCollision(Polygon);
+      s.offset = {x: 0, y: -12};
+      s.setVertices([{x: -8, y: -CONFIG.height / 2},
+        {x: 8, y: -CONFIG.height / 2},
+        {x: 8, y: CONFIG.height / 2},
+        {x: -8, y: CONFIG.height / 2}
+      ]);
+      s.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
+      s.velocity = {x: -CAR_SPEED, y: 0};
+      this.fg.add(s);
+      this.interval = CONFIG.width * 1.5;
+      console.log(s, this.interval);
+      return;
+    }
+
     // choose new lane
     var destination = this.NEXT || modulo(lane + Math.floor(Math.random() * 5 + 1), 7);
     if (Math.random() < 0.1) {
@@ -242,7 +270,7 @@ var onStart = function () {
           {x: 8, y: 6},
           {x: 8, y: 12},
           {x: -8, y: 12}
-        ]);
+        ]);        
         c.addBehavior(Velocity);
         c.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
         c.velocity = {x: -CAR_SPEED, y: 0};
