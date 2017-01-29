@@ -61,7 +61,7 @@ var onStart = function () {
 
   for (var i = 0; i < 2; i ++) {  
     var trees = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, 2.5 * LANE_SIZE, CONFIG.width + LANE_SIZE, LANE_SIZE, Resources.trees);
-    trees.velocity = {x: - 3 * ROAD_SPEED, y: 0};
+    trees.velocity = {x: - 2.5 * ROAD_SPEED, y: 0};
     trees.z = -10;
     bg.add(trees);
 
@@ -75,7 +75,7 @@ var onStart = function () {
     fg.add(ground_low);
     ground_low.addBehavior(Velocity);
     ground_low.addBehavior(Wrap, {min: {x: -CONFIG.width / 2, y: 0}, max: {x: CONFIG.width + CONFIG.width / 2, y: CONFIG.height}});
-    ground_low.velocity = {x: -1 * ROAD_SPEED, y: 0};
+    ground_low.velocity = {x: -2 * ROAD_SPEED, y: 0};
   }
 
   // make BG scroll, using velocity
@@ -206,7 +206,7 @@ var onStart = function () {
 
   this.difficultyFormula = function () {
     // pure 'base-line' possiblity = CAR_SPEED * LANE_SIZE / HANDLING (too hard, though!!)
-    return 1.5 * CAR_SPEED * LANE_SIZE / HANDLING;
+    return 2 * CAR_SPEED * LANE_SIZE / HANDLING;
   }
 
   // - add 'tricks'; where there are 'two' destinations but only ONE is real
@@ -251,18 +251,25 @@ var onStart = function () {
     }
     this.interval = start + 24;
     /*
-    var d = Object.create(Entity).init(CONFIG.width + this.interval / 2, CONFIG.height / 2, this.interval, CONFIG.height);
+    var d = Object.create(Entity).init(CONFIG.width + this.interval / 2, CONFIG.height / 2, this.interval + 8, CONFIG.height);
     d.color = choose(["green", "red", "blue"]);
-    d.opacity = 0.4;
+    d.opacity = 0.8;
     d.addBehavior(Velocity);
-    d.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
+    d.addBehavior(Crop, {min: {x: -40 - this.interval / 2, y: 0}, max: {x: 10000, y: 1000}});
     d.velocity = {x: -CAR_SPEED, y: 0};
-    this.fg.add(d);*/
+    d.blend = "screen";
+    this.fg.add(d);
+*/
     this.last_lane = destination;
   }
 
   this.onKeyDown = function (e) {
-    if (fg.paused > 0) fg.paused = 0;
+    if (fg.paused > 0) {
+      for (var i = 0; i < t.goal_messages.length; i++) {
+        t.goal_messages[i].alive = false;
+      }
+      fg.paused = 0;
+    }
     if (bg.paused > 0) bg.paused = 0;
 
     if (player.crashed) {
@@ -379,7 +386,7 @@ var onStart = function () {
   this.layers.push(fg);
   this.layers.push(ui);
 
-  goalMessage(ui);
+  this.goal_messages = goalMessage(ui);
   fg.paused = 3, bg.paused = 3;
 };
 
@@ -413,25 +420,34 @@ var onUpdate = function (dt) {
   var t = Math.floor(this.distance / 528);
   if (t > this.tenth_distance) {
     // create sign
-    var sign_bg = Object.create(Entity).init(CONFIG.width, 96, 64, 48);
+    var sign_bg = Object.create(Entity).init(CONFIG.width, 64, 64, 40);
     sign_bg.addBehavior(Velocity);
     sign_bg.velocity = {x: -2 * ROAD_SPEED, y: 0};
     sign_bg.addBehavior(Crop, {min: {x: - CONFIG.width, y: 0}, max: {x: 2 * CONFIG.width, y: CONFIG.height}});    
-    sign_bg.z = 2;
+    sign_bg.z = 4;
+    sign_bg.color = ["darksalmon", "darkcyan", "darkgreen"][10 * this.tenth_distance % 3]
     this.bg.add(sign_bg);
+
+    var sign_stem = Object.create(Entity).init(CONFIG.width, 96, 8, 64);
+    sign_stem.addBehavior(Velocity);
+    sign_stem.velocity = {x: -2 * ROAD_SPEED, y: 0};
+    sign_stem.addBehavior(Crop, {min: {x: - CONFIG.width, y: 0}, max: {x: 2 * CONFIG.width, y: CONFIG.height}});    
+    sign_stem.z = 3;
+    sign_stem.color = "black";
+    this.bg.add(sign_stem);
     
-    var sign_text = Object.create(Text).init(CONFIG.width, 92, t/10, {align: "center", color: "white", size: 32});
+    var sign_text = Object.create(Text).init(CONFIG.width, 62, t/10, {align: "center", color: "white", size: 32});
     sign_text.addBehavior(Velocity);
     sign_text.velocity = {x: -2 * ROAD_SPEED, y: 0};
     sign_text.addBehavior(Crop, {min: {x: - CONFIG.width, y: 0}, max: {x: 2 * CONFIG.width, y: CONFIG.height}});    
-    sign_text.z = 3;
+    sign_text.z = 5;
     this.bg.add(sign_text);
 
-    var sign_text2 = Object.create(Text).init(CONFIG.width, 108, "miles", {align: "center", color: "white", size: 24});
+    var sign_text2 = Object.create(Text).init(CONFIG.width, 76, "miles", {align: "center", color: "white", size: 24});
     sign_text2.addBehavior(Velocity);
     sign_text2.velocity = {x: -2 * ROAD_SPEED, y: 0};
     sign_text2.addBehavior(Crop, {min: {x: - CONFIG.width, y: 0}, max: {x: 2 * CONFIG.width, y: CONFIG.height}});    
-    sign_text2.z = 3;
+    sign_text2.z = 5;
     this.bg.add(sign_text2);
 
     this.tenth_distance = t;

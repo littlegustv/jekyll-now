@@ -76,28 +76,47 @@ Scene.loadBehavior = function (script) {
 }
 
 function goalMessage (layer) {
-  var b = Object.create(Entity).init(CONFIG.width / 2, 32, CONFIG.width, 64);
-  b.color = "#333";
+  var goal_messages = [];
+  var b = Object.create(Entity).init(CONFIG.width / 2, 92, CONFIG.width + 128, 64);
+  b.color = "darkcyan";
   b.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
-  b.addBehavior(FadeIn, {duration: 1});
+  b.addBehavior(FadeIn, {duration: 0.5});
+  b.angle = Math.PI / 36;
   layer.add(b);
+  goal_messages.push(b);
 
-  var t = Object.create(Text).init(CONFIG.width / 2, 24, "Oh no! Your brakes have failed!" + (gameWorld.difficulty > 0 ? " (again)" : ""), {align: "center", color: "white", size: 36});
+  var t = Object.create(Text).init(CONFIG.width / 2, 100, "Oh no! Your brakes have failed!", {align: "center", color: "white", size: 36});
+  t.angle = Math.PI / 36;
   t.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
   t.addBehavior(FadeIn, {duration: 1});
   layer.add(t);
+  goal_messages.push(t);
 
-  var t2 = Object.create(Text).init(CONFIG.width / 2, 50, "Get to the rescue car!       , one mile <away!></away!>", {align: "center", color: "white", size: 36});
-  t2.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
-  t2.addBehavior(FadeIn, {duration: 1, delay: 1, maxOpacity: 1});
-  t2.opacity = 0;
-  layer.add(t2);
+  var b = Object.create(Entity).init(CONFIG.width / 2, 192, CONFIG.width + 128, 64);
+  b.color = "darksalmon";
+  b.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
+  b.addBehavior(FadeIn, {duration: 1, delay: 1});
+  b.opacity = 0;
+  b.angle = - Math.PI / 72;
+  layer.add(b);
+  goal_messages.push(b);
 
-  var s = Object.create(Sprite).init(CONFIG.width / 2 + 160, 32, Resources[gameWorld.difficulties[(gameWorld.difficulty + 1) % gameWorld.difficulties.length].sprite]);
+  var t = Object.create(Text).init(CONFIG.width / 2, 200, "A rescue car is 1 mile away!       ", {align: "center", color: "white", size: 36});
+  t.angle = - Math.PI / 72;
+  t.opacity = 0;
+  t.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
+  t.addBehavior(FadeIn, {duration: 1, delay: 1});
+  layer.add(t);
+  goal_messages.push(t);
+
+  var s = Object.create(Sprite).init(CONFIG.width / 2 + 192, 180, Resources[gameWorld.difficulties[(gameWorld.difficulty + 1) % gameWorld.difficulties.length].sprite]);
   s.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
-  s.addBehavior(FadeIn, {duration: 1, delay: 1, maxOpacity: 1});
+  s.addBehavior(FadeIn, {duration: 0.5, delay: 1, maxOpacity: 1});
+  s.angle = - Math.PI / 72;
   s.opacity = 0;
   layer.add(s);
+  goal_messages.push(s);
+  return goal_messages;
 }
 
 // custom behavior to handle 'passing' a car => unlocking that 'difficulty'
@@ -183,7 +202,7 @@ FadeOut.start = function () {
   this.remove = this.remove === undefined ? true : this.remove;
   this.time = 0;
   this.delay = this.delay || 0;
-  console.log('start', this);
+//  console.log('start', this);
 }
 
 Follow.update = function (dt) {

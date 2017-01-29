@@ -30,21 +30,29 @@ var onStart = function () {
   var fg = Object.create(Layer).init(fg_camera);
   t.fg = fg;
 
-  var title2 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 80, "Bad", {align: "right", size: 64, color: "black"});
+  var titlebg1 = Object.create(Entity).init(CONFIG.width / 2, CONFIG.height / 2 - 80, CONFIG.width, 40);
+  titlebg1.color = "darksalmon";
+  bg.add(titlebg1);
+
+  var titlebg2 = Object.create(Entity).init(CONFIG.width / 2, CONFIG.height / 2 - 30, CONFIG.width, 64);
+  titlebg2.color = "darkcyan";
+  bg.add(titlebg2);
+
+  var title2 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 64, "Bad", {align: "center", size: 64, color: "white"});
   fg.add(title2);
 
-  var title3 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 80, "brakes", {align: "left", size: 96, color: "black"});
+  var title3 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 16, "brakes", {align: "center", size: 96, color: "white"});
   fg.add(title3);  
 
   // buttons
 
-  var bg_block = Object.create(Entity).init(CONFIG.width - 56, CONFIG.height / 2 + 104, 112, 32);
+  var bg_block = Object.create(Entity).init(CONFIG.width - 56, CONFIG.height - 18, 112, 32);
   bg_block.color = "#333";
   bg_block.z = -1;
   fg.add(bg_block);
-  fg.add(Object.create(Text).init(CONFIG.width - 4, CONFIG.height / 2 + 112, "BEGIN", {size: 42, align: "right", color: "white"}));
+  fg.add(Object.create(Text).init(CONFIG.width - 56, CONFIG.height - 10, "BEGIN", {size: 42, align: "center", color: "white"}));
 
-  var begin_button = Object.create(Button).init(CONFIG.width - 56, CONFIG.height / 2 + 104, 112, 32);
+  var begin_button = Object.create(Button).init(CONFIG.width - 56, CONFIG.height - 18, 112, 32);
   begin_button.family = "button";
   begin_button.trigger = function () {
     gameWorld.setScene(1);
@@ -97,10 +105,22 @@ var onStart = function () {
   this.buttons.push(mute_button);
   fg.add(mute_button);
 
+  // 'best score' should be stored in localstorage && stored PER CAR type!
   if (gameWorld.score) {
-    var scoreText = Object.create(Text).init(CONFIG.width / 2, 20, "You made it " + gameWorld.score + " miles!", {});
+    var scoreText = Object.create(Text).init(8, 2 * CONFIG.height / 3, "You made it " + gameWorld.score + " miles!", {align: "left"});
     scoreText.addBehavior(FadeIn, {duration: 0.5});
     fg.add(scoreText);
+  }
+  if (localStorage) {
+    if (!localStorage.bestScore) {
+      // new best score!
+      localStorage.bestScore = gameWorld.score;  
+    }
+    else {
+      var bestScoreText = Object.create(Text).init(8, 2 * CONFIG.height / 3 + 25, "Best distance: " + localStorage.bestScore + " miles!", {align: "left"});
+      bestScoreText.addBehavior(FadeIn, {duration: 0.5});
+      fg.add(bestScoreText); 
+    }
   }
 
   this.selectors = [];
@@ -110,7 +130,7 @@ var onStart = function () {
     var theta = (Math.PI / 6) * (i - gameWorld.difficulty);
     var dy = 96 * Math.sin(theta);
     var dx = 96 * Math.cos(theta);
-    var d = Object.create(Sprite).init(72 + dx, CONFIG.height / 2 + dy, Resources[gameWorld.difficulties[i].sprite]);
+    var d = Object.create(Sprite).init(CONFIG.width - 48, 2 * CONFIG.height / 3 + dy, Resources[gameWorld.difficulties[i].sprite]);
     d.addBehavior(Locked);
     d.level = i;
     d.opacity = (i == gameWorld.difficulty) ? 1 : 0.5;
@@ -121,20 +141,20 @@ var onStart = function () {
     fg.add(d);
 
     var st = [];
-    var handling_text = Object.create(Text).init(12, CONFIG.height / 2 - 12, "Handling", {align: "left", size: 24});
+    var handling_text = Object.create(Text).init(CONFIG.width - 192, 2 * CONFIG.height / 3 - 12, "Handling", {align: "left", size: 24});
     st.push(handling_text);
     var h = Math.floor(10 * gameWorld.difficulties[i].handling / 500);
     for (var j = 0; j < 10; j++) {
-      var e = Object.create(Entity).init(12 + j * 10, handling_text.y + 12, 8, 8);
+      var e = Object.create(Entity).init(CONFIG.width - 192 + j * 10, handling_text.y + 12, 8, 8);
       e.color = j <= h ? "black" : "gray";
       st.push(e);
     }
 
-    var speed_text = Object.create(Text).init(12, CONFIG.height / 2 + 24, "Speed", {align: "left", size: 24});
+    var speed_text = Object.create(Text).init(CONFIG.width - 192, 2 * CONFIG.height / 3 + 24, "Speed", {align: "left", size: 24});
     st.push(speed_text);
     var h = Math.floor(10 * gameWorld.difficulties[i].roadSpeed / 500);
     for (var j = 0; j < 10; j++) {
-      var e = Object.create(Entity).init(12 + j * 10, speed_text.y + 12, 8, 8);
+      var e = Object.create(Entity).init(CONFIG.width - 192 + j * 10, speed_text.y + 12, 8, 8);
       e.color = j <= h ? "black" : "gray";
       st.push(e);
     }
@@ -153,7 +173,7 @@ var onStart = function () {
       } else {
         t1.opacity = 0;
       }
-      t1.z = 10;
+      t1.z = 100;
       fg.add(t1);
     }
     this.selector_texts.push(st);
@@ -176,7 +196,8 @@ var onStart = function () {
       var dy = 96 * Math.sin(theta);
       var dx = 96 * Math.cos(theta);
       var d = this.selectors[i];
-      d.x = lerp(d.x, 72 + dx, lerpRate), d.y = lerp(d.y, CONFIG.height / 2 + dy, lerpRate);
+      /*d.x = lerp(d.x, 72 + dx, lerpRate), */
+      d.y = lerp(d.y, 2 * CONFIG.height / 3 + dy, lerpRate);
       if (i == gameWorld.difficulty) {
       }
       d.opacity = (i == gameWorld.difficulty) ? 1 : 0.5;
@@ -209,13 +230,13 @@ var onStart = function () {
     ground_low.addBehavior(Wrap, {min: {x: -CONFIG.width / 2, y: 0}, max: {x: CONFIG.width + CONFIG.width / 2, y: CONFIG.height}});
     ground_low.velocity = {x: -1 * ROAD_SPEED / 2, y: 0};
   }
-
-  var block = Object.create(Entity).init(64, CONFIG.height / 2, 128, CONFIG.height);
+/*
+  var block = Object.create(Entity).init(CONFIG.width / 8, CONFIG.height / 2, CONFIG.width / 4, CONFIG.height);
   block.blend = "difference";
   block.color = "#ddd";
   block.z = 10;
   fg.add(block);
-
+*/
 
   this.onKeyDown = function (e) {
     if (e.keyCode == 38) {
