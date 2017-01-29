@@ -456,7 +456,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					}
 				}
 				saveData = JSON.stringify(saveData);
-				if (chrome && chrome.storage) {
+				if (typeof chrome != 'undefined' && chrome && chrome.storage) {
 					chrome.storage.local.set({"platformSaveData": saveData});
 				} else {
 					localStorage.setItem("platformSaveData", saveData);
@@ -887,7 +887,7 @@ window.addEventListener("DOMContentLoaded", function () {
 					var levels = this.scenes.filter(function (a) { return a.stage == stage && a.type == "level"; });
 					for (var i = 0; i < levels.length; i++) {
 						var w = this.scenes.indexOf(levels[i]);
-						if (!sc || this.stageComplete(sc)) { //  FIX ME: Remove this to re-enable unlock/lock
+						if (true) { //(!sc || this.stageComplete(sc)) { //  FIX ME: Remove this to re-enable unlock/lock
 							var tb;
 							if (!levels[i].score) {
 								tb = Object.create(Button).init(i - j, 2 * j + 2, Resources.empty);
@@ -1167,7 +1167,7 @@ window.addEventListener("DOMContentLoaded", function () {
 								var n = (this.uid + 1) % world.scenes.length;
 								var b = Object.create(Box).init({x: 0, y: canvas.height / 3, w: canvas.width, h: canvas.height / 3, color: "black"}, {}, {counter: 0, maxCount: 1000, type: "fade"});
 								this.entities.push(b);
-								if (world.scenes[n].stage != this.stage && !world.stageComplete(this.stage)) { //FIX ME: uncomment to restore 'locked' behavior
+								if (false) { //(world.scenes[n].stage != this.stage && !world.stageComplete(this.stage)) { //FIX ME: uncomment to restore 'locked' behavior
 									var t = Object.create(Text).init(canvas.width / 2, canvas.height / 2 - 24, "- Next -", {size: 60, color: "#ccc"});
 									t.z = 100;
 									//b.contents.push(t);
