@@ -249,22 +249,12 @@ var onStart = function () {
 
     // choose new lane
     var destination = this.NEXT || modulo(lane + Math.floor(Math.random() * 5 + 1), 7);
-    if (Math.random() < 0.1) {
-      var fake = modulo(destination + Math.floor(Math.random() * 4 + 2), 7);
-      if (destination == 0) this.NEXT = 1;
-      else if (destination == 6) this.NEXT = 5;
-      else this.NEXT = destination + (Math.random() > 0.5 ? 1 : -1);
-    } else {
-      this.NEXT = undefined;
-    }
     var start = Math.abs(destination - lane) * this.difficultyFormula();
     for (var i = 0; i <= 6; i++) {
-      if (i == fake) {
-        // blank 'fake'
-      }
-      else if (i != destination) {
-        var c = Object.create(Sprite).init(CONFIG.width + start, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
-        c.setCollision(Polygon);
+    	if (i != destination) {
+        var s = start - start * Math.abs(i - destination) / 6;
+				var c = Object.create(Sprite).init(CONFIG.width + s, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
+    		c.setCollision(Polygon);
         c.offset = {x: 0, y: -12};
         c.setVertices([{x: -8, y: 6},
           {x: 8, y: 6},
@@ -278,6 +268,7 @@ var onStart = function () {
       }
     }
     this.interval = start + 24;
+    this.last_lane = destination;
     /*
     var d = Object.create(Entity).init(CONFIG.width + this.interval / 2, CONFIG.height / 2, this.interval + 8, CONFIG.height);
     d.color = choose(["green", "red", "blue"]);
@@ -288,7 +279,6 @@ var onStart = function () {
     d.blend = "screen";
     this.fg.add(d);
 */
-    this.last_lane = destination;
   }
 
   this.onKeyDown = function (e) {
