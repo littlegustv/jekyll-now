@@ -252,7 +252,7 @@ var onStart = function () {
     var start = Math.abs(destination - lane) * this.difficultyFormula();
     for (var i = 0; i <= 6; i++) {
     	if (i != destination) {
-        var s = start - start * Math.abs(i - destination) / 6;
+        var s = start - start * Math.abs(i - destination) / 7;
 				var c = Object.create(Sprite).init(CONFIG.width + s, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
     		c.setCollision(Polygon);
         c.offset = {x: 0, y: -12};
