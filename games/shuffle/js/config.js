@@ -42,9 +42,9 @@ function normalize (x, y) {
 var gameWorld = Object.create(World).init('index.json');
 
 gameWorld.difficulties = [
-  {roadSpeed: 200, handling: 230, sprite: "roadster"},
-  {roadSpeed: 260, handling: 300, sprite: "hatchback"},
-  {roadSpeed: 320, handling: 360, sprite: "truck"},
+  {roadSpeed: 200, handling: 230, sprite: "roadster", score: 0},
+  {roadSpeed: 260, handling: 300, sprite: "hatchback", score: 0},
+  {roadSpeed: 320, handling: 360, sprite: "truck", score: 0},
 ]
 
 gameWorld.difficulty = 1;

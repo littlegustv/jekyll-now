@@ -30,18 +30,18 @@ var onStart = function () {
   var fg = Object.create(Layer).init(fg_camera);
   t.fg = fg;
 
-  var titlebg1 = Object.create(Entity).init(CONFIG.width / 2, CONFIG.height / 2 - 80, CONFIG.width, 40);
+  var titlebg1 = Object.create(Entity).init(CONFIG.width / 4, CONFIG.height / 2 - 80, CONFIG.width / 2, 40);
   titlebg1.color = "darksalmon";
   bg.add(titlebg1);
 
-  var titlebg2 = Object.create(Entity).init(CONFIG.width / 2, CONFIG.height / 2 - 30, CONFIG.width, 64);
+  var titlebg2 = Object.create(Entity).init(CONFIG.width / 4, CONFIG.height / 2 - 30, CONFIG.width / 2, 64);
   titlebg2.color = "darkcyan";
   bg.add(titlebg2);
 
-  var title2 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 64, "Bad", {align: "center", size: 64, color: "white"});
+  var title2 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 64, "Bad", {align: "right", size: 64, color: "white"});
   fg.add(title2);
 
-  var title3 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 16, "brakes", {align: "center", size: 96, color: "white"});
+  var title3 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 16, "brakes", {align: "right", size: 96, color: "white"});
   fg.add(title3);  
 
   // buttons
@@ -107,17 +107,24 @@ var onStart = function () {
 
   // 'best score' should be stored in localstorage && stored PER CAR type!
   if (gameWorld.score) {
+    if (gameWorld.score > gameWorld.difficulties[gameWorld.difficulty].score) {
+      console.log('better score');
+      gameWorld.difficulties[gameWorld.difficulty].score = gameWorld.score;
+      if (localStorage) {
+        localStorage.setItem('shuffleData', JSON.stringify(gameWorld.difficulties));  
+      }
+    }
     var scoreText = Object.create(Text).init(8, 2 * CONFIG.height / 3, "You made it " + gameWorld.score + " miles!", {align: "left"});
     scoreText.addBehavior(FadeIn, {duration: 0.5});
     fg.add(scoreText);
   }
   if (localStorage) {
-    if (!localStorage.bestScore) {
+    if (!localStorage.shuffleData) {
       // new best score!
-      localStorage.bestScore = gameWorld.score;  
     }
     else {
-      var bestScoreText = Object.create(Text).init(8, 2 * CONFIG.height / 3 + 25, "Best distance: " + localStorage.bestScore + " miles!", {align: "left"});
+      gameWorld.difficulties = JSON.parse(localStorage.shuffleData);
+      var bestScoreText = Object.create(Text).init(8, 2 * CONFIG.height / 3 + 25, "Best distance: " + gameWorld.difficulties[gameWorld.difficulty].score + " miles!", {align: "left"});
       bestScoreText.addBehavior(FadeIn, {duration: 0.5});
       fg.add(bestScoreText); 
     }

@@ -8,6 +8,7 @@ var World = {
 		this.scenes = [];
 		this.time = 0;
 		this.speed = 1;
+		this.scale = 1;
 		this.scene = undefined;
 		this.paused = false;
 		this.muted = false;
@@ -193,7 +194,7 @@ var World = {
 
 		this.resourceLoadCount = 0;
 		this.resourceCount = this.gameInfo.resources.length;
-		this.ctx.fillStyle = "gray";
+		this.ctx.fillStyle = "white";
 		this.ctx.fillRect(this.width / 2 - 25 * this.resourceCount + i * 50, this.height / 2 - 12, 50, 25);			
 		this.ctx.fillText("loading...", this.width / 2, this.height / 2 - 50);
 		var w = this;

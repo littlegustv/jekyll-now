@@ -62,6 +62,7 @@ Submarine.start = function () {
 
 var Tender = Object.create(Behavior);
 Tender.update = function (dt) {
+  if (this.entity.health <= 0) return;
   var te = this.entity;
   var entities = this.entity.layer.entities.filter( function (e) {
     return e.family == te.family && distance(te.x, te.y, e.x, e.y) < 100 && te != e;
@@ -72,12 +73,14 @@ Tender.update = function (dt) {
   }
 }
 Tender.drawAfter = function (ctx) {
-  ctx.beginPath();
-  ctx.arc(this.entity.x, this.entity.y, 100, 0, Math.PI * 2, true);
-  ctx.fillStyle = "green";
-  ctx.globalAlpha = 0.1;
-  ctx.fill();
-  ctx.globalAlpha = 1;
+  if (this.entity.health > 0) {
+    ctx.beginPath();
+    ctx.arc(this.entity.x, this.entity.y, 100, 0, Math.PI * 2, true);
+    ctx.fillStyle = "green";
+    ctx.globalAlpha = 0.1;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
 }
 
 var Monster = Object.create(Behavior);

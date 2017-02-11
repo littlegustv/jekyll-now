@@ -124,6 +124,15 @@ function addCannon (entity, velocity, offset) {
 	//console.log(cr);
 	entity.layer.add(cb);
 
+	var f = Object.create(Sprite).init(cb.x, cb.y, Resources.flame);
+	f.addBehavior(Follow, {target: cb, offset: {x: 0, y: 0, z: -1}});
+	f.addBehavior(Crop, {min: {x: -100, y: 0}, max: {x: CONFIG.width + 100, y: CONFIG.height - cb.offset.y + 100}})
+	if (entity.family == "enemy") {
+		f.angle = PI;
+		f.addBehavior(Horizon, {horizon: 116});
+	}
+	entity.layer.add(f);
+
 	var bang = Object.create(Sprite).init(cb.x, cb.y, Resources[choose(["bang", "boom", "pow"])]);
 	bang.z = 9;
 	bang.addBehavior(FadeOut, {duration: 1});
@@ -232,7 +241,7 @@ var shipCost = {
 
 			e.addBehavior(Velocity);
 			e.velocity = {x: - SPEED.ship / 3, y: 0};
-			e.addBehavior(Climb, {min: {x: -40}, max: {x: CONFIG.width + 40}});
+			e.climb = e.addBehavior(Climb, {min: {x: -40}, max: {x: CONFIG.width + 40}});
 			e.weight = 1;
 			
 			last = e;
@@ -252,7 +261,7 @@ function buyShips (dt) {
 	if (CONFIG.no_buy) return;
 	var weight = 0;
 	for (var i = 0; i < enemies.length; i++) {
-		if (enemies[i].alive && enemies[i].weight) {
+		if (enemies[i].alive && enemies[i].weight && enemies[i].health > 0) {
 			weight += enemies[i].weight;
 		}
 	}
@@ -291,7 +300,7 @@ function addShips (dt) {
 			s.climb = s.addBehavior(Climb, {min: {x: 0}, max: {x: CONFIG.width}});
 			s.addBehavior(Velocity);
 			s.addBehavior(Cooldown);
-			s.addBehavior(Die, {duration: 1});
+			s.die = s.addBehavior(Die, {duration: 1});
 			s.setVertices([
 				{x: -13, y: -6},
 				{x: 13, y: -6},
@@ -322,6 +331,7 @@ function addShips (dt) {
 				var healing = Object.create(Particles).init(s.x, s.y, healEffect, 0.05);
 				healing.z = 20;
 				healing.addBehavior(Follow, {target: s, offset: {x: 0, y: -24}});
+				s.healing = healing;
 				this.fg.add(healing);
 			}
 			
@@ -331,6 +341,8 @@ function addShips (dt) {
 
 			var spl = addSplashes(s);
 			var f = addFlames(s);
+			s.splashes = spl;
+			s.flames = f;
 
 			this.fg.add(f);
 			this.fg.add(s);
@@ -379,24 +391,24 @@ var onStart = function () {
 
 	scene.musicLoop = function () {
 		if (score == 0 || combo == 0) {
-			scene.soundtrack = gameWorld.playSound(Resources.soundtrack0);
+			gameWorld.soundtrack = gameWorld.playSound(Resources.soundtrack0);
 		} else if (combo <= 5) {
-			scene.soundtrack = gameWorld.playSound(Resources.soundtrack1);			
+			gameWorld.soundtrack = gameWorld.playSound(Resources.soundtrack1);			
 		} else if (combo <= 10) {
-			scene.soundtrack = gameWorld.playSound(Resources.soundtrack2);
+			gameWorld.soundtrack = gameWorld.playSound(Resources.soundtrack2);
 		} else if (combo <= 14) {
-			scene.soundtrack = gameWorld.playSound(Resources.soundtrack3);
+			gameWorld.soundtrack = gameWorld.playSound(Resources.soundtrack3);
 		} else if (combo <= 18) {
-			scene.soundtrack = gameWorld.playSound(Resources.soundtrack4);
+			gameWorld.soundtrack = gameWorld.playSound(Resources.soundtrack4);
 		} else {
-			scene.soundtrack = gameWorld.playSound(Resources.soundtrack5);
+			gameWorld.soundtrack = gameWorld.playSound(Resources.soundtrack5);
 		}
-		scene.soundtrack.onended = scene.musicLoop;
+		gameWorld.soundtrack.onended = scene.musicLoop;
 	}
 
 	scene.oceanLoop = function () {
-		scene.ocean = gameWorld.playSound(Resources.ocean);
-		scene.ocean.onended = scene.oceanLoop;
+		gameWorld.ocean = gameWorld.playSound(Resources.ocean);
+		gameWorld.ocean.onended = scene.oceanLoop;
 	}
 
 	var fg_camera = Object.create(Camera).init(0, -216);
@@ -452,6 +464,9 @@ var onStart = function () {
       highscore = score;
       saveData();
     }
+    ngio.callComponent('ScoreBoard.postScore', {id: 7512, value: score}, function (result) {
+    	console.log(result);
+    });
 
 		var timebonustext = Object.create(Text).init(48, CONFIG.height - 56, "Time Bonus: " + Math.floor(timer) * 10 + "!", {size: 36, align: "left", color: "white"});
 		//timebonustext.addBehavior(FadeOut, {duration: 5.5});
@@ -473,7 +488,7 @@ var onStart = function () {
 
 	var more_button = Object.create(Button).init(64, 12, 96, 18);
   more_button.trigger = function () {
-  	window.open("http://littlegustv.github.io/games");
+  	window.open("http://littlegustv.itch.io");
   };
   more_button.hover = function () {
   	more_text.color = "rgba(150,150,150,0.6)";
@@ -482,6 +497,27 @@ var onStart = function () {
   	more_text.color = "black";
   };
   ui.add(more_button);
+
+	var high_score_text = Object.create(Text).init(200, 12, "HIGH SCORES", {size: 24, color: "black"});
+	ui.add(high_score_text);
+
+	var high_score_button = Object.create(Button).init(240, 12, 200, 18);
+  high_score_button.trigger = function () {
+  	var overlay = Object.create(Entity).init(- CONFIG.width / 2, CONFIG.height / 2, CONFIG.width, CONFIG.height);
+  	overlay.color = "#222";
+  	overlay.addBehavior(Lerp, {goal: {x: CONFIG.width / 2, y: CONFIG.height / 2}, rate: 10});
+  	overlay.addBehavior(Delay, {duration: 1, callback: function () {
+  		gameWorld.setScene(1);
+  	}});
+  	ui.add(overlay);
+  };
+  high_score_button.hover = function () {
+  	high_score_text.color = "rgba(150,150,150,0.6)";
+  };
+  high_score_button.unhover = function () {
+  	high_score_text.color = "black";
+  };
+  ui.add(high_score_button);
 
 
 	var mute_text = Object.create(Text).init(CONFIG.width - 48, 12, "SOUND OFF", {size: 24, color: "black"});
@@ -510,6 +546,7 @@ var onStart = function () {
   this.buttons = [];
   this.buttons.push(mute_button);
   this.buttons.push(more_button);
+  this.buttons.push(high_score_button);
 
   var pause_text = Object.create(Text).init(CONFIG.width - 160, 12, "PAUSE", {size: 24, color: "black"});
   ui.add(pause_text);
@@ -667,6 +704,8 @@ var onStart = function () {
 
 		more_button.addBehavior(ease, {destination: {x: 0, y: -100}});
 		more_text.addBehavior(ease, {destination: {x: 0, y: -100}});
+		high_score_button.addBehavior(ease, {destination: {x: 0, y: -100}});
+		high_score_text.addBehavior(ease, {destination: {x: 0, y: -100}});
 
 		// 'new game'
 		if (highscore == 0) {
@@ -785,7 +824,7 @@ var onStart = function () {
 	this.onMouseMove = function (e) {
 		e.preventDefault();
 		for (var i = 0; i < t.buttons.length; i++) {
-			if (t.buttons[i].check(e.offsetX, e.offsetY)) {
+			if (t.buttons[i].check(e.offsetX / gameWorld.scale, e.offsetY / gameWorld.scale)) {
 				t.buttons[i].hover();
 			} else {
 				t.buttons[i].unhover();
@@ -796,11 +835,11 @@ var onStart = function () {
 
 var onUpdate = function (dt) {
 	timer += dt;
-	if (Resources.soundtrack1 && !this.soundtrack) {
+	if (Resources.soundtrack1 && !gameWorld.soundtrack) {
 		this.musicLoop();
 	}
 
-	if (Resources.ocean && !this.ocean) {
+	if (Resources.ocean && !gameWorld.ocean) {
 		this.oceanLoop();
 	}
 

@@ -1,6 +1,10 @@
 var PI = Math.PI;
 var PI2 = 2 * Math.PI;
 
+function lerp (current, goal, rate) {
+  return (1-rate)*current + rate*goal
+}
+
 function distance(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 }

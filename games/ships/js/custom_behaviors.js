@@ -89,14 +89,19 @@ Flip.transform = function (ctx) {
 var Die = Object.create(Behavior);
 Die.update = function (dt) {
   if (this.entity.health <= 0) {
+
     if (!this.time) this.start();
     this.time += dt;
-    if (this.time >= this.duration) this.entity.alive = false;
-    this.entity.opacity = (this.duration - this.time) / this.duration;
-    if (this.entity.offset) {
-      this.entity.offset.y += Math.sin(this.time) * 5;
+    debug = this.entity;
+    if (this.time >= this.duration) {
+      return;//this.entity.alive = false;
     }
-    this.entity.angle += dt / 10;
+   // this.entity.opacity = (2 * this.duration - this.time) / (this.duration * 2);
+    if (this.entity.offset) {
+      this.entity.offset.y += 40 * dt;
+//      this.entity.offset.y += Math.sin(this.time) * 5;
+    }
+    this.entity.angle += this.direction * dt;
   }
 };
 Die.start = function () {
@@ -104,7 +109,16 @@ Die.start = function () {
     this.entity.collision.onCheck = function (a, b) { return false };
   }
   this.time = 0;
+  this.entity.flames.alive = false;
+  this.entity.splashes.alive = false;
+  if (this.entity.healing) {
+    this.entity.healing.alive = false;
+  }
   this.duration = this.duration || 2;
+  this.entity.removeBehavior(this.entity.climb);
+  this.direction = this.entity.velocity.x > 0 ? 1 : -1;
+  this.entity.opacity = 0.9;
+  this.entity.velocity.x = 0;
 }
 
 var Flash = Object.create(Behavior);
@@ -122,6 +136,26 @@ Flash.start = function () {
   this.entity.blend = "screen";
 }
 
+var Lerp = Object.create(Behavior);
+Lerp.update = function (dt) {
+  this.entity.x = lerp(this.entity.x, this.goal.x, this.rate * dt);
+  this.entity.y = lerp(this.entity.y, this.goal.y, this.rate * dt);
+};
+
+var Delay = Object.create(Behavior);
+Delay.start = function () {
+  this.time = 0;
+}
+Delay.update = function (dt) {
+  if (this.time == undefined) this.start();
+
+  this.time += dt;
+  if (this.time > this.duration) {
+    this.callback();
+    this.entity.removeBehavior(this);
+  }
+}
+
 var DieFanfare = Object.create(Behavior);
 DieFanfare.update = function (dt) {
   if (this.entity.health <= 0) {
@@ -130,6 +164,7 @@ DieFanfare.update = function (dt) {
     if (this.time >= this.duration) this.entity.alive = false;
     this.entity.velocity = {x: 0, y: 0};
     this.entity.opacity = 1 - (this.time / this.duration);
+    /*
     if (Math.random() * 100 < 16) {
       var f = Object.create(Circle).init(this.entity.x + Math.floor(Math.random() * 24) - 12, this.entity.y + 1, Math.floor(Math.random() * 24 + 12));
       f.color = "white";
@@ -142,7 +177,7 @@ DieFanfare.update = function (dt) {
       else
         gameWorld.playSound(Resources.cannon);
       this.entity.layer.add(f);
-    }
+    }*/
   }
 }
 DieFanfare.start = function () {
@@ -158,7 +193,7 @@ DieFanfare.start = function () {
     var s = this.entity.layer.entities[i];
     if (s.climb)
       s.removeBehavior(s.climb);
-    if (s.weight && s.name != "monster") {
+    if (s.weight && s.name != "monster" && s.health > 0) {
       s.velocity.x = 0, s.velocity.y = 0;
       s.addBehavior(Oscillate, {field: "x", constant: 128, time: 0, initial: 0, object: s.velocity, rate: 3});
       s.cooldown = 200;
@@ -166,6 +201,12 @@ DieFanfare.start = function () {
       s.velocity.x = 0;
     }
   }
+
+  var f = Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.explosion);
+  f.z = this.entity.z;
+  this.entity.layer.add(f);
+  gameWorld.playSound(Resources.hit);
+  gameWorld.playSound(Resources.explode);
 }
 
 var FadeOut = Object.create(Behavior);
@@ -352,7 +393,9 @@ Horizon.update = function (dt) {
       this.entity.z = -10;
       //add splash particle here once(?)
       this.entity.opacity -= 1 * dt;
-      this.entity.collision.onCheck = function (o, p) { return false; };
+      if (this.entity.collision) {
+        this.entity.collision.onCheck = function (o, p) { return false; };    
+      }
     } else {
     }
     if (this.entity.opacity <= 0) {

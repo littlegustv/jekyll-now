@@ -1,6 +1,7 @@
 {
   "scenes": [
-    "game.json"
+    "game.json",
+    "scores.json"
   ],
   "resources": [
     {"path": "ship1.png", "frames": 2, "speed": 0.5},
@@ -12,6 +13,7 @@
     {"path": "Cutter.png", "frames": 2, "speed": 0.3},
     {"path": "Tender.png", "frames": 2, "speed": 0.6},
     {"path": "flame.png", "frames": 5, "speed": 0.2},
+    {"path": "explosion.png", "frames": 8, "speed": 0.08, "animations": 1},
     {"path": "monitor.png"},
     {"path": "smoke.png"},
     {"path": "a.png"},
@@ -31,6 +33,7 @@
     {"path": "soundtrack5.ogg"},
     {"path": "cannon.ogg"},
     {"path": "ocean.ogg"},
+    {"path": "explode.ogg"},
     {"path": "swosh.ogg"},
     {"path": "hit.wav"}
   ],

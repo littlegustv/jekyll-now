@@ -35,6 +35,7 @@ var Layer = {
     ctx.restore();
   },
   onButton: function (x, y) {
+    x = x / gameWorld.scale, y = y / gameWorld.scale;
     for (var i = 0; i < this.entities.length; i++) {
       if (this.entities[i].family == 'button') {
         var e = this.entities[i];
