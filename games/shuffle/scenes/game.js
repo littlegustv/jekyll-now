@@ -4,8 +4,6 @@
 // 230, 200 is 'normal?'
 
 // these variables are conflicting between 'exit' and 'game' - find a better place for them!!!
-var LANE_SIZE = 32, HANDLING = 230, THRESHOLD = 2.5, ROAD_SPEED = 200, CAR_SPEED = 220, LANE_OFFSET = 128;
-var GOAL_DISTANCE = 5280; // (one mile)
 
 //var sign_texts = ["Hoboken", "Hackensack", "Camden", "Trenton"];
 var cars = ["smart"];
@@ -125,6 +123,11 @@ var onStart = function () {
         goalMessage(ui, true);
       }});
       gameWorld.difficulty += 1;
+      CAR_SPEED = gameWorld.difficulties[gameWorld.difficulty].roadSpeed + 20;
+      ROAD_SPEED = gameWorld.difficulties[gameWorld.difficulty].roadSpeed;
+      HANDLING = gameWorld.difficulties[gameWorld.difficulty].handling;
+      //object.velocity.x = CAR_SPEED;
+      gameWorld.unlocked = gameWorld.difficulty;
     }
     else {
       gameWorld.playSound(Resources.crash);

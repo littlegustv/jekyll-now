@@ -6,6 +6,9 @@ var CONFIG = {
   debug: false
 };
 
+var LANE_SIZE = 32, HANDLING = 230, THRESHOLD = 2.5, ROAD_SPEED = 200, CAR_SPEED = 220, LANE_OFFSET = 128;
+var GOAL_DISTANCE = 5280; // (one mile)
+
 //GLOBALS.scale = 3;
 
 function requestFullScreen () {
@@ -45,6 +48,8 @@ gameWorld.difficulties = [
   {roadSpeed: 200, handling: 230, sprite: "roadster", score: 0},
   {roadSpeed: 260, handling: 300, sprite: "hatchback", score: 0},
   {roadSpeed: 320, handling: 360, sprite: "truck", score: 0},
+  {roadSpeed: 380, handling: 420, sprite: "car3", score: 0},
+  {roadSpeed: 440, handling: 480, sprite: "car4", score: 0},
 ]
 
 gameWorld.difficulty = 1;

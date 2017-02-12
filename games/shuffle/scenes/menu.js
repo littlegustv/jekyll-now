@@ -2,7 +2,6 @@
 
 // first bug: setScene reloads (THIS) js file, you can see it keep adding script tags to the HTML :/
 
-var LANE_SIZE = 32, HANDLING = 200, THRESHOLD = 2.5, ROAD_SPEED = 160, LANE_OFFSET = 128;
 var fullscreen = false;
 
 var onStart = function () {
@@ -133,6 +132,7 @@ var onStart = function () {
   this.selectors = [];
   this.selector_texts = [];
 
+  console.log(gameWorld.difficulties);
   for (var i = 0; i < gameWorld.difficulties.length; i++) {
     var theta = (Math.PI / 6) * (i - gameWorld.difficulty);
     var dy = 96 * Math.sin(theta);
@@ -263,6 +263,7 @@ var onStart = function () {
     } else if (e.keyCode == 32) {
       e.preventDefault();
       if (gameWorld.difficulty <= gameWorld.unlocked)
+        
         gameWorld.setScene(1);
       else {
         //gameWorld.playSound(Resources.error);
