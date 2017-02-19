@@ -1,12 +1,12 @@
 var CONFIG = {
-  height: 360,
-  width: 640,
+  height: 90,
+  width: 160,
   title: "The Jersey Shuffle",
   startScene: "menu",
   debug: false
 };
 
-var LANE_SIZE = 32, HANDLING = 230, THRESHOLD = 2.5, ROAD_SPEED = 200, CAR_SPEED = 220, LANE_OFFSET = 128;
+var LANE_SIZE = 8, HANDLING = 57, THRESHOLD = 2.5, ROAD_SPEED = 50, CAR_SPEED = 55, LANE_OFFSET = CONFIG.height - 6 * LANE_SIZE;
 var GOAL_DISTANCE = 5280; // (one mile)
 
 //GLOBALS.scale = 3;
@@ -42,43 +42,18 @@ function normalize (x, y) {
   return {x: x / d, y: y / d};
 }
 
-var gameWorld = Object.create(World).init('index.json');
+var gameWorld = Object.create(World).init(160, 90, 'index.json');
 
 gameWorld.difficulties = [
-  {roadSpeed: 200, handling: 230, sprite: "roadster", score: 0},
-  {roadSpeed: 260, handling: 300, sprite: "hatchback", score: 0},
-  {roadSpeed: 320, handling: 360, sprite: "truck", score: 0},
-  {roadSpeed: 380, handling: 420, sprite: "car3", score: 0},
-  {roadSpeed: 440, handling: 480, sprite: "car4", score: 0},
+  {roadSpeed: 50, handling: 58, sprite: "roadster", score: 0},
+  {roadSpeed: 65, handling: 75, sprite: "hatchback", score: 0},
+  {roadSpeed: 80, handling: 90, sprite: "truck", score: 0},
+  {roadSpeed: 95, handling: 105, sprite: "car3", score: 0},
+  {roadSpeed: 110, handling: 120, sprite: "car4", score: 0},
 ]
 
 gameWorld.difficulty = 1;
 gameWorld.unlocked = 1;
-
-// push
-Scene.loadBehavior = function (script) {
-  var s = document.createElement("script");
-  s.type = "text/javascript";
-  s.src = "scenes/" + script;
-  s.id = this.name;
-
-  var old = document.getElementById(this.name);
-  if (old) {
-    old.parentElement.removeChild(old);
-  }
-  document.body.appendChild(s);
-
-
-  // FIX ME: cross browser support
-  var t = this;
-  s.onload = function () {
-    t.onStart = onStart;
-    t.onUpdate = onUpdate;
-    t.onEnd = onEnd;
-    t.onDraw = onDraw;
-    t.loadProgress();
-  };
-}
 
 function goalMessage (layer, again) {
   var goal_messages = [];
@@ -169,12 +144,12 @@ Unlock.update = function (dt) {
 
 var Locked = Object.create(Behavior);
 Behavior.drawAfter = function (ctx) {
-  if (this.entity.level > gameWorld.unlocked) {
+/*  if (this.entity.level > gameWorld.unlocked) {
     ctx.fillStyle = "#333";
-    ctx.fillRect(this.entity.x - 32, this.entity.y, 64, 12);
-    var t = Object.create(Text).init(this.entity.x, this.entity.y + 8, "LOCKED", {align: "center", size: 14, color: "white"});
+    ctx.fillRect(this.entity.x - this.entity.w, this.entity.y, this.entity.w * 2, 8);
+    var t = Object.create(Text).init(this.entity.x, this.entity.y + 2, "LOCKED", {align: "center", size: 6, color: "white"});
     t.draw(ctx);
-  }
+  }*/
 }
 
 var Delay = Object.create(Behavior);

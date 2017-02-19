@@ -1,7 +1,7 @@
 {
   "scenes": [
-    "menu.json",
-    "game.json"
+    {"name": "menu", "reload": true},
+    {"name": "game", "reload": true}
   ],
   "resources": [
     {"path": "roadster.png", "frames": 2, "speed": 0.5, "animations": 1},

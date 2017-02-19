@@ -22,7 +22,7 @@ var onStart = function () {
 
   HANDLING = gameWorld.difficulties[gameWorld.difficulty].handling;
   ROAD_SPEED = gameWorld.difficulties[gameWorld.difficulty].roadSpeed;
-  CAR_SPEED =  gameWorld.difficulties[gameWorld.difficulty].roadSpeed + 20;
+  CAR_SPEED =  gameWorld.difficulties[gameWorld.difficulty].roadSpeed + 5;
 
   var t = this;
   this.distance = 0;
@@ -31,16 +31,13 @@ var onStart = function () {
   this.interval = 0;
   this.bg_interval = 0;
 
-  var bg_camera = Object.create(Camera).init(0, 0);
-  var bg = Object.create(Layer).init(bg_camera);
+  var bg = Object.create(Layer).init(320, 180);
   this.bg = bg;
 
-  var fg_camera = Object.create(Camera).init(0, 0);
-  var fg = Object.create(Layer).init(fg_camera);
+  var fg = Object.create(Layer).init(320, 180);
   t.fg = fg;
 
-  var ui_camera = Object.create(Camera).init(0, 0);
-  var ui = Object.create(Layer).init(ui_camera);
+  var ui = Object.create(Layer).init(320, 180);
   this.ui = ui;
 
 /*  var odometer = Object.create(Text).init(20,20,"0 miles", {align: "left"});
@@ -58,18 +55,20 @@ var onStart = function () {
   //this.fg = fg;
 
   for (var i = 0; i < 2; i ++) {  
-    var trees = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, 2.5 * LANE_SIZE, CONFIG.width + LANE_SIZE, LANE_SIZE, Resources.trees);
+    
+    var trees = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, CONFIG.height - 8 * LANE_SIZE, CONFIG.width + LANE_SIZE, LANE_SIZE * 2, Resources.trees);
     trees.velocity = {x: - 2.5 * ROAD_SPEED, y: 0};
     trees.z = -10;
     bg.add(trees);
 
-    var road = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, (CONFIG.height + 3 * LANE_SIZE) / 2, CONFIG.width + LANE_SIZE, CONFIG.height - 5 * LANE_SIZE, Resources.road);
+    var road = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, CONFIG.height - 7 * LANE_SIZE / 2, CONFIG.width + LANE_SIZE, 7 * LANE_SIZE, Resources.road);
     bg.add(road);
+    console.log(road.h);
 
-    var ground = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, 3.5 * LANE_SIZE, CONFIG.width + LANE_SIZE, LANE_SIZE / 2, Resources.ground);
+    var ground = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, CONFIG.height - 7 * LANE_SIZE - 2, CONFIG.width + LANE_SIZE, 4, Resources.ground);
     bg.add(ground);
 
-    var ground_low = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, 11 * LANE_SIZE - 8, CONFIG.width + LANE_SIZE, LANE_SIZE / 2, Resources.ground);
+    var ground_low = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, CONFIG.height - 2, CONFIG.width + LANE_SIZE, 4, Resources.ground);
     fg.add(ground_low);
     ground_low.addBehavior(Velocity);
     ground_low.addBehavior(Wrap, {min: {x: -CONFIG.width / 2, y: 0}, max: {x: CONFIG.width + CONFIG.width / 2, y: CONFIG.height}});
@@ -86,15 +85,15 @@ var onStart = function () {
 
   var player = Object.create(Sprite).init(64, /*CONFIG.height - 5 * LANE_SIZE*/CONFIG.height / 2, Resources[gameWorld.difficulties[gameWorld.difficulty].sprite]);
   player.addBehavior(Velocity);
-  player.addBehavior(Bound, {min: {x: 0, y: 4 * LANE_SIZE}, max: {x: CONFIG.width, y: CONFIG.height - LANE_SIZE}});
+  //player.addBehavior(Bound, {min: {x: 0, y: 4.5 * LANE_SIZE}, max: {x: CONFIG.width, y: CONFIG.height - LANE_SIZE / 2}});
   player.velocity = {x: 0, y: 0};
-  player.setVertices([{x: -8, y: 6},
-    {x: 8, y: 6},
-    {x: 8, y: 12},
-    {x: -8, y: 12}
+  player.setVertices([{x: -4, y: 3},
+    {x: 4, y: 3},
+    {x: 4, y: 6},
+    {x: -4, y: 6}
   ]);
   player.addBehavior(Trail, {});
-  player.offset = {x: 0, y: -12};
+  player.offset = {x: 0, y: -6};
   this.player = player;
 
   var endGame = function () {
@@ -108,7 +107,7 @@ var onStart = function () {
       if (fg.entities[i].oscillate) fg.entities[i].removeBehavior(fg.entities[i].oscillate);
     }
   }
-
+/*
   player.setCollision(Polygon);
   player.collision.onHandle = function(object, other) {
     if (other.rescue) {
@@ -120,7 +119,7 @@ var onStart = function () {
       other.addBehavior(FadeOut, {duration: 0.5, remove: true});
       object.addBehavior(Delay, {duration: 0.5, callback: function () {
         fg.paused = 3, bg.paused = 3;
-        goalMessage(ui, true);
+        //goalMessage(ui, true);
       }});
       gameWorld.difficulty += 1;
       CAR_SPEED = gameWorld.difficulties[gameWorld.difficulty].roadSpeed + 20;
@@ -143,7 +142,7 @@ var onStart = function () {
         gameWorld.setScene(0);
       }})
     }
-  }
+  }*/
   //CONFIG.player = player;
   //CONFIG.debug = true;
   CONFIG.scene = this;
@@ -167,32 +166,32 @@ var onStart = function () {
 
   this.buttons = [];
 
-  var mute_block = Object.create(Entity).init(CONFIG.width - 48, 18, 96, 32);
+  var mute_block = Object.create(Entity).init(CONFIG.width - 12, 5, 24, 8);
   mute_block.color = "#333", mute_block.oldcolor = "#333";
   mute_block.z = -1;
   ui.add(mute_block);
-  var mute_text = Object.create(Text).init(CONFIG.width - 4, 26, "MUTE", {size: 42, align: "right", color: "white"});
+  var mute_text = Object.create(Text).init(CONFIG.width - 2, 7, "MUTE", {size: 11, align: "right", color: "white"});
   ui.add(mute_text);
 
-  var mute_button = Object.create(Button).init(CONFIG.width - 48, 18, 96, 32);
+  var mute_button = Object.create(Button).init(CONFIG.width - 12, 5, 24, 8);
   mute_button.family = "button";
   mute_button.set = function () {
     if (gameWorld.muted && gameWorld.audioContext && gameWorld.audioContext.gn) {
       mute_text.text = "UNMUTE";
-      mute_block.x = CONFIG.width - 64;
-      mute_block.w = 128;
+      mute_block.x = CONFIG.width - 16;
+      mute_block.w = 32;
       gameWorld.audioContext.gn.gain.value = 0;
     } else if (gameWorld.audioContext && gameWorld.audioContext.gn) {
       mute_text.text = "MUTE";  
-      mute_block.x = CONFIG.width - 48;
-      mute_block.w = 96;    
+      mute_block.x = CONFIG.width - 12;
+      mute_block.w = 24;    
       gameWorld.audioContext.gn.gain.value = 1;
     }
   }
   mute_button.set();
   mute_button.trigger = function () {
     gameWorld.muted = !gameWorld.muted;
-    this.set();
+    mute_button.set();
   };
   mute_button.hover = function () {
     if (mute_block.color != "#999") {
@@ -229,7 +228,6 @@ var onStart = function () {
     var lane = this.last_lane;
     var t = this;
     if (this.distance >= this.goal_distance) {
-      console.log('what');
       // should only happen once
       this.goal_distance += GOAL_DISTANCE;
       var s = Object.create(Sprite).init(CONFIG.width * 1.5, LANE_OFFSET + 3 * LANE_SIZE, Resources[gameWorld.difficulties[(gameWorld.difficulty + 1) % gameWorld.difficulties.length].sprite]);
@@ -259,10 +257,10 @@ var onStart = function () {
 				var c = Object.create(Sprite).init(CONFIG.width + s, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
     		c.setCollision(Polygon);
         c.offset = {x: 0, y: -12};
-        c.setVertices([{x: -8, y: 6},
-          {x: 8, y: 6},
-          {x: 8, y: 12},
-          {x: -8, y: 12}
+        c.setVertices([{x: -4, y: 3},
+          {x: 4, y: 3},
+          {x: 4, y: 6},
+          {x: -4, y: 6}
         ]);        
         c.addBehavior(Velocity);
         c.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
@@ -294,34 +292,36 @@ var onStart = function () {
     if (bg.paused > 0) bg.paused = 0;
 
     if (player.crashed) {
-      e.preventDefault();
+//      e.preventDefault();
       gameWorld.setScene(0);
       return false;
     }
     if (e.keyCode == 38) {
-      e.preventDefault();
+//      e.preventDefault();
       //if (player.direction == 0)
       //  gameWorld.playSound(Resources.pass);
-      player.direction = -1;
-      player.angle = Math.PI / 18 * -1;
+      //player.direction = -1;
+      laning.move(-1);
+      //player.angle = Math.PI / 18 * -1;
       return false;
     } else if (e.keyCode == 40) {
-      e.preventDefault();
+      //e.preventDefault();
       //if (player.direction == 0)
       //  gameWorld.playSound(Resources.pass);
-      player.direction = 1;
-      player.angle = Math.PI / 18 * 1;
+      //player.direction = 1;
+      laning.move(1);
+      //player.angle = Math.PI / 18 * 1;
       return false;
     }
   }
 
   this.onKeyUp = function (e) {
     if (e.keyCode == 38) {
-      e.preventDefault();
+      //e.preventDefault();
       laning.setLane();
       return false;
     } else if (e.keyCode == 40) {
-      e.preventDefault();
+      //e.preventDefault();
       laning.setLane();
       return false;
     }
@@ -332,6 +332,7 @@ var onStart = function () {
   var t = this;
   this._gamepad = Object.create(Gamepad).init();
   this._gamepad.aleft.onUpdate = function (dt) {
+    console.log('bad');
     if (Math.abs(this.y) > 0.3) {
       this.active = true;
       if (this.y < -0.3) {
@@ -347,6 +348,7 @@ var onStart = function () {
     }
   }
   this._gamepad.buttons.a.onStart = function (dt) {
+    console.log('bad');
     if (player.crashed) {
       gameWorld.setScene(0);
     }
@@ -357,6 +359,7 @@ var onStart = function () {
   this.touch = {x: 0, y: 0};
   // on touch start, create a 'center point' that you swipe up or down from
   this.onTouchStart = function (e) {
+    console.log('bad');
     if (player.crashed) {
       gameWorld.setScene(0);
       return false;
@@ -370,6 +373,7 @@ var onStart = function () {
     t.touch.x = e.changedTouches[0].pageX, t.touch.y = e.changedTouches[0].pageY;
   }
   this.onTouchMove = function (e) {
+    console.log('bad');
     var x = e.changedTouches[0].pageX, y = e.changedTouches[0].pageY;
     if (Math.abs(t.touch.y - y) < 10) {
       laning.setLane();
@@ -384,6 +388,7 @@ var onStart = function () {
     }
   }
   this.onTouchEnd = function (e) {
+    console.log('bad');
     laning.setLane();
   }
   this.onClick = function (e) {
@@ -407,8 +412,8 @@ var onStart = function () {
   this.layers.push(fg);
   this.layers.push(ui);
 
-  this.goal_messages = goalMessage(ui);
-  fg.paused = 3, bg.paused = 3;
+  //this.goal_messages = goalMessage(ui);
+  //fg.paused = 3, bg.paused = 3;
 };
 
 var onUpdate = function (dt) {
@@ -426,6 +431,7 @@ var onUpdate = function (dt) {
 
   var spacing = 72;
   var distance_in_blocks = Math.floor(this.distance / spacing) * spacing;
+  /*
   if (this.bg_interval < distance_in_blocks) {
     this.bg_interval = distance_in_blocks;
     if (Math.random() * 100 < 40) {
@@ -436,9 +442,10 @@ var onUpdate = function (dt) {
       b.z = 2;
       this.bg.add(b);
     }
-  }
+  }*/
 
   var t = Math.floor(this.distance / 528);
+  /*
   if (t > this.tenth_distance) {
     // create sign
     var sign_bg = Object.create(Entity).init(CONFIG.width, 64, 64, 40);
@@ -472,7 +479,7 @@ var onUpdate = function (dt) {
     this.bg.add(sign_text2);
 
     this.tenth_distance = t;
-  }
+  }*/
 
 
 //  this.odometer.text = this.miles() + " miles";

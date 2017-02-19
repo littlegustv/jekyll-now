@@ -17,41 +17,34 @@ var onStart = function () {
     gameWorld.musicLoop();
   }
 
-  this.layers = [];
+  //this.layers = [];
   this.buttons = [];
   this.delay = 0.25;
 
-  var bg_camera = Object.create(Camera).init(0, 0);
-  var bg = Object.create(Layer).init(bg_camera);
+  //var bg_camera = Object.create(Camera).init(0, 0);
+  var bg = Object.create(Layer).init(160, 90);
   this.bg = bg;
 
-  var fg_camera = Object.create(Camera).init(0, 0);
-  var fg = Object.create(Layer).init(fg_camera);
+  //var fg_camera = Object.create(Camera).init(0, 0);
+  var fg = Object.create(Layer).init(160, 90);
   t.fg = fg;
 
-  var titlebg1 = Object.create(Entity).init(CONFIG.width / 4, CONFIG.height / 2 - 80, CONFIG.width / 2, 40);
-  titlebg1.color = "darksalmon";
-  bg.add(titlebg1);
+  fg.add(Object.create(Text).init(CONFIG.width / 2, 6, "THE YEAR IS 2032", {align: "center", color: "black", size: 8}));
+  fg.add(Object.create(Text).init(CONFIG.width / 2, 12, "THE ROAD IS THE JERSEY TURNPIKE", {align: "center", color: "black", size: 8}));
 
-  var titlebg2 = Object.create(Entity).init(CONFIG.width / 4, CONFIG.height / 2 - 30, CONFIG.width / 2, 64);
-  titlebg2.color = "darkcyan";
-  bg.add(titlebg2);
-
-  var title2 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 64, "Bad", {align: "right", size: 64, color: "white"});
-  fg.add(title2);
-
-  var title3 = Object.create(Text).init(CONFIG.width / 2, CONFIG.height / 2 - 16, "brakes", {align: "right", size: 96, color: "white"});
-  fg.add(title3);  
+  fg.add(Object.create(Text).init(CONFIG.width / 2, 24, "THE", {align: "center", color: "black", size: 24}));
+  fg.add(Object.create(Text).init(CONFIG.width / 2, 34, "JERSEY", {align: "center", color: "black", size: 24}));
+  fg.add(Object.create(Text).init(CONFIG.width / 2, 44, "SHUFFLE", {align: "center", color: "black", size: 24}));
 
   // buttons
 
-  var bg_block = Object.create(Entity).init(CONFIG.width - 56, CONFIG.height - 18, 112, 32);
+  var bg_block = Object.create(Entity).init(CONFIG.width - 14, CONFIG.height - 5, 28, 8);
   bg_block.color = "#333";
   bg_block.z = -1;
   fg.add(bg_block);
-  fg.add(Object.create(Text).init(CONFIG.width - 56, CONFIG.height - 10, "BEGIN", {size: 42, align: "center", color: "white"}));
+  fg.add(Object.create(Text).init(CONFIG.width - 14, CONFIG.height - 5, "BEGIN", {size: 11, align: "center", color: "white"}));
 
-  var begin_button = Object.create(Button).init(CONFIG.width - 56, CONFIG.height - 18, 112, 32);
+  var begin_button = Object.create(Button).init(CONFIG.width - 14, CONFIG.height - 5, 28, 8);
   begin_button.family = "button";
   begin_button.trigger = function () {
     gameWorld.setScene(1);
@@ -65,25 +58,25 @@ var onStart = function () {
   this.buttons.push(begin_button);
   fg.add(begin_button);
 
-  var mute_block = Object.create(Entity).init(CONFIG.width - 48, 18, 96, 32);
+  var mute_block = Object.create(Entity).init(CONFIG.width - 12, 5, 24, 8);
   mute_block.color = "#333", mute_block.oldcolor = "#333";
   mute_block.z = -1;
   fg.add(mute_block);
-  var mute_text = Object.create(Text).init(CONFIG.width - 4, 26, "MUTE", {size: 42, align: "right", color: "white"});
+  var mute_text = Object.create(Text).init(CONFIG.width - 2, 7, "MUTE", {size: 11, align: "right", color: "white"});
   fg.add(mute_text);
 
-  var mute_button = Object.create(Button).init(CONFIG.width - 48, 18, 96, 32);
+  var mute_button = Object.create(Button).init(CONFIG.width - 12, 5, 24, 8);
   mute_button.family = "button";
   mute_button.set = function () {
     if (gameWorld.muted && gameWorld.audioContext && gameWorld.audioContext.gn) {
       mute_text.text = "UNMUTE";
-      mute_block.x = CONFIG.width - 64;
-      mute_block.w = 128;
+      mute_block.x = CONFIG.width - 16;
+      mute_block.w = 32;
       gameWorld.audioContext.gn.gain.value = 0;
     } else if (gameWorld.audioContext && gameWorld.audioContext.gn) {
       mute_text.text = "MUTE";  
-      mute_block.x = CONFIG.width - 48;
-      mute_block.w = 96;    
+      mute_block.x = CONFIG.width - 12;
+      mute_block.w = 24;    
       gameWorld.audioContext.gn.gain.value = 1;
     }
   }
@@ -123,67 +116,25 @@ var onStart = function () {
     }
     else {
       gameWorld.difficulties = JSON.parse(localStorage.shuffleData);
-      var bestScoreText = Object.create(Text).init(8, 2 * CONFIG.height / 3 + 25, "Best distance: " + gameWorld.difficulties[gameWorld.difficulty].score + " miles!", {align: "left"});
+      var bestScoreText = Object.create(Text).init(CONFIG.width / 2, 2 * CONFIG.height / 3 + 8, "Best distance: " + gameWorld.difficulties[gameWorld.difficulty].score + " miles!", {align: "center", size: 12});
       bestScoreText.addBehavior(FadeIn, {duration: 0.5});
       fg.add(bestScoreText); 
     }
   }
 
   this.selectors = [];
-  this.selector_texts = [];
 
-  console.log(gameWorld.difficulties);
   for (var i = 0; i < gameWorld.difficulties.length; i++) {
-    var theta = (Math.PI / 6) * (i - gameWorld.difficulty);
-    var dy = 96 * Math.sin(theta);
-    var dx = 96 * Math.cos(theta);
-    var d = Object.create(Sprite).init(CONFIG.width - 48, 2 * CONFIG.height / 3 + dy, Resources[gameWorld.difficulties[i].sprite]);
-    d.addBehavior(Locked);
+    var theta = gameWorld.difficulty - i;
+
+    var d = Object.create(Sprite).init(CONFIG.width / 2 - 16 * theta, CONFIG.height / 2 + 8, Resources[gameWorld.difficulties[i].sprite]);
+
     d.level = i;
     d.opacity = (i == gameWorld.difficulty) ? 1 : 0.5;
-    d.w *= (i == gameWorld.difficulty) ? 1 : 0.8;
-    d.h *= (i == gameWorld.difficulty) ? 1 : 0.8;
+
     d.z = 2;
     this.selectors.push(d);
     fg.add(d);
-
-    var st = [];
-    var handling_text = Object.create(Text).init(CONFIG.width - 192, 2 * CONFIG.height / 3 - 12, "Handling", {align: "left", size: 24});
-    st.push(handling_text);
-    var h = Math.floor(10 * gameWorld.difficulties[i].handling / 500);
-    for (var j = 0; j < 10; j++) {
-      var e = Object.create(Entity).init(CONFIG.width - 192 + j * 10, handling_text.y + 12, 8, 8);
-      e.color = j <= h ? "black" : "gray";
-      st.push(e);
-    }
-
-    var speed_text = Object.create(Text).init(CONFIG.width - 192, 2 * CONFIG.height / 3 + 24, "Speed", {align: "left", size: 24});
-    st.push(speed_text);
-    var h = Math.floor(10 * gameWorld.difficulties[i].roadSpeed / 500);
-    for (var j = 0; j < 10; j++) {
-      var e = Object.create(Entity).init(CONFIG.width - 192 + j * 10, speed_text.y + 12, 8, 8);
-      e.color = j <= h ? "black" : "gray";
-      st.push(e);
-    }
-
-    for (var j = 0; j < st.length; j++) {
-      var t1 = st[j];
-      t1.fadeOut = function () {
-        this.opacity = 0;
-      }
-      t1.fadeIn = function () {
-        this.opacity = 1;
-      }
-
-      if (i == gameWorld.difficulty) {
-        t1.opacity = 1;
-      } else {
-        t1.opacity = 0;
-      }
-      t1.z = 100;
-      fg.add(t1);
-    }
-    this.selector_texts.push(st);
   }
 
   fg.drawOrder = function () {
@@ -197,26 +148,17 @@ var onStart = function () {
 
   this.doRefreshSelectors = false;
   this.refreshSelectors = function () {
-    var lerpRate = 0.2;
+    var lerpRate = 0.05;
     for (var i = 0; i < this.selectors.length; i++) {
-      var theta = (Math.PI / 6) * (i - gameWorld.difficulty);
-      var dy = 96 * Math.sin(theta);
-      var dx = 96 * Math.cos(theta);
+      var theta = gameWorld.difficulty - i;
       var d = this.selectors[i];
-      /*d.x = lerp(d.x, 72 + dx, lerpRate), */
-      d.y = lerp(d.y, 2 * CONFIG.height / 3 + dy, lerpRate);
-      if (i == gameWorld.difficulty) {
-      }
-      d.opacity = (i == gameWorld.difficulty) ? 1 : 0.5;
-      d.w = lerp(d.w, d.sprite.w * GLOBALS.scale * ((i == gameWorld.difficulty) ? 1 : 0.8), lerpRate);
-      d.h = lerp(d.h, d.sprite.h * GLOBALS.scale * ((i == gameWorld.difficulty) ? 1 : 0.8), lerpRate);
+      var dx = CONFIG.width / 2 - 16 * theta;
+      d.x = lerp(d.x, dx, lerpRate);
 
-      // snap to if close enough
-      if (Math.abs(d.x - (72 + dx)) < 0.5) {
-        d.x = 72 + dx;
-        d.y = CONFIG.height / 2 + dy;
-        d.w = d.sprite.w * GLOBALS.scale * ((i == gameWorld.difficulty) ? 1 : 0.8);
-        d.h = d.sprite.h * GLOBALS.scale * ((i == gameWorld.difficulty) ? 1 : 0.8);
+      d.opacity = (i == gameWorld.difficulty) ? 1 : 0.5;
+
+      if (Math.abs(d.x - dx) < 2.5) {
+        d.x = dx;
         this.doRefreshSelectors = false;
       }
     }
@@ -224,14 +166,14 @@ var onStart = function () {
 
   for (var i = 0; i < 2; i ++) {
 
-    var trees = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, 10 * LANE_SIZE, CONFIG.width + LANE_SIZE, LANE_SIZE, Resources.trees);
+    var trees = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, CONFIG.height - LANE_SIZE / 2, CONFIG.width + LANE_SIZE, LANE_SIZE, Resources.trees);
     trees.velocity = {x: - 1 * ROAD_SPEED / 3, y: 0};
     trees.addBehavior(Velocity);
     trees.addBehavior(Wrap, {min: {x: -CONFIG.width / 2, y: 0}, max: {x: CONFIG.width + CONFIG.width / 2, y: CONFIG.height}});
     trees.z = -10;
     fg.add(trees);
 
-    var ground_low = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, 11 * LANE_SIZE, CONFIG.width + LANE_SIZE, LANE_SIZE / 2, Resources.ground);
+    var ground_low = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, CONFIG.height - 2, CONFIG.width + LANE_SIZE, 4, Resources.ground);
     fg.add(ground_low);
     ground_low.addBehavior(Velocity);
     ground_low.addBehavior(Wrap, {min: {x: -CONFIG.width / 2, y: 0}, max: {x: CONFIG.width + CONFIG.width / 2, y: CONFIG.height}});
@@ -247,21 +189,21 @@ var onStart = function () {
 
   this.onKeyDown = function (e) {
     if (e.keyCode == 38) {
-      e.preventDefault();
-      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
+      //e.preventDefault();
+      //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
       gameWorld.difficulty = Math.max(0, gameWorld.difficulty - 1);
-      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
+      //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
       t.doRefreshSelectors = true;
       return false;
     } else if (e.keyCode == 40) {
-      e.preventDefault();
-      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
+      //e.preventDefault();
+      //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
       gameWorld.difficulty = Math.min(gameWorld.difficulty + 1, gameWorld.difficulties.length - 1);  
-      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
+      //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
       t.doRefreshSelectors = true;
       return false;
     } else if (e.keyCode == 32) {
-      e.preventDefault();
+      //e.preventDefault();
       if (gameWorld.difficulty <= gameWorld.unlocked)
         
         gameWorld.setScene(1);
@@ -307,7 +249,7 @@ var onStart = function () {
     t.touch.x = e.changedTouches[0].pageX, t.touch.y = e.changedTouches[0].pageY;
   }
   this.onClick = function (e) {
-    var b = t.fg.onButton(e.offsetX, e.offsetY);
+    var b = t.fg.onButton(e.x, e.y);
     if (b) {
       if (b.trigger) b.trigger();
       return;
@@ -342,7 +284,7 @@ var onStart = function () {
   }
   this.onMouseMove = function (e) {
     for (var i = 0; i < t.buttons.length; i++) {
-      if (t.buttons[i].check(e.offsetX, e.offsetY)) {
+      if (t.buttons[i].check(e.x, e.y)) {
         t.buttons[i].hover();
       } else {
         t.buttons[i].unhover();

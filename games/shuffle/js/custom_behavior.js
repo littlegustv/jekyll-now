@@ -2,6 +2,7 @@ var LaneMovement = Object.create(Behavior);
 LaneMovement.start = function () {
   this.started = true;
   this.entity.direction = 0;
+  this.min = 0, this.max = CONFIG.height;
   this.entity.lane = undefined;
 }
 LaneMovement.setLane = function () {
@@ -9,6 +10,12 @@ LaneMovement.setLane = function () {
   this.entity.lane = Math.round((this.entity.y + this.entity.direction * this.lane_size / 3) / this.lane_size) * this.lane_size;
   this.entity.direction = 0;
   this.entity.angle = 0;
+}
+LaneMovement.move = function (direction) {
+  if (this.entity.y > this.min && this.entity.y < this.max) {
+    this.entity.direction = direction;
+    this.entity.angle = Math.PI / 18 * direction;
+  }
 }
 LaneMovement.update = function (dt) {
   if (!this.started) this.start();
@@ -18,7 +25,10 @@ LaneMovement.update = function (dt) {
   if (this.disabled) return;
 
   if (this.entity.direction != 0) {
-    this.entity.velocity.y = lerp(this.entity.velocity.y, this.entity.direction * this.max_speed, 0.5);
+    if (this.entity.lane <= 0 || this.entity.lane >= 6) {}
+    else {      
+      this.entity.velocity.y = lerp(this.entity.velocity.y, this.entity.direction * this.max_speed, 0.5);
+    }
   } else if (this.entity.lane !== undefined) {
     this.entity.velocity.y = (lerp(this.entity.y, this.entity.lane, 0.5) - this.entity.y) * 20;
     if (Math.abs(this.entity.velocity.y) <= this.threshold) {
