@@ -5,6 +5,7 @@
   ],
   "resources": [
     {"path": "roadster.png", "frames": 2, "speed": 0.5, "animations": 1},
+    {"path": "expire_font.png", "frames": 95, "animations": 1},
     {"path": "hatchback.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "smart.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "car.png", "frames": 2, "speed": 0.5, "animations": 1},

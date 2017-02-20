@@ -29,54 +29,64 @@ var onStart = function () {
   var fg = Object.create(Layer).init(160, 90);
   t.fg = fg;
 
-  fg.add(Object.create(Text).init(CONFIG.width / 2, 6, "THE YEAR IS 2032", {align: "center", color: "black", size: 8}));
-  fg.add(Object.create(Text).init(CONFIG.width / 2, 12, "THE ROAD IS THE JERSEY TURNPIKE", {align: "center", color: "black", size: 8}));
+  fg.add(Object.create(SpriteFont).init(CONFIG.width / 2, 31, Resources.expire_font, "The NJ Turnpike", {align: "center"}));
+  fg.add(Object.create(SpriteFont).init(CONFIG.width / 2, 40, Resources.expire_font, "2032 A.D.", {align: "center"}));
 
-  fg.add(Object.create(Text).init(CONFIG.width / 2, 24, "THE", {align: "center", color: "black", size: 24}));
-  fg.add(Object.create(Text).init(CONFIG.width / 2, 34, "JERSEY", {align: "center", color: "black", size: 24}));
-  fg.add(Object.create(Text).init(CONFIG.width / 2, 44, "SHUFFLE", {align: "center", color: "black", size: 24}));
+  //fg.add(Object.create(SpriteFont).init(10, 36, Resources.expire_font, "Welcome, to the", {}));
+  //fg.add(Object.create(SpriteFont).init(10, 46, Resources.expire_font, "JERSEY", {}));
+  //fg.add(Object.create(SpriteFont).init(10, 56, Resources.expire_font, "SHUFFLE", {}));
+
+
+//  fg.add(Object.create(Text).init(CONFIG.width / 2, 6, "THE YEAR IS 2032", {align: "center", color: "black", size: 8}));
+//  fg.add(Object.create(Text).init(CONFIG.width / 2, 12, "THE ROAD IS THE JERSEY TURNPIKE", {align: "center", color: "black", size: 8}));
+
+//  fg.add(Object.create(Text).init(CONFIG.width / 2, 24, "THE", {align: "center", color: "black", size: 24}));
+//  fg.add(Object.create(Text).init(CONFIG.width / 2, 34, "JERSEY", {align: "center", color: "black", size: 24}));
+//  fg.add(Object.create(Text).init(CONFIG.width / 2, 44, "SHUFFLE", {align: "center", color: "black", size: 24}));
 
   // buttons
 
-  var bg_block = Object.create(Entity).init(CONFIG.width - 14, CONFIG.height - 5, 28, 8);
-  bg_block.color = "#333";
-  bg_block.z = -1;
+  var bg_block = Object.create(Entity).init(CONFIG.width - 25, CONFIG.height - 7, 50, 14);
+  bg_block.color = "black";
+  bg_block.z = 3;
   fg.add(bg_block);
-  fg.add(Object.create(Text).init(CONFIG.width - 14, CONFIG.height - 5, "BEGIN", {size: 11, align: "center", color: "white"}));
+  var begin_text = Object.create(SpriteFont).init(CONFIG.width, CONFIG.height - 7, Resources.expire_font, "BEGIN", {align: "right"});
+  begin_text.z = 4;
+  fg.add(begin_text);
 
-  var begin_button = Object.create(Button).init(CONFIG.width - 14, CONFIG.height - 5, 28, 8);
+  var begin_button = Object.create(Button).init(CONFIG.width - 25, CONFIG.height - 7, 50, 14);
   begin_button.family = "button";
   begin_button.trigger = function () {
     gameWorld.setScene(1);
   };
   begin_button.hover = function () {
-    bg_block.color = "#999";
+    bg_block.color = "darkcyan";
   };
   begin_button.unhover = function () {
-    bg_block.color = "#333";
+    bg_block.color = "black";
   };
   this.buttons.push(begin_button);
   fg.add(begin_button);
 
-  var mute_block = Object.create(Entity).init(CONFIG.width - 12, 5, 24, 8);
-  mute_block.color = "#333", mute_block.oldcolor = "#333";
+  var mute_block = Object.create(Entity).init(CONFIG.width - 20, 6, 40, 12);
+  mute_block.color = "black", mute_block.oldcolor = "black";
   mute_block.z = -1;
   fg.add(mute_block);
-  var mute_text = Object.create(Text).init(CONFIG.width - 2, 7, "MUTE", {size: 11, align: "right", color: "white"});
+  var mute_text = Object.create(SpriteFont).init(CONFIG.width, 5, Resources.expire_font, "MUTE", {align: "right"});
   fg.add(mute_text);
 
-  var mute_button = Object.create(Button).init(CONFIG.width - 12, 5, 24, 8);
+  var mute_button = Object.create(Button).init(CONFIG.width - 20, 6, 40, 12);
   mute_button.family = "button";
   mute_button.set = function () {
     if (gameWorld.muted && gameWorld.audioContext && gameWorld.audioContext.gn) {
       mute_text.text = "UNMUTE";
-      mute_block.x = CONFIG.width - 16;
-      mute_block.w = 32;
+      mute_block.x = CONFIG.width - 30;
+      mute_block.w = 60;
       gameWorld.audioContext.gn.gain.value = 0;
     } else if (gameWorld.audioContext && gameWorld.audioContext.gn) {
       mute_text.text = "MUTE";  
-      mute_block.x = CONFIG.width - 12;
-      mute_block.w = 24;    
+      mute_block.x = CONFIG.width - 20;
+      mute_block.w = 40;    
       gameWorld.audioContext.gn.gain.value = 1;
     }
   }
@@ -86,9 +96,9 @@ var onStart = function () {
     mute_button.set();
   };
   mute_button.hover = function () {
-    if (mute_block.color != "#999") {
+    if (mute_block.color != "darksalmon") {
       mute_block.oldcolor = mute_block.color;
-      mute_block.color = "#999";
+      mute_block.color = "darksalmon";
     }
   };
   mute_button.unhover = function () {
@@ -148,7 +158,7 @@ var onStart = function () {
 
   this.doRefreshSelectors = false;
   this.refreshSelectors = function () {
-    var lerpRate = 0.05;
+    var lerpRate = 0.2;
     for (var i = 0; i < this.selectors.length; i++) {
       var theta = gameWorld.difficulty - i;
       var d = this.selectors[i];
@@ -157,7 +167,7 @@ var onStart = function () {
 
       d.opacity = (i == gameWorld.difficulty) ? 1 : 0.5;
 
-      if (Math.abs(d.x - dx) < 2.5) {
+      if (Math.abs(d.x - dx) < 1.5) {
         d.x = dx;
         this.doRefreshSelectors = false;
       }
@@ -166,7 +176,7 @@ var onStart = function () {
 
   for (var i = 0; i < 2; i ++) {
 
-    var trees = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, CONFIG.height - LANE_SIZE / 2, CONFIG.width + LANE_SIZE, LANE_SIZE, Resources.trees);
+    var trees = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, CONFIG.height - LANE_SIZE, CONFIG.width + LANE_SIZE, 2 * LANE_SIZE, Resources.trees);
     trees.velocity = {x: - 1 * ROAD_SPEED / 3, y: 0};
     trees.addBehavior(Velocity);
     trees.addBehavior(Wrap, {min: {x: -CONFIG.width / 2, y: 0}, max: {x: CONFIG.width + CONFIG.width / 2, y: CONFIG.height}});

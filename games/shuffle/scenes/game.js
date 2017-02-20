@@ -1,3 +1,33 @@
+/*
+
+TODO:
+
+functional:::
+
+1. lanemovement is currently broken
+2. scene.reload is not working/triggering
+3. localstorage (max distance for each car)
+4. controls (esp. touch/gamepad for buttons)
+5. GW bridge level (maybe car-> GW BRIDGE REPAIR VEHICLE)
+6. 'unlock' behavior finalized (i.e. you unlock the new car, keep current car, see how far you can go?)
+
+flavor:
+
+1. car names, visuals (handling? speed?)
+2. scene transitions
+3. permanance ('wrecks' of failde attampts? or failed LAST attempt?)
+4. descriptive text? visuals?
+5. more cars? how many?
+
+publishing:
+
+1. cross-browser compat. (esp. sound files!)s
+2. performance testing
+3. promo images/gifs/mini video clips
+
+*/
+
+
 // CONSTANTS
 
 // speeds... 300, 260 is quite fast!
@@ -63,7 +93,6 @@ var onStart = function () {
 
     var road = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, CONFIG.height - 7 * LANE_SIZE / 2, CONFIG.width + LANE_SIZE, 7 * LANE_SIZE, Resources.road);
     bg.add(road);
-    console.log(road.h);
 
     var ground = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, CONFIG.height - 7 * LANE_SIZE - 2, CONFIG.width + LANE_SIZE, 4, Resources.ground);
     bg.add(ground);
@@ -166,25 +195,25 @@ var onStart = function () {
 
   this.buttons = [];
 
-  var mute_block = Object.create(Entity).init(CONFIG.width - 12, 5, 24, 8);
-  mute_block.color = "#333", mute_block.oldcolor = "#333";
+  var mute_block = Object.create(Entity).init(CONFIG.width - 20, 6, 40, 12);
+  mute_block.color = "black", mute_block.oldcolor = "black";
   mute_block.z = -1;
   ui.add(mute_block);
-  var mute_text = Object.create(Text).init(CONFIG.width - 2, 7, "MUTE", {size: 11, align: "right", color: "white"});
+  var mute_text = Object.create(SpriteFont).init(CONFIG.width, 5, Resources.expire_font, "MUTE", {align: "right"});
   ui.add(mute_text);
 
-  var mute_button = Object.create(Button).init(CONFIG.width - 12, 5, 24, 8);
+  var mute_button = Object.create(Button).init(CONFIG.width - 20, 6, 40, 12);
   mute_button.family = "button";
   mute_button.set = function () {
     if (gameWorld.muted && gameWorld.audioContext && gameWorld.audioContext.gn) {
       mute_text.text = "UNMUTE";
-      mute_block.x = CONFIG.width - 16;
-      mute_block.w = 32;
+      mute_block.x = CONFIG.width - 30;
+      mute_block.w = 60;
       gameWorld.audioContext.gn.gain.value = 0;
     } else if (gameWorld.audioContext && gameWorld.audioContext.gn) {
       mute_text.text = "MUTE";  
-      mute_block.x = CONFIG.width - 12;
-      mute_block.w = 24;    
+      mute_block.x = CONFIG.width - 20;
+      mute_block.w = 40;    
       gameWorld.audioContext.gn.gain.value = 1;
     }
   }
@@ -194,9 +223,9 @@ var onStart = function () {
     mute_button.set();
   };
   mute_button.hover = function () {
-    if (mute_block.color != "#999") {
+    if (mute_block.color != "darksalmon") {
       mute_block.oldcolor = mute_block.color;
-      mute_block.color = "#999";
+      mute_block.color = "darksalmon";
     }
   };
   mute_button.unhover = function () {
@@ -204,6 +233,7 @@ var onStart = function () {
   };
   this.buttons.push(mute_button);
   ui.add(mute_button);
+
 
   var laning = player.addBehavior(LaneMovement, {lane_size: LANE_SIZE, max_speed: HANDLING, threshold: THRESHOLD});
   this.laning = laning;
