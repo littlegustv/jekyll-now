@@ -2,10 +2,13 @@
 
 TODO:
 
+1. record backup of audio from piano, backup to USB as well!
+
 functional:::
 
-1. lanemovement is currently broken
+1. car collisions, offsets, and bounds
 2. scene.reload is not working/triggering
+
 3. localstorage (max distance for each car)
 4. controls (esp. touch/gamepad for buttons)
 5. GW bridge level (maybe car-> GW BRIDGE REPAIR VEHICLE)
@@ -13,17 +16,20 @@ functional:::
 
 flavor:
 
-1. car names, visuals (handling? speed?)
+1. car names, visuals (handling? speed?), trees appearance, houses/decoration
 2. scene transitions
 3. permanance ('wrecks' of failde attampts? or failed LAST attempt?)
+  - upsides down, smoke particle effect?
 4. descriptive text? visuals?
 5. more cars? how many?
+6. logo/title image
 
 publishing:
 
 1. cross-browser compat. (esp. sound files!)s
 2. performance testing
 3. promo images/gifs/mini video clips
+4. links!
 
 */
 
@@ -330,17 +336,17 @@ var onStart = function () {
 //      e.preventDefault();
       //if (player.direction == 0)
       //  gameWorld.playSound(Resources.pass);
-      //player.direction = -1;
-      laning.move(-1);
-      //player.angle = Math.PI / 18 * -1;
+      player.direction = -1;
+      //laning.move(-1);
+      player.angle = Math.PI / 18 * -1;
       return false;
     } else if (e.keyCode == 40) {
       //e.preventDefault();
       //if (player.direction == 0)
       //  gameWorld.playSound(Resources.pass);
-      //player.direction = 1;
-      laning.move(1);
-      //player.angle = Math.PI / 18 * 1;
+      player.direction = 1;
+      //laning.move(1);
+      player.angle = Math.PI / 18 * 1;
       return false;
     }
   }

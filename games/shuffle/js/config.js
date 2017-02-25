@@ -6,7 +6,7 @@ var CONFIG = {
   debug: false
 };
 
-var LANE_SIZE = 8, HANDLING = 57, THRESHOLD = 2.5, ROAD_SPEED = 50, CAR_SPEED = 55, LANE_OFFSET = CONFIG.height - 6 * LANE_SIZE;
+var LANE_SIZE = 8, HANDLING = 57, THRESHOLD = 1.5, ROAD_SPEED = 50, CAR_SPEED = 55, LANE_OFFSET = CONFIG.height - 6 * LANE_SIZE;
 var GOAL_DISTANCE = 5280; // (one mile)
 
 //GLOBALS.scale = 3;

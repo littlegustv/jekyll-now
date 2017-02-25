@@ -25,7 +25,7 @@ LaneMovement.update = function (dt) {
   if (this.disabled) return;
 
   if (this.entity.direction != 0) {
-    if (this.entity.lane <= 0 || this.entity.lane >= 6) {}
+    if (false) {} //(this.entity.lane <= 0 || this.entity.lane >= 6) {}
     else {      
       this.entity.velocity.y = lerp(this.entity.velocity.y, this.entity.direction * this.max_speed, 0.5);
     }
