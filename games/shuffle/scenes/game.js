@@ -1,26 +1,29 @@
 /*
 
-TODO:
-
-1. record backup of audio from piano, backup to USB as well!
+name: 'the jersey mile'
+intro (skippable) text scene:
+  "they called it the 'jersey mile"
+  "no one ever made it back to say how long it really was"            
 
 functional:::
 
-1. car collisions, offsets, and bounds
-2. scene.reload is not working/triggering
+xxxxxxxxxxxxxxxx1. car collisions, offsets, and bounds
+xxxxxxxxxxxxxxxx2. scene.reload is not working/triggering
 
-3. localstorage (max distance for each car)
+xxxxxxxxxxxxxxxx3. localstorage (max distance for each car)
 4. controls (esp. touch/gamepad for buttons)
 5. GW bridge level (maybe car-> GW BRIDGE REPAIR VEHICLE)
 6. 'unlock' behavior finalized (i.e. you unlock the new car, keep current car, see how far you can go?)
+7. 'patterns' still aren't that interesting - there is no 'bluff' effect like in super-hexagon
 
 flavor:
 
-1. car names, visuals (handling? speed?), trees appearance, houses/decoration
+xxxxxxxxxxxxxxxx0. narrower sprite font
+xxxxxxxxxxxxxxxx1. car names, visuals (handling? speed?), trees appearance, houses/decoration
 2. scene transitions
 3. permanance ('wrecks' of failde attampts? or failed LAST attempt?)
   - upsides down, smoke particle effect?
-4. descriptive text? visuals?
+
 5. more cars? how many?
 6. logo/title image
 
@@ -120,15 +123,15 @@ var onStart = function () {
 
   var player = Object.create(Sprite).init(64, /*CONFIG.height - 5 * LANE_SIZE*/CONFIG.height / 2, Resources[gameWorld.difficulties[gameWorld.difficulty].sprite]);
   player.addBehavior(Velocity);
-  //player.addBehavior(Bound, {min: {x: 0, y: 4.5 * LANE_SIZE}, max: {x: CONFIG.width, y: CONFIG.height - LANE_SIZE / 2}});
+  player.addBehavior(Bound, {min: {x: 0, y: CONFIG.height - 7 * LANE_SIZE}, max: {x: CONFIG.width, y: CONFIG.height - LANE_SIZE}});
   player.velocity = {x: 0, y: 0};
   player.setVertices([{x: -4, y: 3},
     {x: 4, y: 3},
     {x: 4, y: 6},
     {x: -4, y: 6}
   ]);
-  player.addBehavior(Trail, {});
-  player.offset = {x: 0, y: -6};
+//  player.addBehavior(Trail, {});
+  player.offset = {x: 0, y: -2};
   this.player = player;
 
   var endGame = function () {
@@ -142,7 +145,7 @@ var onStart = function () {
       if (fg.entities[i].oscillate) fg.entities[i].removeBehavior(fg.entities[i].oscillate);
     }
   }
-/*
+
   player.setCollision(Polygon);
   player.collision.onHandle = function(object, other) {
     if (other.rescue) {
@@ -174,10 +177,11 @@ var onStart = function () {
       player.layer.add(expl);
       expl.addBehavior(Delay, {duration: 1, callback: function () {
         this.entity.alive = false;
-        gameWorld.setScene(0);
+        gameWorld.setScene(0, true);
       }})
     }
-  }*/
+  }
+  //DEBUG = true;
   //CONFIG.player = player;
   //CONFIG.debug = true;
   CONFIG.scene = this;
@@ -201,25 +205,17 @@ var onStart = function () {
 
   this.buttons = [];
 
-  var mute_block = Object.create(Entity).init(CONFIG.width - 20, 6, 40, 12);
-  mute_block.color = "black", mute_block.oldcolor = "black";
-  mute_block.z = -1;
-  ui.add(mute_block);
-  var mute_text = Object.create(SpriteFont).init(CONFIG.width, 5, Resources.expire_font, "MUTE", {align: "right"});
-  ui.add(mute_text);
+  var mute_sprite = ui.add(Object.create(Sprite).init(CONFIG.width - 2, 6, Resources.mute));
+  mute_sprite.removeBehavior(mute_sprite.behaviors[0]);
 
   var mute_button = Object.create(Button).init(CONFIG.width - 20, 6, 40, 12);
   mute_button.family = "button";
   mute_button.set = function () {
     if (gameWorld.muted && gameWorld.audioContext && gameWorld.audioContext.gn) {
-      mute_text.text = "UNMUTE";
-      mute_block.x = CONFIG.width - 30;
-      mute_block.w = 60;
+      mute_sprite.animation = 1;
       gameWorld.audioContext.gn.gain.value = 0;
     } else if (gameWorld.audioContext && gameWorld.audioContext.gn) {
-      mute_text.text = "MUTE";  
-      mute_block.x = CONFIG.width - 20;
-      mute_block.w = 40;    
+      mute_sprite.animation = 0;
       gameWorld.audioContext.gn.gain.value = 1;
     }
   }
@@ -229,17 +225,13 @@ var onStart = function () {
     mute_button.set();
   };
   mute_button.hover = function () {
-    if (mute_block.color != "darksalmon") {
-      mute_block.oldcolor = mute_block.color;
-      mute_block.color = "darksalmon";
-    }
+    mute_sprite.frame = 1;
   };
   mute_button.unhover = function () {
-    mute_block.color = mute_block.oldcolor;
+    mute_sprite.frame = 0;
   };
   this.buttons.push(mute_button);
   ui.add(mute_button);
-
 
   var laning = player.addBehavior(LaneMovement, {lane_size: LANE_SIZE, max_speed: HANDLING, threshold: THRESHOLD});
   this.laning = laning;
@@ -270,7 +262,7 @@ var onStart = function () {
       s.rescue = true;
       s.addBehavior(Velocity);
       s.setCollision(Polygon);
-      s.offset = {x: 0, y: -12};
+      s.offset = {x: 0, y: -2};
       s.setVertices([{x: -8, y: -CONFIG.height / 2},
         {x: 8, y: -CONFIG.height / 2},
         {x: 8, y: CONFIG.height / 2},
@@ -292,7 +284,7 @@ var onStart = function () {
         var s = start - start * Math.abs(i - destination) / 7;
 				var c = Object.create(Sprite).init(CONFIG.width + s, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
     		c.setCollision(Polygon);
-        c.offset = {x: 0, y: -12};
+        c.offset = {x: 0, y: -2};
         c.setVertices([{x: -4, y: 3},
           {x: 4, y: 3},
           {x: 4, y: 6},
@@ -336,17 +328,17 @@ var onStart = function () {
 //      e.preventDefault();
       //if (player.direction == 0)
       //  gameWorld.playSound(Resources.pass);
-      player.direction = -1;
-      //laning.move(-1);
-      player.angle = Math.PI / 18 * -1;
+      //player.direction = -1;
+      laning.move(-1);
+      //player.angle = Math.PI / 18 * -1;
       return false;
     } else if (e.keyCode == 40) {
       //e.preventDefault();
       //if (player.direction == 0)
       //  gameWorld.playSound(Resources.pass);
-      player.direction = 1;
-      //laning.move(1);
-      player.angle = Math.PI / 18 * 1;
+      //player.direction = 1;
+      laning.move(1);
+      //player.angle = Math.PI / 18 * 1;
       return false;
     }
   }
@@ -428,7 +420,7 @@ var onStart = function () {
     laning.setLane();
   }
   this.onClick = function (e) {
-    var b = t.ui.onButton(e.offsetX, e.offsetY);
+    var b = t.ui.onButton(e.x, e.y);
     if (b) {
       if (b.trigger) b.trigger();
       return;
@@ -436,7 +428,7 @@ var onStart = function () {
   }
   this.onMouseMove = function (e) {
     for (var i = 0; i < t.buttons.length; i++) {
-      if (t.buttons[i].check(e.offsetX, e.offsetY)) {
+      if (t.buttons[i].check(e.x, e.y)) {
         t.buttons[i].hover();
       } else {
         t.buttons[i].unhover();

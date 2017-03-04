@@ -4,6 +4,7 @@ LaneMovement.start = function () {
   this.entity.direction = 0;
   this.min = 0, this.max = CONFIG.height;
   this.entity.lane = undefined;
+//  this.setLane();
 }
 LaneMovement.setLane = function () {
   this.entity.velocity.y = 0;
@@ -12,10 +13,8 @@ LaneMovement.setLane = function () {
   this.entity.angle = 0;
 }
 LaneMovement.move = function (direction) {
-  if (this.entity.y > this.min && this.entity.y < this.max) {
-    this.entity.direction = direction;
-    this.entity.angle = Math.PI / 18 * direction;
-  }
+  this.entity.direction = direction;
+  this.entity.angle = Math.PI / 18 * direction;
 }
 LaneMovement.update = function (dt) {
   if (!this.started) this.start();

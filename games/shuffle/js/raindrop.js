@@ -1507,7 +1507,7 @@ var World = {
     this.scale = scale;
   },
   filterEvent: function (event) {
-    return {x: event.offsetX / this.scale, y: event.offsetY / this.scale, keyCode: event.keyCode};
+    return {x: event.offsetX / this.scale, y: event.offsetY / this.scale};
   },
   createCanvas: function () {
     this.canvas = document.createElement("canvas");

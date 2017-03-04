@@ -1,3 +1,10 @@
+Sprite.onDraw = function (ctx) {
+  ctx.drawImage(this.sprite.image, 
+    this.frame * this.sprite.w, this.animation * this.sprite.h, 
+    this.sprite.w, this.sprite.h, 
+    this.x - this.w, this.y - this.h / 2, this.w, this.h);
+};
+
 var CONFIG = {
   height: 90,
   width: 160,
@@ -6,8 +13,8 @@ var CONFIG = {
   debug: false
 };
 
-var LANE_SIZE = 8, HANDLING = 57, THRESHOLD = 1.5, ROAD_SPEED = 50, CAR_SPEED = 55, LANE_OFFSET = CONFIG.height - 6 * LANE_SIZE;
-var GOAL_DISTANCE = 5280; // (one mile)
+var LANE_SIZE = 8, HANDLING = 57, THRESHOLD = 1.5, ROAD_SPEED = 50, CAR_SPEED = 55, LANE_OFFSET = CONFIG.height - 7 * LANE_SIZE;
+var GOAL_DISTANCE = 2640; // (one pixel = 2 feet)
 
 //GLOBALS.scale = 3;
 
@@ -46,14 +53,20 @@ World.filterEvent = function (event) {
   return {x: event.offsetX / this.scale, y: event.offsetY / this.scale, keyCode: event.keyCode};
 };
 
+var EntityUp = Object.create(Entity);
+EntityUp.onDraw = function (ctx) {
+  ctx.fillStyle = this.color || "black";
+  ctx.fillRect(this.x - this.w / 2, this.y - this.h, this.w, this.h);
+};
+
 var gameWorld = Object.create(World).init(160, 90, 'index.json');
 
 gameWorld.difficulties = [
-  {roadSpeed: 50, handling: 58, sprite: "roadster", score: 0},
-  {roadSpeed: 65, handling: 75, sprite: "hatchback", score: 0},
-  {roadSpeed: 80, handling: 90, sprite: "truck", score: 0},
-  {roadSpeed: 95, handling: 105, sprite: "car3", score: 0},
-  {roadSpeed: 110, handling: 120, sprite: "car4", score: 0},
+  {name: "red scare", roadSpeed: 50, handling: 58, sprite: "roadster", score: 0},
+  {name: "mirage", roadSpeed: 65, handling: 75, sprite: "hatchback", score: 0},
+  {name: "geist", roadSpeed: 80, handling: 90, sprite: "truck", score: 0},
+  {name: "satsuma", roadSpeed: 95, handling: 105, sprite: "car3", score: 0},
+  {name: "spectre", roadSpeed: 110, handling: 120, sprite: "car4", score: 0},
 ]
 
 gameWorld.difficulty = 1;
@@ -218,8 +231,8 @@ Follow.update = function (dt) {
 }
 
 World.setScene = function (n, reload) {
-  if (reload === false) {}
-  else if (this.scenes[n].reload) {
+  //if (reload === false) {}
+  if (this.scenes[n].reload || reload === true) {
     this.scenes[n] = Object.create(Scene).init(this.scenes[n].name, true);
   }
   this.removeEventListeners(this.scene);
@@ -256,11 +269,12 @@ SpriteFont.init = function (x, y, sprite, text, options) {
   this.oldInit(x, y, sprite);
   this.text = text;
   this.align = options.align || "left";
+  this.spacing = options.spacing || 0;
   return this;
 }
 SpriteFont.getX = function (n) {
   if (this.align == "center") {
-    return this.w * (n - this.text.length / 2);
+    return this.w * (n - this.text.length / 2) - this.spacing * this.text.length / 2;
   } else if (this.align == "left") {
     return this.w * n;
   } else if (this.align == "right") {
@@ -275,7 +289,7 @@ SpriteFont.draw = function (ctx) {
       ctx.drawImage(this.sprite.image, 
         c * this.sprite.w, 0, 
         this.sprite.w, this.sprite.h, 
-        Math.round(this.x - this.w / 2) + x, this.y - Math.round(this.h / 2), this.w, this.h);          
+        Math.round(this.x - this.w / 2) + x + this.spacing * i, this.y - Math.round(this.h / 2), this.w, this.h);          
     }
   }
 }
