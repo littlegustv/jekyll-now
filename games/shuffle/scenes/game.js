@@ -14,14 +14,13 @@ xxxxxxxxxxxxxxxx3. localstorage (max distance for each car)
 4. controls (esp. touch/gamepad for buttons)
 5. GW bridge level (maybe car-> GW BRIDGE REPAIR VEHICLE)
 6. 'unlock' behavior finalized (i.e. you unlock the new car, keep current car, see how far you can go?)
-7. 'patterns' still aren't that interesting - there is no 'bluff' effect like in super-hexagon
 
 flavor:
 
 xxxxxxxxxxxxxxxx0. narrower sprite font
 xxxxxxxxxxxxxxxx1. car names, visuals (handling? speed?), trees appearance, houses/decoration
 2. scene transitions
-3. permanance ('wrecks' of failde attampts? or failed LAST attempt?)
+3. permanance ('wrecks' of failed  attampts? or failed LAST attempt?)
   - upsides down, smoke particle effect?
 
 5. more cars? how many?
@@ -121,7 +120,7 @@ var onStart = function () {
       bg.entities[i].velocity = {x: -2 * ROAD_SPEED, y: 0};
   }
 
-  var player = Object.create(Sprite).init(64, /*CONFIG.height - 5 * LANE_SIZE*/CONFIG.height / 2, Resources[gameWorld.difficulties[gameWorld.difficulty].sprite]);
+  var player = Object.create(Sprite).init(24, /*CONFIG.height - 5 * LANE_SIZE*/CONFIG.height / 2, Resources[gameWorld.difficulties[gameWorld.difficulty].sprite]);
   player.addBehavior(Velocity);
   player.addBehavior(Bound, {min: {x: 0, y: CONFIG.height - 7 * LANE_SIZE}, max: {x: CONFIG.width, y: CONFIG.height - LANE_SIZE}});
   player.velocity = {x: 0, y: 0};
@@ -242,7 +241,7 @@ var onStart = function () {
 
   this.difficultyFormula = function () {
     // pure 'base-line' possiblity = CAR_SPEED * LANE_SIZE / HANDLING (too hard, though!!)
-    return 2 * CAR_SPEED * LANE_SIZE / HANDLING;
+    return 1.1 * CAR_SPEED * LANE_SIZE / HANDLING;
   }
 
   // - add 'tricks'; where there are 'two' destinations but only ONE is real
@@ -272,18 +271,19 @@ var onStart = function () {
       s.velocity = {x: -CAR_SPEED, y: 0};
       this.fg.add(s);
       this.interval = CONFIG.width * 1.5;
-      console.log(s, this.interval);
+      //console.log(s, this.interval);
       return;
     }
 
     // choose new lane
+
     var destination = this.NEXT || modulo(lane + Math.floor(Math.random() * 5 + 1), 7);
     var start = Math.abs(destination - lane) * this.difficultyFormula();
     for (var i = 0; i <= 6; i++) {
-    	if (i != destination) {
+      if (i != destination) {
         var s = start - start * Math.abs(i - destination) / 7;
-				var c = Object.create(Sprite).init(CONFIG.width + s, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
-    		c.setCollision(Polygon);
+        var c = Object.create(Sprite).init(CONFIG.width + s, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
+        c.setCollision(Polygon);
         c.offset = {x: 0, y: -2};
         c.setVertices([{x: -4, y: 3},
           {x: 4, y: 3},
@@ -392,17 +392,17 @@ var onStart = function () {
       gameWorld.setScene(0);
       return false;
     }
-    var b = t.ui.onButton(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+    var b = t.ui.onButton(e.touch.x, e.touch.y);
     if (b) {
       if (b.trigger) b.trigger();
       return;
     }
 
-    t.touch.x = e.changedTouches[0].pageX, t.touch.y = e.changedTouches[0].pageY;
+    t.touch.x = e.touch.x, t.touch.y = e.touch.y;
   }
   this.onTouchMove = function (e) {
     console.log('bad');
-    var x = e.changedTouches[0].pageX, y = e.changedTouches[0].pageY;
+    var x = e.touch.x, y = e.touch.y;
     if (Math.abs(t.touch.y - y) < 10) {
       laning.setLane();
       return;

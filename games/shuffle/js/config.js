@@ -50,8 +50,15 @@ function normalize (x, y) {
 }
 
 World.filterEvent = function (event) {
-  return {x: event.offsetX / this.scale, y: event.offsetY / this.scale, keyCode: event.keyCode};
+  var w = this;
+  return {
+    x: event.offsetX / this.scale, 
+    y: event.offsetY / this.scale, 
+    keyCode: event.keyCode, 
+    touch: event.changedTouches && event.changedTouches.length > 0 ? {x: event.changedTouches[0].pageX / w.scale, y: event.changedTouches[0].pageY / w.scale} : {}
+  };
 };
+
 
 var EntityUp = Object.create(Entity);
 EntityUp.onDraw = function (ctx) {

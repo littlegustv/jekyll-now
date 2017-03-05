@@ -276,7 +276,7 @@ var onStart = function () {
   this.touch = {x: 0, y: 0, delay: 0};
   this.onTouchStart = function (e) {
     if (!fullscreen) requestFullScreen();
-    t.touch.x = e.changedTouches[0].pageX, t.touch.y = e.changedTouches[0].pageY;
+    t.touch.x = e.touch.x, t.touch.y = e.touch.y;
   }
   this.onClick = function (e) {
     var b = t.fg.onButton(e.x, e.y);
@@ -286,10 +286,12 @@ var onStart = function () {
     }
   }
   this.onTouchEnd = function (e) {
-    var x = e.changedTouches[0].pageX, y = e.changedTouches[0].pageY;
-    var b = t.fg.onButton(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+    var x = e.touch.x, y = e.touch.y;
+    var b = t.fg.onButton(e.touch.x, e.touch.y);
     if (b) {
-      if (b.trigger) b.trigger();
+      if (b.trigger) {
+        b.trigger();
+      }
       return;
     }
     if (Math.abs(t.touch.y - y) < 10) {
