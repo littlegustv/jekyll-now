@@ -235,8 +235,11 @@ var onStart = function () {
     } else if (e.keyCode == 32) {
       //e.preventDefault();
       if (gameWorld.difficulty <= gameWorld.unlocked)
-        
-        gameWorld.setScene(1, true);
+        if (gameWorld.difficulty < gameWorld.difficulties.length - 1) {
+          gameWorld.setScene(1, true);
+        } else {
+          gameWorld.setScene(2, true);
+        }
       else {
         //gameWorld.playSound(Resources.error);
       }
@@ -247,7 +250,11 @@ var onStart = function () {
   this._gamepad.buttons.a.onStart = function (dt) {
     if (t.delay <= 0)
       if (gameWorld.difficulty <= gameWorld.unlocked)
-        gameWorld.setScene(1, true);
+        if (gameWorld.difficulty < gameWorld.difficulties.length - 1) {
+          gameWorld.setScene(1, true);
+        } else {
+          gameWorld.setScene(2, true);
+        }
       else {
         //gameWorld.playSound(Resources.error);
       }
@@ -259,15 +266,15 @@ var onStart = function () {
       return;
     }
     if (this.y < -0.3) {
-      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
+      //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
       gameWorld.difficulty = Math.max(0, gameWorld.difficulty - 1);
-      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
+      //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
       this.delay = 0.3;
       t.doRefreshSelectors = true;
     } else if (this.y > 0.3) {
-      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
+      //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
       gameWorld.difficulty = Math.min(gameWorld.difficulty + 1, gameWorld.difficulties.length - 1);  
-      t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
+      //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
       this.delay = 0.3;
       t.doRefreshSelectors = true;
     }

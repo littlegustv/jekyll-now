@@ -74,6 +74,7 @@ gameWorld.difficulties = [
   {name: "geist", roadSpeed: 80, handling: 90, sprite: "truck", score: 0},
   {name: "satsuma", roadSpeed: 95, handling: 105, sprite: "car3", score: 0},
   {name: "spectre", roadSpeed: 110, handling: 120, sprite: "car4", score: 0},
+  {name: "gw bridge", roadSpeed: 110, handling: 120, sprite: "repair", score: 0}
 ]
 
 gameWorld.difficulty = 1;

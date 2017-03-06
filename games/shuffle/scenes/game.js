@@ -1,34 +1,26 @@
 /*
 
-name: 'the jersey mile'
-intro (skippable) text scene:
-  "they called it the 'jersey mile"
-  "no one ever made it back to say how long it really was"            
-
 functional:::
 
 xxxxxxxxxxxxxxxx1. car collisions, offsets, and bounds
 xxxxxxxxxxxxxxxx2. scene.reload is not working/triggering
 
 xxxxxxxxxxxxxxxx3. localstorage (max distance for each car)
-4. controls (esp. touch/gamepad for buttons)
-5. GW bridge level (maybe car-> GW BRIDGE REPAIR VEHICLE)
+xxxxxxxxxxxxxxxx5. GW bridge level (maybe car-> GW BRIDGE REPAIR VEHICLE)
 6. 'unlock' behavior finalized (i.e. you unlock the new car, keep current car, see how far you can go?)
+7. improve sounds, particles (screen-shake??)
+8. improve score display
 
 flavor:
 
 xxxxxxxxxxxxxxxx0. narrower sprite font
 xxxxxxxxxxxxxxxx1. car names, visuals (handling? speed?), trees appearance, houses/decoration
-2. scene transitions
-3. permanance ('wrecks' of failed  attampts? or failed LAST attempt?)
-  - upsides down, smoke particle effect?
-
-5. more cars? how many?
 6. logo/title image
 
 publishing:
 
 1. cross-browser compat. (esp. sound files!)s
+2. APIs
 2. performance testing
 3. promo images/gifs/mini video clips
 4. links!

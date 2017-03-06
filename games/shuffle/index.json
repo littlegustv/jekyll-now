@@ -1,7 +1,8 @@
 {
   "scenes": [
     {"name": "menu", "reload": true},
-    {"name": "game", "reload": true}
+    {"name": "game", "reload": true},
+    {"name": "bonus", "reload": true}
   ],
   "resources": [
     {"path": "roadster.png", "frames": 2, "speed": 0.5, "animations": 1},
@@ -14,11 +15,13 @@
     {"path": "truck.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "car3.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "car4.png", "frames": 2, "speed": 0.5, "animations": 1},
+    {"path": "repair.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "mute.png", "frames": 2, "animations": 2},
     {"path": "road.png"},
     {"path": "a.png"},
     {"path": "power.png"},
     {"path": "handling.png"},
+    {"path": "bridge.png"},
     {"path": "score.png"},
     {"path": "distance.png"},
     {"path": "ground.png"},
