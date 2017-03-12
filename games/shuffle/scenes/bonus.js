@@ -6,6 +6,9 @@ var fullscreen = false;
 
 var onStart = function () {
 
+  this.cars = ["smart", "smart", "smart", "smart", "smart", "smart"];
+  this.cars = this.cars.concat(gameWorld.difficulties.slice(0,gameWorld.difficulty).map(function (d) { return d.sprite; }));
+
   this._gamepad = Object.create(Gamepad).init();
   var t = this;
 
@@ -83,7 +86,7 @@ var onStart = function () {
 
   for (var i = 0; i < 6; i++) {
     for (var j = 32 + randint(16, 32); j < gameWorld.width + 32; j += randint(16, 32)) {
-      var s = fg.add(Object.create(Sprite).init(j, gameWorld.height - 29 - 4 * LANE_SIZE + i * LANE_SIZE, Resources.smart));
+      var s = fg.add(Object.create(Sprite).init(j, gameWorld.height - 29 - 4 * LANE_SIZE + i * LANE_SIZE, Resources[choose(this.cars)]));
       s.removeBehavior(s.behaviors[0]);
       s.addBehavior(Oscillate, {constant: 4, field: 'x', object: s.offset, time: Math.random() * PI2, initial: 0, rate: 0.2});
     }

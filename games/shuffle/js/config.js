@@ -14,7 +14,7 @@ var CONFIG = {
 };
 
 var LANE_SIZE = 8, HANDLING = 57, THRESHOLD = 1.5, ROAD_SPEED = 50, CAR_SPEED = 55, LANE_OFFSET = CONFIG.height - 7 * LANE_SIZE;
-var GOAL_DISTANCE = 2640; // (one pixel = 2 feet)
+var GOAL_DISTANCE = 400;//1320; // (one pixel = 4 feet)
 
 //GLOBALS.scale = 3;
 
@@ -79,6 +79,21 @@ gameWorld.difficulties = [
 
 gameWorld.difficulty = 1;
 gameWorld.unlocked = 1;
+
+if (localStorage) {
+  if (!localStorage.shuffleData) {
+    // new best score!
+  }
+  else {
+    var data = JSON.parse(localStorage.shuffleData);
+    for (var i = 0; i < gameWorld.difficulties.length; i++) {
+      gameWorld.difficulties[i].score = data.scores[i].score;
+    }
+    gameWorld.unlocked = data.unlocked;
+    gameWorld.difficulty = data.difficulty;
+    gameWorld.muted = data.muted;
+  }
+}
 
 function goalMessage (layer, again) {
   var goal_messages = [];

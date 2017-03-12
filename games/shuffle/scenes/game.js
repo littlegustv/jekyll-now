@@ -7,7 +7,7 @@ xxxxxxxxxxxxxxxx2. scene.reload is not working/triggering
 
 xxxxxxxxxxxxxxxx3. localstorage (max distance for each car)
 xxxxxxxxxxxxxxxx5. GW bridge level (maybe car-> GW BRIDGE REPAIR VEHICLE)
-6. 'unlock' behavior finalized (i.e. you unlock the new car, keep current car, see how far you can go?)
+xxxxxxxxxxxxxxxx6. 'unlock' behavior finalized (i.e. you unlock the new car, keep current car, see how far you can go?)
 7. improve sounds, particles (screen-shake??)
 8. improve score display
 
@@ -36,13 +36,15 @@ publishing:
 // these variables are conflicting between 'exit' and 'game' - find a better place for them!!!
 
 //var sign_texts = ["Hoboken", "Hackensack", "Camden", "Trenton"];
-var cars = ["smart"];
 var buildings = ["building2", "box", "cathedral", "house"];
 
 var onStart = function () {
 
+  this.cars = ["smart", "smart", "smart", "smart", "smart", "smart"];
+  this.cars = this.cars.concat(gameWorld.difficulties.slice(0,gameWorld.difficulty).map(function (d) { return d.sprite; }));
   this._gamepad = Object.create(Gamepad).init();
   if (!gameWorld.score) gameWorld.score = 0;
+  this.unlocked = false;
 
   this.layers = [];
 
@@ -141,7 +143,7 @@ var onStart = function () {
   player.collision.onHandle = function(object, other) {
     if (other.rescue) {
       gameWorld.playSound(Resources.beepbeep);
-      var old_sprite = object.sprite, old_position = {x: object.x, y: object.y};
+      /*var old_sprite = object.sprite, old_position = {x: object.x, y: object.y};
       object.sprite = other.sprite;
       object.x = other.x, object.y = other.y;
       other.sprite = old_sprite, other.x = old_position.x, other.y = old_position.y;
@@ -153,9 +155,17 @@ var onStart = function () {
       gameWorld.difficulty += 1;
       CAR_SPEED = gameWorld.difficulties[gameWorld.difficulty].roadSpeed + 20;
       ROAD_SPEED = gameWorld.difficulties[gameWorld.difficulty].roadSpeed;
-      HANDLING = gameWorld.difficulties[gameWorld.difficulty].handling;
+      HANDLING = gameWorld.difficulties[gameWorld.difficulty].handling;*/
       //object.velocity.x = CAR_SPEED;
-      gameWorld.unlocked = gameWorld.difficulty;
+      other.alive = false;
+
+      if (gameWorld.unlocked <= gameWorld.difficulty) { 
+        gameWorld.unlocked = gameWorld.difficulty + 1;
+        var unlocked_text = t.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, 10, Resources.expire_font, gameWorld.difficulties[gameWorld.unlocked].name + " unlocked!", {spacing: -2, align: "center"}))
+        unlocked_text.addBehavior(FadeIn, {duration: 0.5});
+        unlocked_text.addBehavior(FadeOut, {duration: 0.5, delay: 1.5});
+        t.cars.push(gameWorld.difficulties[gameWorld.difficulty].sprite);
+      }
     }
     else {
       gameWorld.playSound(Resources.crash);
@@ -246,9 +256,11 @@ var onStart = function () {
 
     var lane = this.last_lane;
     var t = this;
-    if (this.distance >= this.goal_distance) {
+    var special = undefined;
+    if (this.distance >= this.goal_distance && !this.unlocked) {
+      this.unlocked = true;
       // should only happen once
-      this.goal_distance += GOAL_DISTANCE;
+      /*
       var s = Object.create(Sprite).init(CONFIG.width * 1.5, LANE_OFFSET + 3 * LANE_SIZE, Resources[gameWorld.difficulties[(gameWorld.difficulty + 1) % gameWorld.difficulties.length].sprite]);
       s.rescue = true;
       s.addBehavior(Velocity);
@@ -264,7 +276,8 @@ var onStart = function () {
       this.fg.add(s);
       this.interval = CONFIG.width * 1.5;
       //console.log(s, this.interval);
-      return;
+      return;*/
+      special = randint(1, 6);
     }
 
     // choose new lane
@@ -274,14 +287,25 @@ var onStart = function () {
     for (var i = 0; i <= 6; i++) {
       if (i != destination) {
         var s = start - start * Math.abs(i - destination) / 7;
-        var c = Object.create(Sprite).init(CONFIG.width + s, i * LANE_SIZE + LANE_OFFSET, Resources[choose(cars)]);
+        if (i == special) {
+          var c = Object.create(Sprite).init(CONFIG.width + s, i * LANE_SIZE + LANE_OFFSET, Resources[gameWorld.difficulties[(gameWorld.difficulty + 1) % gameWorld.difficulties.length].sprite]);
+          var r = this.fg.add(Object.create(Entity).init(CONFIG.width + s, CONFIG.height / 2, 4, CONFIG.height));
+          r.setCollision(Polygon);
+          r.rescue = true;
+          r.color = "red";     
+          r.onDraw = function (ctx) {};     
+          r.addBehavior(Velocity);
+          r.velocity = {x: -CAR_SPEED, y: 0};
+        } else {
+          var c = Object.create(Sprite).init(CONFIG.width + s, i * LANE_SIZE + LANE_OFFSET, Resources[choose(this.cars)]);
+        }
         c.setCollision(Polygon);
-        c.offset = {x: 0, y: -2};
         c.setVertices([{x: -4, y: 3},
           {x: 4, y: 3},
           {x: 4, y: 6},
           {x: -4, y: 6}
         ]);        
+        c.offset = {x: 0, y: -2};
         c.addBehavior(Velocity);
         c.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});
         c.velocity = {x: -CAR_SPEED, y: 0};

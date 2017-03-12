@@ -112,20 +112,7 @@ var onStart = function () {
     fg.add(scoreText);*/
   }
   
-  if (localStorage) {
-    if (!localStorage.shuffleData) {
-      // new best score!
-    }
-    else {
-      var data = JSON.parse(localStorage.shuffleData);
-      for (var i = 0; i < gameWorld.difficulties.length; i++) {
-        gameWorld.difficulties[i].score = data.scores[i].score;
-      }
-      gameWorld.unlocked = data.unlocked;
-      gameWorld.difficulty = data.difficulty;
-      gameWorld.muted = data.muted;
-    }
-  }
+  
 
   this.selectors = [];
 
