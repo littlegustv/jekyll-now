@@ -1633,7 +1633,9 @@ var World = {
         if (scene[event]) {
           //w[event] = scene[event];
           w[event] = function (e) {
+          	e.preventDefault();
             scene[event](w.filterEvent(e));
+            return false;
           };
           if (event.substr(0,5) == "onKey") {
             document.addEventListener(event.toLowerCase().substr(2,event.length - 2), w[event]);
@@ -1646,7 +1648,7 @@ var World = {
     } else {
       var t = this;
       // fix me: is there maybe a more elegant way of checking whether the scene is loaded?
-      setTimeout(function () { t.addEventListeners(scene); }, 500);
+      setTimeout(function () { t.addEventListeners(scene); }, 50);
     }
   },
   initAudio: function () {

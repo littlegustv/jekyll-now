@@ -8,21 +8,28 @@ xxxxxxxxxxxxxxxx2. scene.reload is not working/triggering
 xxxxxxxxxxxxxxxx3. localstorage (max distance for each car)
 xxxxxxxxxxxxxxxx5. GW bridge level (maybe car-> GW BRIDGE REPAIR VEHICLE)
 xxxxxxxxxxxxxxxx6. 'unlock' behavior finalized (i.e. you unlock the new car, keep current car, see how far you can go?)
-7. improve sounds, particles (screen-shake??)
-8. improve score display
+xxxxxxxxxxxxxxxx8. improve score display - rotated spriteFont
+
+1. unlock/new high score message in game
+1.5 mileage counter in game
+2. high scores scene?
+xxxxxxxxxxxxxxxx3. menu button
+4. engine running/idle sound effect, different horns maybe?
 
 flavor:
 
 xxxxxxxxxxxxxxxx0. narrower sprite font
 xxxxxxxxxxxxxxxx1. car names, visuals (handling? speed?), trees appearance, houses/decoration
-6. logo/title image
+1. cross-browser compat. (esp. sound files!)s
+2. performance testing
 
 publishing:
 
-1. cross-browser compat. (esp. sound files!)s
+1. itch.io
+  -xxxxxxxxxxx e.preventDefault for key events
+  - touch events, gamepad controls
+  - promo images/gifs/mini video clips
 2. APIs
-2. performance testing
-3. promo images/gifs/mini video clips
 4. links!
 
 */
@@ -72,9 +79,9 @@ var onStart = function () {
   var ui = Object.create(Layer).init(320, 180);
   this.ui = ui;
 
-/*  var odometer = Object.create(Text).init(20,20,"0 miles", {align: "left"});
+  var odometer = Object.create(SpriteFont).init(gameWorld.width / 2, 8,Resources.expire_font, "0.0m", {align: "center", spacing: -2});
   ui.add(odometer);
-  t.odometer = odometer;*/
+  t.odometer = odometer;
 
   fg.drawOrder = function () {
     return this.entities.sort(function (a, b) { 
@@ -205,6 +212,24 @@ var onStart = function () {
   // buttons
 
   this.buttons = [];
+
+  var menu_sprite = ui.add(Object.create(Sprite).init(9, 3, Resources.menu));
+  menu_sprite.removeBehavior(menu_sprite.behaviors[0]);
+
+  var menu_button = Object.create(Button).init(20, 6, 40, 12);
+  menu_button.family = "button";
+
+  menu_button.trigger = function () {
+    gameWorld.setScene(0);
+  };
+  menu_button.hover = function () {
+    menu_sprite.frame = 1;
+  };
+  menu_button.unhover = function () {
+    menu_sprite.frame = 0;
+  };
+  this.buttons.push(menu_button);
+  ui.add(menu_button);
 
   var mute_sprite = ui.add(Object.create(Sprite).init(CONFIG.width - 2, 6, Resources.mute));
   mute_sprite.removeBehavior(mute_sprite.behaviors[0]);
@@ -466,6 +491,7 @@ var onUpdate = function (dt) {
   if (!this.player.crashed) {
     this.distance += ROAD_SPEED * dt;
     gameWorld.score = this.miles();
+    this.odometer.text = this.miles() + "m";
   }
 
   if (this.goal && this.distance > this.goal.x) {

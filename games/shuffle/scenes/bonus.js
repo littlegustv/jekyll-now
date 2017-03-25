@@ -63,6 +63,25 @@ var onStart = function () {
   
   var i = 0;
 
+  this.buttons = [];
+
+  var menu_sprite = fg.add(Object.create(Sprite).init(9, 3, Resources.menu));
+  menu_sprite.removeBehavior(menu_sprite.behaviors[0]);
+
+  var menu_button = Object.create(Button).init(20, 6, 40, 12);
+  menu_button.family = "button";
+
+  menu_button.trigger = function () {
+    gameWorld.setScene(0);
+  };
+  menu_button.hover = function () {
+    menu_sprite.frame = 1;
+  };
+  menu_button.unhover = function () {
+    menu_sprite.frame = 0;
+  };
+  this.buttons.push(menu_button);
+  fg.add(menu_button);
 
   var trees = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, CONFIG.height - 8 * LANE_SIZE, CONFIG.width + LANE_SIZE, LANE_SIZE * 2, Resources.trees);
   bg.add(trees);

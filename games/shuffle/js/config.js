@@ -66,12 +66,18 @@ EntityUp.onDraw = function (ctx) {
   ctx.fillRect(this.x - this.w / 2, this.y - this.h, this.w, this.h);
 };
 
+var EntityRight = Object.create(Entity);
+EntityRight.onDraw = function (ctx) {
+  ctx.fillStyle = this.color || "black";
+  ctx.fillRect(this.x, this.y - this.h / 2, this.w, this.h);
+};
+
 var gameWorld = Object.create(World).init(160, 90, 'index.json');
 
 gameWorld.difficulties = [
-  {name: "red scare", roadSpeed: 50, handling: 58, sprite: "roadster", score: 0},
+ // {name: "red scare", roadSpeed: 50, handling: 58, sprite: "roadster", score: 0},
   {name: "mirage", roadSpeed: 65, handling: 75, sprite: "hatchback", score: 0},
-  {name: "geist", roadSpeed: 80, handling: 90, sprite: "truck", score: 0},
+  {name: "style", roadSpeed: 80, handling: 90, sprite: "truck", score: 0},
   {name: "satsuma", roadSpeed: 95, handling: 105, sprite: "car3", score: 0},
   {name: "spectre", roadSpeed: 110, handling: 120, sprite: "car4", score: 0},
   {name: "gw bridge", roadSpeed: 110, handling: 120, sprite: "repair", score: 0}
@@ -183,13 +189,10 @@ Unlock.update = function (dt) {
 }
 
 var Locked = Object.create(Behavior);
-Behavior.drawAfter = function (ctx) {
-/*  if (this.entity.level > gameWorld.unlocked) {
-    ctx.fillStyle = "#333";
-    ctx.fillRect(this.entity.x - this.entity.w, this.entity.y, this.entity.w * 2, 8);
-    var t = Object.create(Text).init(this.entity.x, this.entity.y + 2, "LOCKED", {align: "center", size: 6, color: "white"});
-    t.draw(ctx);
-  }*/
+Locked.drawAfter = function (ctx) {
+  if (this.entity.level > gameWorld.unlocked) {
+    ctx.drawImage(Resources.lock.image, this.entity.x - this.entity.w + 3, this.entity.y - 2);
+  }
 }
 
 var Delay = Object.create(Behavior);
@@ -304,7 +307,7 @@ SpriteFont.getX = function (n) {
     return this.w * (n - this.text.length);
   }
 }
-SpriteFont.draw = function (ctx) {
+SpriteFont.onDraw = function (ctx) {
   for (var i = 0; i < this.text.length; i++) {
     var c = this.characters.indexOf(this.text[i]);
     var x = this.getX(i);

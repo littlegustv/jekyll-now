@@ -119,12 +119,10 @@ var onStart = function () {
   for (var i = 0; i < gameWorld.difficulties.length; i++) {
     var theta = gameWorld.difficulty - i;
 
-    var d = Object.create(Sprite).init(CONFIG.width / 2 - 16 * theta, 2 * gameWorld.height / 3 + 8, Resources[gameWorld.difficulties[i].sprite]);
-
+    var d = Object.create(Sprite).init(44 - 8 * theta, gameWorld.height / 4 + 24, Resources[gameWorld.difficulties[i].sprite]);
+    
     d.level = i;
-    d.opacity = (i == gameWorld.difficulty) ? 1 : 0.5;
-
-    d.z = 2;
+    d.addBehavior(Locked);
     this.selectors.push(d);
     fg.add(d);
   }
@@ -138,45 +136,73 @@ var onStart = function () {
   }
   //this.fg = fg;
 
-  var d_name = fg.add(Object.create(SpriteFont).init(gameWorld.width / 3, 2 * gameWorld.height / 3 - 3, Resources.expire_font, "", {align: "center", spacing: -2}));
+  var d_name = fg.add(Object.create(SpriteFont).init(44, gameWorld.height / 4 + 2, Resources.expire_font, "", {align: "center", spacing: -2}));
+  d_name.z = 20;
 
-  var d_speed = fg.add(Object.create(EntityUp).init(Math.floor(2 * gameWorld.width / 3 - 12) + 0.5, 2 * gameWorld.height / 3, 11, 0));
-  var d_handling = fg.add(Object.create(EntityUp).init(Math.floor(2 * gameWorld.width / 3) + 0.5, 2 * gameWorld.height / 3, 11, 0));
-  var d_score = fg.add(Object.create(EntityUp).init(Math.floor(2 * gameWorld.width / 3 + 12) + 0.5, 2 * gameWorld.height / 3, 11, 0));
+  var d_speed = fg.add(Object.create(EntityRight).init(Math.floor(gameWorld.width / 2) + 16, 40.5, 0, 11));
+  var d_handling = fg.add(Object.create(EntityRight).init(Math.floor(gameWorld.width / 2) + 16, 52.5, 0, 11));
+ 
+  var d_score = fg.add(Object.create(Entity).init(Math.floor(gameWorld.width / 4), 74.5, gameWorld.width / 2 - 8, 11));
+  d_score.color = "darksalmon";
 
-  var last_score = fg.add(Object.create(EntityUp).init(Math.floor(2 * gameWorld.width / 3 + 24) + 0.5, 2 * gameWorld.height / 3, 11, 11 + 16 * gameWorld.score));
+  var last_score = fg.add(Object.create(Entity).init(Math.floor(3 * gameWorld.width / 4), 74.5, gameWorld.width / 2 - 8, 11));
   last_score.color = "#03a9f4";
 
-  fg.add(Object.create(Sprite).init(2 * gameWorld.width / 3 - 8, 2 * gameWorld.height / 3 - 6, Resources.power)).z = 10;
-  fg.add(Object.create(Sprite).init(2 * gameWorld.width / 3 + 4, 2 * gameWorld.height / 3 - 6, Resources.handling)).z = 10;
-  fg.add(Object.create(Sprite).init(2 * gameWorld.width / 3 + 16, 2 * gameWorld.height / 3 - 6, Resources.score)).z = 10;
-  fg.add(Object.create(Sprite).init(2 * gameWorld.width / 3 + 28, 2 * gameWorld.height / 3 - 6, Resources.distance)).z = 10;
+  fg.add(Object.create(Sprite).init(gameWorld.width / 2 + 26, 40.5, Resources.power)).z = 10;
+  fg.add(Object.create(Sprite).init(gameWorld.width / 2 + 26, 52.5, Resources.handling)).z = 10;
+  //fg.add(Object.create(Sprite).init(gameWorld.width / 2 + 18, 48.5, Resources.score)).z = 10;
+  //fg.add(Object.create(Sprite).init(2 * gameWorld.width / 3 + 28, 2 * gameWorld.height / 3 - 6, Resources.distance)).z = 10;
+  var last_score_text = fg.add(Object.create(SpriteFont).init(
+    last_score.x, 
+    last_score.y, 
+    Resources.expire_font, 
+    "Last: " + Math.floor(gameWorld.score * 10) / 10 + "m", 
+    {align: "center", spacing: -3}
+  ));
+  last_score_text.z = 10;
+  var best_score_text = fg.add(Object.create(SpriteFont).init(
+    d_score.x, 
+    d_score.y, 
+    Resources.expire_font,
+    "Best: " + Math.floor(gameWorld.score * 10) / 10 + "m",
+    {align: "center", spacing: -3}
+  ));
+  best_score_text.z = 10;
 
-  d_speed.lerp = d_speed.addBehavior(Lerp, {goal: 0, field: "h", rate: 5, object: d_speed});
-  d_handling.lerp = d_handling.addBehavior(Lerp, {goal: 0, field: "h", rate: 5, object: d_handling});
-  d_score.lerp = d_score.addBehavior(Lerp, {goal: 0, field: "h", rate: 5, object: d_score});
+  d_speed.lerp = d_speed.addBehavior(Lerp, {goal: 0, field: "w", rate: 5, object: d_speed});
+  d_handling.lerp = d_handling.addBehavior(Lerp, {goal: 0, field: "w", rate: 5, object: d_handling});
+  //d_score.lerp = d_score.addBehavior(Lerp, {goal: 0, field: "w", rate: 5, object: d_score});
 
   this.doRefreshSelectors = true;
   this.refreshSelectors = function () {
     var lerpRate = 0.2;
+    var done = 0;
     for (var i = 0; i < this.selectors.length; i++) {
       var theta = gameWorld.difficulty - i;
       var d = this.selectors[i];
-      var dx = CONFIG.width / 2 - 16 * theta;
+      var dx = 60 + 32 * Math.sin((PI2 * theta) / gameWorld.difficulties.length);
       d.x = lerp(d.x, dx, lerpRate);
+      d.scale = 2.4 * Math.abs(Math.cos(PI * theta / gameWorld.difficulties.length));
 
-      d.opacity = (i == gameWorld.difficulty) ? 1 : 0.5;
+      d.opacity = 1 - Math.abs(Math.sin(PI * theta / gameWorld.difficulties.length));
+      d.z = 10 - Math.abs(Math.sin(PI * theta / gameWorld.difficulties.length));
 
       d_name.text = "'" + gameWorld.difficulties[gameWorld.difficulty].name + "'";
       d_speed.lerp.goal = Math.floor(gameWorld.difficulties[gameWorld.difficulty].roadSpeed / 3);
       d_handling.lerp.goal = Math.floor(gameWorld.difficulties[gameWorld.difficulty].handling / 3);
-      d_score.lerp.goal = Math.floor(gameWorld.difficulties[gameWorld.difficulty].score * 16 + 11);
+      //d_score.lerp.goal = Math.floor(gameWorld.difficulties[gameWorld.difficulty].score * 16 + 11);
 
-      last_score.h = 10 + 16 * gameWorld.score;
+      //last_score.h = 10 + 16 * gameWorld.score;
+      //console.log('mm', (Math.floor(gameWorld.score * 16 * 10) / 10))
+      last_score_text.text = "Last: " + (Math.floor(gameWorld.score * 16 * 10) / 10) + "m";
+      best_score_text.text = "Best: " + (Math.floor(gameWorld.difficulties[gameWorld.difficulty].score * 16 * 10) / 10) + "m";
 
       if (Math.abs(d.x - dx) < 1.5) {
         d.x = dx;
-        this.doRefreshSelectors = false;
+        done += 1;
+        if (done == gameWorld.difficulties.length) {
+          this.doRefreshSelectors = false;          
+        }
       }
     }
   }
@@ -208,14 +234,14 @@ var onStart = function () {
     if (e.keyCode == 38) {
       //e.preventDefault();
       //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
-      gameWorld.difficulty = Math.max(0, gameWorld.difficulty - 1);
+      gameWorld.difficulty = modulo(gameWorld.difficulty - 1, gameWorld.difficulties.length);
       //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
       t.doRefreshSelectors = true;
       return false;
     } else if (e.keyCode == 40) {
       //e.preventDefault();
       //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
-      gameWorld.difficulty = Math.min(gameWorld.difficulty + 1, gameWorld.difficulties.length - 1);  
+      gameWorld.difficulty = modulo(gameWorld.difficulty + 1, gameWorld.difficulties.length);
       //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
       t.doRefreshSelectors = true;
       return false;
@@ -320,6 +346,7 @@ var onStart = function () {
 
   this.layers.push(bg);
   this.layers.push(fg);
+  this.doRefreshSelectors = true;    
 };
 
 
