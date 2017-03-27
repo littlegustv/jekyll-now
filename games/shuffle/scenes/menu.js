@@ -196,6 +196,8 @@ var onStart = function () {
       //console.log('mm', (Math.floor(gameWorld.score * 16 * 10) / 10))
       last_score_text.text = "Last: " + (Math.floor(gameWorld.score * 16 * 10) / 10) + "m";
       best_score_text.text = "Best: " + (Math.floor(gameWorld.difficulties[gameWorld.difficulty].score * 16 * 10) / 10) + "m";
+      last_score.color = gameWorld.difficulties[gameWorld.difficulty].secondary;
+      d_score.color = gameWorld.difficulties[gameWorld.difficulty].primary;
 
       if (Math.abs(d.x - dx) < 1.5) {
         d.x = dx;

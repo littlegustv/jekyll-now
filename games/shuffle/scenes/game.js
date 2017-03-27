@@ -10,11 +10,13 @@ xxxxxxxxxxxxxxxx5. GW bridge level (maybe car-> GW BRIDGE REPAIR VEHICLE)
 xxxxxxxxxxxxxxxx6. 'unlock' behavior finalized (i.e. you unlock the new car, keep current car, see how far you can go?)
 xxxxxxxxxxxxxxxx8. improve score display - rotated spriteFont
 
-1. unlock/new high score message in game
-1.5 mileage counter in game
-2. high scores scene?
+xxxxxxxxxxxxxxxxx1. unlock/new high score message in game
+xxxxxxxxxxxxxxxxx1.5 mileage counter in game
+1. icons reworked: locked, mute, and menu (+ hover)
+2. high scores scene? (for newgrunds api) -> for each car
 xxxxxxxxxxxxxxxx3. menu button
 4. engine running/idle sound effect, different horns maybe?
+bugs/improvements: unlock effect, mileage display consistancy with score, last AND best score per car
 
 flavor:
 
@@ -79,7 +81,7 @@ var onStart = function () {
   var ui = Object.create(Layer).init(320, 180);
   this.ui = ui;
 
-  var odometer = Object.create(SpriteFont).init(gameWorld.width / 2, 8,Resources.expire_font, "0.0m", {align: "center", spacing: -2});
+  var odometer = Object.create(SpriteFont).init(gameWorld.width / 2, 4,Resources.expire_font, "0.0m", {align: "center", spacing: -2});
   ui.add(odometer);
   t.odometer = odometer;
 
@@ -168,10 +170,21 @@ var onStart = function () {
 
       if (gameWorld.unlocked <= gameWorld.difficulty) { 
         gameWorld.unlocked = gameWorld.difficulty + 1;
-        var unlocked_text = t.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, 10, Resources.expire_font, gameWorld.difficulties[gameWorld.unlocked].name + " unlocked!", {spacing: -2, align: "center"}))
+        var background = t.ui.add(Object.create(Entity).init(gameWorld.width / 2, 12, gameWorld.width, 24));
+        background.color = "white";
+        background.addBehavior(FadeIn, {duration: 0.5});
+        background.addBehavior(FadeOut, {duration: 0.5, delay: 1.5});
+
+        var unlocked_text = t.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 2, 12, Resources.expire_font,"unlocked!", {spacing: -2, align: "left"}))
         unlocked_text.addBehavior(FadeIn, {duration: 0.5});
         unlocked_text.addBehavior(FadeOut, {duration: 0.5, delay: 1.5});
         t.cars.push(gameWorld.difficulties[gameWorld.difficulty].sprite);
+
+        var s = Object.create(Sprite).init(gameWorld.width / 2 - 8, 8, Resources[gameWorld.difficulties[gameWorld.unlocked].sprite]);
+        s.scale = 2;
+        s.addBehavior(FadeOut, {duration: 0.5, delay: 1.5, remove: true, maxOpacity: 1});
+        s.addBehavior(FadeIn, {duration: 0.5});
+        t.ui.add(s);
       }
     }
     else {

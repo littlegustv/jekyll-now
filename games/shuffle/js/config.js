@@ -76,11 +76,11 @@ var gameWorld = Object.create(World).init(160, 90, 'index.json');
 
 gameWorld.difficulties = [
  // {name: "red scare", roadSpeed: 50, handling: 58, sprite: "roadster", score: 0},
-  {name: "mirage", roadSpeed: 65, handling: 75, sprite: "hatchback", score: 0},
-  {name: "style", roadSpeed: 80, handling: 90, sprite: "truck", score: 0},
-  {name: "satsuma", roadSpeed: 95, handling: 105, sprite: "car3", score: 0},
-  {name: "spectre", roadSpeed: 110, handling: 120, sprite: "car4", score: 0},
-  {name: "gw bridge", roadSpeed: 110, handling: 120, sprite: "repair", score: 0}
+  {name: "mirage", roadSpeed: 65, handling: 75, sprite: "hatchback", score: 0, last: 0, primary: "#42e546", secondary: "#1dce21"},
+  {name: "style", roadSpeed: 80, handling: 90, sprite: "truck", score: 0, last: 0, primary: "#07dfff", secondary: "#007c8e"},
+  {name: "satsuma", roadSpeed: 95, handling: 105, sprite: "car3", score: 0, last: 0, primary: "#ff8700", secondary: "#f75700"},
+  {name: "spectre", roadSpeed: 110, handling: 120, sprite: "car4", score: 0, last: 0, primary: "#6900b0", secondary: "#3c0065"},
+  {name: "gw bridge", roadSpeed: 110, handling: 120, sprite: "repair", score: 0, last: 0, primary: "#ffec00", secondary: "#ff4f00"}
 ]
 
 gameWorld.difficulty = 1;
@@ -98,93 +98,6 @@ if (localStorage) {
     gameWorld.unlocked = data.unlocked;
     gameWorld.difficulty = data.difficulty;
     gameWorld.muted = data.muted;
-  }
-}
-
-function goalMessage (layer, again) {
-  var goal_messages = [];
-  var b = Object.create(Entity).init(CONFIG.width / 2, 92, CONFIG.width + 128, 64);
-  b.color = "darkcyan";
-  b.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
-  b.addBehavior(FadeIn, {duration: 0.5});
-  b.angle = Math.PI / 36;
-  layer.add(b);
-  goal_messages.push(b);
-
-  var t = Object.create(Text).init(CONFIG.width / 2, 100, "Oh no! Your brakes have failed!", {align: "center", color: "white", size: 36});
-  t.angle = Math.PI / 36;
-  t.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
-  t.addBehavior(FadeIn, {duration: 1});
-  layer.add(t);
-  goal_messages.push(t);
-
-  var b = Object.create(Entity).init(CONFIG.width / 2, 192, CONFIG.width + 128, 64);
-  b.color = "darksalmon";
-  b.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
-  b.addBehavior(FadeIn, {duration: 1, delay: 1});
-  b.opacity = 0;
-  b.angle = - Math.PI / 72;
-  layer.add(b);
-  goal_messages.push(b);
-
-  var t = Object.create(Text).init(CONFIG.width / 2, 200, "A rescue car is 1 mile away!       ", {align: "center", color: "white", size: 36});
-  t.angle = - Math.PI / 72;
-  t.opacity = 0;
-  t.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
-  t.addBehavior(FadeIn, {duration: 1, delay: 1});
-  layer.add(t);
-  goal_messages.push(t);
-
-  var s = Object.create(Sprite).init(CONFIG.width / 2 + 192, 180, Resources[gameWorld.difficulties[(gameWorld.difficulty + 1) % gameWorld.difficulties.length].sprite]);
-  s.addBehavior(FadeOut, {duration: 1, delay: 3, remove: true, maxOpacity: 1});
-  s.addBehavior(FadeIn, {duration: 0.5, delay: 1, maxOpacity: 1});
-  s.angle = - Math.PI / 72;
-  s.opacity = 0;
-  layer.add(s);
-  goal_messages.push(s);
-
-  if (again) {
-    var a = Object.create(Entity).init(CONFIG.width / 2 + 100, 140, 200, 32);
-    a.addBehavior(FadeOut, {duration: 0.4, delay: 3, remove: true, maxOpacity: 1});
-    a.addBehavior(FadeIn, {duration: 0.4, delay: 0.7});
-    a.color = "tomato";
-    a.opacity = 0;
-    layer.add(a);
-    goal_messages.push(a);
-
-    var at = Object.create(Text).init(CONFIG.width / 2 + 100, 150, "(again!)", {align: "center", color: "white", size: 36});
-    at.addBehavior(FadeOut, {duration: 0.4, delay: 3, remove: true, maxOpacity: 1});
-    at.addBehavior(FadeIn, {duration: 0.4, delay: 0.7});
-    at.opacity = 0;
-    layer.add(at);
-    goal_messages.push(at);
-  }
-
-  return goal_messages;
-}
-
-// custom behavior to handle 'passing' a car => unlocking that 'difficulty'
-var Unlock = Object.create(Behavior);
-Unlock.update = function (dt) {
-  if (this.entity.x <= 0 && gameWorld.unlocked < this.level) {
-    var b = Object.create(Entity).init(CONFIG.width / 2, 24, CONFIG.width, 48);
-    b.color = "#333";
-    b.addBehavior(FadeOut, {duration: 1, delay: 2, remove: true, maxOpacity: 1});
-    b.addBehavior(FadeIn, {duration: 1});
-    gameWorld.scene.ui.add(b);
-
-    var t = Object.create(Text).init(CONFIG.width / 2, 32, "You unlocked    !", {align: "center", color: "white"});
-    t.addBehavior(FadeOut, {duration: 1, delay: 2, remove: true, maxOpacity: 1});
-    t.addBehavior(FadeIn, {duration: 1});
-    gameWorld.scene.ui.add(t);
-
-    var s = Object.create(Sprite).init(CONFIG.width / 2 + 112, 8, this.entity.sprite);
-    s.addBehavior(FadeOut, {duration: 1, delay: 2, remove: true, maxOpacity: 1});
-    s.addBehavior(FadeIn, {duration: 1});
-    gameWorld.scene.ui.add(s);
-
-    gameWorld.unlocked = this.level;
-    this.entity.alive = false;
   }
 }
 
