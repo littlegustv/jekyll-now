@@ -96,6 +96,23 @@ var onStart = function () {
   this.buttons.push(mute_button);
   fg.add(mute_button);
 
+  var score_sprite = fg.add(Object.create(Sprite).init(10, 4, Resources.score));
+  score_sprite.removeBehavior(score_sprite.behaviors[0]);
+
+  var score_button = Object.create(Button).init(20, 6, 40, 12);
+  score_button.family = "button";
+  score_button.trigger = function () {
+    gameWorld.setScene(3);
+  };
+  score_button.hover = function () {
+    score_sprite.frame = 1;
+  };
+  score_button.unhover = function () {
+    score_sprite.frame = 0;
+  };
+  this.buttons.push(score_button);
+  fg.add(score_button);
+
   // 'best score' should be stored in localstorage && stored PER CAR type!
   if (gameWorld.score) {
     if (gameWorld.score > gameWorld.difficulties[gameWorld.difficulty].score) {
@@ -180,7 +197,7 @@ var onStart = function () {
     for (var i = 0; i < this.selectors.length; i++) {
       var theta = gameWorld.difficulty - i;
       var d = this.selectors[i];
-      var dx = 60 + 32 * Math.sin((PI2 * theta) / gameWorld.difficulties.length);
+      var dx = 60 - 32 * Math.sin((PI2 * theta) / gameWorld.difficulties.length);
       d.x = lerp(d.x, dx, lerpRate);
       d.scale = 2.4 * Math.abs(Math.cos(PI * theta / gameWorld.difficulties.length));
 

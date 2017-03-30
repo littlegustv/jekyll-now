@@ -104,7 +104,8 @@ if (localStorage) {
 var Locked = Object.create(Behavior);
 Locked.drawAfter = function (ctx) {
   if (this.entity.level > gameWorld.unlocked) {
-    ctx.drawImage(Resources.lock.image, this.entity.x - this.entity.w + 3, this.entity.y - 2);
+    ctx.globalAlpha = this.entity.opacity;
+    ctx.drawImage(Resources.lock.image, this.entity.x - this.entity.scale * this.entity.w, this.entity.y - 12, this.entity.scale * this.entity.w, this.entity.scale * this.entity.h);
   }
 }
 

@@ -12,27 +12,38 @@ xxxxxxxxxxxxxxxx8. improve score display - rotated spriteFont
 
 xxxxxxxxxxxxxxxxx1. unlock/new high score message in game
 xxxxxxxxxxxxxxxxx1.5 mileage counter in game
-1. icons reworked: locked, mute, and menu (+ hover)
+xxxxxxxxxxxxxxxxx1. icons reworked: locked, mute, and menu (+ hover)
 2. high scores scene? (for newgrunds api) -> for each car
+  - implement car 'panels'
+  - add newgrounds api
+  - lock score button unless logged in?
 xxxxxxxxxxxxxxxx3. menu button
 4. engine running/idle sound effect, different horns maybe?
 bugs/improvements: unlock effect, mileage display consistancy with score, last AND best score per car
+5. juice
+    -- have engine 'revving' sound when starting 'game' scene
+    -- overall constant engine sound (?)
+    -- idle sound for gw bridge level
+    -- tracks? changing seasons? weather?
+    -- some confirmation sound on mile intervals
 
 flavor:
 
 xxxxxxxxxxxxxxxx0. narrower sprite font
 xxxxxxxxxxxxxxxx1. car names, visuals (handling? speed?), trees appearance, houses/decoration
-1. cross-browser compat. (esp. sound files!)s
+1. cross-browser compat. (esp. sound files!)
+  - just have to re-record as 'wavs', no?
 2. performance testing
+  - seems ok on a more powerful computer :/
+3. touch and gamepad controls
 
 publishing:
 
 1. itch.io
   -xxxxxxxxxxx e.preventDefault for key events
-  - touch events, gamepad controls
   - promo images/gifs/mini video clips
 2. APIs
-4. links!
+4. links! (???)
 
 */
 
@@ -226,7 +237,7 @@ var onStart = function () {
 
   this.buttons = [];
 
-  var menu_sprite = ui.add(Object.create(Sprite).init(9, 3, Resources.menu));
+  var menu_sprite = ui.add(Object.create(Sprite).init(10, 6, Resources.menu));
   menu_sprite.removeBehavior(menu_sprite.behaviors[0]);
 
   var menu_button = Object.create(Button).init(20, 6, 40, 12);
