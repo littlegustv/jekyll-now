@@ -14,9 +14,8 @@ xxxxxxxxxxxxxxxxx1. unlock/new high score message in game
 xxxxxxxxxxxxxxxxx1.5 mileage counter in game
 xxxxxxxxxxxxxxxxx1. icons reworked: locked, mute, and menu (+ hover)
 2. high scores scene? (for newgrunds api) -> for each car
-  - implement car 'panels'
+  xxxxxxxxxxx- implement car 'panels'
   - add newgrounds api
-  - lock score button unless logged in?
 xxxxxxxxxxxxxxxx3. menu button
 4. engine running/idle sound effect, different horns maybe?
 bugs/improvements: unlock effect, mileage display consistancy with score, last AND best score per car

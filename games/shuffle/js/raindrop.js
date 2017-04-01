@@ -556,8 +556,20 @@ function randint(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
+function short_angle(a1, a2) {
+  var MAX = Math.PI * 2;  
+  var da = (a2 - a1) % MAX;
+  return 2 * da % MAX - da;
+}
+
+function lerp_angle (a1, a2, rate) {
+	if (Math.abs(a1 - a2) <= 0.02) return a2;
+	else return a1 + short_angle(a1, a2) * rate;
+}
+
 function lerp (current, goal, rate) {
-  return (1-rate)*current + rate*goal
+	if (Math.abs(goal - current) <= 1) return goal;
+	else return (1-rate)*current + rate*goal
 }
 
 function normalize (x, y) {

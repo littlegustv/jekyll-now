@@ -60,6 +60,47 @@ World.filterEvent = function (event) {
 };
 
 
+Lerp.update = function (dt) {
+  if (this.field == "angle")
+    this.object[this.field] = lerp_angle(this.object[this.field], this.goal, this.rate * dt);
+  else
+    this.object[this.field] = lerp(this.object[this.field], this.goal, this.rate * dt);
+  if (this.object[this.field] == this.goal && this.callback) this.callback(); 
+};
+
+Entity.draw = function (ctx) {
+  for (var i = 0; i < this.behaviors.length; i++) {
+    this.behaviors[i].draw(ctx);
+  }
+  ctx.save();
+  ctx.translate(this.x, this.y);
+  ctx.translate(this.offset.x, this.offset.y);
+  if (this.origin) ctx.translate(this.origin.x, this.origin.y);
+  ctx.rotate(this.angle);
+  if (this.origin) ctx.translate(-this.origin.x, -this.origin.y);
+  if (this.scale !== undefined) {
+    ctx.scale(this.scale, this.scale);
+  }
+  if (this.blend) {
+    ctx.globalCompositeOperation = this.blend;
+  } else {
+    ctx.globalCompositeOperation = "normal";
+  }
+  for (var i = 0; i < this.behaviors.length; i++) {
+    this.behaviors[i].transform(ctx);
+  }
+  ctx.translate(-this.x, -this.y);
+  ctx.globalAlpha = this.opacity;
+  this.onDraw(ctx);
+
+  ctx.globalAlpha = 1;
+  ctx.restore();
+  for (var i = 0; i < this.behaviors.length; i++) {
+    this.behaviors[i].drawAfter(ctx);
+  }
+  this.drawDebug(ctx);
+};
+
 var EntityUp = Object.create(Entity);
 EntityUp.onDraw = function (ctx) {
   ctx.fillStyle = this.color || "black";
@@ -76,11 +117,11 @@ var gameWorld = Object.create(World).init(160, 90, 'index.json');
 
 gameWorld.difficulties = [
  // {name: "red scare", roadSpeed: 50, handling: 58, sprite: "roadster", score: 0},
-  {name: "mirage", roadSpeed: 65, handling: 75, sprite: "hatchback", score: 0, last: 0, primary: "#42e546", secondary: "#1dce21"},
-  {name: "style", roadSpeed: 80, handling: 90, sprite: "truck", score: 0, last: 0, primary: "#07dfff", secondary: "#007c8e"},
-  {name: "satsuma", roadSpeed: 95, handling: 105, sprite: "car3", score: 0, last: 0, primary: "#ff8700", secondary: "#f75700"},
-  {name: "spectre", roadSpeed: 110, handling: 120, sprite: "car4", score: 0, last: 0, primary: "#6900b0", secondary: "#3c0065"},
-  {name: "gw bridge", roadSpeed: 110, handling: 120, sprite: "repair", score: 0, last: 0, primary: "#ffec00", secondary: "#ff4f00"}
+  {name: "mirage", board: 7592, roadSpeed: 65, handling: 75, sprite: "hatchback", score: 0, last: 0, primary: "#42e546", secondary: "#1dce21"},
+  {name: "style", board: 7593, roadSpeed: 80, handling: 90, sprite: "truck", score: 0, last: 0, primary: "#07dfff", secondary: "#007c8e"},
+  {name: "satsuma", board: 7594, roadSpeed: 95, handling: 105, sprite: "car3", score: 0, last: 0, primary: "#ff8700", secondary: "#f75700"},
+  {name: "spectre", board: 7595, roadSpeed: 110, handling: 120, sprite: "car4", score: 0, last: 0, primary: "#6900b0", secondary: "#3c0065"},
+  {name: "gw bridge", board: 7596, roadSpeed: 110, handling: 120, sprite: "repair", score: 0, last: 0, primary: "#ffec00", secondary: "#ff4f00"}
 ]
 
 gameWorld.difficulty = 1;
@@ -234,34 +275,48 @@ SpriteFont.onDraw = function (ctx) {
   }
 }
 
-/* some attempts at drawing performance improvements here...
+var ngio, scoreboards, medals;
+window.addEventListener("DOMContentLoaded", function () {
 
-fps drops have vanished ... we'll come back to this?
+  ngio = new Newgrounds.io.core("45796:ekIHZEAA", "Nmg+7HXypANBgdE5kxFPgw==");
 
-Entity.draw = function (ctx) {
-  ctx.save();
-  ctx.translate(this.x, this.y);
-  ctx.translate(this.offset.x, this.offset.y);
-  ctx.rotate(this.angle);
-  if (this.blend) {
-    ctx.globalCompositeOperation = this.blend;
-  } else {
-    ctx.globalCompositeOperation = "normal";
+  ngio.getValidSession(function() {
+    if (ngio.user) {
+        /* 
+         * If we have a saved session, and it has not expired, 
+         * we will also have a user object we can access.
+         * We can go ahead and run our onLoggedIn handler here.
+         */
+      console.log('logged in');
+    //    onLoggedIn();
+    } else {
+        /*
+         * If we didn't have a saved session, or it has expired
+         * we should have been given a new one at this point.
+         * This is where you would draw a 'sign in' button and
+         * have it execute the following requestLogin function.
+         */
+      console.log('not logged in');
+    }
+
+  });
+
+  /* vars to record any medals and scoreboards that get loaded */
+
+  /* handle loaded medals */
+  function onMedalsLoaded(result) {
+    if (result.success) medals = result.medals;
   }
-  for (var i = 0; i < this.behaviors.length; i++) {
-    this.behaviors[i].transform(ctx);
+
+  /* handle loaded scores */
+  function onScoreboardsLoaded(result) {
+    if (result.success) scoreboards = result.scoreboards;
   }
-  ctx.translate(-this.x, -this.y);
-  ctx.globalAlpha = this.opacity;
-  for (var i = 0; i < this.behaviors.length; i++) {
-    this.behaviors[i].draw(ctx);
-  }
-  this.onDraw(ctx);
-  for (var i = 0; i < this.behaviors.length; i++) {
-    this.behaviors[i].drawAfter(ctx);
-  }
-  
-  ctx.globalAlpha = 1;
-  ctx.restore();
-  this.drawDebug(ctx);
-};*/
+
+
+
+  /* load our medals and scoreboards from the server */
+  ngio.queueComponent("Medal.getList", {}, onMedalsLoaded);
+  //ngio.queueComponent("ScoreBoard.getBoards", {}, onScoreboardsLoaded);
+  ngio.executeQueue();
+});

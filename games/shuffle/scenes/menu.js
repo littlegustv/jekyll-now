@@ -1,7 +1,3 @@
-// CONSTANTS
-
-// first bug: setScene reloads (THIS) js file, you can see it keep adding script tags to the HTML :/
-
 var fullscreen = false;
 
 var onStart = function () {
@@ -17,56 +13,17 @@ var onStart = function () {
     gameWorld.musicLoop();
   }
 
-  //this.layers = [];
   this.buttons = [];
   this.delay = 0.25;
 
-  //var bg_camera = Object.create(Camera).init(0, 0);
   var bg = Object.create(Layer).init(160, 90);
   this.bg = bg;
 
-  //var fg_camera = Object.create(Camera).init(0, 0);
   var fg = Object.create(Layer).init(160, 90);
   t.fg = fg;
 
   fg.add(Object.create(SpriteFont).init(CONFIG.width / 2, 6, Resources.expire_font, "The Jersey Shuffle", {align: "center", spacing: -2}));
-  //fg.add(Object.create(SpriteFont).init(CONFIG.width / 2, 40, Resources.expire_font, "2032 A.D.", {align: "center", spacing: -2}));
 
-  //fg.add(Object.create(SpriteFont).init(10, 36, Resources.expire_font, "Welcome, to the", {}));
-  //fg.add(Object.create(SpriteFont).init(10, 46, Resources.expire_font, "JERSEY", {}));
-  //fg.add(Object.create(SpriteFont).init(10, 56, Resources.expire_font, "SHUFFLE", {}));
-
-
-//  fg.add(Object.create(Text).init(CONFIG.width / 2, 6, "THE YEAR IS 2032", {align: "center", color: "black", size: 8}));
-//  fg.add(Object.create(Text).init(CONFIG.width / 2, 12, "THE ROAD IS THE JERSEY TURNPIKE", {align: "center", color: "black", size: 8}));
-
-//  fg.add(Object.create(Text).init(CONFIG.width / 2, 24, "THE", {align: "center", color: "black", size: 24}));
-//  fg.add(Object.create(Text).init(CONFIG.width / 2, 34, "JERSEY", {align: "center", color: "black", size: 24}));
-//  fg.add(Object.create(Text).init(CONFIG.width / 2, 44, "SHUFFLE", {align: "center", color: "black", size: 24}));
-
-  // buttons
-
-  /*var bg_block = Object.create(Entity).init(CONFIG.width - 25, CONFIG.height - 7, 50, 14);
-  bg_block.color = "black";
-  bg_block.z = 3;
-  fg.add(bg_block);
-  var begin_text = Object.create(SpriteFont).init(CONFIG.width, CONFIG.height - 7, Resources.expire_font, "BEGIN", {align: "right"});
-  begin_text.z = 4;
-  fg.add(begin_text);
-
-  var begin_button = Object.create(Button).init(CONFIG.width - 25, CONFIG.height - 7, 50, 14);
-  begin_button.family = "button";
-  begin_button.trigger = function () {
-    gameWorld.setScene(1, true);
-  };
-  begin_button.hover = function () {
-    bg_block.color = "darkcyan";
-  };
-  begin_button.unhover = function () {
-    bg_block.color = "black";
-  };
-  this.buttons.push(begin_button);
-  fg.add(begin_button);*/
 
   var mute_sprite = fg.add(Object.create(Sprite).init(CONFIG.width - 2, 6, Resources.mute));
   mute_sprite.removeBehavior(mute_sprite.behaviors[0]);
@@ -118,6 +75,9 @@ var onStart = function () {
     if (gameWorld.score > gameWorld.difficulties[gameWorld.difficulty].score) {
       console.log('better score');
       gameWorld.difficulties[gameWorld.difficulty].score = gameWorld.score;
+      ngio.callComponent('ScoreBoard.postScore', {id: gameWorld.difficulties[gameWorld.difficulty].board, value: score}, function (result) {
+        console.log(result);
+      });
       if (localStorage) {
         localStorage.setItem('shuffleData', JSON.stringify({scores: gameWorld.difficulties.map(function (d) {
           return {score: d.score}
