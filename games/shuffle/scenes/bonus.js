@@ -6,7 +6,7 @@ var fullscreen = false;
 
 var onStart = function () {
 
-  this.cars = ["smart", "smart", "smart", "smart", "smart", "smart"];
+  this.cars = ["smart", "smart"];
   this.cars = this.cars.concat(gameWorld.difficulties.slice(0,gameWorld.difficulty).map(function (d) { return d.sprite; }));
 
   this._gamepad = Object.create(Gamepad).init();
@@ -65,7 +65,7 @@ var onStart = function () {
 
   this.buttons = [];
 
-  var menu_sprite = fg.add(Object.create(Sprite).init(9, 3, Resources.menu));
+  var menu_sprite = fg.add(Object.create(Sprite).init(10, 6, Resources.menu));
   menu_sprite.removeBehavior(menu_sprite.behaviors[0]);
 
   var menu_button = Object.create(Button).init(20, 6, 40, 12);
@@ -170,7 +170,7 @@ var onStart = function () {
 var onUpdate = function (dt) {
   this._gamepad.update(dt);
   if (Math.random() * 100 < 1) {
-    gameWorld.playSound(Resources.beepbeep);
+    gameWorld.playSound(Resources[choose(["beepbeep", "beep2", "beep3"])]);
   }
 };
 

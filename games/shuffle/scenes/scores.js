@@ -77,6 +77,33 @@ var onStart = function () {
 	}
 
 	var th = this;
+	// hacky-way of making sure the scores EVENTUALLY load, since I can't really figure it out otherwise.
+	var create_scores = function (result, i2, menu)  {
+		if (!result.success) {
+			ngio.callComponent("ScoreBoard.getScores", {id: gameWorld.difficulties[i2].board}, function (result) {
+				create_scores(result, i2, menu);
+			});
+			return;
+		}
+		scores = result.scores;
+		for (var j = 0; j < 9; j++) {
+			var name = j < scores.length ? scores[j].user.name : "[EMPTY]";
+			var score_text = j < scores.length ? scores[j].value : "0";
+			
+			var t = th.fg.add(Object.create(SpriteFont).init(4, 22 + j * 7, Resources.expire_font, (j+ 1) + ": " + name.substr(0,8) + (name.length > 8 ? "..." : ""), {align: "left", spacing: -2}));
+			t.origin = {x: 0, y: CONFIG.height * 2};
+			t.angle = i2 * PI2 / gameWorld.difficulties.length;
+			t.lerp = t.addBehavior(Lerp, {field: "angle", object: t, rate: 5, goal: t.angle});
+			menu.push(t);
+
+			var t2 = th.fg.add(Object.create(SpriteFont).init(CONFIG.width, 22 + j * 7, Resources.expire_font, score_text, {align: "right", spacing: -2}));
+			t2.origin = {x: 0, y: CONFIG.height * 2};
+			t2.angle = i2 * PI2 / gameWorld.difficulties.length;
+			t2.lerp = t2.addBehavior(Lerp, {field: "angle", object: t2, rate: 5, goal: t2.angle});
+			menu.push(t2);
+		}
+		th.menus[i2].loading.addBehavior(FadeOut, {duration: 0.5});
+	}
 	for (var i = 0; i < gameWorld.difficulties.length; i++) {
 		(function () {
 			var menu = [];
@@ -90,27 +117,16 @@ var onStart = function () {
 			menu.push(s);
 			var i2 = i;
 
-			ngio.callComponent("ScoreBoard.getScores", {id: gameWorld.difficulties[i].board}, function (result) {
-				scores = result.scores;
-
-				for (var j = 0; j < 9; j++) {
-					var name = j < scores.length ? scores[j].user.name : "[EMPTY]";
-					var score_text = j < scores.length ? scores[j].value : "0";
-					
-					var t = th.fg.add(Object.create(SpriteFont).init(4, 22 + j * 7, Resources.expire_font, (j+ 1) + ": " + name, {align: "left", spacing: -2}));
-					t.origin = {x: 0, y: CONFIG.height * 2};
-					t.angle = i2 * PI2 / gameWorld.difficulties.length;
-					t.lerp = t.addBehavior(Lerp, {field: "angle", object: t, rate: 5, goal: t.angle});
-					menu.push(t);
-
-					var t2 = th.fg.add(Object.create(SpriteFont).init(CONFIG.width - 4, 22 + j * 7, Resources.expire_font, score_text, {align: "right", spacing: -2}));
-					t2.origin = {x: 0, y: CONFIG.height * 2};
-					t2.angle = i2 * PI2 / gameWorld.difficulties.length;
-					t2.lerp = t2.addBehavior(Lerp, {field: "angle", object: t2, rate: 5, goal: t2.angle});
-					menu.push(t2);
-				}
+			ngio.callComponent("ScoreBoard.getScores", {id: gameWorld.difficulties[i2].board}, function (result) {
+				create_scores(result, i2, menu);
 			});
 			th.menus[i2] = menu;
+			var l = th.fg.add(Object.create(SpriteFont).init(CONFIG.width / 2, CONFIG.height / 2, Resources.expire_font, "loading...", {align: "center", spacing: -2}));
+			th.menus[i2].loading = l; 
+			th.menus[i2].push(l);
+			l.origin = {x: 0, y: CONFIG.height * 2};
+			l.angle = i * PI2 / gameWorld.difficulties.length;
+			l.lerp = l.addBehavior(Lerp, {field: "angle", object: l, rate: 5, goal: l.angle});
 		})();
 	}
 

@@ -121,7 +121,7 @@ gameWorld.difficulties = [
   {name: "style", board: 7593, roadSpeed: 80, handling: 90, sprite: "truck", score: 0, last: 0, primary: "#07dfff", secondary: "#007c8e"},
   {name: "satsuma", board: 7594, roadSpeed: 95, handling: 105, sprite: "car3", score: 0, last: 0, primary: "#ff8700", secondary: "#f75700"},
   {name: "spectre", board: 7595, roadSpeed: 110, handling: 120, sprite: "car4", score: 0, last: 0, primary: "#6900b0", secondary: "#3c0065"},
-  {name: "gw bridge", board: 7596, roadSpeed: 110, handling: 120, sprite: "repair", score: 0, last: 0, primary: "#ffec00", secondary: "#ff4f00"}
+  {name: "bridge repair", board: 7596, roadSpeed: 170, handling: 180, sprite: "repair", score: 0, last: 0, primary: "#ffec00", secondary: "#ff4f00"}
 ]
 
 gameWorld.difficulty = 1;

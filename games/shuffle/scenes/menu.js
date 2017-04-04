@@ -11,6 +11,11 @@ var onStart = function () {
       gameWorld.soundtrack.onended = gameWorld.musicLoop;
     }
     gameWorld.musicLoop();
+    gameWorld.engineLoop = function () {
+      gameWorld.engine = gameWorld.playSound(Resources.engineloop);
+      gameWorld.engine.onended = gameWorld.engineLoop;
+    }
+    gameWorld.engineLoop();
   }
 
   this.buttons = [];
@@ -75,14 +80,15 @@ var onStart = function () {
     if (gameWorld.score > gameWorld.difficulties[gameWorld.difficulty].score) {
       console.log('better score');
       gameWorld.difficulties[gameWorld.difficulty].score = gameWorld.score;
-      ngio.callComponent('ScoreBoard.postScore', {id: gameWorld.difficulties[gameWorld.difficulty].board, value: score}, function (result) {
+      ngio.callComponent('ScoreBoard.postScore', {id: gameWorld.difficulties[gameWorld.difficulty].board, value: gameWorld.score}, function (result) {
         console.log(result);
       });
-      if (localStorage) {
-        localStorage.setItem('shuffleData', JSON.stringify({scores: gameWorld.difficulties.map(function (d) {
-          return {score: d.score}
-        }), unlocked: gameWorld.unlocked, difficulty: gameWorld.difficulty, muted: gameWorld.muted}));  
-      }
+    }
+    if (localStorage) {
+      console.log('setting...');
+      localStorage.setItem('shuffleData', JSON.stringify({scores: gameWorld.difficulties.map(function (d) {
+        return {score: d.score}
+      }), unlocked: gameWorld.unlocked, difficulty: gameWorld.difficulty, muted: gameWorld.muted}));  
     }
 /*    var scoreText = Object.create(Text).init(8, 2 * CONFIG.height / 3, "You made it " + gameWorld.score + " miles!", {align: "left"});
     scoreText.addBehavior(FadeIn, {duration: 0.5});
@@ -113,7 +119,7 @@ var onStart = function () {
   }
   //this.fg = fg;
 
-  var d_name = fg.add(Object.create(SpriteFont).init(44, gameWorld.height / 4 + 2, Resources.expire_font, "", {align: "center", spacing: -2}));
+  var d_name = fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 4 + 2, Resources.expire_font, "", {align: "center", spacing: -2}));
   d_name.z = 20;
 
   var d_speed = fg.add(Object.create(EntityRight).init(Math.floor(gameWorld.width / 2) + 16, 40.5, 0, 11));
@@ -133,7 +139,7 @@ var onStart = function () {
     last_score.x, 
     last_score.y, 
     Resources.expire_font, 
-    "Last: " + Math.floor(gameWorld.score * 10) / 10 + "m", 
+    "Last: " + gameWorld.score + "m", 
     {align: "center", spacing: -3}
   ));
   last_score_text.z = 10;
@@ -141,7 +147,7 @@ var onStart = function () {
     d_score.x, 
     d_score.y, 
     Resources.expire_font,
-    "Best: " + Math.floor(gameWorld.score * 10) / 10 + "m",
+    "Best: " + gameWorld.score + "m",
     {align: "center", spacing: -3}
   ));
   best_score_text.z = 10;
@@ -171,8 +177,8 @@ var onStart = function () {
 
       //last_score.h = 10 + 16 * gameWorld.score;
       //console.log('mm', (Math.floor(gameWorld.score * 16 * 10) / 10))
-      last_score_text.text = "Last: " + (Math.floor(gameWorld.score * 16 * 10) / 10) + "m";
-      best_score_text.text = "Best: " + (Math.floor(gameWorld.difficulties[gameWorld.difficulty].score * 16 * 10) / 10) + "m";
+      last_score_text.text = "Last: " + gameWorld.score + "m";
+      best_score_text.text = "Best: " + gameWorld.difficulties[gameWorld.difficulty].score + "m";
       last_score.color = gameWorld.difficulties[gameWorld.difficulty].secondary;
       d_score.color = gameWorld.difficulties[gameWorld.difficulty].primary;
 
@@ -226,12 +232,14 @@ var onStart = function () {
       return false;
     } else if (e.keyCode == 32) {
       //e.preventDefault();
-      if (gameWorld.difficulty <= gameWorld.unlocked)
+      if (gameWorld.difficulty <= gameWorld.unlocked) {
         if (gameWorld.difficulty < gameWorld.difficulties.length - 1) {
           gameWorld.setScene(1, true);
         } else {
           gameWorld.setScene(2, true);
         }
+        gameWorld.playSound(Resources.squeal);
+      }
       else {
         //gameWorld.playSound(Resources.error);
       }

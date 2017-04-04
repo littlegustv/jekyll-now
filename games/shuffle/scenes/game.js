@@ -13,12 +13,15 @@ xxxxxxxxxxxxxxxx8. improve score display - rotated spriteFont
 xxxxxxxxxxxxxxxxx1. unlock/new high score message in game
 xxxxxxxxxxxxxxxxx1.5 mileage counter in game
 xxxxxxxxxxxxxxxxx1. icons reworked: locked, mute, and menu (+ hover)
-2. high scores scene? (for newgrunds api) -> for each car
+xxxxxxxxxxxxxxxxx2. high scores scene? (for newgrunds api) -> for each car
   xxxxxxxxxxx- implement car 'panels'
-  - add newgrounds api
+  xxxxxxxxxxxx- add newgrounds api
 xxxxxxxxxxxxxxxx3. menu button
-4. engine running/idle sound effect, different horns maybe?
-bugs/improvements: unlock effect, mileage display consistancy with score, last AND best score per car
+xxxxxxxxxxxxxxxx4. engine running/idle sound effect, different horns maybe?
+-- top 'bound' limit
+-- unlocked not saving in localstorage?
+-- unlock distance/message
+-- collision boxes are all wrong?s
 5. juice
     -- have engine 'revving' sound when starting 'game' scene
     -- overall constant engine sound (?)
@@ -30,8 +33,9 @@ flavor:
 
 xxxxxxxxxxxxxxxx0. narrower sprite font
 xxxxxxxxxxxxxxxx1. car names, visuals (handling? speed?), trees appearance, houses/decoration
-1. cross-browser compat. (esp. sound files!)
+xxxxxxxxxxxxxxxx1. cross-browser compat. (esp. sound files!)
   - just have to re-record as 'wavs', no?
+  - try IE at some point...
 2. performance testing
   - seems ok on a more powerful computer :/
 3. touch and gamepad controls
@@ -41,8 +45,7 @@ publishing:
 1. itch.io
   -xxxxxxxxxxx e.preventDefault for key events
   - promo images/gifs/mini video clips
-2. APIs
-4. links! (???)
+xxxxxxxxxxxxx2. APIs
 
 */
 
@@ -59,8 +62,8 @@ var buildings = ["building2", "box", "cathedral", "house"];
 
 var onStart = function () {
 
-  this.cars = ["smart", "smart", "smart", "smart", "smart", "smart"];
-  this.cars = this.cars.concat(gameWorld.difficulties.slice(0,gameWorld.difficulty).map(function (d) { return d.sprite; }));
+  this.cars = ["smart"];
+  //this.cars = this.cars.concat(gameWorld.difficulties.slice(0,gameWorld.difficulty).map(function (d) { return d.sprite; }));
   this._gamepad = Object.create(Gamepad).init();
   if (!gameWorld.score) gameWorld.score = 0;
   this.unlocked = false;
@@ -108,7 +111,7 @@ var onStart = function () {
   for (var i = 0; i < 2; i ++) {  
     
     var trees = Object.create(TiledBackground).init(i * CONFIG.width + CONFIG.width / 2, CONFIG.height - 8 * LANE_SIZE, CONFIG.width + LANE_SIZE, LANE_SIZE * 2, Resources.trees);
-    trees.velocity = {x: - 2.5 * ROAD_SPEED, y: 0};
+    trees.velocity = {x: - 1.5 * ROAD_SPEED, y: 0};
     trees.z = -10;
     bg.add(trees);
 
@@ -345,7 +348,7 @@ var onStart = function () {
           r.addBehavior(Velocity);
           r.velocity = {x: -CAR_SPEED, y: 0};
         } else {
-          var c = Object.create(Sprite).init(CONFIG.width + s, i * LANE_SIZE + LANE_OFFSET, Resources[choose(this.cars)]);
+          var c = Object.create(Sprite).init(CONFIG.width + s, i * LANE_SIZE + LANE_OFFSET, Resources.smart);
         }
         c.setCollision(Polygon);
         c.setVertices([{x: -4, y: 3},
