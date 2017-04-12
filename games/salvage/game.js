@@ -72,8 +72,9 @@ var gameWorld = Object.create(World).init(320, 180, "index.json");
 */
 
 /*
--add checks for pause/unpause
+(ish)-add checks for pause/unpause
 -create 5 new enemies with different attacks, patterns of movement
+-touch controls! (get in early)
 -implement AI 'store' (popup)
 -add powerups, upgrades
 -implement scrap/repair mechanic
