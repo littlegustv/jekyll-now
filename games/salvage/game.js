@@ -63,7 +63,13 @@ Damage.update = function (dt) {
 
 var gameWorld = Object.create(World).init(320, 180, "index.json");
 
+/* MUSIC */
 /* I was listeneing to GZA - labels, 4th chambers, and it does seem to fit? but maybe a lot of music would... */
+/* also mos def... just listened to 'habitat' for the first time - not bad! 
+
+  more to the point - the record-skip sound/effect works kinda nicely with the pause/unpause mechanic
+  BUT also the beat is a little more.. driving maybe?  we'll see!
+*/
 
 /*
 -add checks for pause/unpause

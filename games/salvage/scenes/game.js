@@ -23,6 +23,11 @@ var onStart = function () {
     if (other.family == "enemy") {
       p.health -= 1;
     }
+
+    if (p.health <= 0) {
+      p.alive = false;
+      gameWorld.playSound(Resources.hit);
+    }
   }
   player_dummy.addBehavior(Follow, {target: p, offset: {angle: 0, x: 0, y: 0, z: 0}});
   
@@ -35,7 +40,12 @@ var onStart = function () {
   this.bg = bg;
   
   this.keydown = false;
-  this.bg.paused = 10000;
+  this.pause = function () {
+    this.bg.paused = 10000;
+    this.player.velocity = {x: 0, y: 0};
+    this.player.animation = 0;
+  }
+  this.pause();
   
   fg.drawOrder = function () {
     return this.entities.sort(function (a, b) { 
@@ -51,20 +61,17 @@ var onStart = function () {
     }
   }
   this.onMouseUp = function (e) {
+    s.player.velocity = {x: 0, y: 0};
     if (s.player.cooldown <= 0) {
-      s.bg.paused = 10000;
-      s.player.velocity = {x: 0, y: 0};
-      s.player.aniamtion = 0;
+      s.pause();
     }
   }
   this.onMouseDown = function (e) {
-    if (s.player.cooldown <= 0) {
-      s.bg.paused = 0;
-      s.player.animation = 1;
-      s.player.velocity = {
-        x: Math.cos( s.player.angle) * 100,
-        y: Math.sin( s.player.angle) * 100
-      }
+    s.bg.paused = 0;
+    s.player.animation = 1;
+    s.player.velocity = {
+      x: Math.cos( s.player.angle) * 100,
+      y: Math.sin( s.player.angle) * 100
     }
   }
   this.onKeyPress = function (e) {
@@ -95,7 +102,9 @@ var onUpdate = function (dt) {
     if (this.player.cooldown >= 0) {
       this.player.cooldown -= dt;
     } else if (this.player.cooldown > -1) {
-      this.bg.paused = 10000;
+      if (this.player.velocity.x == 0 && this.player.velocity.y == 0) {
+        this.pause();  
+      }
       this.player.cooldown = -1;
       //this.player.cooldown = 0.3;
     }      
