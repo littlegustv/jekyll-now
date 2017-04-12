@@ -18,16 +18,19 @@ xxxxxxxxxxxxxxxxx2. high scores scene? (for newgrunds api) -> for each car
   xxxxxxxxxxxx- add newgrounds api
 xxxxxxxxxxxxxxxx3. menu button
 xxxxxxxxxxxxxxxx4. engine running/idle sound effect, different horns maybe?
--- top 'bound' limit
--- unlocked not saving in localstorage?
--- unlock distance/message
--- collision boxes are all wrong?s
+xxxxxxxxxxxxxxxx-- top 'bound' limit
+xxxxxxxxxxxxxxxx-- unlocked not saving in localstorage?
+xxxxxxxxxxxxxxxxx-- unlock distance/message
+xxxxxxxxxxxxxxx-- collision boxes are all wrong?s
 5. juice
-    -- have engine 'revving' sound when starting 'game' scene
-    -- overall constant engine sound (?)
-    -- idle sound for gw bridge level
-    -- tracks? changing seasons? weather?
+    xxxxxxxxxxxxxx-- have engine 'revving' sound when starting 'game' scene
+    xxxxxxxxxxxxxx-- overall constant engine sound (?)
+    xxxxxxxxxxxxxx-- idle sound for gw bridge level
+    -- tracks
     -- some confirmation sound on mile intervals
+      ****** greater unlock distance makes game seem monotonous, since it's all random... maybe re-examine patterns (had simpler method, no?) - for visual interest at least, yeah? 
+    -- sync animations in time with music
+    -- re-add periodic buildings?
 
 flavor:
 
@@ -44,7 +47,7 @@ publishing:
 
 1. itch.io
   -xxxxxxxxxxx e.preventDefault for key events
-  - promo images/gifs/mini video clips
+  - promo images/gif/screenshots
 xxxxxxxxxxxxx2. APIs
 
 */
@@ -138,12 +141,12 @@ var onStart = function () {
 
   var player = Object.create(Sprite).init(24, /*CONFIG.height - 5 * LANE_SIZE*/CONFIG.height / 2, Resources[gameWorld.difficulties[gameWorld.difficulty].sprite]);
   player.addBehavior(Velocity);
-  player.addBehavior(Bound, {min: {x: 0, y: CONFIG.height - 7 * LANE_SIZE}, max: {x: CONFIG.width, y: CONFIG.height - LANE_SIZE}});
+  player.addBehavior(Bound, {min: {x: 0, y: CONFIG.height - 7 * LANE_SIZE - 1}, max: {x: CONFIG.width, y: CONFIG.height - LANE_SIZE}});
   player.velocity = {x: 0, y: 0};
-  player.setVertices([{x: -4, y: 3},
-    {x: 4, y: 3},
-    {x: 4, y: 6},
-    {x: -4, y: 6}
+  player.setVertices([{x: -12, y: 3},
+    {x: -4, y: 3},
+    {x: -4, y: 6},
+    {x: -12, y: 6}
   ]);
 //  player.addBehavior(Trail, {});
   player.offset = {x: 0, y: -2};
@@ -183,21 +186,18 @@ var onStart = function () {
 
       if (gameWorld.unlocked <= gameWorld.difficulty) { 
         gameWorld.unlocked = gameWorld.difficulty + 1;
-        var background = t.ui.add(Object.create(Entity).init(gameWorld.width / 2, 12, gameWorld.width, 24));
-        background.color = "white";
-        background.addBehavior(FadeIn, {duration: 0.5});
-        background.addBehavior(FadeOut, {duration: 0.5, delay: 1.5});
 
-        var unlocked_text = t.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 2, 12, Resources.expire_font,"unlocked!", {spacing: -2, align: "left"}))
+        var unlocked_text = t.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2 - 8, Resources.expire_font, "NEW CAR", {spacing: -2, align: "center"}))
         unlocked_text.addBehavior(FadeIn, {duration: 0.5});
         unlocked_text.addBehavior(FadeOut, {duration: 0.5, delay: 1.5});
-        t.cars.push(gameWorld.difficulties[gameWorld.difficulty].sprite);
+        unlocked_text.opacity = 0;
+        unlocked_text.scale = 2;
 
-        var s = Object.create(Sprite).init(gameWorld.width / 2 - 8, 8, Resources[gameWorld.difficulties[gameWorld.unlocked].sprite]);
-        s.scale = 2;
-        s.addBehavior(FadeOut, {duration: 0.5, delay: 1.5, remove: true, maxOpacity: 1});
-        s.addBehavior(FadeIn, {duration: 0.5});
-        t.ui.add(s);
+        var unlocked_text2 = t.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2 + 8, Resources.expire_font, "UNLOCKED!", {spacing: -2, align: "center"}))
+        unlocked_text2.addBehavior(FadeIn, {duration: 0.5});
+        unlocked_text2.addBehavior(FadeOut, {duration: 0.5, delay: 1.5});
+        unlocked_text2.opacity = 0;
+        unlocked_text2.scale = 2;
       }
     }
     else {
@@ -351,11 +351,10 @@ var onStart = function () {
           var c = Object.create(Sprite).init(CONFIG.width + s, i * LANE_SIZE + LANE_OFFSET, Resources.smart);
         }
         c.setCollision(Polygon);
-        c.setVertices([{x: -4, y: 3},
-          {x: 4, y: 3},
-          {x: 4, y: 6},
-          {x: -4, y: 6}
-        ]);        
+        c.setVertices([{x: -12, y: 3},
+          {x: -4, y: 3},
+          {x: -4, y: 6},
+          {x: -12, y: 6}])      
         c.offset = {x: 0, y: -2};
         c.addBehavior(Velocity);
         c.addBehavior(Crop, {min: {x: -40, y: 0}, max: {x: 10000, y: 1000}});

@@ -1,0 +1,154 @@
+var onStart = function () {
+  var bg = this.addLayer(Object.create(Layer).init(320,240));
+  var fg = this.addLayer(Object.create(Layer).init(320,240));
+
+  bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg));
+  this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
+  this.player.family = "player";
+  this.player.addBehavior(Damage, {layer: bg});
+  this.player.addBehavior(Velocity);
+  this.player.health = 10;
+
+  this.player.velocity = {x: 0, y: 0};
+  this.player.cooldown = 0;
+  var p = this.player;
+  var player_dummy = bg.add(Object.create(Entity).init(p.x, p.y, p.w, p.h));
+  player_dummy.color = "red";
+  player_dummy.setCollision(Polygon);
+  player_dummy.velocity = {x: 0, y: 0};
+  player_dummy.acceleration = {x: 0, y: 0};
+  player_dummy.opacity = 0;
+  player_dummy.family = "player";
+  player_dummy.collision.onHandle = function (object, other) {
+    if (other.family == "enemy") {
+      p.health -= 1;
+    }
+  }
+  player_dummy.addBehavior(Follow, {target: p, offset: {angle: 0, x: 0, y: 0, z: 0}});
+  
+  var b = bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4,gameWorld.width,8,Resources.ground));
+  b.obstacle = true;
+  b.setCollision(Polygon);  
+  b.solid = true;
+  
+  bg.add(Object.create(Entity).init(160, 220, 320, 20));
+  this.bg = bg;
+  
+  this.keydown = false;
+  this.bg.paused = 10000;
+  
+  fg.drawOrder = function () {
+    return this.entities.sort(function (a, b) { 
+      if (a.z && b.z && b.z != a.z) return a.z - b.z;
+      else if (a.y && b.y && a.y != b.y) return a.y - b.y;
+      else return a.x - b.x;
+    });
+  }
+  var s = this;
+  this.onMouseMove = function (e) {
+    if (s.player.velocity.x == 0 && s.player.velocity.y == 0) {
+      s.player.angle = angle(this.player.x, this.player.y, e.x, e.y) ;
+    }
+  }
+  this.onMouseUp = function (e) {
+    if (s.player.cooldown <= 0) {
+      s.bg.paused = 10000;
+      s.player.velocity = {x: 0, y: 0};
+      s.player.aniamtion = 0;
+    }
+  }
+  this.onMouseDown = function (e) {
+    if (s.player.cooldown <= 0) {
+      s.bg.paused = 0;
+      s.player.animation = 1;
+      s.player.velocity = {
+        x: Math.cos( s.player.angle) * 100,
+        y: Math.sin( s.player.angle) * 100
+      }
+    }
+  }
+  this.onKeyPress = function (e) {
+    if (e.keyCode == 122) {
+      if (s.player.cooldown <= 0) {
+        s.bg.paused = 0;
+        var a = s.bg.add(Object.create(Sprite).init(s.player.x, s.player.y, Resources.projectile));
+        a.setCollision(Polygon);
+        gameWorld.playSound(Resources.laser);
+        a.collision.onHandle = function (object, other) {
+          if (other.family != "player" && !other.projectile) {
+            object.alive = false;
+          } if (other.family == "enemy" && other.die) {
+            //other.alive = false;
+            other.die();
+          }
+        };
+        a.addBehavior(Velocity);
+        a.velocity = {x: 100 * Math.cos(s.player.angle), y: 100 * Math.sin(s.player.angle)};
+        s.player.cooldown = 0.3;
+      }
+    }
+  }
+}
+var onUpdate = function (dt) {
+  // should convert this into behavior, eventually
+  if (this.bg.paused == 0) {
+    if (this.player.cooldown >= 0) {
+      this.player.cooldown -= dt;
+    } else if (this.player.cooldown > -1) {
+      this.bg.paused = 10000;
+      this.player.cooldown = -1;
+      //this.player.cooldown = 0.3;
+    }      
+  }
+  if (this.bg.paused == 0 && Math.random() * 100 < 2) {
+    var c = Math.random() * 60;
+    if (c < 30) {  
+      var enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources.asteroid));
+      enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
+      enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle)}; 
+    }
+    else if (c < 60) {
+      gameWorld.playSound(Resources.spawn);
+      var enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources.saucer));
+      enemy.addBehavior(Shoot, {target: this.player, cooldown: 1});
+      enemy.velocity = {x: 0, y: 40};
+    } else if (false) {
+      // disable tanks for now...
+      var enemy = this.bg.add(Object.create(Sprite).init(choose([0, gameWorld.width]), gameWorld.height - 16, Resources.tank));
+      enemy.angle = 0;
+      enemy.mirrored = enemy.x > 100;
+      enemy.addBehavior(Flip);
+      enemy.addBehavior(Mortar, {cooldown: 1});
+      enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
+      enemy.velocity = {x: enemy.x > 100 ? -20 : 20, y: 0};
+    }
+
+    enemy.addBehavior(Velocity);
+    enemy.setCollision(Polygon);
+    enemy.setVertices([
+      {x: 0, y: -6},
+      {x: -6, y: 0},
+      {x: 0, y: 6},
+      {x: 6, y: 0}
+    ]);
+    enemy.family = "enemy";
+    enemy.collision.onHandle = function (object, other) {
+      if (other.family != "enemy") {
+      //console.log('die?');
+        //object.alive = false;
+        if (object.opacity >= 1)
+          object.die();
+      }        
+    }
+    enemy.die = function () {
+      this.collision.onCheck = function (a, b) { return false; };
+      this.velocity = {x: 0, y: 0};
+      this.addBehavior(FadeOut, {duration: 0.5});
+      var exp = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.explosion));
+      exp.addBehavior(FadeOut, {duration: 0.5, delay: 1});
+      exp.z = this.z - 1;
+      gameWorld.playSound(Resources.hit);
+    }
+    enemy.addBehavior(Crop, {min: {x: -10, y: -10}, max: {x: gameWorld.width + 10, y: gameWorld.height + 20}});
+  }
+}

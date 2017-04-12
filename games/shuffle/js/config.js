@@ -14,7 +14,7 @@ var CONFIG = {
 };
 
 var LANE_SIZE = 8, HANDLING = 57, THRESHOLD = 1.5, ROAD_SPEED = 50, CAR_SPEED = 55, LANE_OFFSET = CONFIG.height - 7 * LANE_SIZE;
-var GOAL_DISTANCE = 400;//1320; // (one pixel = 4 feet)
+var GOAL_DISTANCE = 1320; // (one pixel = 4 feet)
 
 //GLOBALS.scale = 3;
 

@@ -1,162 +1,78 @@
-CONFIG.height = 360, CONFIG.width = 640;
-
-GLOBALS.width = 32, GLOBALS.height = 24, GLOBALS.scale = 1;
-function toGrid (x, y) {
-			var gridY = Math.round(y / GLOBALS.height );
-			return {
-				x: Math.round((x - gridY * GLOBALS.width / 2) / (GLOBALS.width)),
-				y: gridY
-			}
-		}
-
-Entity.draw = function (ctx) {
-  for (var i = 0; i < this.behaviors.length; i++) {
-    this.behaviors[i].draw(ctx);
-  }
-  ctx.save();
-  ctx.translate(this.x, this.y);
-  ctx.translate(this.offset.x, this.offset.y);
-  ctx.rotate(this.angle);
-  if (this.scale !== undefined) {
-    ctx.scale(this.scale, this.scale);
-  }
-  if (this.blend) {
-    ctx.globalCompositeOperation = this.blend;
+var Shoot = Object.create(Behavior);
+Shoot.update = function (dt) {
+  if (this.cooldown <= 0) {
+    gameWorld.playSound(Resources.laser);
+    var e = Object.create(Sprite).init(this.entity.x - 2, this.entity.y - 2, Resources.projectile);
+    e.color = "red";
+    e.addBehavior(Velocity);
+    e.setCollision(Polygon);
+    e.family = "enemy";
+    e.projectile = true;
+    e.collision.onHandle = function (object, other) {
+      if (other.family == "player") {
+        other.health -= 1;
+      }
+      if (other.family != "enemy") object.alive = false;
+    }
+    var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
+    e.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
+    this.entity.layer.add(e);
+    this.cooldown = randint(1,2);
   } else {
-    ctx.globalCompositeOperation = "normal";
-  }
-  for (var i = 0; i < this.behaviors.length; i++) {
-    this.behaviors[i].transform(ctx);
-  }
-  ctx.translate(-this.x, -this.y);
-  ctx.globalAlpha = this.opacity;
-  this.onDraw(ctx);
-
-  ctx.globalAlpha = 1;
-  ctx.restore();
-  for (var i = 0; i < this.behaviors.length; i++) {
-    this.behaviors[i].drawAfter(ctx);
-  }
-  this.drawDebug(ctx);
-};
-
-var Hex = Object.create(Entity);
-Hex.init = function (x, y, radius) {
-	this.behaviors = [];
-	this.x = x, this.y = y, this.radius = radius;
-  this.drawvertices = [
-    {x: -this.radius, y: -this.radius / 2},
-    {x: 0, y: -this.radius},
-    {x: this.radius, y: -this.radius / 2},
-    {x: this.radius, y: this.radius / 2},
-    {x: 0, y: this.radius},
-    {x: -this.radius, y: this.radius / 2}
-  ];
-  this.setVertices(this.drawvertices);
-  return this;
-}
-Hex.onDraw = function (ctx) {
-	ctx.fillStyle = this.color;
-  ctx.beginPath();
-  for (var i = 0; i < this.drawvertices.length; i++) {
-  	var x = this.drawvertices[i].x,
-      y = this.drawvertices[i].y;
-  	if (i == 0)
-    	ctx.moveTo(this.x + x, this.y + y);
-    else
-      ctx.lineTo(this.x + x, this.y + y);
-  }
-  ctx.closePath();
-  ctx.fill();
-}
-
-var gameWorld = Object.create(World).init("game.json");
-gameWorld.height = 360, gameWorld.width = 640;
-var s = Object.create(Scene).init("grid");
-s.ready = true;
-s.onStart = function () {
-  var bg = this.addLayer(Object.create(Layer).init());
-  var fg = this.addLayer(Object.create(Layer).init())
-
-  for (var i = 0; i < 30; i++) {
-    //var obstacle = fg.add(Object.create(Hex).init(Math.floor(Math.random() * 16) * 32,Math.floor(Math.random() * 14) * 24,12));
-    
-    var obstacle = fg.add(Object.create(Sprite).init(Math.floor(Math.random() * 16) * 32,Math.floor(Math.random() * 14) * 24,Resources.asteroid));
-    obstacle.x += Math.floor(obstacle.y / 24) * 16;
-    obstacle.scale = 2;
-    obstacle.setVertices([
-      {x: -12, y: -12 / 2},
-      {x: 0, y: -12},
-      {x: 12, y: -12/ 2},
-      {x: 12, y: 12 / 2},
-      {x: 0, y: 12},
-      {x: -12, y: 12 / 2}
-    ]);
-    obstacle.obstacle = true;
-    obstacle.setCollision(Polygon);
-    if (obstacle.x == 96 && obstacle.y == 96)
-      fg.remove(obstacle);
-  }
-  
-  var player = fg.add(Object.create(Sprite).init(96,96,Resources.viper));
-  player.scale = 2;
-  this.player = player;
-  player.setVertices([
-    {x: -16, y: -16 / 2},
-    {x: 0, y: -16},
-    {x: 16, y: -16 / 2},
-    {x: 16, y: 16 / 2},
-    {x: 0, y: 16},
-    {x: -16, y: 16 / 2}
-  ]);
-  //player.movement = player.addBehavior(HexMovement, {direction: undefined, gridX: 1, gridY: 5, gridSize: 32, rate: 4});
-  player.pathfind = player.addBehavior(HexPathfind, {
-		layer: fg,
-		bound: {min: {x: 0, y: 0}, max: {x: 640, y: 360}},
-		cell_size: 32,
-		target: undefined
-	});
-  player.addBehavior(Velocity);
-  player.velocity = {x: 0, y: 0};
-  // doesn't 'start' until we have a target
-  player.pathfind.start();
-
-  var saucer = fg.add(Object.create(Sprite).init(256,96,Resources.saucer));
-  saucer.scale = 2;
-}
-s.onUpdate = function (dt) {
-	
-}
-s.onKeyDown = function (e) {
-	if (e.keyCode == 39) {
-  	s.player.movement.direction = {x: 1, y: 0};
-  } else if (e.keyCode == 37) {
-  	s.player.movement.direction = {x: -1, y: 0};
-  } else if (e.keyCode == 40) {
-  	s.player.movement.direction = {x: 0, y: 1};
-  } else if (e.keyCode == 38) {
-  	s.player.movement.direction = {x: 0, y: -1};
-  }
-}
-s.onMouseDown = function (e) {
-  e.preventDefault();
-  return false;
-}
-s.onClick = function (e) {
-  e.preventDefault();
-  if (e.button == 0) {
-    var t = toGrid(e.offsetX, e.offsetY);
-    s.player.pathfind.target = {x: GLOBALS.width * t.x + t.y * GLOBALS.width / 2, y: GLOBALS.height * t.y};
-    s.player.pathfind.route = null;
-  }
-  return false;
-}
-s.onMouseMove = function (e) {
-  if (e.button == 1) {
-    var t = toGrid(e.offsetX, e.offsetY);
-    s.player.angle = angle(s.player.x, s.player.y, GLOBALS.width * t.x + t.y * GLOBALS.width / 2, GLOBALS.height * t.y);
+    this.cooldown -= dt;
   }
 }
 
-//CONFIG.debug = true;
-gameWorld.scenes.push(s);
+var Mortar = Object.create(Behavior);
+Mortar.update = function (dt) {
+  if (this.cooldown <= 0) {
+    gameWorld.playSound(Resources.shoot);
+    var e = Object.create(Sprite).init(this.entity.x - 2, this.entity.y - 2, Resources.bomb);
+    e.addBehavior(Velocity);
+    e.setCollision(Polygon);
+    e.family = "enemy";
+    e.projectile = true;
+    e.collision.onHandle = function (object, other) {
+      if (other.family == "player") {
+        other.health -= 1;
+      }
+      if (other.family != "enemy") object.alive = false;
+    }
+    e.velocity = {x: 0, y: -90};
+    this.entity.layer.add(e);
+    this.cooldown = randint(1,3);
+  } else {
+    this.cooldown -= dt;
+  }
+}
+
+var Damage = Object.create(Behavior);
+Damage.update = function (dt) {
+  if (Math.random() * 100 < (10 - this.entity.health)) {
+    var c = Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.smoke);
+    //var c = Object.create(Entity).init(this.entity.x, this.entity.y, 8, 8);
+    c.opacity = 1;
+    c.addBehavior(FadeOut, {duration: 0.7});
+    c.addBehavior(Velocity);
+    c.z = this.entity.z - 1;
+    c.velocity = {x: Math.random() * 32 - 16, y: -100};
+    //c.addBehavior(Oscillate, {object: c.offset, field: "x", constant: 10, rate: 4, time: 0});
+    this.layer.add(c);
+  }
+}
+
+var gameWorld = Object.create(World).init(320, 180, "index.json");
+
+/* I was listeneing to GZA - labels, 4th chambers, and it does seem to fit? but maybe a lot of music would... */
+
+/*
+-add checks for pause/unpause
+-create 5 new enemies with different attacks, patterns of movement
+-implement AI 'store' (popup)
+-add powerups, upgrades
+-implement scrap/repair mechanic
+-implement AI 'greedy' tractor beam for dropped powerups
+-implement end goal -> barrier with 'salvage' cost
+-implement AI combat behavior
+-add more enemies, waves, environmental hazards [volvanic eruption? ion clouds? asteroids? lightning?], etc.
+*/
