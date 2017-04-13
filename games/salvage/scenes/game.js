@@ -48,10 +48,15 @@ var onStart = function () {
   }
   player_dummy.addBehavior(Follow, {target: p, offset: {angle: 0, x: 0, y: 0, z: 0}});
   
-  var b = bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4,gameWorld.width,8,Resources.ground));
-  b.obstacle = true;
-  b.setCollision(Polygon);  
-  b.solid = true;
+	var borders = [];
+  borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4,gameWorld.width,8,Resources.ground)));
+	borders.push(bg.add(Object.create(TiledBackground).init(-12, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
+  borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width + 12, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
+	borders.forEach(function (b) {
+		b.obstacle = true;
+  	b.setCollision(Polygon);  
+  	b.solid = true;
+	});
   
   bg.add(Object.create(Entity).init(160, 220, 320, 20));
   this.bg = bg;
@@ -144,15 +149,25 @@ var onUpdate = function (dt) {
   if (this.bg.paused === 0 && Math.random() * 100 < 2) {
     var c = Math.random() * 100;
     var enemy;
-    if (c < 50) {  
-      enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["asteroid", "bomber", "x"])]));
+    if (c < 20) {  
+      enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["asteroid", "bomber"])]));
       enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
       enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle)}; 
     }
-    else if (c < 75) {
+    else if (c < 30) {
       gameWorld.playSound(Resources.spawn);
-      enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["drone", "saucer"])]));
+      enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["saucer"])]));
       enemy.addBehavior(Shoot, {target: this.player, cooldown: 1});
+      enemy.velocity = {x: 0, y: 10};
+		} else if (c < 50) {			  
+      enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["x"])]));
+      enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
+      enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle), angle: PI}; 
+			enemy.addBehavior(Bounce, {min: {x: 5, y: 0}, max: {x: gameWorld.width - 5, y: gameWorld.height - 16}});
+		}	else if (c < 85) {
+		  gameWorld.playSound(Resources.spawn);
+      enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["drone"])]));
+      enemy.addBehavior(Drone, {target: this.player, cooldown: 1, rate: 0.6, radius: 40, angle: Math.random() * PI2});
       enemy.velocity = {x: 0, y: 10};
     } else {
       // disable tanks for now...

@@ -12,7 +12,7 @@ Shoot.update = function (dt) {
       if (other.family == "player") {
         other.health -= 1;
       }
-      if (other.family != "enemy") object.alive = false;
+      if (other.family != "enemy" && !other.projectile) object.alive = false;
     }
     var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
     e.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
@@ -22,6 +22,44 @@ Shoot.update = function (dt) {
     this.cooldown -= dt;
   }
 }
+
+// target, radius, rate, angle
+var Drone = Object.create(Behavior);
+Drone.update = function (dt) {
+  if (distance(this.entity.x, this.entity.y, this.target.x, this.target.y) > this.radius) {
+    this.entity.x = lerp(this.entity.x, this.target.x, dt * this.rate);
+    this.entity.y = lerp(this.entity.y, this.target.y, dt * this.rate);    
+  } else {
+    this.angle += dt;
+    this.entity.x = lerp(this.entity.x, this.target.x + Math.cos(this.angle) * this.radius, dt * this.rate);
+    this.entity.y = lerp(this.entity.y, this.target.y + Math.sin(this.angle) * this.radius, dt * this.rate);   
+  }
+}
+
+var Bounce = Object.create(Behavior);
+Bounce.update = function (dt) {
+  if (this.entity.x > this.max.x) {
+    this.entity.x = this.max.x;
+    this.entity.velocity.x *= -1;
+  } else if (this.entity.x < this.min.x) {
+    this.entity.x = this.min.x;
+    this.entity.velocity.x *= -1;
+  }
+  if (this.entity.y > this.max.y) {
+    this.entity.y = this.max.y;
+    this.entity.velocity.y *= -1;
+  } else if (this.entity.y < this.min.y) {
+    this.entity.y = this.min.y;
+    this.entity.velocity.y *= -1;
+  }
+}
+
+// push to raindrop
+Velocity.update = function (dt) {
+	this.entity.x += dt * this.entity.velocity.x;
+	this.entity.y += dt * this.entity.velocity.y;	
+	this.entity.angle += dt * this.entity.velocity.angle || 0;	
+};
 
 var Mortar = Object.create(Behavior);
 Mortar.update = function (dt) {
@@ -36,7 +74,7 @@ Mortar.update = function (dt) {
       if (other.family == "player") {
         other.health -= 1;
       }
-      if (other.family != "enemy") object.alive = false;
+      if (other.family != "enemy" && !other.projectile) object.alive = false;
     }
     e.velocity = {x: 0, y: -90};
     this.entity.layer.add(e);
@@ -66,6 +104,7 @@ var gameWorld = Object.create(World).init(320, 180, "index.json");
 /* MUSIC */
 /* I was listeneing to GZA - labels, 4th chambers, and it does seem to fit? but maybe a lot of music would... */
 /* also mos def... just listened to 'habitat' for the first time - not bad! 
+  - oh, also django reinheirts 'montemarte', so maybe it's all good?
 
   more to the point - the record-skip sound/effect works kinda nicely with the pause/unpause mechanic
   BUT also the beat is a little more.. driving maybe?  we'll see!
