@@ -5,7 +5,6 @@ var onStart = function () {
   bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg));
   this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
   this.player.family = "player";
-  this.player.damage = this.player.addBehavior(Damage, {layer: bg, timer: 0, invulnerable: 1});
   this.player.addBehavior(Velocity);
   this.player.health = 10;
 
@@ -15,18 +14,21 @@ var onStart = function () {
   var player_dummy = bg.add(Object.create(Entity).init(p.x, p.y, p.w, p.h));
   player_dummy.color = "red";
   player_dummy.setCollision(Polygon);
+	player_dummy.damage = this.player.addBehavior(Damage, {layer: bg, timer: 0, invulnerable: 1});
+
   player_dummy.velocity = {x: 0, y: 0};
   player_dummy.acceleration = {x: 0, y: 0};
   player_dummy.opacity = 0;
   player_dummy.family = "player";
   player_dummy.collision.onHandle = function (object, other) {
     if (other.family == "enemy") {
-      p.health -= 1;
+      //p.health -= 1;
     }
 
     if (p.health <= 0) {
       p.alive = false;
       gameWorld.playSound(Resources.hit);
+			gameWorld.setScene(0, true);
     }
   }
   player_dummy.addBehavior(Follow, {target: p, offset: {angle: 0, x: 0, y: 0, z: 0}});
@@ -132,7 +134,7 @@ var onUpdate = function (dt) {
   if (this.bg.paused === 0 && Math.random() * 100 < 2) {
     var c = Math.random() * 100;
     var enemy;
-		if (c < 100) {
+		if (c < 15) {
 			enemy = this.bg.add(Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["walker"])]));
       enemy.angle = 0;
 			enemy.offset = {x: 0, y: 2};
@@ -141,28 +143,28 @@ var onUpdate = function (dt) {
 			enemy.addBehavior(Walker, {cooldown: 1});
       enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
       enemy.velocity = {x: enemy.x > 100 ? -20 : 20, y: 0};
-		} else if (c < 5) {  
+		} else if (c < 30) {  
       enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["asteroid"])]));
       enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
       enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle)}; 
-    } else if (c < 20) {
+    } else if (c < 45) {
       enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["bomber"])]));
       enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
       enemy.velocity = {x: Math.cos(enemy.angle) * 150, y: 150 * Math.sin(enemy.angle)};
 			enemy.addBehavior(Accelerate);
 			enemy.acceleration = {x: 0, y: -100};
 			enemy.addBehavior(Bomber);
-		} else if (c < 30) {
+		} else if (c < 60) {
       gameWorld.playSound(Resources.spawn);
       enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["saucer"])]));
       enemy.addBehavior(Shoot, {target: this.player, cooldown: 1});
       enemy.velocity = {x: 0, y: 10};
-		} else if (c < 50) {			  
+		} else if (c < 75) {			  
       enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["x"])]));
       enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
       enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle), angle: PI}; 
 			enemy.addBehavior(Bounce, {min: {x: 5, y: 0}, max: {x: gameWorld.width - 5, y: gameWorld.height - 16}});
-		}	else if (c < 85) {
+		}	else if (c < 90) {
 		  gameWorld.playSound(Resources.spawn);
       enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["drone"])]));
       enemy.addBehavior(Drone, {target: this.player, cooldown: 1, rate: 0.6, radius: 40, angle: Math.random() * PI2});

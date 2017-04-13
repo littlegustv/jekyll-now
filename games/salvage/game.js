@@ -54,6 +54,7 @@ Walker.update = function (dt) {
 		beam.family = "enemy";
 		beam.collision.onHandle = function (object, other) {
 			if (other.family == "player" && other.damage && other.damage.hit) {
+				console.log('what');
         other.damage.hit(1);
       }
 		}
@@ -128,6 +129,12 @@ Velocity.update = function (dt) {
 	this.entity.angle += dt * this.entity.velocity.angle || 0;	
 };
 
+FadeIn.start = function () {
+  this.maxOpacity = 1;
+  this.time = 0;
+};
+// end of push to riandrop
+
 var Mortar = Object.create(Behavior);
 Mortar.update = function (dt) {
   if (this.cooldown <= 0) {
@@ -169,7 +176,11 @@ Damage.update = function (dt) {
 }
 Damage.hit = function (damage) {
 	if (this.timer <= 0) {
-		this.entity.health -= dt;
+		console.log('yeah');
+		this.entity.health -= damage;
+		if (this.entity.health <= 0) {
+			
+		}
 		this.timer = this.invulnerable;
 		return true;
 	} else {
