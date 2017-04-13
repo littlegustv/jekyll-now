@@ -1,3 +1,20 @@
+var fullscreen = false;
+
+function requestFullScreen () {
+// we've made the attempt, at least
+  fullscreen = true;
+  var body = document.documentElement;
+  if (body.requestFullscreen) {
+    body.requestFullscreen();
+  } else if (body.webkitRequestFullscreen) {
+    body.webkitRequestFullscreen();
+  } else if (body.mozRequestFullscreen) {
+    body.mozRequestFullscreen();
+  } else if (body.msRequestFullscreen) {
+    body.msRequestFullscreen();
+  }
+}
+
 var onStart = function () {
   var bg = this.addLayer(Object.create(Layer).init(320,240));
   var fg = this.addLayer(Object.create(Layer).init(320,240));
@@ -56,7 +73,7 @@ var onStart = function () {
   }
   var s = this;
   this.onMouseMove = function (e) {
-    if (s.player.velocity.x == 0 && s.player.velocity.y == 0) {
+    if (s.player.velocity.x === 0 && s.player.velocity.y === 0) {
       s.player.angle = angle(this.player.x, this.player.y, e.x, e.y) ;
     }
   }
@@ -95,35 +112,51 @@ var onStart = function () {
       }
     }
   }
+  this.onTouchStart = function (e) {
+
+		if (!fullscreen) requestFullScreen();
+    s.pause();
+	}
+  this.onTouchEnd = function (e) {
+    s.bg.paused = 0;
+    s.player.velocity = {
+      x: Math.cos( s.player.angle) * 100,
+      y: Math.sin( s.player.angle) * 100
+    }
+  }
+  this.onTouchMove = function (e) {
+    s.player.angle = angle(this.player.x, this.player.y, e.touch.x, e.touch.y) ;
+  }
 }
 var onUpdate = function (dt) {
   // should convert this into behavior, eventually
-  if (this.bg.paused == 0) {
+  if (this.bg.paused === 0) {
     if (this.player.cooldown >= 0) {
       this.player.cooldown -= dt;
     } else if (this.player.cooldown > -1) {
-      if (this.player.velocity.x == 0 && this.player.velocity.y == 0) {
+      if (this.player.velocity.x === 0 && this.player.velocity.y === 0) {
         this.pause();  
       }
       this.player.cooldown = -1;
       //this.player.cooldown = 0.3;
     }      
   }
-  if (this.bg.paused == 0 && Math.random() * 100 < 2) {
-    var c = Math.random() * 60;
-    if (c < 30) {  
-      var enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources.asteroid));
+  if (this.bg.paused === 0 && Math.random() * 100 < 2) {
+    var c = Math.random() * 100;
+    var enemy;
+    if (c < 50) {  
+      enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["asteroid", "bomber", "x"])]));
       enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
       enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle)}; 
     }
-    else if (c < 60) {
+    else if (c < 75) {
       gameWorld.playSound(Resources.spawn);
-      var enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources.saucer));
+      enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["drone", "saucer"])]));
       enemy.addBehavior(Shoot, {target: this.player, cooldown: 1});
-      enemy.velocity = {x: 0, y: 40};
-    } else if (false) {
+      enemy.velocity = {x: 0, y: 10};
+    } else {
       // disable tanks for now...
-      var enemy = this.bg.add(Object.create(Sprite).init(choose([0, gameWorld.width]), gameWorld.height - 16, Resources.tank));
+      enemy = this.bg.add(Object.create(Sprite).init(choose([0, gameWorld.width]), gameWorld.height - 16, Resources[choose(["tank", "walker"])]));
       enemy.angle = 0;
       enemy.mirrored = enemy.x > 100;
       enemy.addBehavior(Flip);
