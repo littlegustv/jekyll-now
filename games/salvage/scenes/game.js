@@ -1,9 +1,6 @@
 var onStart = function () {
   var bg = this.addLayer(Object.create(Layer).init(320,240));
   var fg = this.addLayer(Object.create(Layer).init(320,240));
-
-	var ui = this.addLayer(Object.create(Layer).init(320,240));
-	this.ui = ui;
 	
   bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg));
   this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
@@ -67,20 +64,25 @@ var onStart = function () {
   }
   var s = this;
   this.onMouseMove = function (e) {
+		if (s.ui) return;
     if (s.player.velocity.x === 0 && s.player.velocity.y === 0) {
       s.player.angle = angle(this.player.x, this.player.y, e.x, e.y) ;
     }
   }
   this.onMouseUp = function (e) {
+		if (s.ui) return;
     s.player.velocity = {x: 0, y: 0};
     if (s.player.cooldown <= 0) {
       s.pause();
     }
   }
   this.onMouseDown = function (e) {
-		var b = s.ui.onButton(e.x, e.y);
-		if (b) {
-			b.trigger();
+		if (s.ui) {
+			var b = s.ui.onButton(e.x, e.y);
+			if (b) {
+				b.trigger();
+			}
+			return;
 		}
 		s.bg.paused = 0;
     s.player.animation = 1;
@@ -158,7 +160,8 @@ var onUpdate = function (dt) {
 			console.log('new wave');
 			var w = choose(this.waves);
 			this.current_wave += 1;
-			if (this.current_wave % 2 == 0) {
+			if (this.current_wave % 2 === 0) {
+				this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 				store(this.layers, this.ui);
 			}
 			for (var j = 0; j < w.length; j++) {

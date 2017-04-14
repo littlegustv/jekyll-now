@@ -297,10 +297,22 @@ function store(layers, layer) {
 	inner.addBehavior(FadeIn, {duration: 0.5, delay: 0.5});
 	inner.color = "white";
 	
+	var title = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2 - 40, Resources.expire_font, "SHOPPE", {align: "center", spacing: -2}));
+	
 	var buy_heal = layer.add(Object.create(Sprite).init(gameWorld.width / 2 - 64, gameWorld.height / 2 - 32, Resources.itemHeal));
 	buy_heal.family = "button";
 	buy_heal.trigger = function () {
 		console.log('buy it!');
+	}
+	
+	var close = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2 + 40, Resources.expire_font, "close.", {align: "center", spacing: -2}));
+	close.family = "button";
+	close.trigger = function () {
+		console.log('mhm');
+		gameWorld.scene.layers.splice(gameWorld.scene.layers.indexOf(layer), 1);
+		gameWorld.scene.ui = undefined;
+		gameWorld.scene.bg.paused = 0;
+		//gameWorld.scene.fg.paused = 0;
 	}
 }
 /* MUSIC */

@@ -13,6 +13,7 @@
 		{"path": "x.png", "frames": 2, "animations": 1, "speed": 0.5},
 		{"path": "saucer.png", "frames": 5, "animations": 1, "speed": 0.5},
 		{"path": "explosion.png", "frames": 8, "animations": 1, "speed": 0.2},
+		{"path": "expire_font.png", "frames": 95, "animations": 1},
 		{"path": "asteroid.png"},
 		{"path": "smoke.png"},
 		{"path": "item.png"},
