@@ -16,6 +16,7 @@
 		{"path": "asteroid.png"},
 		{"path": "smoke.png"},
 		{"path": "item.png"},
+		{"path": "itemHeal.png"},
 		{"path": "ground.png"},
 		{"path": "bg.png"},
 		{"path": "building2.png"},

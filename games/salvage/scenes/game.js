@@ -2,6 +2,9 @@ var onStart = function () {
   var bg = this.addLayer(Object.create(Layer).init(320,240));
   var fg = this.addLayer(Object.create(Layer).init(320,240));
 
+	var ui = this.addLayer(Object.create(Layer).init(320,240));
+	this.ui = ui;
+	
   bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg));
   this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
   this.player.family = "player";
@@ -75,7 +78,11 @@ var onStart = function () {
     }
   }
   this.onMouseDown = function (e) {
-    s.bg.paused = 0;
+		var b = s.ui.onButton(e.x, e.y);
+		if (b) {
+			b.trigger();
+		}
+		s.bg.paused = 0;
     s.player.animation = 1;
     s.player.velocity = {
       x: Math.cos( s.player.angle) * 100,
@@ -119,6 +126,7 @@ var onStart = function () {
     s.player.angle = angle(this.player.x, this.player.y, e.touch.x, e.touch.y) ;
   }
 	this.wave = [];
+	this.current_wave = 0;
 	this.waves = [
 		[1,1,1,1,1],
 		[2,2,2,3,3,3],
@@ -149,6 +157,10 @@ var onUpdate = function (dt) {
 		if (this.wave.length <= 0) {
 			console.log('new wave');
 			var w = choose(this.waves);
+			this.current_wave += 1;
+			if (this.current_wave % 2 == 0) {
+				store(this.layers, this.ui);
+			}
 			for (var j = 0; j < w.length; j++) {
 		    var enemy = spawn(this.bg, w[j], this.player);
 				this.wave.push(enemy);

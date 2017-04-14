@@ -286,6 +286,23 @@ function spawn(layer, key, player) {
 	enemy.addBehavior(Crop, {min: {x: -10, y: -10}, max: {x: gameWorld.width + 10, y: gameWorld.height + 20}});  
 	return enemy;
 }
+
+function store(layers, layer) {
+	for (var i = 0; i < layers.length; i++) {
+		layers[i].paused = 10000; //true
+	}
+	var border = layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 160, 112, Resources.building2));
+	var inner = layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, 144, 96));
+	border.addBehavior(FadeIn, {duration: 1});
+	inner.addBehavior(FadeIn, {duration: 0.5, delay: 0.5});
+	inner.color = "white";
+	
+	var buy_heal = layer.add(Object.create(Sprite).init(gameWorld.width / 2 - 64, gameWorld.height / 2 - 32, Resources.itemHeal));
+	buy_heal.family = "button";
+	buy_heal.trigger = function () {
+		console.log('buy it!');
+	}
+}
 /* MUSIC */
 /* I was listeneing to GZA - labels, 4th chambers, and it does seem to fit? but maybe a lot of music would... */
 /* also mos def... just listened to 'habitat' for the first time - not bad! 
