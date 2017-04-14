@@ -15,6 +15,7 @@
 		{"path": "explosion.png", "frames": 8, "animations": 1, "speed": 0.2},
 		{"path": "asteroid.png"},
 		{"path": "smoke.png"},
+		{"path": "item.png"},
 		{"path": "ground.png"},
 		{"path": "bg.png"},
 		{"path": "building2.png"},

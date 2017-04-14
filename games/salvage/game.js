@@ -187,6 +187,105 @@ Damage.hit = function (damage) {
 		return false;
 	}
 }
+function spawn(layer, key, player) {
+	var enemy;
+	switch (key) {
+		case 1:
+			enemy = Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["walker"])]);
+      enemy.angle = 0;
+			enemy.offset = {x: 0, y: 2};
+      enemy.mirrored = enemy.x > 100;
+      enemy.addBehavior(Flip);
+			enemy.addBehavior(Walker, {cooldown: 1});
+      enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
+      enemy.velocity = {x: enemy.x > 100 ? -20 : 20, y: 0};
+			break;
+		case 2:
+      enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["asteroid"])]);
+      enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
+      enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle)}; 
+			break;
+		case 3:
+      enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["bomber"])]);
+      enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
+      enemy.velocity = {x: Math.cos(enemy.angle) * 150, y: 150 * Math.sin(enemy.angle)};
+			enemy.addBehavior(Accelerate);
+			enemy.acceleration = {x: 0, y: -100};
+			enemy.addBehavior(Bomber);
+			break;
+		case 4:
+			gameWorld.playSound(Resources.spawn);
+      enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["saucer"])]);
+      enemy.addBehavior(Shoot, {target: player, cooldown: 1});
+      enemy.velocity = {x: 0, y: 10};
+			break;
+		case 5:
+			enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["x"])]);
+      enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
+      enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle), angle: PI}; 
+			enemy.addBehavior(Bounce, {min: {x: 5, y: 0}, max: {x: gameWorld.width - 5, y: gameWorld.height - 16}});
+			break;
+		case 6:
+			gameWorld.playSound(Resources.spawn);
+      enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["drone"])]);
+      enemy.addBehavior(Drone, {target: player, cooldown: 1, rate: 0.6, radius: 40, angle: Math.random() * PI2});
+      enemy.velocity = {x: 0, y: 10};
+    	break;
+		case 7:
+			// disable tanks for now...
+      enemy = Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["tank", "walker"])]);
+      enemy.angle = 0;
+			enemy.offset = {x: 0, y: 2};
+      enemy.mirrored = enemy.x > 100;
+      enemy.addBehavior(Flip);
+      enemy.addBehavior(Mortar, {cooldown: 1});
+      enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
+      enemy.velocity = {x: enemy.x > 100 ? -20 : 20, y: 0};
+    	break;
+	}
+	layer.add(enemy);
+	enemy.addBehavior(Velocity);
+	enemy.setCollision(Polygon);
+	enemy.setVertices([
+		{x: 0, y: -6},
+		{x: -6, y: 0},
+		{x: 0, y: 6},
+		{x: 6, y: 0}
+	]);
+	enemy.family = "enemy";
+	enemy.collision.onHandle = function (object, other) {
+		if (other.family != "enemy") {
+		//console.log('die?');
+			//object.alive = false;
+			if (object.opacity >= 1)
+				object.die();
+		}        
+	}
+	enemy.die = function () {
+		this.collision.onCheck = function (a, b) { return false; };
+		this.velocity = {x: 0, y: 0};
+		this.addBehavior(FadeOut, {duration: 0.5});
+		var exp = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.explosion));
+		exp.addBehavior(FadeOut, {duration: 0.5, delay: 1});
+		exp.z = this.z - 1;
+		
+		var salvage = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.item));
+		salvage.addBehavior(FadeOut, {duration: 1, delay: 1});
+		salvage.setCollision(Polygon);
+		salvage.collision.onHandle = function (object, other) {
+			if (other.family == "player" && !other.projectile) {
+				object.alive = false;
+				player.salvage += 1;
+			}
+		}
+		salvage.z = this.z - 1;
+		salvage.addBehavior(Velocity);
+		salvage.velocity = {x: 0, y: 50};
+		gameWorld.playSound(Resources.hit);
+	}
+	enemy.addBehavior(Crop, {min: {x: -10, y: -10}, max: {x: gameWorld.width + 10, y: gameWorld.height + 20}});  
+	return enemy;
+}
 /* MUSIC */
 /* I was listeneing to GZA - labels, 4th chambers, and it does seem to fit? but maybe a lot of music would... */
 /* also mos def... just listened to 'habitat' for the first time - not bad! 
@@ -197,15 +296,23 @@ Damage.hit = function (damage) {
 */
 
 /*
+BUGS:
+-collision handling happens twice? (i.e. salvage score)
+
+FEATURES:
 x-add checks for pause/unpause
 x-create 5 new enemies with different attacks, patterns of movement
-  - different attacks
-  - different movement behaviors
--implement AI 'store' (popup)
+  x- different attacks
+  x- different movement behaviors
+x-implement 'waves'
+-implement AI 'store' (popup) - UI layer
+ x- collectible 'scrap' (salvage?) that enemies drop (score counter)
+ - start with repairs only?
 -add powerups, upgrades
 -implement scrap/repair mechanic
 -implement AI 'greedy' tractor beam for dropped powerups
 -implement end goal -> barrier with 'salvage' cost
 -implement AI combat behavior
 -add more enemies, waves, environmental hazards [volvanic eruption? ion clouds? asteroids? lightning?], etc.
+-different 'levels' - locations with different environments/hazards?
 */

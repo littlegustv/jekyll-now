@@ -10,6 +10,7 @@ var onStart = function () {
 
   this.player.velocity = {x: 0, y: 0};
   this.player.cooldown = 0;
+	this.player.salvage = 0;
   var p = this.player;
   var player_dummy = bg.add(Object.create(Entity).init(p.x, p.y, p.w, p.h));
   player_dummy.color = "red";
@@ -117,6 +118,15 @@ var onStart = function () {
   this.onTouchMove = function (e) {
     s.player.angle = angle(this.player.x, this.player.y, e.touch.x, e.touch.y) ;
   }
+	this.wave = [];
+	this.waves = [
+		[1,1,1,1,1],
+		[2,2,2,3,3,3],
+		[1,2,3,4,5,6,7],
+		[7,7,7],
+		[6,5,6,5,6,5],
+		[4,4,4,4,4,4,4,4]
+	]
 }
 var onUpdate = function (dt) {
   // should convert this into behavior, eventually
@@ -131,82 +141,18 @@ var onUpdate = function (dt) {
       //this.player.cooldown = 0.3;
     }      
   }
+	for (var i = 0; i < this.wave.length; i++) {
+		if (!this.wave[i].alive) this.wave.splice(i, 1);
+	}
   if (this.bg.paused === 0 && Math.random() * 100 < 2) {
     var c = Math.random() * 100;
-    var enemy;
-		if (c < 15) {
-			enemy = this.bg.add(Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["walker"])]));
-      enemy.angle = 0;
-			enemy.offset = {x: 0, y: 2};
-      enemy.mirrored = enemy.x > 100;
-      enemy.addBehavior(Flip);
-			enemy.addBehavior(Walker, {cooldown: 1});
-      enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
-      enemy.velocity = {x: enemy.x > 100 ? -20 : 20, y: 0};
-		} else if (c < 30) {  
-      enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["asteroid"])]));
-      enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
-      enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle)}; 
-    } else if (c < 45) {
-      enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["bomber"])]));
-      enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
-      enemy.velocity = {x: Math.cos(enemy.angle) * 150, y: 150 * Math.sin(enemy.angle)};
-			enemy.addBehavior(Accelerate);
-			enemy.acceleration = {x: 0, y: -100};
-			enemy.addBehavior(Bomber);
-		} else if (c < 60) {
-      gameWorld.playSound(Resources.spawn);
-      enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["saucer"])]));
-      enemy.addBehavior(Shoot, {target: this.player, cooldown: 1});
-      enemy.velocity = {x: 0, y: 10};
-		} else if (c < 75) {			  
-      enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["x"])]));
-      enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
-      enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle), angle: PI}; 
-			enemy.addBehavior(Bounce, {min: {x: 5, y: 0}, max: {x: gameWorld.width - 5, y: gameWorld.height - 16}});
-		}	else if (c < 90) {
-		  gameWorld.playSound(Resources.spawn);
-      enemy = this.bg.add(Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["drone"])]));
-      enemy.addBehavior(Drone, {target: this.player, cooldown: 1, rate: 0.6, radius: 40, angle: Math.random() * PI2});
-      enemy.velocity = {x: 0, y: 10};
-    } else {
-      // disable tanks for now...
-      enemy = this.bg.add(Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["tank", "walker"])]));
-      enemy.angle = 0;
-			enemy.offset = {x: 0, y: 2};
-      enemy.mirrored = enemy.x > 100;
-      enemy.addBehavior(Flip);
-      enemy.addBehavior(Mortar, {cooldown: 1});
-      enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
-      enemy.velocity = {x: enemy.x > 100 ? -20 : 20, y: 0};
-    }
-
-    enemy.addBehavior(Velocity);
-    enemy.setCollision(Polygon);
-    enemy.setVertices([
-      {x: 0, y: -6},
-      {x: -6, y: 0},
-      {x: 0, y: 6},
-      {x: 6, y: 0}
-    ]);
-    enemy.family = "enemy";
-    enemy.collision.onHandle = function (object, other) {
-      if (other.family != "enemy") {
-      //console.log('die?');
-        //object.alive = false;
-        if (object.opacity >= 1)
-          object.die();
-      }        
-    }
-    enemy.die = function () {
-      this.collision.onCheck = function (a, b) { return false; };
-      this.velocity = {x: 0, y: 0};
-      this.addBehavior(FadeOut, {duration: 0.5});
-      var exp = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.explosion));
-      exp.addBehavior(FadeOut, {duration: 0.5, delay: 1});
-      exp.z = this.z - 1;
-      gameWorld.playSound(Resources.hit);
-    }
-    enemy.addBehavior(Crop, {min: {x: -10, y: -10}, max: {x: gameWorld.width + 10, y: gameWorld.height + 20}});
-  }
+		if (this.wave.length <= 0) {
+			console.log('new wave');
+			var w = choose(this.waves);
+			for (var j = 0; j < w.length; j++) {
+		    var enemy = spawn(this.bg, w[j], this.player);
+				this.wave.push(enemy);
+			}
+		}
+	}
 }
