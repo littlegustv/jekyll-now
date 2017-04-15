@@ -1,4 +1,12 @@
 var onStart = function () {
+	if (!gameWorld.soundtrack) { 
+    gameWorld.musicLoop = function () {
+      gameWorld.soundtrack = gameWorld.playSound(Resources[choose(["salvagetheme", "salvagetheme2"])]);
+      gameWorld.soundtrack.onended = gameWorld.musicLoop;
+    }
+    gameWorld.musicLoop();
+  }
+	
   var bg = this.addLayer(Object.create(Layer).init(320,240));
   var fg = this.addLayer(Object.create(Layer).init(320,240));
 	
@@ -90,6 +98,7 @@ var onStart = function () {
       x: Math.cos( s.player.angle) * 100,
       y: Math.sin( s.player.angle) * 100
     }
+		console.log(s.player.velocity);
   }
   this.onKeyPress = function (e) {
     if (e.keyCode == 122) {
@@ -154,18 +163,16 @@ var onUpdate = function (dt) {
 	for (var i = 0; i < this.wave.length; i++) {
 		if (!this.wave[i].alive) this.wave.splice(i, 1);
 	}
-  if (this.bg.paused === 0 && Math.random() * 100 < 2) {
-    var c = Math.random() * 100;
-		if (this.wave.length <= 0) {
-			console.log('new wave');
+  if (this.bg.paused === 0 && this.wave.length <= 0) {
+		console.log('new wave');
+		this.current_wave += 1;
+		if (this.current_wave % 3 === 0) {
+			this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
+			store(this.layers, this.ui);
+		} else {
 			var w = choose(this.waves);
-			this.current_wave += 1;
-			if (this.current_wave % 2 === 0) {
-				this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
-				store(this.layers, this.ui);
-			}
 			for (var j = 0; j < w.length; j++) {
-		    var enemy = spawn(this.bg, w[j], this.player);
+				var enemy = spawn(this.bg, w[j], this.player);
 				this.wave.push(enemy);
 			}
 		}

@@ -189,6 +189,8 @@ Damage.hit = function (damage) {
 }
 function spawn(layer, key, player) {
 	var enemy;
+	console.log('twice?');
+	gameWorld.playSound(Resources[choose(["spawn", "spawn2"])]);
 	switch (key) {
 		case 1:
 			enemy = Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["walker"])]);
@@ -214,7 +216,6 @@ function spawn(layer, key, player) {
 			enemy.addBehavior(Bomber);
 			break;
 		case 4:
-			gameWorld.playSound(Resources.spawn);
       enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["saucer"])]);
       enemy.addBehavior(Shoot, {target: player, cooldown: 1});
       enemy.velocity = {x: 0, y: 10};
@@ -226,7 +227,6 @@ function spawn(layer, key, player) {
 			enemy.addBehavior(Bounce, {min: {x: 5, y: 0}, max: {x: gameWorld.width - 5, y: gameWorld.height - 16}});
 			break;
 		case 6:
-			gameWorld.playSound(Resources.spawn);
       enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["drone"])]);
       enemy.addBehavior(Drone, {target: player, cooldown: 1, rate: 0.6, radius: 40, angle: Math.random() * PI2});
       enemy.velocity = {x: 0, y: 10};
@@ -288,31 +288,44 @@ function spawn(layer, key, player) {
 }
 
 function store(layers, layer) {
+	gameWorld.playSound(Resources.store);
 	for (var i = 0; i < layers.length; i++) {
 		layers[i].paused = 10000; //true
 	}
-	var border = layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 160, 112, Resources.building2));
-	var inner = layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, 144, 96));
+	layer.paused = 0;
+	var border = layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, -gameWorld.height, 160, 112, Resources.building2));
+	var inner = layer.add(Object.create(Entity).init(gameWorld.width / 2, -gameWorld.height, 144, 96));
 	border.addBehavior(FadeIn, {duration: 1});
 	inner.addBehavior(FadeIn, {duration: 0.5, delay: 0.5});
 	inner.color = "white";
+	border.goal = gameWorld.height / 2, inner.goal = gameWorld.height / 2;
 	
-	var title = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2 - 40, Resources.expire_font, "SHOPPE", {align: "center", spacing: -2}));
+	var title = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -gameWorld.height, Resources.expire_font, "SHOPPE", {align: "center", spacing: -2}));
+	title.goal = gameWorld.height / 2 - 40;
 	
-	var buy_heal = layer.add(Object.create(Sprite).init(gameWorld.width / 2 - 64, gameWorld.height / 2 - 32, Resources.itemHeal));
+	var buy_heal = layer.add(Object.create(Sprite).init(gameWorld.width / 2 - 64, -gameWorld.height, Resources.itemHeal));
+	buy_heal = gameWorld.height / 2 - 32;
 	buy_heal.family = "button";
 	buy_heal.trigger = function () {
 		console.log('buy it!');
 	}
 	
-	var close = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2 + 40, Resources.expire_font, "close.", {align: "center", spacing: -2}));
+	var close = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -gameWorld.height, Resources.expire_font, "close.", {align: "center", spacing: -2}));
 	close.family = "button";
+	close.goal = gameWorld.height / 2 + 40;
+	close.w = 12, close.h = 8;
 	close.trigger = function () {
 		console.log('mhm');
 		gameWorld.scene.layers.splice(gameWorld.scene.layers.indexOf(layer), 1);
 		gameWorld.scene.ui = undefined;
-		gameWorld.scene.bg.paused = 0;
-		//gameWorld.scene.fg.paused = 0;
+		for (var i = 0; i < layers.length; i++) {
+			layers[i].paused = 0; //true
+		}
+		gameWorld.current_wave += 1;
+	}
+	
+	for (var i = 0; i < layer.entities.length; i++) {
+		layer.entities[i].addBehavior(Lerp, {object: layer.entities[i], field: "y", goal: layer.entities[i].goal, rate: 10});
 	}
 }
 /* MUSIC */

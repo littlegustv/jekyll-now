@@ -23,7 +23,11 @@
 		{"path": "building2.png"},
 		{"path": "hit.wav"},
 		{"path": "laser.wav"},
+		{"path": "salvagetheme.wav"},
+		{"path": "salvagetheme2.wav"},
 		{"path": "spawn.wav"},
+		{"path": "spawn2.wav"},
+		{"path": "store.wav"},
 		{"path": "shoot.wav"}
 	]
 }
