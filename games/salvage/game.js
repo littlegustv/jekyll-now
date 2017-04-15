@@ -190,7 +190,6 @@ Damage.hit = function (damage) {
 function spawn(layer, key, player) {
 	var enemy;
 	console.log('twice?');
-	gameWorld.playSound(Resources[choose(["spawn", "spawn2"])]);
 	switch (key) {
 		case 1:
 			enemy = Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["walker"])]);
@@ -293,26 +292,31 @@ function store(layers, layer) {
 		layers[i].paused = 10000; //true
 	}
 	layer.paused = 0;
-	var border = layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, -gameWorld.height, 160, 112, Resources.building2));
-	var inner = layer.add(Object.create(Entity).init(gameWorld.width / 2, -gameWorld.height, 144, 96));
-	border.addBehavior(FadeIn, {duration: 1});
-	inner.addBehavior(FadeIn, {duration: 0.5, delay: 0.5});
+	var border = layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, -3 * gameWorld.height / 2, 160, 112, Resources.building2));
+	var inner = layer.add(Object.create(Entity).init(gameWorld.width / 2, -3 * gameWorld.height / 2, 144, 96));
 	inner.color = "white";
-	border.goal = gameWorld.height / 2, inner.goal = gameWorld.height / 2;
 	
-	var title = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -gameWorld.height, Resources.expire_font, "SHOPPE", {align: "center", spacing: -2}));
-	title.goal = gameWorld.height / 2 - 40;
+	var title = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 40, Resources.expire_font, "SHOPPE", {align: "center", spacing: -2}));
 	
-	var buy_heal = layer.add(Object.create(Sprite).init(gameWorld.width / 2 - 64, -gameWorld.height, Resources.itemHeal));
-	buy_heal = gameWorld.height / 2 - 32;
-	buy_heal.family = "button";
-	buy_heal.trigger = function () {
-		console.log('buy it!');
+	for (var i = 0; i < 3; i++) {
+		var buy_heal = layer.add(Object.create(Sprite).init(gameWorld.width / 2 - 64, -3 * gameWorld.height / 2 - 32 + i * 8, Resources.itemHeal));
+		buy_heal.family = "button";
+		buy_heal.trigger = function () {
+			console.log('buying!');
+		}
+		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 - 32, -3 * gameWorld.height / 2 - 32 + i * 8, Resources.expire_font, randint(1,5) + "$", {align: "left", spacing: -2}));
+		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 32 + i * 8, Resources.expire_font, "___", {align: "left", spacing: -2}));
+		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 64, -3 * gameWorld.height / 2 - 32 + i * 8, Resources.expire_font, "- +", {align: "right", spacing: -2}));		
 	}
 	
-	var close = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -gameWorld.height, Resources.expire_font, "close.", {align: "center", spacing: -2}));
+	var salvage = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 32, Resources.expire_font, "" + gameWorld.scene.player.salvage, {align: "center", spacing: -2}));
+	
+	for (var i = 0; i < 10; i++) {
+		layer.add(Object.create(Entity).init(gameWorld.width / 2 - 64 + 12 * i, -3 * gameWorld.height / 2 + 32, 10, 10)).color = (i <= gameWorld.scene.player.health ? "black" : "gray");
+	}
+	
+	var close = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 64, -3 * gameWorld.height / 2 + 40, Resources.expire_font, "done", {align: "right", spacing: -2}));
 	close.family = "button";
-	close.goal = gameWorld.height / 2 + 40;
 	close.w = 12, close.h = 8;
 	close.trigger = function () {
 		console.log('mhm');
@@ -325,18 +329,10 @@ function store(layers, layer) {
 	}
 	
 	for (var i = 0; i < layer.entities.length; i++) {
-		layer.entities[i].addBehavior(Lerp, {object: layer.entities[i], field: "y", goal: layer.entities[i].goal, rate: 10});
+		layer.entities[i].addBehavior(Lerp, {object: layer.entities[i], field: "y", goal: layer.entities[i].y + gameWorld.height * 2, rate: 10});
 	}
 }
 /* MUSIC */
-/* I was listeneing to GZA - labels, 4th chambers, and it does seem to fit? but maybe a lot of music would... */
-/* also mos def... just listened to 'habitat' for the first time - not bad! 
-  - oh, also django reinheirts 'montemarte', so maybe it's all good?
-
-  more to the point - the record-skip sound/effect works kinda nicely with the pause/unpause mechanic
-  BUT also the beat is a little more.. driving maybe?  we'll see!
-*/
-
 /*
 BUGS:
 -collision handling happens twice? (i.e. salvage score)

@@ -20,6 +20,7 @@
 		{"path": "itemHeal.png"},
 		{"path": "ground.png"},
 		{"path": "bg.png"},
+		{"path": "planet2.png"},
 		{"path": "building2.png"},
 		{"path": "hit.wav"},
 		{"path": "laser.wav"},

@@ -9,9 +9,11 @@ var onStart = function () {
 	
   var bg = this.addLayer(Object.create(Layer).init(320,240));
   var fg = this.addLayer(Object.create(Layer).init(320,240));
-	
+		
   bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg));
-  this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
+	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 80, Resources.planet2));
+
+	this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
   this.player.family = "player";
   this.player.addBehavior(Velocity);
   this.player.health = 10;
@@ -171,6 +173,7 @@ var onUpdate = function (dt) {
 			store(this.layers, this.ui);
 		} else {
 			var w = choose(this.waves);
+			gameWorld.playSound(Resources[choose(["spawn", "spawn2"])]);
 			for (var j = 0; j < w.length; j++) {
 				var enemy = spawn(this.bg, w[j], this.player);
 				this.wave.push(enemy);
