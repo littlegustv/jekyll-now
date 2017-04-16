@@ -1,7 +1,7 @@
 var onStart = function () {
 	if (!gameWorld.soundtrack) { 
     gameWorld.musicLoop = function () {
-      gameWorld.soundtrack = gameWorld.playSound(Resources[choose(["salvagetheme", "salvagetheme2"])]);
+      gameWorld.soundtrack = gameWorld.playSound(Resources.salvage);
       gameWorld.soundtrack.onended = gameWorld.musicLoop;
     }
     gameWorld.musicLoop();
