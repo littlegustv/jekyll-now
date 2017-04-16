@@ -17,6 +17,25 @@ function requestFullScreen () {
   }
 }
 
+// push to raindrop 'active' flag for layer
+Scene.draw = function (ctx) {
+	for (var i = 0; i < this.layers.length; i++) {
+		if (this.layers[i].active)
+		{
+			this.layers[i].draw(ctx);
+			ctx.drawImage(this.layers[i].canvas, 0, 0);
+		}
+	}
+};
+Scene.update = function (dt) {
+	this.time += dt;
+	for (var i = 0; i < this.layers.length; i++) {
+		if (this.layers[i].active)
+			this.layers[i].update(dt);
+	}
+	this.onUpdate(dt);
+};
+
 var Shoot = Object.create(Behavior);
 Shoot.update = function (dt) {
   if (this.cooldown <= 0) {
@@ -286,52 +305,58 @@ function spawn(layer, key, player) {
 	return enemy;
 }
 
-function store(layers, layer) {
-	gameWorld.playSound(Resources.store);
-	for (var i = 0; i < layers.length; i++) {
-		layers[i].paused = 10000; //true
-	}
-	layer.paused = 0;
-	var border = layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, -3 * gameWorld.height / 2, 160, 112, Resources.building2));
-	var inner = layer.add(Object.create(Entity).init(gameWorld.width / 2, -3 * gameWorld.height / 2, 144, 96));
+function create_store(layer) {
+	var border = layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, -3 * gameWorld.height / 2, 160, 112, Resources.border));
+	var inner = layer.add(Object.create(Entity).init(gameWorld.width / 2, -3 * gameWorld.height / 2, 152, 104));
 	inner.color = "white";
 	
-	var title = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 40, Resources.expire_font, "SHOPPE", {align: "center", spacing: -2}));
+	var title = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 44, Resources.expire_font, "SHOPPE", {align: "center", spacing: -2}));
+	layer.items = [];
 	
 	for (var i = 0; i < 3; i++) {
-		var buy_heal = layer.add(Object.create(Sprite).init(gameWorld.width / 2 - 64, -3 * gameWorld.height / 2 - 32 + i * 8, Resources.itemHeal));
-		buy_heal.family = "button";
-		buy_heal.trigger = function () {
-			console.log('buying!');
-		}
-		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 - 32, -3 * gameWorld.height / 2 - 32 + i * 8, Resources.expire_font, randint(1,5) + "$", {align: "left", spacing: -2}));
-		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 32 + i * 8, Resources.expire_font, "___", {align: "left", spacing: -2}));
-		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 64, -3 * gameWorld.height / 2 - 32 + i * 8, Resources.expire_font, "- +", {align: "right", spacing: -2}));		
+		var item_icon = layer.add(Object.create(Sprite).init(gameWorld.width / 2 - 64, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.icons));
+		item_icon.animation = i + 2;
+		var price = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 - 32, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, randint(1,5) + "$", {align: "left", spacing: -2}));
+		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, "___", {align: "left", spacing: -2}));
+		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 56, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, "-", {align: "right", spacing: -2}));		
+		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 72, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, "+", {align: "right", spacing: -2}));		
+		layer.items.push({icon: item_icon, price: price});
 	}
 	
-	var salvage = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 32, Resources.expire_font, "" + gameWorld.scene.player.salvage, {align: "center", spacing: -2}));
+	layer.salvage = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 32, Resources.expire_font, "Total: $ 0", {align: "center", spacing: -2}));
 	
-	for (var i = 0; i < 10; i++) {
-		layer.add(Object.create(Entity).init(gameWorld.width / 2 - 64 + 12 * i, -3 * gameWorld.height / 2 + 32, 10, 10)).color = (i <= gameWorld.scene.player.health ? "black" : "gray");
-	}
+	layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, - 3 * gameWorld.height / 2 + 16, Resources.expire_font, "Repairs", {align: "center", spacing: -2}));
+	layer.repairs = {};
+	layer.repairs.price = layer.add(Object.create(SpriteFont).init(gameWorld.width - 64, -3*gameWorld.height / 2 + 28, Resources.expire_font, "$ 1", {align: "left", spacing: -2}));
+	
+	layer.repairs.health = layer.add(Object.create(Entity).init(gameWorld.width / 2, -3 * gameWorld.height / 2 + 28, 128, 12));
 	
 	var close = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 64, -3 * gameWorld.height / 2 + 40, Resources.expire_font, "done", {align: "right", spacing: -2}));
 	close.family = "button";
 	close.w = 12, close.h = 8;
 	close.trigger = function () {
-		console.log('mhm');
-		gameWorld.scene.layers.splice(gameWorld.scene.layers.indexOf(layer), 1);
-		gameWorld.scene.ui = undefined;
-		for (var i = 0; i < layers.length; i++) {
-			layers[i].paused = 0; //true
+		for (var i = 0; i < layer.entities.length; i++) {
+			layer.entities[i].lerp.goal = layer.entities[i].goal - gameWorld.height * 2;
 		}
-		gameWorld.current_wave += 1;
+		close.addBehavior(Delay, {duration: 1, callback: function () {
+			
+			layer.active = false
+			gameWorld.current_wave += 1;
+		}});
 	}
 	
 	for (var i = 0; i < layer.entities.length; i++) {
-		layer.entities[i].addBehavior(Lerp, {object: layer.entities[i], field: "y", goal: layer.entities[i].y + gameWorld.height * 2, rate: 10});
+		layer.entities[i].lerp = layer.entities[i].addBehavior(Lerp, {object: layer.entities[i], field: "y", goal: layer.entities[i].y + gameWorld.height * 2, rate: 10});
+		layer.entities[i].goal = layer.entities[i].lerp.goal;
 	}
 }
+function open_store(layer) {
+	for (var i = 0; i < layer.entities.length; i++) {
+		layer.entities[i].lerp.goal = layer.entities[i].goal;
+	}
+	layer.active = true;
+}
+
 /* MUSIC */
 /*
 BUGS:

@@ -8,7 +8,12 @@ var onStart = function () {
   }
 	
   var bg = this.addLayer(Object.create(Layer).init(320,240));
+	bg.active = true;
   var fg = this.addLayer(Object.create(Layer).init(320,240));
+	fg.active = true;
+	
+	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
+	create_store(this.ui);
 		
   bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg));
 	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 80, Resources.planet2));
@@ -16,7 +21,7 @@ var onStart = function () {
 	this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
   this.player.family = "player";
   this.player.addBehavior(Velocity);
-  this.player.health = 10;
+  this.player.health = 25;
 
   this.player.velocity = {x: 0, y: 0};
   this.player.cooldown = 0;
@@ -74,20 +79,20 @@ var onStart = function () {
   }
   var s = this;
   this.onMouseMove = function (e) {
-		if (s.ui) return;
+		if (s.ui.active) return;
     if (s.player.velocity.x === 0 && s.player.velocity.y === 0) {
       s.player.angle = angle(this.player.x, this.player.y, e.x, e.y) ;
     }
   }
   this.onMouseUp = function (e) {
-		if (s.ui) return;
+		if (s.ui.active) return;
     s.player.velocity = {x: 0, y: 0};
     if (s.player.cooldown <= 0) {
       s.pause();
     }
   }
   this.onMouseDown = function (e) {
-		if (s.ui) {
+		if (s.ui.active) {
 			var b = s.ui.onButton(e.x, e.y);
 			if (b) {
 				b.trigger();
@@ -100,7 +105,7 @@ var onStart = function () {
       x: Math.cos( s.player.angle) * 100,
       y: Math.sin( s.player.angle) * 100
     }
-		console.log(s.player.velocity);
+		//console.log(s.player.velocity);
   }
   this.onKeyPress = function (e) {
     if (e.keyCode == 122) {
@@ -169,8 +174,8 @@ var onUpdate = function (dt) {
 		console.log('new wave');
 		this.current_wave += 1;
 		if (this.current_wave % 3 === 0) {
-			this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
-			store(this.layers, this.ui);
+			open_store(this.ui);
+			gameWorld.playSound(Resources.store);
 		} else {
 			var w = choose(this.waves);
 			gameWorld.playSound(Resources[choose(["spawn", "spawn2"])]);
