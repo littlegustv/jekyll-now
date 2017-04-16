@@ -318,8 +318,12 @@ function create_store(layer) {
 		item_icon.animation = i + 2;
 		var price = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 - 32, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, randint(1,5) + "$", {align: "left", spacing: -2}));
 		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, "___", {align: "left", spacing: -2}));
-		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 56, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, "-", {align: "right", spacing: -2}));		
-		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 72, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, "+", {align: "right", spacing: -2}));		
+		var plus = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 56, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, "-", {align: "right", spacing: -2}));
+		plus.family = "button";
+		plus.trigger = function () { console.log('plus'); };
+		var minus = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 72, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, "+", {align: "right", spacing: -2}));
+		minus.family = "button";
+		minus.trigger = function () { console.log('minus'); };
 		layer.items.push({icon: item_icon, price: price});
 	}
 	
@@ -331,18 +335,17 @@ function create_store(layer) {
 	
 	layer.repairs.health = layer.add(Object.create(Entity).init(gameWorld.width / 2, -3 * gameWorld.height / 2 + 28, 128, 12));
 	
-	var close = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 64, -3 * gameWorld.height / 2 + 40, Resources.expire_font, "done", {align: "right", spacing: -2}));
+	var close_text = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 64, -3 * gameWorld.height / 2 + 40, Resources.expire_font, "done", {align: "right", spacing: -2}));
+	var close = layer.add(Object.create(Entity).init(gameWorld.width / 2 + 64, -3 * gameWorld.height / 2 + 40, 32, 16));
+	close.color = "#dddddd";
 	close.family = "button";
 	close.w = 12, close.h = 8;
 	close.trigger = function () {
 		for (var i = 0; i < layer.entities.length; i++) {
 			layer.entities[i].lerp.goal = layer.entities[i].goal - gameWorld.height * 2;
 		}
-		close.addBehavior(Delay, {duration: 1, callback: function () {
-			
-			layer.active = false
-			gameWorld.current_wave += 1;
-		}});
+		close_store(layer);
+		gameWorld.current_wave += 1;
 	}
 	
 	for (var i = 0; i < layer.entities.length; i++) {
@@ -351,10 +354,17 @@ function create_store(layer) {
 	}
 }
 function open_store(layer) {
+	gameWorld.scene.layers.forEach( l => l.paused = 10000 );
+	layer.paused = 0;
 	for (var i = 0; i < layer.entities.length; i++) {
 		layer.entities[i].lerp.goal = layer.entities[i].goal;
 	}
 	layer.active = true;
+}
+
+function close_store(layer) {
+	gameWorld.scene.layers.forEach( l => l.paused = 0 );
+	layer.active = false;
 }
 
 /* MUSIC */
