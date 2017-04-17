@@ -17,6 +17,7 @@
 		{"path": "asteroid.png"},
 		{"path": "smoke.png"},
 		{"path": "item.png"},
+		{"path": "barrier.png"},
 		{"path": "icons.png", "animations": 5},
 		{"path": "border.png"},
 		{"path": "itemHeal.png"},

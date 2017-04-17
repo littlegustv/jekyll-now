@@ -17,6 +17,7 @@ var onStart = function () {
 		
   bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg));
 	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 80, Resources.planet));
+	var barrier = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 80, Resources.barrier));
 
 	this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
   this.player.family = "player";
@@ -49,17 +50,19 @@ var onStart = function () {
   }
   player_dummy.addBehavior(Follow, {target: p, offset: {angle: 0, x: 0, y: 0, z: 0}});
   
+	bg.camera.addBehavior(Follow, {target: p, offset: {angle: 0, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});
+	fg.camera.addBehavior(Follow, {target: p, offset: {angle: 0, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});
+	
 	var borders = [];
-  borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4,gameWorld.width,8,Resources.ground)));
-	borders.push(bg.add(Object.create(TiledBackground).init(-12, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
-  borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width + 12, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
+  //borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4,gameWorld.width,8,Resources.ground)));
+	//borders.push(bg.add(Object.create(TiledBackground).init(-12, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
+  //borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width + 12, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
 	borders.forEach(function (b) {
 		b.obstacle = true;
   	b.setCollision(Polygon);  
   	b.solid = true;
 	});
   
-  bg.add(Object.create(Entity).init(160, 220, 320, 20));
   this.bg = bg;
   
   this.keydown = false;
@@ -81,7 +84,7 @@ var onStart = function () {
   this.onMouseMove = function (e) {
 		if (s.ui.active) return;
     if (s.player.velocity.x === 0 && s.player.velocity.y === 0) {
-      s.player.angle = angle(this.player.x, this.player.y, e.x, e.y) ;
+      s.player.angle = angle(gameWorld.width / 2, gameWorld.height / 2, e.x, e.y);
     }
   }
   this.onMouseUp = function (e) {
@@ -128,12 +131,15 @@ var onStart = function () {
       }
     }
   }
-  this.onTouchStart = function (e) {
-
-		if (!fullscreen) requestFullScreen();
+	
+  this.onTouchStart = function (e) {			
     s.pause();
 	}
   this.onTouchEnd = function (e) {
+		if (!fullscreen) {
+			requestFullScreen();
+			return;
+		}
     s.bg.paused = 0;
     s.player.velocity = {
       x: Math.cos( s.player.angle) * 100,
@@ -141,7 +147,7 @@ var onStart = function () {
     }
   }
   this.onTouchMove = function (e) {
-    s.player.angle = angle(this.player.x, this.player.y, e.touch.x, e.touch.y) ;
+    s.player.angle = angle(gameWorld.width / 2, gameWorld.height / 2, e.touch.x, e.touch.y) ;
   }
 	this.wave = [];
 	this.current_wave = 0;

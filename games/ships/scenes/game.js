@@ -781,13 +781,16 @@ var onStart = function () {
 	}
 	this.onTouchStart = function (e) {
 
-		if (!fullscreen) requestFullScreen();
-
 		t.touch.timestamp = new Date();
 		t.touch.x = e.changedTouches[0].pageX, t.touch.y = e.changedTouches[0].pageY;
 
 	}
 	this.onTouchEnd = function (e) {
+		if (!fullscreen) {
+			requestFullScreen();
+			return;
+		}
+
 		var b = fg.onButton(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
 		if (b) {
 			if (b.trigger) b.trigger();

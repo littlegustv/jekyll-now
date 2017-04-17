@@ -1,10 +1,11 @@
 var gameWorld = Object.create(World).init(320, 180, "index.json");
 
+// push to raindrop
 var fullscreen = false;
-
 function requestFullScreen () {
 // we've made the attempt, at least
   fullscreen = true;
+	console.log('requestingFullScreen');
   var body = document.documentElement;
   if (body.requestFullscreen) {
     body.requestFullscreen();
