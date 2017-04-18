@@ -20,10 +20,10 @@ var onStart = function () {
 	//fg.camera.scale = 0.5;
 		
   bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg)).z = -2;
-	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,  Resources.planet));
+	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 100,  Resources.planet));
 	planet.z = -1;
 	//var barrier = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 80, Resources.barrier));
-
+	/*
 	for(var i = 0; i < 6; i++) {
 		var theta = i * PI2 / 6;
 		var b =  bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2 - 320, 380, 4, Resources.barrier));
@@ -33,7 +33,7 @@ var onStart = function () {
 		b.solid = true;
 		//b.collision.onHandle = HandleCollision.handleSolid;
 		bg.add(Object.create(Sprite).init(gameWorld.width / 2 + 370 * Math.cos(theta), gameWorld.height / 2 + 370 * Math.sin(theta), Resources.node)).z = 10;	
-	}
+	}*/
 	
 	this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
   this.player.family = "player";
@@ -44,6 +44,7 @@ var onStart = function () {
   this.player.cooldown = 0;
 	this.player.salvage = 0;
   var p = this.player;
+	this.player.shoot = Weapons.double;
   var player_dummy = bg.add(Object.create(Entity).init(p.x, p.y, p.w, p.h));
   player_dummy.color = "red";
   player_dummy.setCollision(Polygon);
@@ -66,13 +67,13 @@ var onStart = function () {
   }
   player_dummy.addBehavior(Follow, {target: p, offset: {angle: 0, x: 0, y: 0, z: 0}});
   
-	bg.camera.addBehavior(Follow, {target: p, offset: {angle: 0, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});
-	fg.camera.addBehavior(Follow, {target: p, offset: {angle: 0, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});
+	//g.camera.addBehavior(Follow, {target: p, offset: {angle: 0, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});
+	//fg.camera.addBehavior(Follow, {target: p, offset: {angle: 0, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});
 	
 	var borders = [];
-  //borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4,gameWorld.width,8,Resources.ground)));
-	//borders.push(bg.add(Object.create(TiledBackground).init(-12, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
-  //borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width + 12, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
+  borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4,gameWorld.width,8,Resources.ground)));
+	borders.push(bg.add(Object.create(TiledBackground).init(-12, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
+  borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width + 12, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
 	borders.forEach(function (b) {
 		b.obstacle = true;
   	b.setCollision(Polygon);  
@@ -95,19 +96,12 @@ var onStart = function () {
       else if (a.y && b.y && a.y != b.y) return a.y - b.y;
       else return a.x - b.x;
     });
-  }
-	bg.drawOrder = function () {
-    return this.entities.sort(function (a, b) { 
-      if (a.z && b.z && b.z != a.z) return a.z - b.z;
-      else if (a.y && b.y && a.y != b.y) return a.y - b.y;
-      else return a.x - b.x;
-    });
-  }
+  };
   var s = this;
   this.onMouseMove = function (e) {
 		if (s.ui.active) return;
     if (s.player.velocity.x === 0 && s.player.velocity.y === 0) {
-      s.player.angle = angle(gameWorld.width / 2, gameWorld.height / 2, e.x, e.y);
+      s.player.angle = angle(s.player.x, s.player.y, e.x, e.y);
     }
   }
   this.onMouseUp = function (e) {
@@ -135,23 +129,8 @@ var onStart = function () {
   }
   this.onKeyPress = function (e) {
     if (e.keyCode == 122) {
-      if (s.player.cooldown <= 0) {
-        s.bg.paused = 0;
-        var a = s.bg.add(Object.create(Sprite).init(s.player.x, s.player.y, Resources.projectile));
-        a.setCollision(Polygon);
-        gameWorld.playSound(Resources.laser);
-        a.collision.onHandle = function (object, other) {
-          if (other.family != "player" && !other.projectile) {
-            object.alive = false;
-          } if (other.family == "enemy" && other.die) {
-            //other.alive = false;
-            other.die();
-          }
-        };
-        a.addBehavior(Velocity);
-        a.velocity = {x: 100 * Math.cos(s.player.angle), y: 100 * Math.sin(s.player.angle)};
-        s.player.cooldown = 0.3;
-      }
+			s.player.shoot(s.bg);
+			s.bg.paused = 0;      
     }
   }
 	
@@ -170,7 +149,7 @@ var onStart = function () {
     }
   }
   this.onTouchMove = function (e) {
-    s.player.angle = angle(gameWorld.width / 2, gameWorld.height / 2, e.touch.x, e.touch.y) ;
+    s.player.angle = angle(s.player.x, s.player.y, e.x, e.y);
   }
 	this.wave = [];
 	this.current_wave = 0;

@@ -374,6 +374,52 @@ function close_store(layer) {
 	layer.active = false;
 }
 
+var Weapons = {
+	standard: function (layer) {
+		if (this.cooldown <= 0) {
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+			a.setCollision(Polygon);
+			gameWorld.playSound(Resources.laser);
+			a.collision.onHandle = function (object, other) {
+				if (other.family != "player" && !other.projectile) {
+					object.alive = false;
+				} if (other.family == "enemy" && other.die) {
+					//other.alive = false;
+					other.die();
+				}
+			};
+			a.addBehavior(Velocity);
+			a.family = "player";
+			a.projectile = true;
+			a.velocity = {x: 100 * Math.cos(this.angle), y: 100 * Math.sin(this.angle)};
+			this.cooldown = 0.3;
+    }
+	},
+	double: function (layer) {
+		if (this.cooldown <= 0) {
+			for (var i = 0; i < 3; i++) {
+				var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+				a.setCollision(Polygon);
+				gameWorld.playSound(Resources.laser);
+				a.collision.onHandle = function (object, other) {
+					if (other.family != "player" && !other.projectile) {
+						object.alive = false;
+					} if (other.family == "enemy" && other.die) {
+						//other.alive = false;
+						other.die();
+					}
+				};
+				a.addBehavior(Velocity);
+				a.family = "player";
+				a.projectile = true;
+				var theta = this.angle - PI / 6 + i * PI / 6;
+				a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
+				this.cooldown = 0.6;
+			}
+    }
+	}
+}
+
 /* MUSIC */
 /*
 BUGS:
