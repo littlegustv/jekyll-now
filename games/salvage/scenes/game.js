@@ -4,7 +4,7 @@ var onStart = function () {
       gameWorld.soundtrack = gameWorld.playSound(Resources.salvage);
       gameWorld.soundtrack.onended = gameWorld.musicLoop;
     }
-    gameWorld.musicLoop();
+    //gameWorld.musicLoop();
   }
 	
   var bg = this.addLayer(Object.create(Layer).init(320,240));
@@ -14,11 +14,23 @@ var onStart = function () {
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	create_store(this.ui);
+	
+	// zoom out for debug...
+	//bg.camera.scale = 0.5;
+	//fg.camera.scale = 0.5;
 		
-  bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg));
-	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 80, Resources.planet));
-	var barrier = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 80, Resources.barrier));
+  bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg)).z = -1;
+	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,  Resources.planet));
+	//var barrier = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 80, Resources.barrier));
 
+	for(var i = 0; i < 6; i++) {
+		var theta = i * PI2 / 6;
+		var b =  bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2 - 320, 380, 4, Resources.barrier));
+		b.angle = theta;
+		b.origin = {x: 0, y: 320};
+		bg.add(Object.create(Sprite).init(gameWorld.width / 2 + 370 * Math.cos(theta), gameWorld.height / 2 + 370 * Math.sin(theta), Resources.node)).z = 10;	
+	}
+	
 	this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
   this.player.family = "player";
   this.player.addBehavior(Velocity);
@@ -74,6 +86,13 @@ var onStart = function () {
   this.pause();
   
   fg.drawOrder = function () {
+    return this.entities.sort(function (a, b) { 
+      if (a.z && b.z && b.z != a.z) return a.z - b.z;
+      else if (a.y && b.y && a.y != b.y) return a.y - b.y;
+      else return a.x - b.x;
+    });
+  }
+	bg.drawOrder = function () {
     return this.entities.sort(function (a, b) { 
       if (a.z && b.z && b.z != a.z) return a.z - b.z;
       else if (a.y && b.y && a.y != b.y) return a.y - b.y;

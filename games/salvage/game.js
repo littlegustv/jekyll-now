@@ -18,6 +18,8 @@ function requestFullScreen () {
   }
 }
 
+
+
 // push to raindrop 'active' flag for layer
 Scene.draw = function (ctx) {
 	for (var i = 0; i < this.layers.length; i++) {
