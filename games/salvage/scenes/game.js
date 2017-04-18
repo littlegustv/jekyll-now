@@ -19,8 +19,9 @@ var onStart = function () {
 	//bg.camera.scale = 0.5;
 	//fg.camera.scale = 0.5;
 		
-  bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg)).z = -1;
+  bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg)).z = -2;
 	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,  Resources.planet));
+	planet.z = -1;
 	//var barrier = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 80, Resources.barrier));
 
 	for(var i = 0; i < 6; i++) {
@@ -28,6 +29,9 @@ var onStart = function () {
 		var b =  bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2 - 320, 380, 4, Resources.barrier));
 		b.angle = theta;
 		b.origin = {x: 0, y: 320};
+		b.setCollision(Polygon);
+		b.solid = true;
+		//b.collision.onHandle = HandleCollision.handleSolid;
 		bg.add(Object.create(Sprite).init(gameWorld.width / 2 + 370 * Math.cos(theta), gameWorld.height / 2 + 370 * Math.sin(theta), Resources.node)).z = 10;	
 	}
 	

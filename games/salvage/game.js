@@ -49,6 +49,7 @@ Shoot.update = function (dt) {
     e.family = "enemy";
     e.projectile = true;
     e.collision.onHandle = function (object, other) {
+			if (other.solid) object.alive = false;
       if (other.family == "player" && other.damage && other.damage.hit) {
         other.damage.hit(1);
       }
@@ -124,6 +125,7 @@ Bounce.update = function (dt) {
 // also add 'wrap' or 'bounce' to bombers to keep them around?
 var Bomber = Object.create(Behavior);
 Bomber.update = function (dt) {
+	this.entity.velocity.y = Math.max(this.entity.velocity.y, -100);
 	if (this.entity.velocity.y <= 0 && !this.done) {
 		var e = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.bomb));
 		e.addBehavior(Velocity);
@@ -167,6 +169,7 @@ Mortar.update = function (dt) {
     e.family = "enemy";
     e.projectile = true;
     e.collision.onHandle = function (object, other) {
+			if (other.solid) object.alive = false;
       if (other.family == "player" && other.damage && other.damage.hit) {
         other.damage.hit(1);
       }
@@ -220,7 +223,7 @@ function spawn(layer, key, player) {
       enemy.mirrored = enemy.x > 100;
       enemy.addBehavior(Flip);
 			enemy.addBehavior(Walker, {cooldown: 1});
-      enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
+      //enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
       enemy.velocity = {x: enemy.x > 100 ? -20 : 20, y: 0};
 			break;
 		case 2:
@@ -260,7 +263,7 @@ function spawn(layer, key, player) {
       enemy.mirrored = enemy.x > 100;
       enemy.addBehavior(Flip);
       enemy.addBehavior(Mortar, {cooldown: 1});
-      enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
+      //enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
       enemy.velocity = {x: enemy.x > 100 ? -20 : 20, y: 0};
     	break;
 	}
@@ -275,6 +278,7 @@ function spawn(layer, key, player) {
 	]);
 	enemy.family = "enemy";
 	enemy.collision.onHandle = function (object, other) {
+		if (other.solid && object.opacity >= 1) object.die();
 		if (other.family != "enemy") {
 		//console.log('die?');
 			//object.alive = false;
@@ -304,7 +308,7 @@ function spawn(layer, key, player) {
 		salvage.velocity = {x: 0, y: 50};
 		gameWorld.playSound(Resources.hit);
 	}
-	enemy.addBehavior(Crop, {min: {x: -10, y: -10}, max: {x: gameWorld.width + 10, y: gameWorld.height + 20}});  
+	//enemy.addBehavior(Crop, {min: {x: -10, y: -10}, max: {x: gameWorld.width + 10, y: gameWorld.height + 20}});  
 	return enemy;
 }
 
