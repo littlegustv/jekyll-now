@@ -1,4 +1,4 @@
-var MAXHEALTH = 25;
+var MAXHEALTH = 16;
 var gameWorld = Object.create(World).init(320, 180, "index.json");
 
 
@@ -235,7 +235,7 @@ Mortar.update = function (dt) {
 var Damage = Object.create(Behavior);
 Damage.update = function (dt) {
 	if (this.timer > 0) this.timer -= dt;
-  if (Math.random() * 100 < (25 - this.entity.health)) {
+  if (Math.random() * 100 < (MAXHEALTH - this.entity.health)) {
     var c = Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.smoke);
     //var c = Object.create(Entity).init(this.entity.x, this.entity.y, 8, 8);
     c.opacity = 1;
@@ -378,6 +378,7 @@ var Store = {
 		close.trigger = function () {
 			t.player.salvage -= t.spent;
 			t.spent = 0;
+			if (t.weapon) t.player.shoot = Weapons[t.weapon];
 			t.close();
 		}
 		
@@ -386,7 +387,32 @@ var Store = {
 		this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 - 72, - 3 * gameWorld.height / 2 + 16, Resources.expire_font, "Repairs", {align: "left", spacing: -2}));
 		this.repair_price_text = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3*gameWorld.height / 2 + 16, Resources.expire_font, "$ 1", {align: "center", spacing: -2}));
 	
-		this.health_bar = this.layer.add(Object.create(Entity).init(gameWorld.width / 2, -3 * gameWorld.height / 2 + 28, 128, 12));
+		this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, -3 * gameWorld.height / 2 + 32, 128, 8, Resources.border)).opacity = 0.5;
+		this.health_bar = this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, -3 * gameWorld.height / 2 + 32, 128, 8, Resources.border));
+		
+		var i = 2;
+		for (var k in Weapons) {
+			(function () {	
+				var key = k;
+				var icon = t.layer.add(Object.create(Sprite).init(gameWorld.width / 2 - 64, -3 * gameWorld.height / 2 - 44 + i * 14, Resources.icons));
+				icon.animation = i;
+				icon.family = "button";
+				icon.purchase = key;
+				icon.trigger = function () {
+					console.log(key);
+					if (t.weapon == key && t.spent > 0) {
+						t.weapon = undefined;
+						t.spent -= 1;
+						this.opacity = 1;
+					} else if (t.player.salvage > (t.spent + 1)) {
+						t.weapon = key;
+						this.opacity = 0.5;
+						t.spent += 1;
+					}
+				}
+				i++;
+			})();
+		}
 		
 		var plus = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 63, -3 * gameWorld.height / 2 + 16, Resources.expire_font, "+", {align: "center", spacing: -2}));
 		plus.family = "button";
@@ -397,8 +423,8 @@ var Store = {
 				t.spent += 1;
 				t.player.health += 1;
 				t.salvage.text = "$" + (t.player.salvage - t.spent);
-				t.health_bar.w = 128 * t.player.health / 25;
-				t.health_bar.w = 128 * (t.player.health / 25), t.health_bar.x = gameWorld.width / 2 - (128 - t.health_bar.w) / 2;
+				t.health_bar.w = 128 * t.player.health / MAXHEALTH;
+				t.health_bar.w = 128 * (t.player.health / MAXHEALTH), t.health_bar.x = gameWorld.width / 2 - (128 - t.health_bar.w) / 2;
 			}
 		};
 		var minus = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 72, -3 * gameWorld.height / 2 + 16, Resources.expire_font, "-", {align: "center", spacing: -2}));
@@ -410,7 +436,7 @@ var Store = {
 				t.spent -= 1;
 				t.player.health -= 1;
 				t.salvage.text = "$" + (t.player.salvage - t.spent);
-				t.health_bar.w = 128 * (t.player.health / 25), t.health_bar.x = gameWorld.width / 2 - (128 - t.health_bar.w) / 2;
+				t.health_bar.w = 128 * (t.player.health / MAXHEALTH), t.health_bar.x = gameWorld.width / 2 - (128 - t.health_bar.w) / 2;
 			}
 		};
 		
@@ -421,9 +447,9 @@ var Store = {
 	},
 	open: function () {
 		this.salvage.text = "$ " + this.player.salvage;
-		this.health_bar.w = 128 * (this.player.health / 25), this.health_bar.x = gameWorld.width / 2 - (128 - this.health_bar.w) / 2;
+		this.health_bar.w = 128 * (this.player.health / MAXHEALTH), this.health_bar.x = gameWorld.width / 2 - (128 - this.health_bar.w) / 2;
 		
-		this.repair_cost = (25 - this.player.health) / this.player.salvage; // price calculated to cost ALL your money to repair completely
+		this.repair_cost = (MAXHEALTH - this.player.health) / this.player.salvage; // price calculated to cost ALL your money to repair completely
 		this.repair_price_text.text = "$ " + Math.floor(this.repair_cost * 10) / 10;
 		
 		for (var i = 0; i < this.layer.entities.length; i++) {
