@@ -367,6 +367,14 @@ var Store = {
 		this.createUI();
 		return this;
 	},
+	spend: function (amount) {
+		if (this.player.salvage - this.spent < amount) return false; // can't afford
+		else if (amount < 0 && this.spent + amount < 0) return false; // can't unspend more than you've spent
+		else {
+			this.spent += amount;
+			this.salvage.text = "$ " + (this.player.salvage - this.spent);
+		}
+	},
 	createUI: function () {
 		this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, -3 * gameWorld.height / 2, 160, 112, Resources.border)); 				// border
 		this.layer.add(Object.create(Entity).init(gameWorld.width / 2, -3 * gameWorld.height / 2, 152, 104)).color="white";								//body
@@ -378,10 +386,11 @@ var Store = {
 		close.trigger = function () {
 			t.player.salvage -= t.spent;
 			t.spent = 0;
+			t.weapon = undefined;
 			if (t.weapon) t.player.shoot = Weapons[t.weapon];
 			t.close();
 		}
-		
+		this.weapons = {};
 		this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 32, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
 	
 		this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 - 72, - 3 * gameWorld.height / 2 + 16, Resources.expire_font, "Repairs", {align: "left", spacing: -2}));
@@ -395,6 +404,7 @@ var Store = {
 			(function () {	
 				var key = k;
 				var icon = t.layer.add(Object.create(Sprite).init(gameWorld.width / 2 - 64, -3 * gameWorld.height / 2 - 44 + i * 14, Resources.icons));
+				t.weapons[key] = icon;
 				icon.animation = i;
 				icon.family = "button";
 				icon.purchase = key;
@@ -402,12 +412,16 @@ var Store = {
 					console.log(key);
 					if (t.weapon == key && t.spent > 0) {
 						t.weapon = undefined;
-						t.spent -= 1;
+						t.spend(-1);
 						this.opacity = 1;
 					} else if (t.player.salvage > (t.spent + 1)) {
+						if (t.weapon) {
+							t.weapons[t.weapon].opacity = 1;
+							t.spend(-1);
+						}
 						t.weapon = key;
 						this.opacity = 0.5;
-						t.spent += 1;
+						t.spend(1);
 					}
 				}
 				i++;
