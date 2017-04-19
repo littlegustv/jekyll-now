@@ -13,33 +13,21 @@ var onStart = function () {
 	fg.active = true;
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
-	create_store(this.ui);
 	
-	// zoom out for debug...
-	//bg.camera.scale = 0.5;
-	//fg.camera.scale = 0.5;
-		
   bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg)).z = -2;
 	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 100,  Resources.planet));
 	planet.z = -1;
-	//var barrier = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 80, Resources.barrier));
-	/*
-	for(var i = 0; i < 6; i++) {
-		var theta = i * PI2 / 6;
-		var b =  bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2 - 320, 380, 4, Resources.barrier));
-		b.angle = theta;
-		b.origin = {x: 0, y: 320};
-		b.setCollision(Polygon);
-		b.solid = true;
-		//b.collision.onHandle = HandleCollision.handleSolid;
-		bg.add(Object.create(Sprite).init(gameWorld.width / 2 + 370 * Math.cos(theta), gameWorld.height / 2 + 370 * Math.sin(theta), Resources.node)).z = 10;	
-	}*/
 	
 	this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
   this.player.family = "player";
   this.player.addBehavior(Velocity);
   this.player.health = 25;
 
+	this.store = Object.create(Store).init(this.ui, this.player);
+/*	store.player = this.player;
+	store.layer = this.ui;
+	create_store();*/
+	
   this.player.velocity = {x: 0, y: 0};
   this.player.cooldown = 0;
 	this.player.salvage = 0;
@@ -81,7 +69,8 @@ var onStart = function () {
 	});
   
   this.bg = bg;
-  
+  this.fg = fg;
+	
   this.keydown = false;
   this.pause = function () {
     this.bg.paused = 10000;
@@ -120,6 +109,7 @@ var onStart = function () {
 			return;
 		}
 		s.bg.paused = 0;
+		s.fg.paused = 0;
     s.player.animation = 1;
     s.player.velocity = {
       x: Math.cos( s.player.angle) * 100,
@@ -131,6 +121,7 @@ var onStart = function () {
     if (e.keyCode == 122) {
 			s.player.shoot(s.bg);
 			s.bg.paused = 0;      
+			s.fg.paused = 0;      
     }
   }
 	
@@ -143,6 +134,7 @@ var onStart = function () {
 			return;
 		}
     s.bg.paused = 0;
+		s.fg.paused = 0;      
     s.player.velocity = {
       x: Math.cos( s.player.angle) * 100,
       y: Math.sin( s.player.angle) * 100
@@ -181,8 +173,8 @@ var onUpdate = function (dt) {
   if (this.bg.paused === 0 && this.wave.length <= 0) {
 		console.log('new wave');
 		this.current_wave += 1;
-		if (this.current_wave % 3 === 0) {
-			open_store(this.ui);
+		if (this.current_wave % 2 === 0) {
+			this.store.open();
 			gameWorld.playSound(Resources.store);
 		} else {
 			var w = choose(this.waves);

@@ -1,6 +1,53 @@
 var MAXHEALTH = 25;
 var gameWorld = Object.create(World).init(320, 180, "index.json");
 
+
+var Weapons = {
+	standard: function (layer) {
+		if (this.cooldown <= 0) {
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+			a.setCollision(Polygon);
+			gameWorld.playSound(Resources.laser);
+			a.collision.onHandle = function (object, other) {
+				if (other.family != "player" && !other.projectile) {
+					object.alive = false;
+				} if (other.family == "enemy" && other.die) {
+					//other.alive = false;
+					other.die();
+				}
+			};
+			a.addBehavior(Velocity);
+			a.family = "player";
+			a.projectile = true;
+			a.velocity = {x: 100 * Math.cos(this.angle), y: 100 * Math.sin(this.angle)};
+			this.cooldown = 0.3;
+    }
+	},
+	double: function (layer) {
+		if (this.cooldown <= 0) {
+			for (var i = 0; i < 3; i++) {
+				var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+				a.setCollision(Polygon);
+				gameWorld.playSound(Resources.laser);
+				a.collision.onHandle = function (object, other) {
+					if (other.family != "player" && !other.projectile) {
+						object.alive = false;
+					} if (other.family == "enemy" && other.die) {
+						//other.alive = false;
+						other.die();
+					}
+				};
+				a.addBehavior(Velocity);
+				a.family = "player";
+				a.projectile = true;
+				var theta = this.angle - PI / 6 + i * PI / 6;
+				a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
+				this.cooldown = 0.6;
+			}
+    }
+	}
+}
+
 // push to raindrop
 var fullscreen = false;
 function requestFullScreen () {
@@ -188,7 +235,7 @@ Mortar.update = function (dt) {
 var Damage = Object.create(Behavior);
 Damage.update = function (dt) {
 	if (this.timer > 0) this.timer -= dt;
-  if (Math.random() * 100 < (10 - this.entity.health)) {
+  if (Math.random() * 100 < (25 - this.entity.health)) {
     var c = Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.smoke);
     //var c = Object.create(Entity).init(this.entity.x, this.entity.y, 8, 8);
     c.opacity = 1;
@@ -313,19 +360,97 @@ function spawn(layer, key, player) {
 	return enemy;
 }
 
-function create_store(layer) {
-	var border = layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, -3 * gameWorld.height / 2, 160, 112, Resources.border));
-	var inner = layer.add(Object.create(Entity).init(gameWorld.width / 2, -3 * gameWorld.height / 2, 152, 104));
-	inner.color = "white";
+var Store = {
+	init: function (layer, player) {
+		this.layer = layer, this.player = player, this.spent = 0, this.repair_cost = 1;
+		// create UI
+		this.createUI();
+		return this;
+	},
+	createUI: function () {
+		this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, -3 * gameWorld.height / 2, 160, 112, Resources.border)); 				// border
+		this.layer.add(Object.create(Entity).init(gameWorld.width / 2, -3 * gameWorld.height / 2, 152, 104)).color="white";								//body
+		this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 44, Resources.expire_font, "SHOPPE", {align: "center", spacing: -2})); // title
+		
+		var t = this;
+		var close = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 64, -3 * gameWorld.height / 2 + 40, Resources.expire_font, "done", {align: "center", spacing: -2}));
+		close.family = "button";
+		close.trigger = function () {
+			t.player.salvage -= t.spent;
+			t.spent = 0;
+			t.close();
+		}
+		
+		this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 32, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
 	
-	var title = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 44, Resources.expire_font, "SHOPPE", {align: "center", spacing: -2}));
-	layer.items = [];
+		this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 - 72, - 3 * gameWorld.height / 2 + 16, Resources.expire_font, "Repairs", {align: "left", spacing: -2}));
+		this.repair_price_text = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 72, -3*gameWorld.height / 2 + 16, Resources.expire_font, "$ 1", {align: "right", spacing: -2}));
 	
-	layer.spent = 0;
-	
-	for (var i = 0; i < 3; i++) {
+		this.health_bar = this.layer.add(Object.create(Entity).init(gameWorld.width / 2, -3 * gameWorld.height / 2 + 28, 128, 12));
+		
+		var plus = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 56, -3 * gameWorld.height / 2 + 16, Resources.expire_font, "+", {align: "center", spacing: -2}));
+		plus.family = "button";
+		plus.w = 8, plus.h = 8;
+		plus.trigger = function () {
+			console.log('repair plus');
+			if (t.player.health < MAXHEALTH && t.spent < t.player.salvage) {
+				t.spent += 1;
+				t.player.health += 1;
+				t.salvage.text = "$" + (t.player.salvage - t.spent);
+				t.health_bar.w = 128 * t.player.health / 25;
+			}
+		};
+		var minus = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 72, -3 * gameWorld.height / 2 + 16, Resources.expire_font, "-", {align: "center", spacing: -2}));
+		minus.family = "button";
+		plus.w = 8, plus.h = 8;
+		minus.trigger = function () { 
+			console.log('repair minus');
+			if (t.player.health > 0 && t.spent > 0) {
+				t.spent -= 1;
+				t.player.health -= 1;
+				t.salvage.text = "$" + (t.player.salvage - t.spent);
+				t.health_bar.w = 128 * t.player.health / 25;
+			}
+		};
+		
+		for (var i = 0; i < this.layer.entities.length; i++) {
+			this.layer.entities[i].lerp = this.layer.entities[i].addBehavior(Lerp, {object: this.layer.entities[i], field: "y", goal: this.layer.entities[i].y + gameWorld.height * 2, rate: 10});
+			this.layer.entities[i].goal = this.layer.entities[i].lerp.goal;
+		}
+	},
+	open: function () {
+		this.salvage.text = "$ " + this.player.salvage;
+		this.health_bar.w = 128 * (this.player.health / 25), this.health_bar.x = gameWorld.width / 2 - (128 - this.health_bar.w) / 2;
+		
+		this.repair_cost = (25 - this.player.health) / this.player.salvage; // price calculated to cost ALL your money to repair completely
+		this.repair_price_text.text = "$ " + this.repair_cost;
+		
+		for (var i = 0; i < this.layer.entities.length; i++) {
+			this.layer.entities[i].lerp.goal = this.layer.entities[i].goal;
+		}
+		this.layer.active = true;
+		for (var i = 0; i < gameWorld.scene.layers.length; i++) {
+			gameWorld.scene.layers[i].paused = 10000;
+		}
+		this.layer.paused = 0;
+	},
+	close: function () {
+		var t = this;
+		for (var i = 0; i < this.layer.entities.length; i++) {
+			this.layer.entities[i].lerp.goal = this.layer.entities[i].goal - gameWorld.height * 2;
+		}
+		this.layer.entities[0].lerp.callback = function () {
+			this.callback = undefined;
+			t.layer.active = false;
+		}
+		gameWorld.current_wave += 1;
+	}
+}
+
+		/*
+	for (var i = 0; i < store.weapons.length; i++) {
 		var item_icon = layer.add(Object.create(Sprite).init(gameWorld.width / 2 - 64, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.icons));
-		item_icon.animation = i + 2;
+		item_icon.animation = store.weapons[i].icon + 2;
 		var price = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 - 32, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, randint(1,5) + "$", {align: "left", spacing: -2}));
 		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, "___", {align: "left", spacing: -2}));
 		var plus = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 56, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, "-", {align: "right", spacing: -2}));
@@ -335,125 +460,7 @@ function create_store(layer) {
 		minus.family = "button";
 		minus.trigger = function () { console.log('minus'); };
 		layer.items.push({icon: item_icon, price: price});
-	}
-	
-	var plus = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 72, -3 * gameWorld.height / 2 + 16, Resources.expire_font, "-", {align: "center", spacing: -2}));
-	plus.family = "button";
-	plus.w = 8, plus.h = 8;
-	plus.trigger = function () {
-		console.log('repair plus');
-		if (gameWorld.scene.player.health < MAXHEALTH && layer.spent < gameWorld.scene.player.salvage) {
-			layer.spent += 1;
-			gameWorld.scene.player.health += 1;
-			layer.salvage.text = "$" + (gameWorld.scene.player.salvage - layer.spent);
-			layer.repairs.health.w = 128 * gameWorld.scene.player.health / 25;
-		}
-	};
-	var minus = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 56, -3 * gameWorld.height / 2 + 16, Resources.expire_font, "+", {align: "center", spacing: -2}));
-	minus.family = "button";
-	plus.w = 8, plus.h = 8;
-	minus.trigger = function () { 
-		console.log('repair minus');
-		if (gameWorld.scene.player.health > 0 && layer.spent > 0) {
-			layer.spent -= 1;
-			gameWorld.scene.player.health -= 1;
-			layer.salvage.text = "$" + (gameWorld.scene.player.salvage - layer.spent);
-			layer.repairs.health.w = 128 * gameWorld.scene.player.health / 25;
-		}
-	};
-	
-	layer.salvage = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 32, Resources.expire_font, "Total: $ 0", {align: "center", spacing: -2}));
-	
-	layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, - 3 * gameWorld.height / 2 + 16, Resources.expire_font, "Repairs", {align: "center", spacing: -2}));
-	layer.repairs = {};
-	layer.repairs.price = layer.add(Object.create(SpriteFont).init(gameWorld.width - 64, -3*gameWorld.height / 2 + 28, Resources.expire_font, "$ 1", {align: "left", spacing: -2}));
-	
-	layer.repairs.health = layer.add(Object.create(Entity).init(gameWorld.width / 2, -3 * gameWorld.height / 2 + 28, 128, 12));
-	
-	var close_text = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 64, -3 * gameWorld.height / 2 + 40, Resources.expire_font, "done", {align: "right", spacing: -2}));
-	var close = layer.add(Object.create(Entity).init(gameWorld.width / 2 + 64, -3 * gameWorld.height / 2 + 40, 32, 16));
-	close.color = "#dddddd";
-	close.family = "button";
-	close.w = 12, close.h = 8;
-	close.trigger = function () {
-		gameWorld.scene.player.salvage -= layer.spent;
-		layer.spent = 0;
-		for (var i = 0; i < layer.entities.length; i++) {
-			layer.entities[i].lerp.goal = layer.entities[i].goal - gameWorld.height * 2;
-		}
-		layer.entities[0].lerp.callback = function () {
-			close_store(layer);
-			this.callback = undefined;
-		}
-		gameWorld.current_wave += 1;
-	}
-	
-	for (var i = 0; i < layer.entities.length; i++) {
-		layer.entities[i].lerp = layer.entities[i].addBehavior(Lerp, {object: layer.entities[i], field: "y", goal: layer.entities[i].y + gameWorld.height * 2, rate: 10});
-		layer.entities[i].goal = layer.entities[i].lerp.goal;
-	}
-}
-function open_store(layer) {
-	gameWorld.scene.layers.forEach( l => l.paused = 10000 );
-	layer.paused = 0;
-	for (var i = 0; i < layer.entities.length; i++) {
-		layer.entities[i].lerp.goal = layer.entities[i].goal;
-	}
-	layer.repairs.health.w = 128 * gameWorld.scene.player.health / 25;
-	layer.active = true;
-	layer.salvage.text = "$" + gameWorld.scene.player.salvage;
-}
-
-function close_store(layer) {
-	gameWorld.scene.layers.forEach( l => l.paused = 0 );
-	layer.active = false;
-}
-
-var Weapons = {
-	standard: function (layer) {
-		if (this.cooldown <= 0) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
-			a.setCollision(Polygon);
-			gameWorld.playSound(Resources.laser);
-			a.collision.onHandle = function (object, other) {
-				if (other.family != "player" && !other.projectile) {
-					object.alive = false;
-				} if (other.family == "enemy" && other.die) {
-					//other.alive = false;
-					other.die();
-				}
-			};
-			a.addBehavior(Velocity);
-			a.family = "player";
-			a.projectile = true;
-			a.velocity = {x: 100 * Math.cos(this.angle), y: 100 * Math.sin(this.angle)};
-			this.cooldown = 0.3;
-    }
-	},
-	double: function (layer) {
-		if (this.cooldown <= 0) {
-			for (var i = 0; i < 3; i++) {
-				var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
-				a.setCollision(Polygon);
-				gameWorld.playSound(Resources.laser);
-				a.collision.onHandle = function (object, other) {
-					if (other.family != "player" && !other.projectile) {
-						object.alive = false;
-					} if (other.family == "enemy" && other.die) {
-						//other.alive = false;
-						other.die();
-					}
-				};
-				a.addBehavior(Velocity);
-				a.family = "player";
-				a.projectile = true;
-				var theta = this.angle - PI / 6 + i * PI / 6;
-				a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
-				this.cooldown = 0.6;
-			}
-    }
-	}
-}
+	}*/
 
 /* MUSIC */
 /*
