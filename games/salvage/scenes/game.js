@@ -55,13 +55,17 @@ var onStart = function () {
   }
   player_dummy.addBehavior(Follow, {target: p, offset: {angle: 0, x: 0, y: 0, z: 0}});
   
-	//g.camera.addBehavior(Follow, {target: p, offset: {angle: 0, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});
-	//fg.camera.addBehavior(Follow, {target: p, offset: {angle: 0, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});
+	/* skyline...
+	for (var i = 16; i < gameWorld.width; i += 32) {
+		var h = randint(2,5) * 32;
+		var b = bg.add(Object.create(TiledBackground).init(i, gameWorld.height - h / 2, 32, h, Resources.building2));
+		b.opacity = Math.random() * 0.2 + 0.1;
+	}*/
 	
 	var borders = [];
+	borders.push(bg.add(Object.create(TiledBackground).init(-6, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
+  borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width + 6, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
   borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4,gameWorld.width,8,Resources.ground)));
-	borders.push(bg.add(Object.create(TiledBackground).init(-12, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
-  borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width + 12, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
 	borders.forEach(function (b) {
 		b.obstacle = true;
   	b.setCollision(Polygon);  

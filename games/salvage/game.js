@@ -384,11 +384,11 @@ var Store = {
 		this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 32, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
 	
 		this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 - 72, - 3 * gameWorld.height / 2 + 16, Resources.expire_font, "Repairs", {align: "left", spacing: -2}));
-		this.repair_price_text = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 72, -3*gameWorld.height / 2 + 16, Resources.expire_font, "$ 1", {align: "right", spacing: -2}));
+		this.repair_price_text = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3*gameWorld.height / 2 + 16, Resources.expire_font, "$ 1", {align: "center", spacing: -2}));
 	
 		this.health_bar = this.layer.add(Object.create(Entity).init(gameWorld.width / 2, -3 * gameWorld.height / 2 + 28, 128, 12));
 		
-		var plus = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 56, -3 * gameWorld.height / 2 + 16, Resources.expire_font, "+", {align: "center", spacing: -2}));
+		var plus = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 63, -3 * gameWorld.height / 2 + 16, Resources.expire_font, "+", {align: "center", spacing: -2}));
 		plus.family = "button";
 		plus.w = 8, plus.h = 8;
 		plus.trigger = function () {
@@ -398,6 +398,7 @@ var Store = {
 				t.player.health += 1;
 				t.salvage.text = "$" + (t.player.salvage - t.spent);
 				t.health_bar.w = 128 * t.player.health / 25;
+				t.health_bar.w = 128 * (t.player.health / 25), t.health_bar.x = gameWorld.width / 2 - (128 - t.health_bar.w) / 2;
 			}
 		};
 		var minus = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 72, -3 * gameWorld.height / 2 + 16, Resources.expire_font, "-", {align: "center", spacing: -2}));
@@ -409,7 +410,7 @@ var Store = {
 				t.spent -= 1;
 				t.player.health -= 1;
 				t.salvage.text = "$" + (t.player.salvage - t.spent);
-				t.health_bar.w = 128 * t.player.health / 25;
+				t.health_bar.w = 128 * (t.player.health / 25), t.health_bar.x = gameWorld.width / 2 - (128 - t.health_bar.w) / 2;
 			}
 		};
 		
@@ -423,7 +424,7 @@ var Store = {
 		this.health_bar.w = 128 * (this.player.health / 25), this.health_bar.x = gameWorld.width / 2 - (128 - this.health_bar.w) / 2;
 		
 		this.repair_cost = (25 - this.player.health) / this.player.salvage; // price calculated to cost ALL your money to repair completely
-		this.repair_price_text.text = "$ " + this.repair_cost;
+		this.repair_price_text.text = "$ " + Math.floor(this.repair_cost * 10) / 10;
 		
 		for (var i = 0; i < this.layer.entities.length; i++) {
 			this.layer.entities[i].lerp.goal = this.layer.entities[i].goal;
