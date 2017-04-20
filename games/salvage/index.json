@@ -17,6 +17,7 @@
 		{"path": "expire_font.png", "frames": 95, "animations": 1},
 		{"path": "asteroid.png"},
 		{"path": "smoke.png"},
+		{"path": "dust.png", "frames": 4, "speed": 0.2},
 		{"path": "item.png"},
 		{"path": "icons.png", "animations": 5},
 		{"path": "border.png"},

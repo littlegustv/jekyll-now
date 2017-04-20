@@ -21,6 +21,7 @@ var onStart = function () {
 	this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
   this.player.family = "player";
   this.player.addBehavior(Velocity);
+	this.player.addBehavior(Contrail);
   this.player.health = MAXHEALTH;
 
 	this.store = Object.create(Store).init(this.ui, this.player);
