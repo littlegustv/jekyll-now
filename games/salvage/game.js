@@ -113,8 +113,31 @@ var Weapons = {
 			a.family = "player";
 			a.projectile = true;
 			var theta = this.angle;
-			a.velocity = {x: 50 * Math.cos(theta), y: 50 * Math.sin(theta)};
+			a.velocity = {x: 90 * Math.cos(theta), y: 90 * Math.sin(theta)};
 			this.cooldown = 0.6;			
+    }
+	},
+	mine_layer: function (layer) {
+		if (this.cooldown <= 0) {
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bomb));
+			a.setCollision(Polygon);
+			//gameWorld.playSound(Resources.mortar);
+			a.collision.onHandle = function (object, other) {
+				if (other.family != "player" && !other.projectile) {
+					object.alive = false;
+				} if (other.family == "enemy" && other.die) {
+					//other.alive = false;
+					other.die();
+				}
+			};
+			a.addBehavior(Oscillate, {field: "angle", object: a, rate: 1, initial: 0, constant: PI2, offset: 0});
+			//a.addBehavior(Velocity);
+			//a.addBehavior(HeatSeeking, {family: "enemy"});
+			a.family = "player";
+			a.projectile = true;
+			//var theta = this.angle;
+			//a.velocity = {x: 50 * Math.cos(theta), y: 50 * Math.sin(theta)};
+			this.cooldown = 0.1;			
     }
 	}
 }
@@ -492,7 +515,7 @@ var Store = {
 				var key = k;
 				var icon = t.layer.add(Object.create(Sprite).init(gameWorld.width / 6, 44 + i * 14, Resources.icons));
 				t.weapons[key] = icon;
-				icon.animation = i;
+				icon.animation = i % Resources.icons.animations;
 				icon.family = "button";
 				icon.purchase = key;
 				icon.trigger = function () {
