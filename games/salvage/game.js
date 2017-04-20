@@ -1,4 +1,4 @@
-var MAXHEALTH = 16;
+var MAXHEALTH = 16, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(320, 180, "index.json");
 
 // push to raindrop
@@ -15,6 +15,20 @@ SpriteFont.onDraw = function (ctx) {
     }
   }
 }
+
+
+
+// goes to nearest enemy of acceptable 'family'
+var HeatSeeking = Object.create(Behavior);
+HeatSeeking.start = function () {
+	var t = this;
+	this.target = this.entity.layer.entities.filter(function (a) { return a.family == t.family && !a.projectile }).sort(function (a, b) { return distance(t.entity.x, t.entity.y, a.x, a.y) - distance(t.entity.x, t.entity.y, b.x, b.y); })[0];
+};
+HeatSeeking.update = function (dt) {
+	if (!this.target) this.start();
+	this.entity.angle = lerp_angle(this.entity.angle, angle(this.entity.x, this.entity.y, this.target.x, this.target.y), dt);
+	this.entity.velocity = {x: 50 * Math.cos(this.entity.angle), y: 50 * Math.sin(this.entity.angle) };
+};
 
 // push to raindrop
 function lerp_angle (a1, a2, rate) {
@@ -65,6 +79,28 @@ var Weapons = {
 				a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
 				this.cooldown = 0.6;
 			}
+    }
+	},
+	heat_seeking: function (layer) {
+		if (this.cooldown <= 0) {
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+			a.setCollision(Polygon);
+			//gameWorld.playSound(Resources.mortar);
+			a.collision.onHandle = function (object, other) {
+				if (other.family != "player" && !other.projectile) {
+					object.alive = false;
+				} if (other.family == "enemy" && other.die) {
+					//other.alive = false;
+					other.die();
+				}
+			};
+			a.addBehavior(Velocity);
+			a.addBehavior(HeatSeeking, {family: "enemy"});
+			a.family = "player";
+			a.projectile = true;
+			var theta = this.angle;
+			a.velocity = {x: 50 * Math.cos(theta), y: 50 * Math.sin(theta)};
+			this.cooldown = 0.6;			
     }
 	}
 }
@@ -404,8 +440,8 @@ var Store = {
 		
 		var r = [];
 
-		var outer = this.layer.add(Object.create(Entity).init(3 * gameWorld.width / 4, gameWorld.height - 16, gameWorld.width / 2, 32));
-		var inner = this.layer.add(Object.create(Entity).init(3 * gameWorld.width / 4 + 12, gameWorld.height - 12, gameWorld.width / 2, 24));
+		var outer = this.layer.add(Object.create(Sprite).init(3 * gameWorld.width / 4, gameWorld.height - 22, Resources.silhouette));
+		var inner = this.layer.add(Object.create(Entity).init(3 * gameWorld.width / 4 + 12, gameWorld.height - 12, gameWorld.width / 2 + 8, 24));
 		inner.color = "white";
 		r.push(inner);
 		r.push(outer);

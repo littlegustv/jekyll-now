@@ -26,6 +26,7 @@
 		{"path": "bg.png"},
 		{"path": "planet.png"},
 		{"path": "building2.png"},
+		{"path": "silhouette.png"},
 		{"path": "hit.wav"},
 		{"path": "laser.wav"},
 		{"path": "spawn.wav"},

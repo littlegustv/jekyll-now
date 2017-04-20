@@ -24,10 +24,6 @@ var onStart = function () {
   this.player.health = MAXHEALTH;
 
 	this.store = Object.create(Store).init(this.ui, this.player);
-/*	store.player = this.player;
-	store.layer = this.ui;
-	create_store();*/
-	
   this.player.velocity = {x: 0, y: 0};
   this.player.cooldown = 0;
 	this.player.salvage = 0;
@@ -44,7 +40,8 @@ var onStart = function () {
   player_dummy.family = "player";
   player_dummy.collision.onHandle = function (object, other) {
     if (other.family == "enemy") {
-      //p.health -= 1;
+      object.health -= 1;
+			object.cooldown = DAMAGE_COOLDOWN;
     }
 
     if (p.health <= 0) {
