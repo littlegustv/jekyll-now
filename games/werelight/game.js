@@ -55,7 +55,7 @@ Grid.available = function (coord) {
 	return between(coord.x, this.min.x, this.max.x) && between(coord.y, this.min.y,this.max.y);
 };
 Grid.select = function (coord) {
-	var t = this.toXY(this.toGrid(coord));
+  var t = this.toXY(this.toGrid(coord));
   if (this.possible(t)) this.target = t;
 }
 Grid.draw = function (ctx) {
@@ -108,3 +108,28 @@ Hungry.setTarget = function () {
 
 var TILESIZE = 20, OFFSET = {x: 90, y: 20};
 var gameWorld = Object.create(World).init(320, 180, "index.json");
+
+/*
+
+Saturday:
+
+todo: gameplay
+xxxxxxxxxxxxxxxxx1. pause/unpause fix
+xxxxxxxxxxxxxxxxx2. light effect (function lit())
+3. alternate/improved 'hungry' functions... (/movements)
+
+todo: util
+1. tileset handling (based on positions, mapping)
+2. puzzle editor
+
+Sunday
+
+todo: art
+1. enemy sprites; tiles
+2. menu/ui/transitions
+
+todo: sound
+1. player move, enemy move, splash, fail, menu, success
+2. music
+
+*/
