@@ -614,6 +614,8 @@ var Store = {
 			this.callback = undefined;
 			t.layer.active = false;
 		}
+		gameWorld.scene.claw.addBehavior(Lerp, {object: gameWorld.scene.claw, field: "x", goal: gameWorld.width / 2, rate: 5});
+		gameWorld.scene.claw.addBehavior(Lerp, {object: gameWorld.scene.claw, field: "y", goal: - gameWorld.height, rate: 5});
 		gameWorld.current_wave += 1;
 	}
 }

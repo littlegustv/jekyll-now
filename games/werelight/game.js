@@ -116,11 +116,12 @@ Saturday:
 todo: gameplay
 xxxxxxxxxxxxxxxxx1. pause/unpause fix
 xxxxxxxxxxxxxxxxx2. light effect (function lit())
-3. alternate/improved 'hungry' functions... (/movements)
 
-todo: util
-1. tileset handling (based on positions, mapping)
-2. puzzle editor
+make it top down, more minimalist
+simple tiles
+procedural generation (somehow)
+only rows/columns, no diagonals
+simplify lighting somehow
 
 Sunday
 

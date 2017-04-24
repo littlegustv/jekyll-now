@@ -24,6 +24,10 @@ var onStart = function () {
 	this.player.addBehavior(Contrail);
   this.player.health = MAXHEALTH;
 
+  this.claw = fg.add(Object.create(Sprite).init(gameWorld.width / 2, - gameWorld.height / 2, Resources.claw));
+  this.arm = fg.add(Object.create(Entity).init(gameWorld.width / 2, - gameWorld.height, 4, gameWorld.height));
+  this.arm.addBehavior(Follow, {target: this.claw, offset: {x: 0, y: -gameWorld.height / 2 - 6}});
+
 	this.store = Object.create(Store).init(this.ui, this.player);
   this.player.velocity = {x: 0, y: 0};
   this.player.cooldown = 0;
@@ -176,8 +180,23 @@ var onUpdate = function (dt) {
 		console.log('new wave');
 		this.current_wave += 1;
 		if (this.current_wave % 2 === 0) {
-			this.store.open();
-			gameWorld.playSound(Resources.store);
+      var t = this;
+      t.bg.paused = 10000;
+      this.claw.lerpx = this.claw.addBehavior(Lerp, {object: this.claw, field: "x", goal: this.player.x, rate: 5});
+      this.claw.lerpy = this.claw.addBehavior(Lerp, {object: this.claw, field: "y", goal: this.player.y, rate: 5, callback: function () {
+        t.claw.animation = 1;
+        t.claw.removeBehavior(t.claw.lerpx);
+        t.claw.removeBehavior(t.claw.lerpy);
+        t.player.grabbed = t.player.addBehavior(Follow, {target: t.claw, offset: {x: 0, y: 0}});
+        t.claw.lerpx = t.claw.addBehavior(Lerp, {object: t.claw, field: "x", goal: 3 * gameWorld.width / 4, rate: 5});
+        t.claw.lerpy = t.claw.addBehavior(Lerp, {object: t.claw, field: "y", goal: gameWorld.height / 3, rate: 5, callback: function () {
+    			t.store.open(); 
+        t.claw.removeBehavior(t.claw.lerpx);
+        t.claw.removeBehavior(t.claw.lerpy);
+          t.player.removeBehavior(t.player.grabbed);
+        }});
+      }})
+      gameWorld.playSound(Resources.store);
 		} else {
 			var w = choose(this.waves);
 			gameWorld.playSound(Resources[choose(["spawn", "spawn2"])]);

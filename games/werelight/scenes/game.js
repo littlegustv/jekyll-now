@@ -9,6 +9,7 @@ var onStart = function () {
   this.grid = [];
 
   this.light_layer = this.addLayer(Object.create(Layer).init(320,180));
+  var water = this.bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 8 * TILESIZE, 8 * TILESIZE, Resources.water));
 
   // grid
   for (var i = 0; i < 8; i++) {
@@ -19,13 +20,16 @@ var onStart = function () {
       if (randint(0,10) < 1) {
         g.solid = true;
         //g.color = "darkgreen";
+        this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j, Resources.post));
       } else if (randint(0, 10) < 1) {
         g.swamp = true;
         //g.color = "darkcyan";
+      } else {
+        this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j, Resources.tile));
       }
       this.grid[i].push({solid: g.solid, swamp: g.swamp});        
     }
-  }
+  }/*
   var map = [];
   for (var i = 0; i < this.grid.length; i++) {
     map.push([]);
@@ -34,20 +38,17 @@ var onStart = function () {
       else if (this.grid[i][j].swamp) map[i].push({x: 1, y: 0});
       else map[i].push({x: 0, y: 0});
     }
-  }
-  var t = this.bg.add(Object.create(TileMap).init(gameWorld.width / 2, gameWorld.height / 2, Resources.tiles, map));
+  }*/
+  //var t = this.bg.add(Object.create(TileMap).init(gameWorld.width / 2, gameWorld.height / 2, Resources.tiles, map));
 
   this.player = this.fg.add(Object.create(Sprite).init(170,40,Resources.wisp));
   this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: 115, y: 80}, tilesize: TILESIZE, callback: function () {
     for (var i = 0; i < s.mobs.length; i++) {
-      var g = s.mobs[i].grid.toGrid(s.mobs[i]);
-      if (s.lights[g.x][g.y].opacity > 0.15) {
-        s.mobs[i].hungry.setTarget();
-      }
+      s.mobs[i].hungry.setTarget();
     }
-    console.log(s.lights[g.x][g.y]);
+    //console.log(s.lights[g.x][g.y]);
     s.bg.paused = false;
-    s.lit();
+    //s.lit();
     this.entity.addBehavior(Delay, {duration: 0.8, callback: function () {
       s.bg.paused = true;
     }});
@@ -66,6 +67,7 @@ var onStart = function () {
   }
 
   // light tiles
+  /*
   this.light_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
   this.lights = [];
   for (var i = 0; i < 8; i++) {
@@ -73,7 +75,7 @@ var onStart = function () {
     for (var j = 0; j < 8; j++) {
       var l = this.light_layer.add(Object.create(Entity).init(OFFSET.x + i * TILESIZE, OFFSET.y + j * TILESIZE, TILESIZE, TILESIZE));
       l.color = "white";
-      l.opacity = 1 - (distance(l.x, l.y, this.player.x, this.player.y) / 160);
+      //l.opacity = 1 - (distance(l.x, l.y, this.player.x, this.player.y) / 160);
       l.blend = "destination-out";
       this.lights[i].push(l);
     }
@@ -100,7 +102,7 @@ var onStart = function () {
         }       
       }
     }
-  }
+  }*/
 
 
   // event listeners
