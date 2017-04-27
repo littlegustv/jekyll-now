@@ -1,0 +1,11 @@
+{ 
+	"scenes": [
+		{"name": "game", "reload": true}
+	],
+	"resources": [
+		{"path": "tile.png"},
+		{"path": "post.png"},
+		{"path": "water.png"},
+		{"path": "wisp.png", "frames": 3, "animations": 1, "speed": 0.5}
+	]
+}
