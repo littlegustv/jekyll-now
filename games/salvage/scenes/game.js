@@ -17,6 +17,8 @@ var onStart = function () {
   bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg)).z = -2;
 	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 100,  Resources.planet));
 	planet.z = -1;
+	planet.addBehavior(Velocity);
+	planet.velocity = {x: 0, y: 0, angle: PI / 72};
 	
 	this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
   this.player.family = "player";
@@ -94,17 +96,19 @@ var onStart = function () {
   };
   var s = this;
   this.onMouseMove = function (e) {
-		if (s.ui.active) return;
-    if (s.player.velocity.x === 0 && s.player.velocity.y === 0) {
-      s.player.angle = angle(s.player.x, s.player.y, e.x, e.y);
-    }
+		if (!s.player.locked) {
+			if (s.player.velocity.x === 0 && s.player.velocity.y === 0) {
+				s.player.angle = angle(s.player.x, s.player.y, e.x, e.y);
+			}
+		}
   }
   this.onMouseUp = function (e) {
-		if (s.ui.active) return;
-    s.player.velocity = {x: 0, y: 0};
-    if (s.player.cooldown <= 0) {
-      s.pause();
-    }
+		if (!s.player.locked) {
+			s.player.velocity = {x: 0, y: 0};
+			if (s.player.cooldown <= 0) {
+				s.pause();
+			}
+		}
   }
   this.onMouseDown = function (e) {
 		if (s.ui.active) {
@@ -113,24 +117,26 @@ var onStart = function () {
 				b.trigger();
 			}
 			return;
+		} else if (!s.player.locked) {		
+			s.bg.paused = 0;
+			s.fg.paused = 0;
+			s.player.animation = 1;
+			s.player.velocity = {
+				x: Math.cos( s.player.angle) * 100,
+				y: Math.sin( s.player.angle) * 100
+			}	
 		}
-		s.bg.paused = 0;
-		s.fg.paused = 0;
-    s.player.animation = 1;
-    s.player.velocity = {
-      x: Math.cos( s.player.angle) * 100,
-      y: Math.sin( s.player.angle) * 100
-    }
-		//console.log(s.player.velocity);
   }
   this.onKeyPress = function (e) {
-    if (e.keyCode == 122) {
-			s.player.shoot(s.bg);
-			s.bg.paused = 0;      
-			s.fg.paused = 0;      
-    }
+		if (!s.player.locked) {
+			if (e.keyCode == 122) {
+				s.player.shoot(s.bg);
+				s.bg.paused = 0;      
+				s.fg.paused = 0;      
+			}			
+		}
   }
-	
+	/*
   this.onTouchStart = function (e) {			
     s.pause();
 	}
@@ -148,7 +154,7 @@ var onStart = function () {
   }
   this.onTouchMove = function (e) {
     s.player.angle = angle(s.player.x, s.player.y, e.x, e.y);
-  }
+  }*/
 	this.wave = [];
 	this.current_wave = 0;
 	this.waves = [
@@ -182,6 +188,8 @@ var onUpdate = function (dt) {
 		if (this.current_wave % 2 === 0) {
       var t = this;
       t.bg.paused = 10000;
+			t.player.locked = true;
+			t.player.velocity = {x: 0, y: 0};
       this.claw.lerpx = this.claw.addBehavior(Lerp, {object: this.claw, field: "x", goal: this.player.x, rate: 5});
       this.claw.lerpy = this.claw.addBehavior(Lerp, {object: this.claw, field: "y", goal: this.player.y, rate: 5, callback: function () {
         t.claw.animation = 1;
@@ -190,9 +198,9 @@ var onUpdate = function (dt) {
         t.player.grabbed = t.player.addBehavior(Follow, {target: t.claw, offset: {x: 0, y: 0}});
         t.claw.lerpx = t.claw.addBehavior(Lerp, {object: t.claw, field: "x", goal: 3 * gameWorld.width / 4, rate: 5});
         t.claw.lerpy = t.claw.addBehavior(Lerp, {object: t.claw, field: "y", goal: gameWorld.height / 3, rate: 5, callback: function () {
-    			t.store.open(); 
-        t.claw.removeBehavior(t.claw.lerpx);
-        t.claw.removeBehavior(t.claw.lerpy);
+    			t.store.open();
+        	t.claw.removeBehavior(t.claw.lerpx);
+        	t.claw.removeBehavior(t.claw.lerpy);
           t.player.removeBehavior(t.player.grabbed);
         }});
       }})
