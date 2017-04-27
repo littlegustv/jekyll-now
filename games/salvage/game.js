@@ -19,7 +19,7 @@ SpriteFont.onDraw = function (ctx) {
 var Contrail = Object.create(Behavior);
 Contrail.update = function (dt) {
 	if (this.cooldown === undefined) this.cooldown = 0.1;
-	if (this.entity.velocity.x != 0 && this.entity.velocity.y != 0) {
+	if (this.entity.velocity.x !== 0 && this.entity.velocity.y !== 0) {
 		if (this.cooldown <= 0 && randint(0,100) < 25) {
 			this.cooldown = 0.1;
 			var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
