@@ -61,12 +61,12 @@ var onStart = function () {
   var score_sprite = fg.add(Object.create(Sprite).init(10, 4, Resources.score));
   score_sprite.removeBehavior(score_sprite.behaviors[0]);
   // fix me: newgrounds only
-  score_sprite.opacity = 0.5;
+  //score_sprite.opacity = 0.5;
 
   var score_button = Object.create(Button).init(20, 6, 40, 12);
   score_button.family = "button";
   score_button.trigger = function () {
-    //gameWorld.setScene(3); newgrounds only...
+    gameWorld.setScene(3);// newgrounds only...
   };
   score_button.hover = function () {
     score_sprite.frame = 1;
