@@ -209,6 +209,52 @@ var onStart = function () {
     ground_low.addBehavior(Wrap, {min: {x: -CONFIG.width / 2, y: 0}, max: {x: CONFIG.width + CONFIG.width / 2, y: CONFIG.height}});
     ground_low.velocity = {x: -1 * ROAD_SPEED / 2, y: 0};
   }
+  
+ // fg.add(Object.create(Sprite).init(64, 64, Resources.keys));
+  var prev = fg.add(Object.create(TileMap).init(12, gameWorld.height / 4, Resources.keys, [[{x: 1, y: 0}]]));
+  var next = fg.add(Object.create(TileMap).init(gameWorld.width - 12, gameWorld.height / 4, Resources.keys, [[{x: 0, y: 0}]]));
+  
+  var start = fg.add(Object.create(TileMap).init(gameWorld.width / 2, gameWorld.height / 4, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 2, y: 1}], [{x: 2, y: 1}], [{x: 2, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
+  prev.trigger = function () {
+    gameWorld.difficulty = modulo(gameWorld.difficulty - 1, gameWorld.difficulties.length);
+    t.doRefreshSelectors = true;
+  }
+  prev.button = true;
+  this.buttons.push(prev);
+  next.trigger = function () {
+    gameWorld.difficulty = modulo(gameWorld.difficulty + 1, gameWorld.difficulties.length);
+    t.doRefreshSelectors = true;
+  }
+  next.button = true;
+  this.buttons.push(next);
+  start.trigger = function () {
+    if (gameWorld.difficulty <= gameWorld.unlocked) {
+      if (gameWorld.difficulty < gameWorld.difficulties.length - 1) {
+        gameWorld.setScene(1, true);
+      } else {
+        gameWorld.setScene(2, true);
+      }
+      gameWorld.playSound(Resources.squeal);
+    }
+    else {
+      //gameWorld.playSound(Resources.error);
+    }
+  }
+  start.button = true;
+  this.buttons.push(start);
+  prev.hover = function () { prev.opacity = 0.5; }
+  prev.unhover = function () { prev.opacity = 1; }
+  next.hover = function () { next.opacity = 0.5; }
+  next.unhover = function () { next.opacity = 1; }
+  start.hover = function () { start.opacity = 0.5; d_name.opacity = 0.5; }
+  start.unhover = function () { start.opacity = 1; d_name.opacity = 1; }
+  prev.check = function (x, y) {
+    return (x > this.x - this.w / 2 && x < this.x + this.w / 2 && y > this.y - this.h / 2 && y < this.y + this.h / 2);
+  }
+  next.check = prev.check;
+  start.check = prev.check;
+  next.family = "button", prev.family = "button", start.family = "button";
+  
 /*
   var block = Object.create(Entity).init(CONFIG.width / 8, CONFIG.height / 2, CONFIG.width / 4, CONFIG.height);
   block.blend = "difference";
@@ -218,21 +264,21 @@ var onStart = function () {
 */
 
   this.onKeyDown = function (e) {
-    if (e.keyCode == 38) {
+    if (e.keyCode == 37) {
       //e.preventDefault();
       //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
       gameWorld.difficulty = modulo(gameWorld.difficulty - 1, gameWorld.difficulties.length);
       //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
       t.doRefreshSelectors = true;
       return false;
-    } else if (e.keyCode == 40) {
+    } else if (e.keyCode == 39) {
       //e.preventDefault();
       //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeOut() });
       gameWorld.difficulty = modulo(gameWorld.difficulty + 1, gameWorld.difficulties.length);
       //t.selector_texts[gameWorld.difficulty].forEach( function (st) { st.fadeIn() });
       t.doRefreshSelectors = true;
       return false;
-    } else if (e.keyCode == 32) {
+    } else if (e.keyCode == 32 || e.keyCode == 13) {
       //e.preventDefault();
       if (gameWorld.difficulty <= gameWorld.unlocked) {
         if (gameWorld.difficulty < gameWorld.difficulties.length - 1) {

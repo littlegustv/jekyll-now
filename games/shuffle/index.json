@@ -6,13 +6,11 @@
     {"name": "scores", "reload": true}
   ],
   "resources": [
-    {"path": "roadster.png", "frames": 2, "speed": 0.5, "animations": 1},
+    {"path": "keys.png", "frames": 4, "speed": 0.5, "animations": 2},
     {"path": "expire_font.png", "frames": 95, "animations": 1},
     {"path": "hatchback.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "smart.png", "frames": 2, "speed": 0.5, "animations": 1},
-    {"path": "car.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "explosion.png", "frames": 8, "speed": 0.08, "animations": 1},
-    {"path": "sedan.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "truck.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "car3.png", "frames": 2, "speed": 0.5, "animations": 1},
     {"path": "car4.png", "frames": 2, "speed": 0.5, "animations": 1},

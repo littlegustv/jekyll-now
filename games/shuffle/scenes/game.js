@@ -336,7 +336,7 @@ var onStart = function () {
     var destination = this.NEXT || modulo(lane + Math.floor(Math.random() * 5 + 1), 7);
     var start = Math.abs(destination - lane) * this.difficultyFormula();
     for (var i = 0; i <= 6; i++) {
-      if (i != destination) {
+      if (i != destination && Math.random() < 10 * this.miles() + 0.5) {
         var s = start - start * Math.abs(i - destination) / 7;
         if (i == special) {
           var c = Object.create(Sprite).init(CONFIG.width + s, i * LANE_SIZE + LANE_OFFSET, Resources[gameWorld.difficulties[(gameWorld.difficulty + 1) % gameWorld.difficulties.length].sprite]);

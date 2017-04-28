@@ -19,7 +19,7 @@ SpriteFont.onDraw = function (ctx) {
 var Contrail = Object.create(Behavior);
 Contrail.update = function (dt) {
 	if (this.cooldown === undefined) this.cooldown = 0.1;
-	if (this.entity.velocity.x != 0 && this.entity.velocity.y != 0) {
+	if (this.entity.velocity.x !== 0 && this.entity.velocity.y !== 0) {
 		if (this.cooldown <= 0 && randint(0,100) < 25) {
 			this.cooldown = 0.1;
 			var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
@@ -613,9 +613,10 @@ var Store = {
 		this.layer.entities[0].lerp.callback = function () {
 			this.callback = undefined;
 			t.layer.active = false;
+			t.player.locked = false;
 		}
-		gameWorld.scene.claw.addBehavior(Lerp, {object: gameWorld.scene.claw, field: "x", goal: gameWorld.width / 2, rate: 5});
-		gameWorld.scene.claw.addBehavior(Lerp, {object: gameWorld.scene.claw, field: "y", goal: - gameWorld.height, rate: 5});
+		gameWorld.scene.claw.lerpx = gameWorld.scene.claw.addBehavior(Lerp, {object: gameWorld.scene.claw, field: "x", goal: gameWorld.width / 2, rate: 5, callback: function () { this.entity.removeBehavior(this.entity.lerpx); }});
+		gameWorld.scene.claw.lerpy = gameWorld.scene.claw.addBehavior(Lerp, {object: gameWorld.scene.claw, field: "y", goal: - gameWorld.height, rate: 5, callback: function () { this.entity.removeBehavior(this.entity.lerpy); }});
 		gameWorld.current_wave += 1;
 	}
 }
