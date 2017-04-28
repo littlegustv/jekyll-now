@@ -124,8 +124,8 @@ gameWorld.difficulties = [
   {name: "bridge repair", board: 7596, roadSpeed: 170, handling: 180, sprite: "repair", score: 0, last: 0, primary: "#ffec00", secondary: "#ff4f00"}
 ]
 
-gameWorld.difficulty = 1;
-gameWorld.unlocked = 1;
+gameWorld.difficulty = 0;
+gameWorld.unlocked = 0;
 
 if (localStorage) {
   if (!localStorage.shuffleData) {

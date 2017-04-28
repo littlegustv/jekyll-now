@@ -139,7 +139,7 @@ var onStart = function () {
       bg.entities[i].velocity = {x: -2 * ROAD_SPEED, y: 0};
   }
 
-  var player = Object.create(Sprite).init(24, /*CONFIG.height - 5 * LANE_SIZE*/CONFIG.height / 2, Resources[gameWorld.difficulties[gameWorld.difficulty].sprite]);
+  var player = Object.create(Sprite).init(24, CONFIG.height - 5 * LANE_SIZE/*CONFIG.height / 2*/, Resources[gameWorld.difficulties[gameWorld.difficulty].sprite]);
   player.addBehavior(Velocity);
   player.addBehavior(Bound, {min: {x: 0, y: CONFIG.height - 7 * LANE_SIZE - 1}, max: {x: CONFIG.width, y: CONFIG.height - LANE_SIZE}});
   player.velocity = {x: 0, y: 0};
