@@ -39,6 +39,7 @@ Accelerate.update = function (dt) {
 
 var Animate = Object.create(Behavior);
 Animate.update = function (dt) {
+	if (this.paused) return;
 	this.entity.frameDelay -= dt;
 	if (this.entity.frameDelay <= 0) {
 		this.entity.frameDelay = this.entity.maxFrameDelay;
@@ -505,6 +506,14 @@ var HandleCollision = {
 var PI = Math.PI;
 var PI2 = 2 * Math.PI;
 
+function range(min, max) {
+  var arr = [];
+  for (var i = min; i < max; i++) {
+    arr.push(i);
+  }
+  return arr;
+}
+
 function distance(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 }
@@ -527,6 +536,16 @@ function cross(v1, v2) {
 
 function sign (n) {
   return n >= 0 ? 1 : -1;
+}
+
+function short_angle(a1, a2) {
+  var MAX = Math.PI * 2;  
+  var da = (a2 - a1) % MAX;
+  return 2 * da % MAX - da;
+}
+
+function lerp_angle (a1, a2, rate) {
+  return a1 + short_angle(a1, a2) * rate;
 }
 
 function choose (array) {
@@ -556,20 +575,17 @@ function randint(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function short_angle(a1, a2) {
-  var MAX = Math.PI * 2;  
-  var da = (a2 - a1) % MAX;
-  return 2 * da % MAX - da;
-}
-
-function lerp_angle (a1, a2, rate) {
-	if (Math.abs(a1 - a2) <= 0.02) return a2;
-	else return a1 + short_angle(a1, a2) * rate;
+function randomGray () {
+  var seed = ("00" + Math.floor(Math.random() * 150 + 56).toString(16)).substr(-2);
+  return "#" + seed + seed + seed;
 }
 
 function lerp (current, goal, rate) {
-	if (Math.abs(goal - current) <= 1) return goal;
-	else return (1-rate)*current + rate*goal
+  if (Math.abs(goal - current) <= 1) {
+    return goal;
+  } else {
+    return (1-rate)*current + rate*goal
+  }  
 }
 
 function normalize (x, y) {
@@ -599,16 +615,16 @@ function distance (x1, y1, x2, y2) {
 
 var DEBUG = false;
 
-var KEYCODES = {
-	37: "left",
-  38: "up",
-  39: "right",
-  40: "down",
-  65: "a",
-  68: "d",
-  83: "s",
-  87: "w",
-  80: "p"
+var KEYCODE = {
+	left: 37,
+  up: 38,
+  right: 39,
+  down: 40,
+  a: 65,
+  d: 68,
+  s: 83,
+  w: 87,
+  p: 80
 };
 
 var Resources = [];
@@ -616,14 +632,34 @@ var RESOURCES = [];
 
 var debug = {};
 
+// movement (x,y), size, rate, threshold
+var TileMovement = Object.create(Behavior);
+TileMovement.threshold = 0;
+TileMovement.update = function (dt) {
+  if (this.movement.y != 0) {
+    this.entity.velocity.y = this.movement.y * this.speed;
+  } else {
+    this.entity.velocity.y = Math.round((Math.round((this.entity.y + sign(this.entity.velocity.y) * this.threshold * this.size)/ this.size) * this.size - this.entity.y)) * (this.rate);
+    if (this.entity.velocity.y == 0) this.entity.y = Math.round(Math.round(this.entity.y / this.size) * this.size);
+  }
+  if (this.movement.x != 0) {
+    this.entity.velocity.x = this.movement.x * this.speed;
+  } else {
+    this.entity.velocity.x = Math.round((Math.round((this.entity.x + sign(this.entity.velocity.x) * this.threshold * this.size)/ this.size) * this.size - this.entity.x)) * (this.rate);
+    if (this.entity.velocity.y == 0) this.entity.y = Math.round(Math.round(this.entity.y / this.size) * this.size);
+  }
+}
+
 var Follow = Object.create(Behavior);
-Follow.update = function (dt) {
+Follow.update = function (dt) {  
   if (this.offset.x !== false)
     this.entity.x = this.target.x + (this.offset.x || 0);
   if (this.offset.y !== false)
     this.entity.y = this.target.y + (this.offset.y || 0);
   if (this.offset.z !== false)
     this.entity.z = this.target.z + (this.offset.z || 0);
+  if (this.offset.angle !== false)
+    this.entity.angle = this.target.angle + (this.offset.angle || 0);
   if (this.target.alive === false) this.entity.alive = false;
 };
 
@@ -740,7 +776,11 @@ FadeIn.start = function () {
 //object, field, goal, rate
 var Lerp = Object.create(Behavior);
 Lerp.update = function (dt) {
-  this.object[this.field] = lerp(this.object[this.field], this.goal, this.rate * dt);
+  if (this.field == "angle")
+    this.object[this.field] = lerp_angle(this.object[this.field], this.goal, this.rate * dt);
+  else
+    this.object[this.field] = lerp(this.object[this.field], this.goal, this.rate * dt);
+  if (this.object[this.field] == this.goal && this.callback) this.callback(); 
 };
 
 FadeIn.update = function (dt) {
@@ -858,7 +898,15 @@ var Entity = {
 		ctx.save();
 		ctx.translate(this.x, this.y);
 		ctx.translate(this.offset.x, this.offset.y);
+		
+		if (this.origin)
+			ctx.translate(this.origin.x, this.origin.y);
+		
 		ctx.rotate(this.angle);
+
+		if (this.origin)
+			ctx.translate(-this.origin.x, -this.origin.y);
+		
 		if (this.scale !== undefined) {
 			ctx.scale(this.scale, this.scale);
 		}
@@ -1131,6 +1179,60 @@ Button.init = function (x, y, w, h, object) {
   this.object = object;
   this.x = x, this.y = y, this.w = w, this.h = h;
   return this;
+}
+
+var SpriteFont = Object.create(Sprite);
+SpriteFont.characters = ['!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',  'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', 'ƒ'];
+SpriteFont.oldInit = SpriteFont.init;
+SpriteFont.init = function (x, y, sprite, text, options) {
+  this.oldInit(x, y, sprite);
+  this.text = text;
+  this.align = options.align || "left";
+  this.spacing = options.spacing || 0;
+  return this;
+}
+SpriteFont.getX = function (n) {
+  if (this.align == "center") {
+    return this.w * (n - this.text.length / 2) - this.spacing * this.text.length / 2;
+  } else if (this.align == "left") {
+    return this.w * n;
+  } else if (this.align == "right") {
+    return this.w * (n - this.text.length);
+  }
+}
+SpriteFont.draw = function (ctx) {
+  for (var i = 0; i < this.text.length; i++) {
+    var c = this.characters.indexOf(this.text[i]);
+    var x = this.getX(i);
+    if (c != -1) {
+      ctx.drawImage(this.sprite.image, 
+        c * this.sprite.w, 0, 
+        this.sprite.w, this.sprite.h, 
+        Math.round(this.x - this.w / 2) + x + this.spacing * i, this.y - Math.round(this.h / 2), this.w, this.h);          
+    }
+  }
+}
+
+var TileMap = Object.create(Sprite);
+TileMap.oldInit = Sprite.init;
+TileMap.init = function(x, y, sprite, map) {
+	this.oldInit(x, y, sprite);
+  this.behaviors = [];
+  this.map = map;
+  this.w = this.map.length * this.sprite.w;
+  this.h = this.map[0].length * this.sprite.h;
+  return this;
+}
+TileMap.onDraw = function (ctx) {
+	//ctx.fillRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+	for (var i = 0; i < this.map.length; i++) {
+  	for (var j = 0; j < this.map[i].length; j++) {
+    	ctx.drawImage(this.sprite.image,
+        this.map[i][j].x * this.sprite.w, this.map[i][j].y * this.sprite.h, 
+        this.sprite.w, this.sprite.h, 
+        Math.round(this.x - this.w / 2 + i * this.sprite.w), this.y - Math.round(this.h / 2) + j * this.sprite.h, this.sprite.w, this.sprite.h);
+    }
+  }
 }
 
 var mapping = ["a", "b", "x", "y", "lb", "rb", "lt", "rt", "back", "start", "ls", "rs", "dup", "ddown", "dleft", "dright"];
@@ -1519,7 +1621,13 @@ var World = {
     this.scale = scale;
   },
   filterEvent: function (event) {
-    return {x: event.offsetX / this.scale, y: event.offsetY / this.scale};
+    var w = this;
+    return {
+      x: event.offsetX / this.scale, 
+      y: event.offsetY / this.scale, 
+      keyCode: event.keyCode, 
+      touch: event.changedTouches && event.changedTouches.length > 0 ? {x: event.changedTouches[0].pageX / w.scale, y: event.changedTouches[0].pageY / w.scale} : {}
+    };
   },
   createCanvas: function () {
     this.canvas = document.createElement("canvas");
@@ -1645,7 +1753,7 @@ var World = {
         if (scene[event]) {
           //w[event] = scene[event];
           w[event] = function (e) {
-          	e.preventDefault();
+            e.preventDefault();
             scene[event](w.filterEvent(e));
             return false;
           };
@@ -1660,7 +1768,7 @@ var World = {
     } else {
       var t = this;
       // fix me: is there maybe a more elegant way of checking whether the scene is loaded?
-      setTimeout(function () { t.addEventListeners(scene); }, 50);
+      setTimeout(function () { t.addEventListeners(scene); }, 10);
     }
   },
   initAudio: function () {
@@ -1792,4 +1900,3 @@ var World = {
     }
   }
 };
-
