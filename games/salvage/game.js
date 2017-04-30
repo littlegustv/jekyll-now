@@ -1,6 +1,36 @@
 var MAXHEALTH = 16, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(320, 180, "index.json");
 
+// push to raindrop -> collisions fix
+Layer.update = function (dt) {
+	if (this.paused > 0) {
+	  this.paused -= dt;
+	  return;
+	}
+	this.camera.update(dt);
+	for (var i = 0; i < this.entities.length; i++) {
+	  this.entities[i].update(dt);
+	}
+	for (var i = 0; i < this.entities.length; i++) {
+	  this.entities[i].checkCollisions(i + 1, this.entities); // i + 1 instead of i
+	}
+	for (var i = 0; i < this.entities.length; i++) {
+	  if (!this.entities[i].alive) {
+	    this.entities[i].end();
+	    this.entities.splice(i, 1);
+	  }
+	}
+}
+
+function projectileHit (object, other) {
+	if (other.family != object.family && !other.projectile) {
+		object.alive = false;
+		var small = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.small));
+		small.addBehavior(FadeOut, {duration: 0.5});
+		gameWorld.playSound(Resources.hit);
+	}
+}
+
 // push to raindrop
 SpriteFont.draw = Sprite.draw;
 SpriteFont.onDraw = function (ctx) {
@@ -57,18 +87,12 @@ var Weapons = {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
 			a.setCollision(Polygon);
 			gameWorld.playSound(Resources.laser);
-			a.collision.onHandle = function (object, other) {
-				if (other.family != "player" && !other.projectile) {
-					object.alive = false;
-				} if (other.family == "enemy" && other.die) {
-					//other.alive = false;
-					other.die();
-				}
-			};
+			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
 			a.family = "player";
 			a.projectile = true;
-			a.velocity = {x: 100 * Math.cos(this.angle), y: 100 * Math.sin(this.angle)};
+			a.velocity = {x: 100 * Math.cos(this.angle), y: 100 * Math.sin(this.angle)	};
+			a.angle = theta;
 			this.cooldown = 0.3;
     }
 	},
@@ -78,19 +102,13 @@ var Weapons = {
 				var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
 				a.setCollision(Polygon);
 				gameWorld.playSound(Resources.laser);
-				a.collision.onHandle = function (object, other) {
-					if (other.family != "player" && !other.projectile) {
-						object.alive = false;
-					} if (other.family == "enemy" && other.die) {
-						//other.alive = false;
-						other.die();
-					}
-				};
+				a.collision.onHandle = projectileHit;
 				a.addBehavior(Velocity);
 				a.family = "player";
 				a.projectile = true;
 				var theta = this.angle - PI / 6 + i * PI / 6;
 				a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
+				a.angle = theta;
 				this.cooldown = 0.6;
 			}
     }
@@ -100,36 +118,23 @@ var Weapons = {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
-			a.collision.onHandle = function (object, other) {
-				if (other.family != "player" && !other.projectile) {
-					object.alive = false;
-				} if (other.family == "enemy" && other.die) {
-					//other.alive = false;
-					other.die();
-				}
-			};
+			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
 			a.addBehavior(HeatSeeking, {family: "enemy"});
 			a.family = "player";
 			a.projectile = true;
 			var theta = this.angle;
 			a.velocity = {x: 90 * Math.cos(theta), y: 90 * Math.sin(theta)};
+			a.angle = theta;
 			this.cooldown = 0.6;			
-    }
+    	}
 	},
 	mine_layer: function (layer) {
 		if (this.cooldown <= 0) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bomb));
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
-			a.collision.onHandle = function (object, other) {
-				if (other.family != "player" && !other.projectile) {
-					object.alive = false;
-				} if (other.family == "enemy" && other.die) {
-					//other.alive = false;
-					other.die();
-				}
-			};
+			a.collision.onHandle = projectileHit;
 			a.addBehavior(Oscillate, {field: "angle", object: a, rate: 1, initial: 0, constant: PI2, offset: 0});
 			//a.addBehavior(Velocity);
 			//a.addBehavior(HeatSeeking, {family: "enemy"});
@@ -198,6 +203,7 @@ Shoot.update = function (dt) {
       if (other.family != "enemy" && !other.projectile) object.alive = false;
     }
     var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
+    e.angle = theta;
     e.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
     this.entity.layer.add(e);
     this.cooldown = randint(1,2);
@@ -418,36 +424,52 @@ function spawn(layer, key, player) {
 		{x: 0, y: 6},
 		{x: 6, y: 0}
 	]);
+	enemy.health = randint(1, 3);
 	enemy.family = "enemy";
 	enemy.collision.onHandle = function (object, other) {
-		if (other.solid && object.opacity >= 1) object.die();
-		if (other.family != "enemy") {
-		//console.log('die?');
-			//object.alive = false;
-			if (object.opacity >= 1)
-				object.die();
+		if (other.family != object.family) {
+			object.health -= 1;
+			if (object.health < 0) object.die();
 		}        
 	}
 	enemy.die = function () {
-		this.collision.onCheck = function (a, b) { return false; };
+		this.collision.onHandle = function (a, b) { return false; };
 		this.velocity = {x: 0, y: 0};
 		this.addBehavior(FadeOut, {duration: 0.5});
 		var exp = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.explosion));
 		exp.addBehavior(FadeOut, {duration: 0.5, delay: 1});
 		exp.z = this.z - 1;
 		
-		var salvage = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.item));
-		salvage.addBehavior(FadeOut, {duration: 1, delay: 1});
-		salvage.setCollision(Polygon);
-		salvage.collision.onHandle = function (object, other) {
-			if (other.family == "player" && !other.projectile) {
-				object.alive = false;
-				player.salvage += 1;
+		for (var i = 0; i < randint(2,5); i++) {
+			var salvage = this.layer.add(Object.create(Sprite).init(this.x + randint(0,10) - 5, this.y + randint(0, 10) - 5, Resources.gem));
+			salvage.addBehavior(FadeOut, {duration: 1, delay: 3});
+			salvage.value = 1;
+			salvage.setCollision(Polygon);
+			salvage.collision.onHandle = function (object, other) {
+				if (other.family == "player" && !other.projectile) {
+					object.alive = false;
+					other.salvage += object.value;
+					gameWorld.playSound(Resources.pickup);
+					for (var i = 0; i < randint(5, 10); i++) {
+						var p = object.layer.add(Object.create(Entity).init(object.x, object.y, 12, 12));
+						p.color = "#0051ee";
+						p.addBehavior(Velocity);
+						p.addBehavior(FadeOut, {duration: 0.3});
+						var theta = Math.random() * PI2;
+						p.velocity = {x: 20 * Math.cos(theta), y: 20 * Math.sin(theta)};
+					}
+				} else if (other.solid) {
+					HandleCollision.handleSolid(object, other);
+				}
 			}
+			salvage.bounce = 0.5;
+			salvage.z = this.z - 1;
+			salvage.addBehavior(Velocity);
+			//salvage.addBehavior(Accelerate);
+			//salvage.acceleration = {x: 0, y: 100};
+			var theta = Math.random() * PI2;
+			salvage.velocity = {x: Math.cos(theta) * 30, y: Math.sin(theta) * 30, angle: PI};
 		}
-		salvage.z = this.z - 1;
-		salvage.addBehavior(Velocity);
-		salvage.velocity = {x: 0, y: 50};
 		gameWorld.playSound(Resources.hit);
 	}
 	enemy.addBehavior(Crop, {min: {x: -10, y: -10}, max: {x: gameWorld.width + 10, y: gameWorld.height + 20}});  
@@ -496,6 +518,13 @@ var Store = {
 			t.weapon = undefined;
 			t.close();
 		}
+		close.hover = function () {
+			this.old_opacity = this.opacity;
+			this.opacity = 0.6;
+		}
+		close.unhover = function () {
+			this.opacity = this.old_opacity || 1;
+		}
 		this.weapons = {};
 		this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 6, 48, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
 			
@@ -519,7 +548,6 @@ var Store = {
 				icon.family = "button";
 				icon.purchase = key;
 				icon.trigger = function () {
-					console.log(key);
 					if (t.weapon == key && t.spent > 0) {
 						t.weapon = undefined;
 						t.spend(-1);
@@ -530,9 +558,16 @@ var Store = {
 							t.spend(-1);
 						}
 						t.weapon = key;
-						this.opacity = 0.5;
+						this.opacity = 0.3;
 						t.spend(1);
 					}
+				}
+				icon.hover = function () {
+					this.old_opacity = this.opacity;
+					this.opacity = 0.6;
+				}
+				icon.unhover = function () {
+					this.opacity = this.old_opacity || 1;
 				}
 				i++;
 			})();
@@ -551,6 +586,8 @@ var Store = {
 				t.health_bar.w = 128 * (t.player.health / MAXHEALTH), t.health_bar.x = gameWorld.width / 6 - (128 - t.health_bar.w) / 2;
 			}
 		};
+		plus.hover = function () {}
+		plus.unhover = function () {}
 		r.push(plus);
 		var minus = t.layer.add(Object.create(SpriteFont).init(gameWorld.width - 12, gameWorld.height - 24, Resources.expire_font, "-", {align: "center", spacing: -2}));
 		minus.family = "button";
@@ -564,6 +601,9 @@ var Store = {
 				t.health_bar.w = 128 * (t.player.health / MAXHEALTH), t.health_bar.x = gameWorld.width / 6 - (128 - t.health_bar.w) / 2;
 			}
 		};
+
+		minus.hover = function () {}
+		minus.unhover = function () {}
 		r.push(minus);
 		
 		for (var i = 0; i < this.layer.entities.length; i++) {
@@ -621,21 +661,6 @@ var Store = {
 	}
 }
 
-		/*
-	for (var i = 0; i < store.weapons.length; i++) {
-		var item_icon = layer.add(Object.create(Sprite).init(gameWorld.width / 2 - 64, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.icons));
-		item_icon.animation = store.weapons[i].icon + 2;
-		var price = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 - 32, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, randint(1,5) + "$", {align: "left", spacing: -2}));
-		layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, "___", {align: "left", spacing: -2}));
-		var plus = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 56, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, "-", {align: "right", spacing: -2}));
-		plus.family = "button";
-		plus.trigger = function () { console.log('plus'); };
-		var minus = layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 72, -3 * gameWorld.height / 2 - 16 + i * 12, Resources.expire_font, "+", {align: "right", spacing: -2}));
-		minus.family = "button";
-		minus.trigger = function () { console.log('minus'); };
-		layer.items.push({icon: item_icon, price: price});
-	}*/
-
 /* MUSIC */
 /*
 BUGS:
@@ -647,13 +672,13 @@ x-create 5 new enemies with different attacks, patterns of movement
   x- different attacks
   x- different movement behaviors
 x-implement 'waves'
--implement AI 'store' (popup) - UI layer
+x-implement AI 'store' (popup) - UI layer
  x- collectible 'scrap' (salvage?) that enemies drop (score counter)
- - start with repairs only?
--add powerups, upgrades
--implement scrap/repair mechanic
--implement AI 'greedy' tractor beam for dropped powerups
--implement end goal -> barrier with 'salvage' cost
+ x- start with repairs only?
+x-add powerups, upgrades
+x-implement scrap/repair mechanic
+
+-end goal -> barrier with 'salvage' cost ?
 -implement AI combat behavior
 -add more enemies, waves, environmental hazards [volvanic eruption? ion clouds? asteroids? lightning?], etc.
 -different 'levels' - locations with different environments/hazards?

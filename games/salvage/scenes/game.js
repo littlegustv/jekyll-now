@@ -19,11 +19,12 @@ var onStart = function () {
 	planet.z = -1;
 	planet.addBehavior(Velocity);
 	planet.velocity = {x: 0, y: 0, angle: PI / 72};
-	
+
 	this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
   this.player.family = "player";
   this.player.addBehavior(Velocity);
-	this.player.addBehavior(Contrail);
+  this.player.addBehavior(Accelerate);
+	//this.player.addBehavior(Contrail);
   this.player.health = MAXHEALTH;
 
   this.claw = fg.add(Object.create(Sprite).init(gameWorld.width / 2, - gameWorld.height / 2, Resources.claw));
@@ -96,6 +97,19 @@ var onStart = function () {
   };
   var s = this;
   this.onMouseMove = function (e) {
+    if (s.ui.active) {
+      var b = s.ui.onButton(e.x, e.y);
+      if (b) {
+        b.hover();
+      }
+      var buttons = s.ui.entities.map( function (e) { return e.family == "button"; });
+      for (var i = 0; i < buttons.length; i++) {
+        if (buttons[i] != b && buttons[i].unhover) {
+          buttons[i].unhover();
+        }
+      }
+      return;
+    }
 		if (!s.player.locked) {
 			if (s.player.velocity.x === 0 && s.player.velocity.y === 0) {
 				s.player.angle = angle(s.player.x, s.player.y, e.x, e.y);
@@ -103,7 +117,8 @@ var onStart = function () {
 		}
   }
   this.onMouseUp = function (e) {
-		if (!s.player.locked) {
+		return;
+    if (!s.player.locked) {
 			s.player.velocity = {x: 0, y: 0};
 			if (s.player.cooldown <= 0) {
 				s.pause();
@@ -117,21 +132,43 @@ var onStart = function () {
 				b.trigger();
 			}
 			return;
-		} else if (!s.player.locked) {		
-			s.bg.paused = 0;
-			s.fg.paused = 0;
-			s.player.animation = 1;
-			s.player.velocity = {
-				x: Math.cos( s.player.angle) * 100,
-				y: Math.sin( s.player.angle) * 100
-			}	
+		} else if (!s.player.locked) {
+      s.bg.paused = 0;
+      s.fg.paused = 0;
+      s.player.animation = 1;
+      //s.player.cooldown = 1;
+      s.player.velocity = {
+        x: Math.cos( s.player.angle) * 100,
+        y: Math.sin( s.player.angle) * 100
+      }
+      s.player.acceleration = {
+        x: -s.player.velocity.x,
+        y: -s.player.velocity.y
+      }
+      // create contrail sprite
+      gameWorld.playSound(Resources.move);  
+      var d = s.player.layer.add(Object.create(Sprite).init(s.player.x, s.player.y, Resources.dust));
+      d.addBehavior(Velocity);
+      d.velocity = {x: -s.player.velocity.x / 2, y: -s.player.velocity.y / 2};
+      d.addBehavior(FadeOut, {duration: 0.8});
+
+      s.player.addBehavior(Delay, {duration: 1, callback: function () {
+        this.entity.velocity = {x: 0, y: 0};
+        this.entity.acceleration = {x: 0, y: 0};
+        s.pause();
+      }});
 		}
   }
   this.onKeyPress = function (e) {
 		if (!s.player.locked) {
 			if (e.keyCode == 122) {
 				s.player.shoot(s.bg);
-				s.bg.paused = 0;      
+				var flash = s.bg.add(Object.create(Sprite).init(s.player.x + 9 * Math.cos(s.player.angle),
+          s.player.y + 9 * Math.sin(s.player.angle), Resources.flash));
+        flash.opacity = 0;
+        flash.addBehavior(FadeIn, {duration: 0.2, maxOpacity: 1});
+        flash.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.3, delay: 0.2});
+        s.bg.paused = 0;      
 				s.fg.paused = 0;      
 			}			
 		}
@@ -185,7 +222,7 @@ var onUpdate = function (dt) {
   if (this.bg.paused === 0 && this.wave.length <= 0) {
 		console.log('new wave');
 		this.current_wave += 1;
-		if (this.current_wave % 2 === 0) {
+		if (this.current_wave % 5 === 0) {
       var t = this;
       t.bg.paused = 10000;
 			t.player.locked = true;

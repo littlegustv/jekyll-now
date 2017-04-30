@@ -18,25 +18,6 @@ var fontFamily = "Visitor"
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 if (AudioContext) AudioContext.createGain = AudioContext.createGain || AudioContext.createGainNode;
 
-var service, tracker;
-if (typeof chrome === 'undefined') {}
-else if (analytics && chrome && chrome.runtime.getManifest) {
-	service = analytics.getService('platforms');
-  tracker = service.getTracker('UA-65874667-3');
-  tracker.sendAppView('MainView');
-  service.getConfig().addCallback(
-    /** @param {!analytics.Config} config */
-    function(config) {
-    	console.log('hey!');
-      var permitted = myApp.askUser('Allow anonymous usage tracking?');
-      config.setTrackingPermitted(permitted);
-      // If "permitted" is false the library will automatically stop
-      // sending information to Google Analytics and will persist this
-      // behavior automatically.
-    });
-  // Supply your GA Tracking ID.
-}
-
 function resizeCanvas(canvas) {
 	canvas.style.width = "", canvas.style.height = "";
 	var ratio = canvas.width / canvas.height;
@@ -1155,10 +1136,6 @@ window.addEventListener("DOMContentLoaded", function () {
 						if (this.entities.filter(function (a) { return a.type == "collectable"; }).length <= 0) {
 							if (!this.completed) {
 								playSound(Resources.complete);
-								if (tracker && tracker.sendEvent) {
-									console.log('sending event');
-								  tracker.sendEvent('Complete', 'Level', this.uid);
-								}	
 								world.speed += 1;
 								this.completed = true;
 								this.character.animation = 1, this.character.frame = 0;
@@ -1180,9 +1157,6 @@ window.addEventListener("DOMContentLoaded", function () {
 								}
 								else {
 									// completed a level...
-									if (world.scenes[n].stage != this.stage && tracker && tracker.sendEvent) {
-										tracker.sendEvent('Complete', 'Stage', this.stage);
-									}
 									var t = Object.create(Text).init(0,0,"- Next -",{size: 60, color: "#ccc"});
 									var tb = Object.create(TextButton).init(canvas.width / 2, canvas.height / 2 - 24, t);
 									tb.callback = function () {
