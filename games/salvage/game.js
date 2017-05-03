@@ -22,6 +22,40 @@ Layer.update = function (dt) {
 	}
 }
 
+var Wheel = Object.create(Entity);
+Wheel.init = function (x, y, radius, border, slice, step, percentage, colors) {
+	this.x = x, this.y = y, this.radius = radius, this.border = border, this.slice = slice, this.step = step, this.percentage = percentage, this.colors = colors;
+	this.behaviors = [], this.offset = {x: 0, y: 0};
+	return this;
+} 
+Wheel.onDraw = function (ctx) {
+	ctx.fillStyle = this.colors[0];
+  ctx.beginPath();
+  ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+  ctx.fill();
+
+	for (var i = 0; i < 100 / this.step; i += 1) {
+  	if (i < this.percentage / this.step)
+      ctx.fillStyle = this.colors[2];
+    else
+    	ctx.fillStyle = this.colors[1];
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    ctx.arc(this.x, this.y, this.radius - this.border, i * 2 * Math.PI / (100 / this.step) + this.slice, (i + 1) * 2 * Math.PI / (100 / this.step) - this.slice, false);
+    ctx.fill();
+	}
+  
+  ctx.fillStyle = this.colors[0];
+  ctx.beginPath();
+  ctx.arc(this.x, this.y, this.radius / 4 + this.border, 0, Math.PI * 2, false);
+  ctx.fill();
+  
+  ctx.fillStyle = this.colors[3];
+  ctx.beginPath();
+  ctx.arc(this.x, this.y, this.radius / 4, 0, Math.PI * 2, false);
+  ctx.fill();
+}
+
 function projectileHit (object, other) {
 	if (other.family != object.family && !other.projectile) {
 		object.alive = false;
@@ -542,7 +576,7 @@ var Store = {
 		//r.push(this.health_bar);
 		
 		this.layer.add(Object.create(Sprite).init(12, 16, Resources.gem)).velocity = {x: 0, y: 0, angle: PI / 2};
-		var gems = this.layer.add(Object.create(SpriteFont).init(24, 16, Resources.expire_font, String(t.player.salvage), {align: "left", spacing: -2}));
+		this.gems = this.layer.add(Object.create(SpriteFont).init(24, 16, Resources.expire_font, String(t.player.salvage), {align: "left", spacing: -2}));
 		
 		var i = 0;
 		for (var k in Weapons) {
@@ -578,6 +612,8 @@ var Store = {
 			})();
 		}
 		
+		this.damageWheel = t.layer.add(Object.create(Wheel).init(52, 44 + (i + 1) * 18, 32, 4, 0.01, 5, 60, ["#000", "#333", "#6DC72E", "#fff"]));
+		
 		var plus = t.layer.add(Object.create(Sprite).init(8, 32 + (++i) * 18, Resources.icons));
 		plus.animation = 1;
 		plus.family = "button";
@@ -586,9 +622,10 @@ var Store = {
 			if (t.player.health < MAXHEALTH && t.spent < t.player.salvage) {
 				t.spent += 1;
 				t.player.health += 1;
+				t.damageWheel.percentage = 100 * (t.player.health / MAXHEALTH);
 				t.salvage.text = "$" + (t.player.salvage - t.spent);
-				t.health_bar.w = 128 * t.player.health / MAXHEALTH;
-				t.health_bar.w = 128 * (t.player.health / MAXHEALTH), t.health_bar.x = gameWorld.width / 6 - (128 - t.health_bar.w) / 2;
+				//t.health_bar.w = 128 * t.player.health / MAXHEALTH;
+				//t.health_bar.w = 128 * (t.player.health / MAXHEALTH), t.health_bar.x = gameWorld.width / 6 - (128 - t.health_bar.w) / 2;
 			}
 		};
 		plus.hover = function () { this.opacity = 0.6;}
@@ -602,8 +639,9 @@ var Store = {
 			if (t.player.health > 0 && t.spent > 0) {
 				t.spent -= 1;
 				t.player.health -= 1;
+				t.damageWheel.percentage = 100 * (t.player.health / MAXHEALTH);
 				t.salvage.text = "$" + (t.player.salvage - t.spent);
-				t.health_bar.w = 128 * (t.player.health / MAXHEALTH), t.health_bar.x = gameWorld.width / 6 - (128 - t.health_bar.w) / 2;
+				//t.health_bar.w = 128 * (t.player.health / MAXHEALTH), t.health_bar.x = gameWorld.width / 6 - (128 - t.health_bar.w) / 2;
 			}
 		};
 
@@ -635,7 +673,9 @@ var Store = {
 		
 	},
 	open: function () {
+		this.gems.text = "" + this.player.salvage;		
 		this.salvage.text = "$ " + this.player.salvage;
+		this.damageWheel.percentage = 100 * (this.player.health / MAXHEALTH);
 		//this.health_bar.w = 128 * (this.player.health / MAXHEALTH), this.health_bar.x = 3 * gameWorld.width / 4 - (128 - this.health_bar.w) / 2;
 		
 		//this.repair_cost = (MAXHEALTH - this.player.health) / this.player.salvage; // price calculated to cost ALL your money to repair completely
