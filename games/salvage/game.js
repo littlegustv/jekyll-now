@@ -94,7 +94,8 @@ var Weapons = {
 			a.velocity = {x: 100 * Math.cos(this.angle), y: 100 * Math.sin(this.angle)	};
 			a.angle = theta;
 			this.cooldown = 0.3;
-    }
+			return true;
+	    }
 	},
 	double: function (layer) {
 		if (this.cooldown <= 0) {
@@ -111,6 +112,7 @@ var Weapons = {
 				a.angle = theta;
 				this.cooldown = 0.6;
 			}
+			return true;
     }
 	},
 	heat_seeking: function (layer) {
@@ -127,6 +129,7 @@ var Weapons = {
 			a.velocity = {x: 90 * Math.cos(theta), y: 90 * Math.sin(theta)};
 			a.angle = theta;
 			this.cooldown = 0.6;			
+			return true;
     	}
 	},
 	mine_layer: function (layer) {
@@ -143,7 +146,8 @@ var Weapons = {
 			//var theta = this.angle;
 			//a.velocity = {x: 50 * Math.cos(theta), y: 50 * Math.sin(theta)};
 			this.cooldown = 0.1;			
-    }
+			return true;
+		}
 	}
 }
 

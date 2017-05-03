@@ -15,10 +15,10 @@ var onStart = function () {
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	
   bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg)).z = -2;
-	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 100,  Resources.planet));
+	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60,  Resources.planet));
 	planet.z = -1;
 	planet.addBehavior(Velocity);
-	planet.velocity = {x: 0, y: 0, angle: PI / 72};
+	//planet.velocity = {x: 0, y: 0, angle: PI / 72};
 
 	this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
   this.player.family = "player";
@@ -76,6 +76,10 @@ var onStart = function () {
   	b.setCollision(Polygon);  
   	b.solid = true;
 	});
+
+  for (var i = 0; i < gameWorld.width / 4; i++) {
+    bg.add(Object.create(Sprite).init(i * 4 + 2, 4, Resources.barrier));
+  }
   
   this.bg = bg;
   this.fg = fg;
@@ -162,14 +166,16 @@ var onStart = function () {
   this.onKeyPress = function (e) {
 		if (!s.player.locked) {
 			if (e.keyCode == 122) {
-				s.player.shoot(s.bg);
-				var flash = s.bg.add(Object.create(Sprite).init(s.player.x + 9 * Math.cos(s.player.angle),
-          s.player.y + 9 * Math.sin(s.player.angle), Resources.flash));
-        flash.opacity = 0;
-        flash.addBehavior(FadeIn, {duration: 0.2, maxOpacity: 1});
-        flash.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.3, delay: 0.2});
-        s.bg.paused = 0;      
-				s.fg.paused = 0;      
+				if (s.player.shoot(s.bg)) {
+  				var flash = s.bg.add(Object.create(Sprite).init(s.player.x + 9 * Math.cos(s.player.angle),
+            s.player.y + 9 * Math.sin(s.player.angle), Resources.flash));
+          flash.opacity = 0;
+          flash.addBehavior(FadeIn, {duration: 0.1, maxOpacity: 1});
+          flash.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.1, delay: 0.2});
+          flash.z = -1;
+          s.bg.paused = 0;      
+  				s.fg.paused = 0;
+        }
 			}			
 		}
   }
