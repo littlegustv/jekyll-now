@@ -23,7 +23,7 @@
 		{"path": "smoke.png"},
 		{"path": "dust.png", "frames": 4, "speed": 0.2},
 		{"path": "item.png"},
-		{"path": "icons.png", "animations": 5},
+		{"path": "icons.png", "animations": 13},
 		{"path": "border.png"},
 		{"path": "itemHeal.png"},
 		{"path": "bullet.png"},

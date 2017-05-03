@@ -452,7 +452,7 @@ function spawn(layer, key, player) {
 			salvage.collision.onHandle = function (object, other) {
 				if (other.family == "player" && !other.projectile) {
 					object.alive = false;
-					other.salvage += object.value;
+					player.salvage += object.value;
 					gameWorld.playSound(Resources.pickup);
 					for (var i = 0; i < randint(5, 10); i++) {
 						var p = object.layer.add(Object.create(Entity).init(object.x, object.y, 12, 12));
@@ -504,16 +504,16 @@ var Store = {
 		var r = [];
 
 		var outer = this.layer.add(Object.create(Sprite).init(3 * gameWorld.width / 4, gameWorld.height - 22, Resources.silhouette));
-		var inner = this.layer.add(Object.create(Entity).init(3 * gameWorld.width / 4 + 12, gameWorld.height - 12, gameWorld.width / 2 + 8, 24));
-		inner.color = "white";
-		r.push(inner);
+		//var inner = this.layer.add(Object.create(Entity).init(3 * gameWorld.width / 4 + 12, gameWorld.height - 12, gameWorld.width / 2 + 8, 24));
+		//inner.color = "white";
+		//r.push(inner);
 		r.push(outer);
 		//this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 160, 112, Resources.border)); 				// border
 		//this.layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, 152, 104)).color="white";								//body
-		this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 6, 32, Resources.expire_font, "SHOPPE", {align: "center", spacing: -2})); // title
+		//this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 6, 32, Resources.expire_font, "SHOPPE", {align: "center", spacing: -2})); // title
 		
 		var t = this;
-		var close = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 6, gameWorld.height - 32, Resources.expire_font, "done", {align: "center", spacing: -2}));
+		var close = this.layer.add(Object.create(SpriteFont).init(12, gameWorld.height - 16, Resources.expire_font, "done...", {align: "left", spacing: -2}));
 		close.family = "button";
 		close.trigger = function () {
 			t.player.salvage -= t.spent;
@@ -523,32 +523,34 @@ var Store = {
 			t.close();
 		}
 		close.hover = function () {
-			this.old_opacity = this.opacity;
 			this.opacity = 0.6;
 		}
 		close.unhover = function () {
-			this.opacity = this.old_opacity || 1;
+			this.opacity = 1;
 		}
 		this.weapons = {};
 		this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 6, 48, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
 			
 		//r.push(this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 6 - 72, gameWorld.height / 2 + 16, Resources.expire_font, "Repairs", {align: "left", spacing: -2})));
-		this.repair_price_text = this.layer.add(Object.create(SpriteFont).init(3 * gameWorld.width / 4, gameWorld.height - 24, Resources.expire_font, "Repair $ 1", {align: "center", spacing: -2}));
-		r.push(this.repair_price_text);
+		//this.repair_price_text = this.layer.add(Object.create(SpriteFont).init(3 * gameWorld.width / 4, gameWorld.height - 24, Resources.expire_font, "Repair $ 1", {align: "center", spacing: -2}));
+		//r.push(this.repair_price_text);
 		
-		var health_bg = this.layer.add(Object.create(TiledBackground).init(3 * gameWorld.width / 4, gameWorld.height - 12, 128, 8, Resources.border));
-		health_bg.opacity = 0;
-		r.push(health_bg);
-		this.health_bar = this.layer.add(Object.create(TiledBackground).init(3 * gameWorld.width / 4, gameWorld.height - 12, 128, 8, Resources.border));
-		r.push(this.health_bar);
+		//var health_bg = this.layer.add(Object.create(TiledBackground).init(3 * gameWorld.width / 4, gameWorld.height - 12, 128, 8, Resources.border));
+		//health_bg.opacity = 0;
+		//r.push(health_bg);
+		//this.health_bar = this.layer.add(Object.create(TiledBackground).init(3 * gameWorld.width / 4, gameWorld.height - 12, 128, 8, Resources.border));
+		//r.push(this.health_bar);
 		
-		var i = 2;
+		this.layer.add(Object.create(Sprite).init(12, 16, Resources.gem)).velocity = {x: 0, y: 0, angle: PI / 2};
+		var gems = this.layer.add(Object.create(SpriteFont).init(24, 16, Resources.expire_font, String(t.player.salvage), {align: "left", spacing: -2}));
+		
+		var i = 0;
 		for (var k in Weapons) {
 			(function () {	
 				var key = k;
-				var icon = t.layer.add(Object.create(Sprite).init(gameWorld.width / 6, 44 + i * 14, Resources.icons));
+				var icon = t.layer.add(Object.create(Sprite).init(8, 40 + i * 18, Resources.icons));
 				t.weapons[key] = icon;
-				icon.animation = i % Resources.icons.animations;
+				icon.animation = (i + 3) % Resources.icons.animations;
 				icon.family = "button";
 				icon.purchase = key;
 				icon.trigger = function () {
@@ -567,19 +569,18 @@ var Store = {
 					}
 				}
 				icon.hover = function () {
-					this.old_opacity = this.opacity;
 					this.opacity = 0.6;
 				}
 				icon.unhover = function () {
-					this.opacity = this.old_opacity || 1;
+					this.opacity = 1;
 				}
 				i++;
 			})();
 		}
 		
-		var plus = t.layer.add(Object.create(SpriteFont).init(gameWorld.width - 24, gameWorld.height - 24, Resources.expire_font, "+", {align: "center", spacing: -2}));
+		var plus = t.layer.add(Object.create(Sprite).init(8, 32 + (++i) * 18, Resources.icons));
+		plus.animation = 1;
 		plus.family = "button";
-		plus.w = 8, plus.h = 8;
 		plus.trigger = function () {
 			console.log('repair plus');
 			if (t.player.health < MAXHEALTH && t.spent < t.player.salvage) {
@@ -590,12 +591,12 @@ var Store = {
 				t.health_bar.w = 128 * (t.player.health / MAXHEALTH), t.health_bar.x = gameWorld.width / 6 - (128 - t.health_bar.w) / 2;
 			}
 		};
-		plus.hover = function () {}
-		plus.unhover = function () {}
+		plus.hover = function () { this.opacity = 0.6;}
+		plus.unhover = function () { this.opacity = 1;}
 		r.push(plus);
-		var minus = t.layer.add(Object.create(SpriteFont).init(gameWorld.width - 12, gameWorld.height - 24, Resources.expire_font, "-", {align: "center", spacing: -2}));
+		var minus = t.layer.add(Object.create(Sprite).init(8, 32 + (++i) * 18, Resources.icons));
+		minus.animation = 2;
 		minus.family = "button";
-		plus.w = 8, plus.h = 8;
 		minus.trigger = function () { 
 			console.log('repair minus');
 			if (t.player.health > 0 && t.spent > 0) {
@@ -606,8 +607,8 @@ var Store = {
 			}
 		};
 
-		minus.hover = function () {}
-		minus.unhover = function () {}
+		minus.hover = function () { this.opacity = 0.6 }
+		minus.unhover = function () { this.opacity = 1 }
 		r.push(minus);
 		
 		for (var i = 0; i < this.layer.entities.length; i++) {
@@ -635,10 +636,10 @@ var Store = {
 	},
 	open: function () {
 		this.salvage.text = "$ " + this.player.salvage;
-		this.health_bar.w = 128 * (this.player.health / MAXHEALTH), this.health_bar.x = 3 * gameWorld.width / 4 - (128 - this.health_bar.w) / 2;
+		//this.health_bar.w = 128 * (this.player.health / MAXHEALTH), this.health_bar.x = 3 * gameWorld.width / 4 - (128 - this.health_bar.w) / 2;
 		
-		this.repair_cost = (MAXHEALTH - this.player.health) / this.player.salvage; // price calculated to cost ALL your money to repair completely
-		this.repair_price_text.text = "$ " + Math.floor(this.repair_cost * 10) / 10;
+		//this.repair_cost = (MAXHEALTH - this.player.health) / this.player.salvage; // price calculated to cost ALL your money to repair completely
+		//this.repair_price_text.text = "$ " + Math.floor(this.repair_cost * 10) / 10;
 		
 		for (var i = 0; i < this.layer.entities.length; i++) {
 			this.layer.entities[i].lerp.goal = this.layer.entities[i].goal;

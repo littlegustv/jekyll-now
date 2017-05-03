@@ -106,7 +106,7 @@ var onStart = function () {
       if (b) {
         b.hover();
       }
-      var buttons = s.ui.entities.map( function (e) { return e.family == "button"; });
+      var buttons = s.ui.entities.filter( function (e) { return e.family == "button"; });
       for (var i = 0; i < buttons.length; i++) {
         if (buttons[i] != b && buttons[i].unhover) {
           buttons[i].unhover();
@@ -228,7 +228,7 @@ var onUpdate = function (dt) {
   if (this.bg.paused === 0 && this.wave.length <= 0) {
 		console.log('new wave');
 		this.current_wave += 1;
-		if (this.current_wave % 5 === 0) {
+		if (this.current_wave % 2 === 0) {
       var t = this;
       t.bg.paused = 10000;
 			t.player.locked = true;
