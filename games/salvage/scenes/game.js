@@ -61,13 +61,10 @@ var onStart = function () {
     }
   }
   player_dummy.addBehavior(Follow, {target: p, offset: {angle: 0, x: 0, y: 0, z: 0}});
-  
-	/* skyline...
-	for (var i = 16; i < gameWorld.width; i += 32) {
-		var h = randint(2,5) * 32;
-		var b = bg.add(Object.create(TiledBackground).init(i, gameWorld.height - h / 2, 32, h, Resources.building2));
-		b.opacity = Math.random() * 0.2 + 0.1;
-	}*/
+	
+  for (var i = 0; i < gameWorld.width / 4; i++) {
+    bg.add(Object.create(Sprite).init(i * 4 + 2, 2, Resources.barrier));
+  }  
 	
 	var borders = [];
 	borders.push(bg.add(Object.create(TiledBackground).init(-6, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
@@ -79,10 +76,6 @@ var onStart = function () {
   	b.solid = true;
 	});
 
-  for (var i = 0; i < gameWorld.width / 4; i++) {
-    bg.add(Object.create(Sprite).init(i * 4 + 2, 4, Resources.barrier));
-  }
-  
   this.bg = bg;
   this.fg = fg;
 	
