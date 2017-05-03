@@ -126,7 +126,7 @@ var Weapons = {
 			a.family = "player";
 			a.projectile = true;
 			a.velocity = {x: 100 * Math.cos(this.angle), y: 100 * Math.sin(this.angle)	};
-			a.angle = theta;
+			a.angle = this.angle;
 			this.cooldown = 0.3;
 			return true;
 	    }
@@ -530,21 +530,17 @@ var Store = {
 		}
 	},
 	createUI: function () {
-		var b1 = this.layer.add(Object.create(Entity).init(0, gameWorld.height / 2, gameWorld.width / 2, gameWorld.height * 2));
+
+		var border = this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 4 + 26, gameWorld.height / 2, 32, gameWorld.height, Resources.building2));
+		
+		var b1 = this.layer.add(Object.create(Entity).init(16, gameWorld.height / 2 + 1, gameWorld.width / 2 + 34, gameWorld.height * 2));
 		b1.color = "#000000";
-		var b2 = this.layer.add(Object.create(Entity).init(0, gameWorld.height / 2, gameWorld.width / 2, gameWorld.height - 12));
+		var b2 = this.layer.add(Object.create(Entity).init(15, gameWorld.height / 2 + 1, gameWorld.width / 2 + 30, gameWorld.height - 6));
 		b2.color = "white";
 		
 		var r = [];
 
-		var outer = this.layer.add(Object.create(Sprite).init(3 * gameWorld.width / 4, gameWorld.height - 22, Resources.silhouette));
-		//var inner = this.layer.add(Object.create(Entity).init(3 * gameWorld.width / 4 + 12, gameWorld.height - 12, gameWorld.width / 2 + 8, 24));
-		//inner.color = "white";
-		//r.push(inner);
-		r.push(outer);
-		//this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 160, 112, Resources.border)); 				// border
-		//this.layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, 152, 104)).color="white";								//body
-		//this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 6, 32, Resources.expire_font, "SHOPPE", {align: "center", spacing: -2})); // title
+		var outer = this.layer.add(Object.create(Sprite).init(3 * gameWorld.width / 4 + 8, gameWorld.height - 16, Resources.silhouette));
 		
 		var t = this;
 		var close = this.layer.add(Object.create(SpriteFont).init(12, gameWorld.height - 16, Resources.expire_font, "done...", {align: "left", spacing: -2}));
@@ -563,17 +559,7 @@ var Store = {
 			this.opacity = 1;
 		}
 		this.weapons = {};
-		this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 6, 48, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
-			
-		//r.push(this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 6 - 72, gameWorld.height / 2 + 16, Resources.expire_font, "Repairs", {align: "left", spacing: -2})));
-		//this.repair_price_text = this.layer.add(Object.create(SpriteFont).init(3 * gameWorld.width / 4, gameWorld.height - 24, Resources.expire_font, "Repair $ 1", {align: "center", spacing: -2}));
-		//r.push(this.repair_price_text);
-		
-		//var health_bg = this.layer.add(Object.create(TiledBackground).init(3 * gameWorld.width / 4, gameWorld.height - 12, 128, 8, Resources.border));
-		//health_bg.opacity = 0;
-		//r.push(health_bg);
-		//this.health_bar = this.layer.add(Object.create(TiledBackground).init(3 * gameWorld.width / 4, gameWorld.height - 12, 128, 8, Resources.border));
-		//r.push(this.health_bar);
+		this.salvage = this.layer.add(Object.create(SpriteFont).init(80, 16, Resources.expire_font, "$ 0", {align: "right", spacing: -2}));
 		
 		this.layer.add(Object.create(Sprite).init(12, 16, Resources.gem)).velocity = {x: 0, y: 0, angle: PI / 2};
 		this.gems = this.layer.add(Object.create(SpriteFont).init(24, 16, Resources.expire_font, String(t.player.salvage), {align: "left", spacing: -2}));
@@ -583,6 +569,7 @@ var Store = {
 			(function () {	
 				var key = k;
 				var icon = t.layer.add(Object.create(Sprite).init(8, 40 + i * 18, Resources.icons));
+				icon.name = t.layer.add(Object.create(SpriteFont).init(26, 40 + i * 18, Resources.expire_font, k, {align: "left", spacing: -2}));
 				t.weapons[key] = icon;
 				icon.animation = (i + 3) % Resources.icons.animations;
 				icon.family = "button";
@@ -604,9 +591,11 @@ var Store = {
 				}
 				icon.hover = function () {
 					this.opacity = 0.6;
+					this.name.opacity = 0.6;
 				}
 				icon.unhover = function () {
 					this.opacity = 1;
+					this.name.opacity = 1;
 				}
 				i++;
 			})();
@@ -658,18 +647,14 @@ var Store = {
 			this.layer.entities[i].original = this.layer.entities[i].angle;
 		}
 		
-		for (var i = 0; i < r.length; i++) {
-			r[i].angle = PI / 2;
-		}
-		
 		outer.lerp.goal = -PI / 36;
 		outer.goal = outer.lerp.goal;
 		
 		// special exception for off-kilter border
-		b1.lerp.goal = PI / 36;
-		b1.goal = b1.lerp.goal;
-		b2.lerp.goal = PI / 72;
-		b2.goal = b2.lerp.goal;
+		//b1.lerp.goal = PI / 36;
+		//b1.goal = b1.lerp.goal;
+		//b2.lerp.goal = PI / 72;
+		//b2.goal = b2.lerp.goal;
 		
 	},
 	open: function () {

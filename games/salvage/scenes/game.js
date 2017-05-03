@@ -18,6 +18,8 @@ var onStart = function () {
 	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60,  Resources.planet));
 	planet.z = -1;
 	planet.addBehavior(Velocity);
+	
+	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 16, gameWorld.width, 64, Resources.silhouette)).opacity = 0.3;
 	//planet.velocity = {x: 0, y: 0, angle: PI / 72};
 
 	this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
