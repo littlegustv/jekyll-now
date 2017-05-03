@@ -728,7 +728,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				//var b = Object.create(Button).init( 11, 0, Resources.help);
 				//b.name = "walkthrough";
 				//b.offset = {x: 0, y: -8};
-				if (config.walkthrough) {
+				if (false) {//config.walkthrough) {
 					var t_walkthrough = Object.create(Text).init(0,0,"help!", {size: 20, align: "right"});
 					var b = Object.create(TextButton).init(470, 38, t_walkthrough);
 					b.target = config.walkthrough || "http://www.youtube.com";
@@ -809,32 +809,7 @@ window.addEventListener("DOMContentLoaded", function () {
 				var e = Object.create(Entity).init(3,3,Resources.temp);
 				e.animation = 0;
 				s.entities.push(e);*/
-				var t_mute = Object.create(Text).init(0,0,"mute", {size: 20, align: "right"});
-				var mute = Object.create(TextButton).init(470, 14, t_mute);
-				//var mute = Object.create(Button).init(12, 0, Resources.mute);
-				//mute.name = "mute";
-				if (AudioContext) {
-					mute.animation = audioContext.state == "suspended" ? 1 : 0;
-					mute.callback = function () {
-						if (this.animation == 0) {
-							if (audioContext.suspend) audioContext.suspend();
-							else audioContext.gn.gain.value = 0;
-							this.animation = 1;
-						} else {
-							if (audioContext.resume) audioContext.resume();
-							else audioContext.gn.gain.value = 1;
-							this.animation = 0;
-						}
-					}
-				}
-				else {
-					mute.animation = window.muted ? 1 : 0;
-					mute.callback = function () {
-						window.muted = !window.muted;
-						mute.animation = window.muted ? 1 : 0;
-					};
-				}
-				s.buttons.push(mute);
+				
 
 			} else if (s.type != "cutscene") {
 				/*
@@ -848,15 +823,53 @@ window.addEventListener("DOMContentLoaded", function () {
 				else
 					b.callback = function () {	world.doScene(0); };		
 				s.buttons.push(b);
+
+				var t_mute = Object.create(Text).init(0,0,"mute", {size: 20, align: "right"});
+				var mute = Object.create(TextButton).init(470, 38, t_mute);
+				//var mute = Object.create(Button).init(12, 0, Resources.mute);
+				//mute.name = "mute";
+				window.was_muted = false;
+				
+				if (AudioContext) {
+					mute.animation = audioContext.state == "suspended" ? 1 : 0;
+					mute.callback = function () {
+						if (this.animation == 0) {
+							if (audioContext.suspend) audioContext.suspend();
+							else audioContext.gn.gain.value = 0;
+							this.animation = 1;
+							t_mute.text = "unmute";
+							t_mute.current = 6;
+							window.was_muted = true;
+						} else {
+							if (audioContext.resume) audioContext.resume();
+							else audioContext.gn.gain.value = 1;
+							this.animation = 0;							
+							t_mute.text = "mute";
+							t_mute.current = 4;
+							window.was_muted = false;
+						}
+					}
+				}
+				else {
+					mute.animation = window.muted ? 1 : 0;
+					mute.callback = function () {
+						window.muted = !window.muted;
+						mute.animation = window.muted ? 1 : 0;
+						t_mute.text = window.muted ? "unmute" : "mute";
+						t_mute.current = t_mute.text.length;
+						window.was_muted = window.muted;
+					};
+				}
+				s.buttons.push(mute);
 			}
 			if (s.name == "credits") {
-				var t = Object.create(Text).init(0, 0, "@littlegustv", {size: 16});
+				var t = Object.create(Text).init(0, 0, "@littlegustv", {size: 20});
 				var b = Object.create(TextButton).init(240, 136, t);
 				b.callback = function () { window.open("http://www.twitter.com/littlegustv", "_blank"); };
 				s.buttons.push(b);
-				var t = Object.create(Text).init(0, 0, "littlegustv.github.io", {size: 16});
+				var t = Object.create(Text).init(0, 0, "littlegustv.itch.io", {size: 20});
 				var b = Object.create(TextButton).init(240, 162, t);
-				b.callback = function () { window.open("https://littlegustv.github.io", "_blank"); };
+				b.callback = function () { window.open("https://littlegustv.itch.io", "_blank"); };
 				s.buttons.push(b);
 			}
 			else if (s.name == "stagemenu") {
@@ -1838,8 +1851,10 @@ window.addEventListener("DOMContentLoaded", function () {
 			else window.muted = true;
 		}
 		else {
-			if (AudioContext) audioContext.resume();
-			else window.muted = false;
+			if (window.was_muted == false) {
+				if (AudioContext) audioContext.resume();
+				else window.muted = false;
+			}
 		}
 		world.time = new Date(); 
 	});

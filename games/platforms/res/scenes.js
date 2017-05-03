@@ -91,7 +91,7 @@
 					"gridY": 110,
 					"text": "developed by Benny Heller",
 					"type": "text",
-					"format": {"size": 16}
+					"format": {"size": 20}
 				}
 			]
 		},
