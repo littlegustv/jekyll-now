@@ -18,6 +18,8 @@ var onStart = function () {
 	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60,  Resources.planet));
 	planet.z = -1;
 	planet.addBehavior(Velocity);
+	
+	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 16, gameWorld.width, 64, Resources.silhouette)).opacity = 0.3;
 	//planet.velocity = {x: 0, y: 0, angle: PI / 72};
 
 	this.player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
@@ -59,13 +61,10 @@ var onStart = function () {
     }
   }
   player_dummy.addBehavior(Follow, {target: p, offset: {angle: 0, x: 0, y: 0, z: 0}});
-  
-	/* skyline...
-	for (var i = 16; i < gameWorld.width; i += 32) {
-		var h = randint(2,5) * 32;
-		var b = bg.add(Object.create(TiledBackground).init(i, gameWorld.height - h / 2, 32, h, Resources.building2));
-		b.opacity = Math.random() * 0.2 + 0.1;
-	}*/
+	
+  for (var i = 0; i < gameWorld.width / 4; i++) {
+    bg.add(Object.create(Sprite).init(i * 4 + 2, 2, Resources.barrier));
+  }  
 	
 	var borders = [];
 	borders.push(bg.add(Object.create(TiledBackground).init(-6, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
@@ -77,10 +76,6 @@ var onStart = function () {
   	b.solid = true;
 	});
 
-  for (var i = 0; i < gameWorld.width / 4; i++) {
-    bg.add(Object.create(Sprite).init(i * 4 + 2, 4, Resources.barrier));
-  }
-  
   this.bg = bg;
   this.fg = fg;
 	
@@ -106,7 +101,7 @@ var onStart = function () {
       if (b) {
         b.hover();
       }
-      var buttons = s.ui.entities.map( function (e) { return e.family == "button"; });
+      var buttons = s.ui.entities.filter( function (e) { return e.family == "button"; });
       for (var i = 0; i < buttons.length; i++) {
         if (buttons[i] != b && buttons[i].unhover) {
           buttons[i].unhover();
@@ -228,7 +223,7 @@ var onUpdate = function (dt) {
   if (this.bg.paused === 0 && this.wave.length <= 0) {
 		console.log('new wave');
 		this.current_wave += 1;
-		if (this.current_wave % 5 === 0) {
+		if (this.current_wave % 2 === 0) {
       var t = this;
       t.bg.paused = 10000;
 			t.player.locked = true;
