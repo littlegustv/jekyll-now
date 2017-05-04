@@ -10,6 +10,7 @@ var onStart = function () {
 
   this.light_layer = this.addLayer(Object.create(Layer).init(320,180));
   var water = this.bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 8 * TILESIZE, 8 * TILESIZE, Resources.water));
+  water.z = -1;
 
   // grid
   for (var i = 0; i < 8; i++) {
@@ -42,7 +43,7 @@ var onStart = function () {
   //var t = this.bg.add(Object.create(TileMap).init(gameWorld.width / 2, gameWorld.height / 2, Resources.tiles, map));
 
   this.player = this.fg.add(Object.create(Sprite).init(170,40,Resources.wisp));
-  this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: 115, y: 80}, tilesize: TILESIZE, callback: function () {
+  this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: OFFSET.x + 7 * TILESIZE, y: OFFSET.y + 7 * TILESIZE}, tilesize: TILESIZE, callback: function () {
     for (var i = 0; i < s.mobs.length; i++) {
       s.mobs[i].hungry.setTarget();
     }
@@ -54,6 +55,8 @@ var onStart = function () {
     }});
   }, grid: this.grid});
   var p = this.player;
+  this.player.offset = {x: 0, y: -6};
+  this.player.z = 10;
   this.mobs = [];
   for (var i = 0; i < 10; i++) {
     var m = this.bg.add(Object.create(Entity).init(randint(0,8) * TILESIZE + OFFSET.x, randint(0,8) * OFFSET.y + TILESIZE, 8, 8));
@@ -63,49 +66,9 @@ var onStart = function () {
       if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) this.entity.alive = false;
     }});
     m.hungry = m.addBehavior(Hungry, {target:p});
+    m.z = 2;
     this.mobs.push(m);
   }
-
-  // light tiles
-  /*
-  this.light_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
-  this.lights = [];
-  for (var i = 0; i < 8; i++) {
-    this.lights.push([]);
-    for (var j = 0; j < 8; j++) {
-      var l = this.light_layer.add(Object.create(Entity).init(OFFSET.x + i * TILESIZE, OFFSET.y + j * TILESIZE, TILESIZE, TILESIZE));
-      l.color = "white";
-      //l.opacity = 1 - (distance(l.x, l.y, this.player.x, this.player.y) / 160);
-      l.blend = "destination-out";
-      this.lights[i].push(l);
-    }
-  }
-  // iffy!
-  this.lit = function () {
-    // get player x,y
-    var coord = s.player.grid.toGrid(s.player);
-    var opacity = [1,1,1,1,1,1,1,1,1];
-    for (var i = 0; i < this.light_layer.entities.length; i++) {
-      if (this.light_layer.entities[i].w < 34)
-        this.light_layer.entities[i].opacity = 0.15;
-    }
-    for (var i = 0; i < 8; i++) {
-      var o = 0;
-      for (var j = -1; j <= 1; j++) {
-        for (var k = -1; k <= 1; k++) {
-          var x = clamp(coord.x + j * i, 0, 7), y = clamp(coord.y + k   * i, 0, 7);
-          if (this.grid[x][y].solid) opacity[o] = 0;
-          else opacity[o] -= 0.05;
-          this.lights[x][y].opacity = opacity[o] + 0.1;
-          o++;
-          console.log(o);       
-        }       
-      }
-    }
-  }*/
-
-
-  // event listeners
 
   s.onClick = function (e) {
   }
