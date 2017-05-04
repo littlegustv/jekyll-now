@@ -20,6 +20,7 @@
 		{"path": "gem.png"},
 		{"path": "asteroid.png"},
 		{"path": "flash.png"},
+		{"path": "spark.png"},
 		{"path": "smoke.png"},
 		{"path": "dust.png", "frames": 4, "speed": 0.2},
 		{"path": "item.png"},

@@ -189,6 +189,21 @@ var Weapons = {
 			//var theta = this.angle;
 			//a.velocity = {x: 50 * Math.cos(theta), y: 50 * Math.sin(theta)};
 			return 0.1;			
+	},
+	spark: function (layer) {
+		for (var i = 0; i < 8; i++) {
+			var theta = i * PI2 / 8;
+			var a = layer.add(Object.create(Sprite).init(this.x + Math.cos(theta) * 8, this.y + Math.sin(theta) * 8, Resources.spark));
+			a.angle = theta;
+			a.addBehavior(Velocity);
+			a.velocity = {x: 40 * Math.cos(theta), y: 40 * Math.sin(theta) };
+			a.addBehavior(FadeOut, {duration: 1});
+			a.setCollision(Polygon);
+			a.collision.onHandle = projectileHit;
+			a.family = this.family;
+			a.projectile = true;
+		}
+		return 1;
 	}
 }
 
@@ -459,7 +474,7 @@ function spawn(layer, key, player) {
       enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["drone"])]);
       enemy.addBehavior(Drone, {target: player, cooldown: 1, rate: 0.6, radius: 40, angle: Math.random() * PI2});
       enemy.velocity = {x: 0, y: 10};
-			enemy.shoot = function () {}; // 'static' electricity
+			enemy.shoot = Weapons.spark;//function () {}; // 'static' electricity
     	break;
 		case 7:
 			// disable tanks for now...
@@ -717,20 +732,6 @@ var Store = {
 
 /* MUSIC */
 /*
-BUGS:
--collision handling happens twice? (i.e. salvage score)
-
-FEATURES:
-x-add checks for pause/unpause
-x-create 5 new enemies with different attacks, patterns of movement
-  x- different attacks
-  x- different movement behaviors
-x-implement 'waves'
-x-implement AI 'store' (popup) - UI layer
- x- collectible 'scrap' (salvage?) that enemies drop (score counter)
- x- start with repairs only?
-x-add powerups, upgrades
-x-implement scrap/repair mechanic
 
 -end goal -> barrier with 'salvage' cost ?
 -implement AI combat behavior
