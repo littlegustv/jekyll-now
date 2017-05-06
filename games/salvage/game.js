@@ -1,9 +1,28 @@
 var MAXHEALTH = 16, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(320, 180, "index.json");
 
+Delay.update = function (dt) {
+  if (this.time === undefined) this.start();
+	
+  this.time += dt;
+  if (this.time > this.duration) {
+    this.callback();
+		this.time = undefined;
+		if (this.remove) {
+    	this.entity.removeBehavior(this);
+		}
+  }
+}
+Delay.set = function (t) {
+	if (t !== undefined) this.duration = t;
+	this.time = 0;
+}
+
 // push to raindrop -> collisions fix
 Layer.update = function (dt) {
-	if (this.paused > 0) {
+	if (this.paused === true) {
+		return;
+	} else if (this.paused > 0) {
 	  this.paused -= dt;
 	  return;
 	}
@@ -117,57 +136,47 @@ function lerp_angle (a1, a2, rate) {
 
 var Weapons = {
 	standard: function (layer) {
-		if (this.cooldown <= 0) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
 			a.setCollision(Polygon);
 			gameWorld.playSound(Resources.laser);
 			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
-			a.family = "player";
+			a.family = this.family;//"player";
 			a.projectile = true;
 			a.velocity = {x: 100 * Math.cos(this.angle), y: 100 * Math.sin(this.angle)	};
 			a.angle = this.angle;
-			this.cooldown = 0.3;
-			return true;
-	    }
+			return 0.3;
 	},
 	double: function (layer) {
-		if (this.cooldown <= 0) {
-			for (var i = 0; i < 3; i++) {
-				var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
-				a.setCollision(Polygon);
-				gameWorld.playSound(Resources.laser);
-				a.collision.onHandle = projectileHit;
-				a.addBehavior(Velocity);
-				a.family = "player";
-				a.projectile = true;
-				var theta = this.angle - PI / 6 + i * PI / 6;
-				a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
-				a.angle = theta;
-				this.cooldown = 0.6;
-			}
-			return true;
-    }
+		for (var i = 0; i < 3; i++) {
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+			a.setCollision(Polygon);
+			gameWorld.playSound(Resources.laser);
+			a.collision.onHandle = projectileHit;
+			a.addBehavior(Velocity);
+			a.family = this.family;//"player";
+			a.projectile = true;
+			var theta = this.angle - PI / 6 + i * PI / 6;
+			a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
+			a.angle = theta;
+		}
+		return 0.6;
 	},
 	heat_seeking: function (layer) {
-		if (this.cooldown <= 0) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
 			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
-			a.addBehavior(HeatSeeking, {family: "enemy"});
-			a.family = "player";
+			a.addBehavior(HeatSeeking, {family: this.family == "player" ? "enemy" : "player" });
+			a.family = this.family;
 			a.projectile = true;
 			var theta = this.angle;
 			a.velocity = {x: 90 * Math.cos(theta), y: 90 * Math.sin(theta)};
 			a.angle = theta;
-			this.cooldown = 0.6;			
-			return true;
-    	}
+			return 0.6;			
 	},
 	mine_layer: function (layer) {
-		if (this.cooldown <= 0) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bomb));
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
@@ -175,13 +184,26 @@ var Weapons = {
 			a.addBehavior(Oscillate, {field: "angle", object: a, rate: 1, initial: 0, constant: PI2, offset: 0});
 			//a.addBehavior(Velocity);
 			//a.addBehavior(HeatSeeking, {family: "enemy"});
-			a.family = "player";
+			a.family = this.family;
 			a.projectile = true;
 			//var theta = this.angle;
 			//a.velocity = {x: 50 * Math.cos(theta), y: 50 * Math.sin(theta)};
-			this.cooldown = 0.1;			
-			return true;
+			return 0.1;			
+	},
+	spark: function (layer) {
+		for (var i = 0; i < 8; i++) {
+			var theta = i * PI2 / 8;
+			var a = layer.add(Object.create(Sprite).init(this.x + Math.cos(theta) * 8, this.y + Math.sin(theta) * 8, Resources.spark));
+			a.angle = theta;
+			a.addBehavior(Velocity);
+			a.velocity = {x: 40 * Math.cos(theta), y: 40 * Math.sin(theta) };
+			a.addBehavior(FadeOut, {duration: 1});
+			a.setCollision(Polygon);
+			a.collision.onHandle = projectileHit;
+			a.family = this.family;
+			a.projectile = true;
 		}
+		return 1;
 	}
 }
 
@@ -224,9 +246,18 @@ Scene.update = function (dt) {
 	this.onUpdate(dt);
 };
 
+// cooldown, shoot
+var Enemy = Object.create(Behavior);
+Enemy.update = function (dt) {
+	if (this.cooldown > 0) this.cooldown -= dt;
+	else if (this.entity.shoot) {
+		this.cooldown = this.entity.shoot(this.entity.layer);
+	}
+}
+/*
 var Shoot = Object.create(Behavior);
 Shoot.update = function (dt) {
-  if (this.cooldown <= 0) {
+	if (this.cooldown <= 0) {
     gameWorld.playSound(Resources.laser);
     var e = Object.create(Sprite).init(this.entity.x - 2, this.entity.y - 2, Resources.projectile);
     e.addBehavior(Velocity);
@@ -275,7 +306,7 @@ Walker.update = function (dt) {
 		
 	}
 }
-
+*/
 // target, radius, rate, angle
 var Drone = Object.create(Behavior);
 Drone.update = function (dt) {
@@ -312,7 +343,7 @@ Bounce.update = function (dt) {
 var Bomber = Object.create(Behavior);
 Bomber.update = function (dt) {
 	this.entity.velocity.y = Math.max(this.entity.velocity.y, -100);
-	if (this.entity.velocity.y <= 0 && !this.done) {
+	/*if (this.entity.velocity.y <= 0 && !this.done) {
 		var e = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.bomb));
 		e.addBehavior(Velocity);
 		e.velocity = {x: 0, y: 0};
@@ -329,7 +360,7 @@ Bomber.update = function (dt) {
     }
 		this.done = true;
 		this.entity.angle = Math.atan2(this.entity.velocity.y, this.entity.velocity.x);
-	}
+	}*/
 }
 
 // push to raindrop
@@ -344,7 +375,7 @@ FadeIn.start = function () {
   this.time = 0;
 };
 // end of push to riandrop
-
+/*
 var Mortar = Object.create(Behavior);
 Mortar.update = function (dt) {
   if (this.cooldown <= 0) {
@@ -367,7 +398,7 @@ Mortar.update = function (dt) {
   } else {
     this.cooldown -= dt;
   }
-}
+}*/
 
 // timer, invulnerable
 var Damage = Object.create(Behavior);
@@ -408,14 +439,14 @@ function spawn(layer, key, player) {
 			enemy.offset = {x: 0, y: 2};
       enemy.mirrored = enemy.x > 100;
       enemy.addBehavior(Flip);
-			enemy.addBehavior(Walker, {cooldown: 1});
-      //enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
+			//enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
       enemy.velocity = {x: enemy.x > 100 ? -20 : 20, y: 0};
+			enemy.shoot = Weapons.double;
 			break;
 		case 2:
       enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["asteroid"])]);
       enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
-      enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle)}; 
+      enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle)}; 			
 			break;
 		case 3:
       enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["bomber"])]);
@@ -424,37 +455,43 @@ function spawn(layer, key, player) {
 			enemy.addBehavior(Accelerate);
 			enemy.acceleration = {x: 0, y: -100};
 			enemy.addBehavior(Bomber);
+			enemy.shoot = Weapons.mine_layer;
 			break;
 		case 4:
       enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["saucer"])]);
-      enemy.addBehavior(Shoot, {target: player, cooldown: 1});
+      //enemy.addBehavior(Shoot, {target: player, cooldown: 1});
       enemy.velocity = {x: 0, y: 10};
+			enemy.shoot = Weapons.standard;
 			break;
 		case 5:
 			enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["x"])]);
       enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
       enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle), angle: PI}; 
 			enemy.addBehavior(Bounce, {min: {x: 5, y: 0}, max: {x: gameWorld.width - 5, y: gameWorld.height - 16}});
+			//enemy.shoot = function () {}; // none
 			break;
 		case 6:
       enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["drone"])]);
       enemy.addBehavior(Drone, {target: player, cooldown: 1, rate: 0.6, radius: 40, angle: Math.random() * PI2});
       enemy.velocity = {x: 0, y: 10};
+			enemy.shoot = Weapons.spark;//function () {}; // 'static' electricity
     	break;
 		case 7:
 			// disable tanks for now...
-      enemy = Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["tank", "walker"])]);
+      enemy = Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["tank"])]);
       enemy.angle = 0;
 			enemy.offset = {x: 0, y: 2};
       enemy.mirrored = enemy.x > 100;
       enemy.addBehavior(Flip);
-      enemy.addBehavior(Mortar, {cooldown: 1});
+			enemy.shoot = Weapons.heat_seeking;
+      //enemy.addBehavior(Mortar, {cooldown: 1});
       //enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
       enemy.velocity = {x: enemy.x > 100 ? -20 : 20, y: 0};
     	break;
 	}
 	layer.add(enemy);
 	enemy.addBehavior(Velocity);
+	enemy.addBehavior(Enemy, {cooldown: 0});
 	enemy.setCollision(Polygon);
 	enemy.setVertices([
 		{x: 0, y: -6},
@@ -465,10 +502,12 @@ function spawn(layer, key, player) {
 	enemy.health = randint(1, 3);
 	enemy.family = "enemy";
 	enemy.collision.onHandle = function (object, other) {
-		if (other.family != object.family) {
+		if (other.solid) {
+			object.velocity = {x: -object.velocity.x, y: -object.velocity.y};
+		} else if (other.family != object.family) {
 			object.health -= 1;
 			if (object.health < 0) object.die();
-		}        
+		}       
 	}
 	enemy.die = function () {
 		this.collision.onHandle = function (a, b) { return false; };
@@ -671,9 +710,9 @@ var Store = {
 		}
 		this.layer.active = true;
 		for (var i = 0; i < gameWorld.scene.layers.length; i++) {
-			gameWorld.scene.layers[i].paused = 10000;
+			gameWorld.scene.layers[i].paused = true;
 		}
-		this.layer.paused = 0;
+		this.layer.paused = false;
 	},
 	close: function () {
 		var t = this;
@@ -693,20 +732,6 @@ var Store = {
 
 /* MUSIC */
 /*
-BUGS:
--collision handling happens twice? (i.e. salvage score)
-
-FEATURES:
-x-add checks for pause/unpause
-x-create 5 new enemies with different attacks, patterns of movement
-  x- different attacks
-  x- different movement behaviors
-x-implement 'waves'
-x-implement AI 'store' (popup) - UI layer
- x- collectible 'scrap' (salvage?) that enemies drop (score counter)
- x- start with repairs only?
-x-add powerups, upgrades
-x-implement scrap/repair mechanic
 
 -end goal -> barrier with 'salvage' cost ?
 -implement AI combat behavior

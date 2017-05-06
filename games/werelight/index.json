@@ -6,6 +6,6 @@
 		{"path": "tile.png"},
 		{"path": "post.png"},
 		{"path": "water.png"},
-		{"path": "wisp.png", "frames": 3, "animations": 1, "speed": 0.5}
+		{"path": "wisp.png", "frames": 6, "animations": 1, "speed": 0.2}
 	]
 }

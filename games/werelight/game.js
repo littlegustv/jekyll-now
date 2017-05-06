@@ -20,6 +20,13 @@ Layer.update = function (dt) {
     }
   }
 };
+Layer.drawOrder = function () {
+	return this.entities.sort(function (a, b) { 
+		if (a.z && b.z && b.z != a.z) return a.z - b.z;
+		else if (a.y && b.y && a.y != b.y) return a.y - b.y;
+		else return a.x - b.x;
+	});
+};
 
 // tilesize, min, rate, max... grid
 var Grid = Object.create(Behavior);
@@ -60,6 +67,7 @@ Grid.select = function (coord) {
 }
 Grid.draw = function (ctx) {
 	if (this.show) {
+		ctx.strokeStyle = "white";
   	for (var i = this.min.x; i <= this.max.x; i += this.tilesize) {
     	for (var j = this.min.y; j <= this.max.y; j += this.tilesize) {
       	if (this.possible({x: i, y: j})) {
@@ -108,29 +116,3 @@ Hungry.setTarget = function () {
 
 var TILESIZE = 20, OFFSET = {x: 90, y: 20};
 var gameWorld = Object.create(World).init(320, 180, "index.json");
-
-/*
-
-Saturday:
-
-todo: gameplay
-xxxxxxxxxxxxxxxxx1. pause/unpause fix
-xxxxxxxxxxxxxxxxx2. light effect (function lit())
-
-make it top down, more minimalist
-simple tiles
-procedural generation (somehow)
-only rows/columns, no diagonals
-simplify lighting somehow
-
-Sunday
-
-todo: art
-1. enemy sprites; tiles
-2. menu/ui/transitions
-
-todo: sound
-1. player move, enemy move, splash, fail, menu, success
-2. music
-
-*/
