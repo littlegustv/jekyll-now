@@ -41,6 +41,23 @@ Layer.update = function (dt) {
 	}
 }
 
+Lerp.update = function (dt) {
+  if (this.field == "angle")
+    this.object[this.field] = lerp_angle(this.object[this.field], this.goal, this.rate * dt);
+  else
+    this.object[this.field] = lerp(this.object[this.field], this.goal, this.rate * dt, this.threshold || 1);
+  if (this.object[this.field] == this.goal && this.callback) this.callback(); 
+};
+
+function lerp (current, goal, rate, threshold) {
+  if (threshold == undefined) threshold = 1;
+  if (Math.abs(goal - current) <= threshold) {
+    return goal;
+  } else {
+    return (1-rate)*current + rate*goal
+  }  
+}
+
 var Wheel = Object.create(Entity);
 Wheel.init = function (x, y, radius, border, slice, step, percentage, colors) {
 	this.x = x, this.y = y, this.radius = radius, this.border = border, this.slice = slice, this.step = step, this.percentage = percentage, this.colors = colors;

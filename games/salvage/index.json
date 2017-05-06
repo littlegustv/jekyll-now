@@ -1,5 +1,6 @@
 { 
 	"scenes": [
+		{"name": "menu", "reload": true},
 		{"name": "game", "reload": true}
 	],
 	"resources": [
@@ -21,6 +22,7 @@
 		{"path": "asteroid.png"},
 		{"path": "flash.png"},
 		{"path": "spark.png"},
+		{"path": "title.png"},
 		{"path": "smoke.png"},
 		{"path": "dust.png", "frames": 4, "speed": 0.2},
 		{"path": "item.png"},

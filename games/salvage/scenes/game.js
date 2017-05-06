@@ -19,7 +19,7 @@ var onStart = function () {
 	planet.z = -1;
 	planet.addBehavior(Velocity);
 	
-	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 16, gameWorld.width, 64, Resources.silhouette)).opacity = 0.3;
+//	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 16, gameWorld.width, 64, Resources.silhouette)).opacity = 0.3;
 	//planet.velocity = {x: 0, y: 0, angle: PI / 72};
 
 	// player is on foreground, can rotate when game is paused
@@ -62,19 +62,19 @@ var onStart = function () {
 			gameWorld.setScene(0, true);
 		}
   }
-	player_bot.delay = player_bot.addBehavior(Delay, {duration: 1, remove: false, callback: function () {
-		this.entity.velocity = {x: 0, y: 0};
-		this.entity.acceleration = {x: 0, y: 0};
-		s.pause();
-	}});
 
   //player_bot.addBehavior(Follow, {target: p, offset: {angle: 0, x: false, y: false, z: false}});
 	this.player_top.addBehavior(Follow, {target: player_bot, offset: {angle: false, x: 0, y: 0, z: 0}});
 	this.player_bot = player_bot;
-	
-  for (var i = 0; i < gameWorld.width / 32; i++) {
+
+  bg.camera.addBehavior(Follow, {target: player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});  
+  fg.camera.addBehavior(Follow, {target: player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});
+
+  //bg.camera.addBehavior(Bound, {min: {x: -160, y: -160}, max: {x: gameWorld.width + 160, y: gameWorld.height + 160}});
+  //fg.camera.addBehavior(Bound, {min: {x: -160, y: -160}, max: {x: gameWorld.width + 160, y: gameWorld.height + 160}});	
+/*  for (var i = 0; i < gameWorld.width / 32; i++) {
     bg.add(Object.create(Sprite).init(i * 32 + 16, 4, Resources.barrier));
-  }  
+  }*/  
 
   this.claw = fg.add(Object.create(Sprite).init(gameWorld.width / 2, - gameWorld.height / 2, Resources.claw));
   this.arm = fg.add(Object.create(Entity).init(gameWorld.width / 2, - gameWorld.height, 4, gameWorld.height));
@@ -83,7 +83,7 @@ var onStart = function () {
   this.store = Object.create(Store).init(this.ui, this.player_bot);
   //for (var i = 0; i < gameWorld.width / 4; i++) {
    // bg.add(Object.create(Sprite).init(i * 4 + 2, 2, Resources.barrier));
-	
+	/*
 	var borders = [];
 	borders.push(bg.add(Object.create(TiledBackground).init(-6, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
   borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width + 6, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
@@ -92,7 +92,7 @@ var onStart = function () {
 		b.obstacle = true;
   	b.setCollision(Polygon);  
   	b.solid = true;
-	});
+	});*/
 
   this.bg = bg;
   this.fg = fg;
@@ -130,7 +130,7 @@ var onStart = function () {
     }
 		if (!s.player_top.locked) {
 			//if (s.player_bot.velocity.x === 0 && s.player_bot.velocity.y === 0) {
-				s.player_top.angle = angle(s.player_top.x, s.player_top.y, e.x, e.y);
+				s.player_top.angle = angle(gameWorld.width / 2, gameWorld.height / 2, e.x, e.y);
 			//}
 		}
   }
@@ -214,17 +214,42 @@ var onStart = function () {
 		[7,7,7],
 		[6,5,6,5,6,5],
 		[4,4,4,4,4,4,4,4]
-	]
+	];
+
+  // intro animation
+  this.intro = true;
+  this.bg.paused = false;
+  this.fg.paused = false;
+
+  this.bg.camera.scale = 0.5;
+  //this.fg.camera.scale = 0.5;
+  this.bg.camera.x = -gameWorld.width / 4;
+  this.bg.camera.y = -gameWorld.height / 4;
+
+  this.bg.camera.addBehavior(Lerp, {field: "x", object: s.bg.camera, goal: 0, rate: 3.5});
+  this.bg.camera.addBehavior(Lerp, {field: "y", object: s.bg.camera, goal: 0, rate: 3.5});
+  this.bg.camera.lerp = this.bg.camera.addBehavior(Lerp, {field: "scale", object: s.bg.camera, goal: 1, rate: 3.5, threshold: 0.01, callback: function () {
+    s.intro = false;
+    s.player_bot.delay = player_bot.addBehavior(Delay, {duration: 1, remove: false, callback: function () {
+      this.entity.velocity = {x: 0, y: 0};
+      this.entity.acceleration = {x: 0, y: 0};
+      s.pause();
+    }});
+    this.entity.removeBehavior(this.entity.lerp);
+    console.log('what?');
+  }});
 }
 var onUpdate = function (dt) {
   
+  if (this.intro) return; // for now...
+
 	for (var i = 0; i < this.wave.length; i++) {
 		if (!this.wave[i].alive) this.wave.splice(i, 1);
 	}
   if (!this.bg.paused && this.wave.length <= 0) {
 		console.log('new wave');
 		this.current_wave += 1;
-		if (this.current_wave % 2 === 0) {
+		if (false) {//this.current_wave % 2 === 0) {
       var t = this;
       t.bg.paused = true;
 			t.player_bot.locked = true;
