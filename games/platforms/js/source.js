@@ -1845,18 +1845,18 @@ window.addEventListener("DOMContentLoaded", function () {
 		}
 	});
 
-	document.addEventListener("visibilitychange", function (e) { 
-		if (document.visibilityState == "hidden") {
+	/*document.addEventListener("visibilitychange", function (e) { 
+		if (document.visibilityState == "hidden") {			
 			if (AudioContext) audioContext.suspend(); // FIX ME: adjust volume instead?
 			else window.muted = true;
 		}
 		else {
-			if (window.was_muted == false) {
+			if (window.was_muted === false) {
 				if (AudioContext) audioContext.resume();
 				else window.muted = false;
 			}
 		}
 		world.time = new Date(); 
-	});
+	});*/
 
 });

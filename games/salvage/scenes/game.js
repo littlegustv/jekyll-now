@@ -62,8 +62,8 @@ var onStart = function () {
   }
   player_dummy.addBehavior(Follow, {target: p, offset: {angle: 0, x: 0, y: 0, z: 0}});
 	
-  for (var i = 0; i < gameWorld.width / 4; i++) {
-    bg.add(Object.create(Sprite).init(i * 4 + 2, 2, Resources.barrier));
+  for (var i = 0; i < gameWorld.width / 32; i++) {
+    bg.add(Object.create(Sprite).init(i * 32 + 16, 4, Resources.barrier));
   }  
 	
 	var borders = [];
