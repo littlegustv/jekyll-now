@@ -565,7 +565,7 @@ function spawn(layer, key, player) {
 			var salvage = this.layer.add(Object.create(Sprite).init(this.x + randint(0,10) - 5, this.y + randint(0, 10) - 5, Resources.gem));
 			salvage.addBehavior(FadeOut, {duration: 1, delay: 3});
 			salvage.value = 1;
-			salvage.addBehavior(Magnet, {target: gameWorld.store});
+			salvage.addBehavior(Magnet, {target: gameWorld.shop, speed: 30});
 			salvage.setCollision(Polygon);
 			salvage.collision.onHandle = function (object, other) {
 				if ((other.family == "player" || other.family == "store") && !other.projectile) {

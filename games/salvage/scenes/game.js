@@ -22,7 +22,9 @@ var onStart = function () {
 //	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 16, gameWorld.width, 64, Resources.silhouette)).opacity = 0.3;
 	//planet.velocity = {x: 0, y: 0, angle: PI / 72};
 
-	bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2, Resources.store));
+	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60,  Resources.shop));
+	gameWorld.shop.family = "store";
+	gameWorld.shop.setCollision(Polygon);
 	
 	// player is on foreground, can rotate when game is paused
 	this.player_top = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
