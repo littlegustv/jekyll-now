@@ -14,7 +14,10 @@ var onStart = function () {
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	
-  bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg)).z = -2;
+  var atmosphere = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60, Resources.atmosphere));
+  atmosphere.z = -2;
+
+  //bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg)).z = -3;
 	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60,  Resources.planet));
 	planet.z = -1;
 	planet.addBehavior(Velocity);
@@ -66,9 +69,10 @@ var onStart = function () {
   //player_bot.addBehavior(Follow, {target: p, offset: {angle: 0, x: false, y: false, z: false}});
 	this.player_top.addBehavior(Follow, {target: player_bot, offset: {angle: false, x: 0, y: 0, z: 0}});
 	this.player_bot = player_bot;
+  var t = this;
 
-  bg.camera.addBehavior(Follow, {target: player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});  
-  fg.camera.addBehavior(Follow, {target: player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});
+  bg.camera.addBehavior(Follow, {target: t.player_top, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: false}});  
+  fg.camera.addBehavior(Follow, {target: t.player_top, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: false}});
 
   //bg.camera.addBehavior(Bound, {min: {x: -160, y: -160}, max: {x: gameWorld.width + 160, y: gameWorld.height + 160}});
   //fg.camera.addBehavior(Bound, {min: {x: -160, y: -160}, max: {x: gameWorld.width + 160, y: gameWorld.height + 160}});	

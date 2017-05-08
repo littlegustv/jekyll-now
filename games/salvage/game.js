@@ -1,6 +1,7 @@
 var MAXHEALTH = 16, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(320, 180, "index.json");
 
+
 Delay.update = function (dt) {
   if (this.time === undefined) this.start();
 	
