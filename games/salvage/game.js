@@ -20,13 +20,13 @@ Delay.set = function (t) {
 
 // push to raindrop -> collisions fix
 Layer.update = function (dt) {
+	this.camera.update(dt);
 	if (this.paused === true) {
 		return;
 	} else if (this.paused > 0) {
 	  this.paused -= dt;
 	  return;
 	}
-	this.camera.update(dt);
 	for (var i = 0; i < this.entities.length; i++) {
 	  this.entities[i].update(dt);
 	}
@@ -56,6 +56,26 @@ function lerp (current, goal, rate, threshold) {
   } else {
     return (1-rate)*current + rate*goal
   }  
+}
+
+// radius, cooldown, rate, target, damage
+var Space = Object.create(Behavior);
+Space.update = function (dt) {
+	if (this.cooldown === undefined) this.cooldown = 0;
+	else if (this.cooldown > 0) this.cooldown -= dt;
+	else if (distance(this.entity.x, this.entity.y, this.target.x, this.target.y) > this.radius) {
+		console.log('ah, ha!');
+		this.entity.health -= this.damage;
+		this.cooldown = this.rate;
+		// create particle effect
+		for (var i = 0; i < 6; i++) {
+			var e = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y, 4, 4));
+			e.addBehavior(Velocity);
+			var theta = Math.random() * PI2;
+			e.velocity = {x: 30 * Math.cos(theta), y: 30 * Math.sin(theta) };
+			e.addBehavior(FadeOut, {duration: 1, remove: true});
+		}
+	}
 }
 
 var Wheel = Object.create(Entity);
