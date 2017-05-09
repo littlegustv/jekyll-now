@@ -1,6 +1,13 @@
 var MAXHEALTH = 16, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(320, 180, "index.json");
 
+var Surface = Object.create(Behavior);
+Surface.update = function (dt) {
+	this.entity.angle += this.speed * dt;
+	this.entity.x = this.target.x + this.radius * Math.cos(this.entity.angle - PI / 2);
+	this.entity.y = this.target.y + this.radius * Math.sin(this.entity.angle - PI / 2);
+}
+
 Delay.update = function (dt) {
   if (this.time === undefined) this.start();
 	
@@ -479,12 +486,11 @@ function spawn(layer, key, player) {
 	switch (key) {
 		case 1:
 			enemy = Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["walker"])]);
-      enemy.angle = 0;
-			enemy.offset = {x: 0, y: 2};
-      enemy.mirrored = enemy.x > 100;
-      enemy.addBehavior(Flip);
+      enemy.addBehavior(Surface, {speed: PI / 36, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 164});
+      enemy.angle = Math.random() * PI2;
+      //enemy.addBehavior(Flip);
 			//enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
-      enemy.velocity = {x: enemy.x > 100 ? -20 : 20, y: 0};
+      enemy.velocity = {x: 0, y: 0};//enemy.x > 100 ? -20 : 20, y: 0};
 			enemy.shoot = Weapons.double;
 			break;
 		case 2:
@@ -522,15 +528,18 @@ function spawn(layer, key, player) {
     	break;
 		case 7:
 			// disable tanks for now...
-      enemy = Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["tank"])]);
-      enemy.angle = 0;
-			enemy.offset = {x: 0, y: 2};
-      enemy.mirrored = enemy.x > 100;
-      enemy.addBehavior(Flip);
+			var theta = Math.random() * PI2;
+      enemy = Object.create(Sprite).init(gameWorld.width / 2 + 160 * Math.cos(theta), gameWorld.height / 2 + 60  + 160 * Math.sin(theta), Resources[choose(["tank"])]);
+			enemy.addBehavior(Surface, {speed: PI / 36, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 164});
+      enemy.angle = theta;
+			//enemy.origin = {x: 0, y: 160};
+			//enemy.offset = {x: 0, y: 2};
+      //enemy.mirrored = enemy.x > 100;
+      //enemy.addBehavior(Flip);
 			enemy.shoot = Weapons.heat_seeking;
       //enemy.addBehavior(Mortar, {cooldown: 1});
       //enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
-      enemy.velocity = {x: enemy.x > 100 ? -20 : 20, y: 0};
+      enemy.velocity = {x: 0, y: 0 };
     	break;
 	}
 	layer.add(enemy);
@@ -594,7 +603,8 @@ function spawn(layer, key, player) {
 		}
 		gameWorld.playSound(Resources.hit);
 	}
-	enemy.addBehavior(Crop, {min: {x: -10, y: -10}, max: {x: gameWorld.width + 10, y: gameWorld.height + 20}});  
+	enemy.addBehavior(Space, {cooldown: 0, rate: 1.5, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 320, damage: 1});
+	//enemy.addBehavior(Crop, {min: {x: -10, y: -10}, max: {x: gameWorld.width + 10, y: gameWorld.height + 20}});  
 	return enemy;
 }
 
