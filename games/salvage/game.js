@@ -21,13 +21,13 @@ Delay.set = function (t) {
 
 // push to raindrop -> collisions fix
 Layer.update = function (dt) {
+	this.camera.update(dt);
 	if (this.paused === true) {
 		return;
 	} else if (this.paused > 0) {
 	  this.paused -= dt;
 	  return;
 	}
-	this.camera.update(dt);
 	for (var i = 0; i < this.entities.length; i++) {
 	  this.entities[i].update(dt);
 	}
@@ -57,6 +57,33 @@ function lerp (current, goal, rate, threshold) {
   } else {
     return (1-rate)*current + rate*goal
   }  
+}
+
+// radius, cooldown, rate, target, damage
+var Space = Object.create(Behavior);
+Space.update = function (dt) {
+	if (this.cooldown === undefined) this.cooldown = 0;
+	else if (this.cooldown > 0) this.cooldown -= dt;
+	else if (distance(this.entity.x, this.entity.y, this.target.x, this.target.y) > this.radius) {
+		this.entity.health -= this.damage;
+		this.cooldown = this.rate;
+		// create particle effect
+		for (var i = 0; i < 6; i++) {
+			var e = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y, 4, 4));
+			e.addBehavior(Velocity);
+			var theta = Math.random() * PI2;
+			e.velocity = {x: 30 * Math.cos(theta), y: 30 * Math.sin(theta) };
+			e.addBehavior(FadeOut, {duration: 1, remove: true});
+		}
+	}
+}
+
+// target, speed
+var Magnet = Object.create(Behavior);
+Magnet.update = function (dt) {
+	var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
+	this.entity.velocity.x = lerp(this.entity.velocity.x, this.speed * Math.cos(theta), dt);
+	this.entity.velocity.y = lerp(this.entity.velocity.y, this.speed * Math.sin(theta), dt);
 }
 
 var Wheel = Object.create(Entity);
@@ -539,9 +566,10 @@ function spawn(layer, key, player) {
 			var salvage = this.layer.add(Object.create(Sprite).init(this.x + randint(0,10) - 5, this.y + randint(0, 10) - 5, Resources.gem));
 			salvage.addBehavior(FadeOut, {duration: 1, delay: 3});
 			salvage.value = 1;
+			salvage.addBehavior(Magnet, {target: gameWorld.shop, speed: 30});
 			salvage.setCollision(Polygon);
 			salvage.collision.onHandle = function (object, other) {
-				if (other.family == "player" && !other.projectile) {
+				if ((other.family == "player" || other.family == "store") && !other.projectile) {
 					object.alive = false;
 					player.salvage += object.value;
 					gameWorld.playSound(Resources.pickup);

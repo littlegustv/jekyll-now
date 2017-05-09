@@ -25,6 +25,10 @@ var onStart = function () {
 //	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 16, gameWorld.width, 64, Resources.silhouette)).opacity = 0.3;
 	//planet.velocity = {x: 0, y: 0, angle: PI / 72};
 
+	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60,  Resources.shop));
+	gameWorld.shop.family = "store";
+	gameWorld.shop.setCollision(Polygon);
+	
 	// player is on foreground, can rotate when game is paused
 	this.player_top = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
   //this.player_top.family = "player";
@@ -50,6 +54,9 @@ var onStart = function () {
   player_bot.acceleration = {x: 0, y: 0};
   player_bot.opacity = 0;
 	player_bot.health = MAXHEALTH;
+	
+	player_bot.addBehavior(Space, {cooldown: 0, rate: 1.5, target: planet, radius: 320, damage: 1});
+	
 	player_bot.salvage = 0;
   player_bot.family = "player";
   player_bot.collision.onHandle = function (object, other) {
@@ -230,8 +237,8 @@ var onStart = function () {
   this.bg.camera.x = -gameWorld.width / 4;
   this.bg.camera.y = -gameWorld.height / 4;
 
-  this.bg.camera.addBehavior(Lerp, {field: "x", object: s.bg.camera, goal: 0, rate: 3.5});
-  this.bg.camera.addBehavior(Lerp, {field: "y", object: s.bg.camera, goal: 0, rate: 3.5});
+  this.bg.camera.lerpx = this.bg.camera.addBehavior(Lerp, {field: "x", object: s.bg.camera, goal: 0, rate: 3.5});
+  this.bg.camera.lerpy = this.bg.camera.addBehavior(Lerp, {field: "y", object: s.bg.camera, goal: 0, rate: 3.5});
   this.bg.camera.lerp = this.bg.camera.addBehavior(Lerp, {field: "scale", object: s.bg.camera, goal: 1, rate: 3.5, threshold: 0.01, callback: function () {
     s.intro = false;
     s.player_bot.delay = player_bot.addBehavior(Delay, {duration: 1, remove: false, callback: function () {
@@ -240,6 +247,12 @@ var onStart = function () {
       s.pause();
     }});
     this.entity.removeBehavior(this.entity.lerp);
+    this.entity.removeBehavior(this.entity.lerpx);
+    this.entity.removeBehavior(this.entity.lerpy);
+		
+	  s.bg.camera.addBehavior(Follow, {target: s.player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});  
+  	s.fg.camera.addBehavior(Follow, {target: s.player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});
+
     console.log('what?');
   }});
 }
