@@ -12,6 +12,8 @@ var onStart = function () {
   var fg = this.addLayer(Object.create(Layer).init(320,240));
 	fg.active = true;
 	
+	bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height)).color = "#222255";
+	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	
   var atmosphere = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60, Resources.atmosphere));
@@ -25,12 +27,12 @@ var onStart = function () {
 //	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 16, gameWorld.width, 64, Resources.silhouette)).opacity = 0.3;
 	//planet.velocity = {x: 0, y: 0, angle: PI / 72};
 
-	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60,  Resources.shop));
+	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width / 2 + 80, gameWorld.height / 2 - 60,  Resources.shop));
 	gameWorld.shop.family = "store";
 	gameWorld.shop.setCollision(Polygon);
 	
 	// player is on foreground, can rotate when game is paused
-	this.player_top = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2,Resources.viper));
+	this.player_top = fg.add(Object.create(Sprite).init(gameWorld.width / 4, gameWorld.height / 4, Resources.viper));
   //this.player_top.family = "player";
   //this.player.addBehavior(Velocity);
   //this.player.addBehavior(Accelerate);
@@ -266,7 +268,7 @@ var onUpdate = function (dt) {
   if (!this.bg.paused && this.wave.length <= 0) {
 		console.log('new wave');
 		this.current_wave += 1;
-		if (false) {//this.current_wave % 2 === 0) {
+		if (this.current_wave % 2 === 1) {
       var t = this;
       t.bg.paused = true;
 			t.player_bot.locked = true;

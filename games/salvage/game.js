@@ -1,6 +1,24 @@
 var MAXHEALTH = 16, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(320, 180, "index.json");
 
+// push to raindrop -> making setScene(reload) work properly
+World.setScene = function (n, reload) {
+	if (this.scenes[n].reload || reload === true) {
+		console.log('reloading, supposedly');
+		this.scenes[n] = Object.create(Scene).init(this.scenes[n].name, true);
+	}
+	this.removeEventListeners(this.scene);
+	this.scene = this.scenes[n];
+	this.addEventListeners(this.scene);
+};
+
+// push to raindrop -> remove flickering on scene change 
+World.draw = function () {
+	if (this.scene) {
+		this.scene.draw(this.ctx);
+	}
+};
+
 var Surface = Object.create(Behavior);
 Surface.update = function (dt) {
 	this.entity.angle += this.speed * dt;
@@ -213,7 +231,7 @@ var Weapons = {
 		}
 		return 0.6;
 	},
-	heat_seeking: function (layer) {
+	homing: function (layer) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
@@ -227,7 +245,7 @@ var Weapons = {
 			a.angle = theta;
 			return 0.6;			
 	},
-	mine_layer: function (layer) {
+	proximity: function (layer) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bomb));
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
@@ -536,7 +554,7 @@ function spawn(layer, key, player) {
 			//enemy.offset = {x: 0, y: 2};
       //enemy.mirrored = enemy.x > 100;
       //enemy.addBehavior(Flip);
-			enemy.shoot = Weapons.heat_seeking;
+			enemy.shoot = Weapons.homing;
       //enemy.addBehavior(Mortar, {cooldown: 1});
       //enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
       enemy.velocity = {x: 0, y: 0 };
@@ -637,7 +655,8 @@ var Store = {
 		var outer = this.layer.add(Object.create(Sprite).init(3 * gameWorld.width / 4 + 8, gameWorld.height - 16, Resources.silhouette));
 		
 		var t = this;
-		var close = this.layer.add(Object.create(SpriteFont).init(12, gameWorld.height - 16, Resources.expire_font, "done...", {align: "left", spacing: -2}));
+		var close = this.layer.add(Object.create(Entity).init(gameWorld.width / 6, gameWorld.height - 16, gameWorld.width / 3, 16));
+		this.layer.add(Object.create(SpriteFont).init(12, gameWorld.height - 16, Resources.expire_font, "done...", {align: "left", spacing: -2}));
 		close.family = "button";
 		close.trigger = function () {
 			t.player.salvage -= t.spent;
@@ -647,10 +666,10 @@ var Store = {
 			t.close();
 		}
 		close.hover = function () {
-			this.opacity = 0.6;
+			this.color = "#6DC72E";
 		}
 		close.unhover = function () {
-			this.opacity = 1;
+			this.color = "white";
 		}
 		this.weapons = {};
 		this.salvage = this.layer.add(Object.create(SpriteFont).init(80, 16, Resources.expire_font, "$ 0", {align: "right", spacing: -2}));
@@ -658,41 +677,52 @@ var Store = {
 		this.layer.add(Object.create(Sprite).init(12, 16, Resources.gem)).velocity = {x: 0, y: 0, angle: PI / 2};
 		this.gems = this.layer.add(Object.create(SpriteFont).init(24, 16, Resources.expire_font, String(t.player.salvage), {align: "left", spacing: -2}));
 		
-		var i = 0;
+		var i = 0, j = 0;
 		for (var k in Weapons) {
-			(function () {	
-				var key = k;
-				var icon = t.layer.add(Object.create(Sprite).init(8, 40 + i * 18, Resources.icons));
-				icon.name = t.layer.add(Object.create(SpriteFont).init(26, 40 + i * 18, Resources.expire_font, k, {align: "left", spacing: -2}));
-				t.weapons[key] = icon;
-				icon.animation = (i + 3) % Resources.icons.animations;
-				icon.family = "button";
-				icon.purchase = key;
-				icon.trigger = function () {
-					if (t.weapon == key && t.spent > 0) {
-						t.weapon = undefined;
-						t.spend(-1);
-						this.opacity = 1;
-					} else if (t.player.salvage > (t.spent + 1)) {
-						if (t.weapon) {
-							t.weapons[t.weapon].opacity = 1;
-							t.spend(-1);
+			if (j <= 2) { // limit to 3
+				(function () {	
+					var key = k;
+					var b = t.layer.add(Object.create(Entity).init(gameWorld.width / 6, 40 + i * 18, gameWorld.width / 3, 16));
+					b.color = "white";				
+
+					var icon = t.layer.add(Object.create(Sprite).init(8, 40 + i * 18, Resources.icons));
+					b.name = t.layer.add(Object.create(SpriteFont).init(26, 40 + i * 18, Resources.expire_font, k, {align: "left", spacing: -2}));
+					b.icon = icon;
+					t.weapons[key] = b;
+					icon.animation = (i + 3) % Resources.icons.animations;
+					b.family = "button";
+					b.purchase = key;
+					b.price = 1;
+					b.priceText = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 3, 40 + i * 18, Resources.expire_font, "$" + b.price, {align: "right", spacing: -2}));
+					b.trigger = function () {
+						if (t.weapon == key && t.spent >= this.price) {
+							t.weapon = undefined;
+							t.spend(-1 * this.price);
+							this.color = "white";
+							//this.opacity = 1;
+						} else {
+							if (t.weapon) {
+								t.weapons[t.weapon].color = "white";
+								t.spend(-1 * this.price);
+							}
+							if (t.player.salvage > (t.spent + this.price)) {
+								t.weapon = key;
+								this.color = "#6DC72E";
+								t.spend(this.price);
+							}
 						}
-						t.weapon = key;
-						this.opacity = 0.3;
-						t.spend(1);
 					}
-				}
-				icon.hover = function () {
-					this.opacity = 0.6;
-					this.name.opacity = 0.6;
-				}
-				icon.unhover = function () {
-					this.opacity = 1;
-					this.name.opacity = 1;
-				}
-				i++;
-			})();
+					b.hover = function () {
+						this.color = "#6DC72E";
+					}
+					b.unhover = function () {
+						if (t.weapon != this.purchase)
+							this.color = "white";
+					}
+					i++;
+				})();
+				j++; // limit to 3
+			}
 		}
 		
 		this.damageWheel = t.layer.add(Object.create(Wheel).init(52, 44 + (i + 1) * 18, 32, 4, 0.01, 5, 60, ["#000", "#333", "#6DC72E", "#fff"]));
@@ -766,6 +796,10 @@ var Store = {
 		this.layer.active = true;
 		for (var i = 0; i < gameWorld.scene.layers.length; i++) {
 			gameWorld.scene.layers[i].paused = true;
+		}
+		for (var key in this.weapons) {
+			this.weapons[key].price = Math.max(1, this.player.salvage - 1);
+			this.weapons[key].priceText.text = "$" + this.weapons[key].price;
 		}
 		this.layer.paused = false;
 	},

@@ -6,7 +6,7 @@
 	"resources": [
 		{"path": "viper.png", "frames": 4, "animations": 2, "speed": 0.5},
 		{"path": "drone.png", "frames": 6, "animations": 1, "speed": 0.1},
-		{"path": "shopkeeper.png", "frames": 2, "animations": 1, "speed": 0.4},
+		{"path": "beamship.png", "frames": 2, "animations": 1, "speed": 0.4},
 		{"path": "projectile.png"},
 		{"path": "bomb.png", "frames": 3, "speed": 0.2},
 		{"path": "shop.png", "frames": 2, "speed": 0.2},
