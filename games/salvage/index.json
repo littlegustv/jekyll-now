@@ -17,6 +17,7 @@
 		{"path": "bomber.png", "frames": 2, "animations": 1, "speed": 0.5},
 		{"path": "x.png", "frames": 2, "animations": 1, "speed": 0.5},
 		{"path": "saucer.png", "frames": 5, "animations": 1, "speed": 0.5},
+		{"path": "silo.png", "frames": 3, "animations": 1, "speed": 0.5},
 		{"path": "explosion.png", "frames": 8, "animations": 1, "speed": 0.2},
 		{"path": "expire_font.png", "frames": 95, "animations": 1},
 		{"path": "gem.png"},

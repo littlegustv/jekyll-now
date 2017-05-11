@@ -19,6 +19,44 @@ World.draw = function () {
 	}
 };
 
+function inverse(family) {
+	return family == "enemy" ? "player" : "enemy";
+}
+
+var Silo = Object.create(Behavior);
+Silo.update = function (dt) {
+	// a lot of redunancy here, and it's not even working properly!
+	if (this.cooldown === undefined) this.cooldown = 0.5;
+	else if (this.cooldown > 0) this.cooldown -= dt;
+	else {
+		var p = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.beamship));
+		p.angle = this.entity.angle - PI / 2;
+		p.projectile = true;
+		p.velocity = {x: 30 * Math.cos(p.angle), y: 30 * Math.sin(p.angle)};
+		p.addBehavior(Velocity);
+		p.family = this.entity.family;
+		p.addBehavior(HeatSeeking, {family: inverse(this.entity.family), speed: 30, rate: 3 });
+		p.setCollision(Polygon);
+		p.health = 1;
+		p.setVertices([
+			{x: 0, y: -6},
+			{x: -6, y: 0},
+			{x: 0, y: 6},
+			{x: 6, y: 0}
+		]);
+		p.collision.onHandle = function (object, other) {
+			if (other.solid) {
+				object.velocity = {x: -object.velocity.x, y: -object.velocity.y};
+			} else if (other.family != object.family) {
+				object.health -= 1;
+				if (object.health < 0) object.die();
+			}  
+		}
+		p.die = function () { this.alive = true; };
+		this.cooldown = 1.5;
+	}
+}
+
 var Surface = Object.create(Behavior);
 Surface.update = function (dt) {
 	this.entity.angle += this.speed * dt;
@@ -192,8 +230,8 @@ HeatSeeking.start = function () {
 };
 HeatSeeking.update = function (dt) {
 	if (!this.target) this.start();
-	this.entity.angle = lerp_angle(this.entity.angle, angle(this.entity.x, this.entity.y, this.target.x, this.target.y), dt);
-	this.entity.velocity = {x: 50 * Math.cos(this.entity.angle), y: 50 * Math.sin(this.entity.angle) };
+	this.entity.angle = lerp_angle(this.entity.angle, angle(this.entity.x, this.entity.y, this.target.x, this.target.y), this.rate * dt);
+	this.entity.velocity = {x: this.speed * Math.cos(this.entity.angle), y: this.speed * Math.sin(this.entity.angle) };
 };
 
 // push to raindrop
@@ -237,7 +275,7 @@ var Weapons = {
 			//gameWorld.playSound(Resources.mortar);
 			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
-			a.addBehavior(HeatSeeking, {family: this.family == "player" ? "enemy" : "player" });
+			a.addBehavior(HeatSeeking, {family: this.family == "player" ? "enemy" : "player" , speed: 50, rate: 1});
 			a.family = this.family;
 			a.projectile = true;
 			var theta = this.angle;
@@ -578,7 +616,7 @@ function spawn(layer, key, player) {
 		} else if (other.family != object.family) {
 			object.health -= 1;
 			if (object.health < 0) object.die();
-		}       
+		}  
 	}
 	enemy.die = function () {
 		this.collision.onHandle = function (a, b) { return false; };
