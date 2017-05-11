@@ -35,25 +35,10 @@ Silo.update = function (dt) {
 		p.velocity = {x: 30 * Math.cos(p.angle), y: 30 * Math.sin(p.angle)};
 		p.addBehavior(Velocity);
 		p.family = this.entity.family;
-		p.addBehavior(HeatSeeking, {family: inverse(this.entity.family), speed: 30, rate: 3 });
+		p.addBehavior(HeatSeeking, {family: inverse(this.entity.family), speed: 30, rate: 0.5 });
 		p.setCollision(Polygon);
-		p.health = 1;
-		p.setVertices([
-			{x: 0, y: -6},
-			{x: -6, y: 0},
-			{x: 0, y: 6},
-			{x: 6, y: 0}
-		]);
-		p.collision.onHandle = function (object, other) {
-			if (other.solid) {
-				object.velocity = {x: -object.velocity.x, y: -object.velocity.y};
-			} else if (other.family != object.family) {
-				object.health -= 1;
-				if (object.health < 0) object.die();
-			}  
-		}
-		p.die = function () { this.alive = true; };
-		this.cooldown = 1.5;
+		p.collision.onHandle = projectileHit;
+		this.cooldown = 3;
 	}
 }
 
