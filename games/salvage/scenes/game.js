@@ -269,40 +269,39 @@ var onUpdate = function (dt) {
 	for (var i = 0; i < this.wave.length; i++) {
 		if (!this.wave[i].alive) this.wave.splice(i, 1);
 	}
+	
   if (!this.bg.paused && this.wave.length <= 0) {
 		console.log('new wave');
 		this.current_wave += 1;
-		if (false) {//this.current_wave % 2 === 1) {
-      var t = this;
-      t.bg.paused = true;
-			t.player_bot.locked = true;
-			t.player_bot.velocity = {x: 0, y: 0};
-			t.player_bot.acceleration = {x: 0, y: 0};
-      this.claw.lerpx = this.claw.addBehavior(Lerp, {object: this.claw, field: "x", goal: this.player_bot.x, rate: 5});
-      this.claw.lerpy = this.claw.addBehavior(Lerp, {object: this.claw, field: "y", goal: this.player_bot.y, rate: 5, callback: function () {
-        t.claw.animation = 1;
-        t.claw.removeBehavior(t.claw.lerpx);
-        t.claw.removeBehavior(t.claw.lerpy);
-        t.player_bot.grabbed = t.player_bot.addBehavior(Follow, {target: t.claw, offset: {x: 0, y: 0}});
-        t.player_top.grabbed = t.player_top.addBehavior(Follow, {target: t.claw, offset: {x: 0, y: 0}});
-        t.claw.lerpx = t.claw.addBehavior(Lerp, {object: t.claw, field: "x", goal: 3 * gameWorld.width / 4, rate: 5});
-        t.claw.lerpy = t.claw.addBehavior(Lerp, {object: t.claw, field: "y", goal: gameWorld.height / 3, rate: 5, callback: function () {
-    			t.store.open();
-        	t.claw.removeBehavior(t.claw.lerpx);
-        	t.claw.removeBehavior(t.claw.lerpy);
-					// player jumps back to previous position here; but no matter, this whole store-open trigger is going to change, right? FIX ME!
-          t.player_bot.removeBehavior(t.player_bot.grabbed);
-          t.player_top.removeBehavior(t.player_top.grabbed);
-        }});
-      }})
-      gameWorld.playSound(Resources.store);
-		} else {
-			var w = choose(this.waves);
-			gameWorld.playSound(Resources[choose(["spawn", "spawn2"])]);
-			for (var j = 0; j < w.length; j++) {
-				var enemy = spawn(this.bg, w[j], this.player_bot);
-				this.wave.push(enemy);
+		if (this.current_wave % 2 === 1) {
+			var landing_pad = this.bg.add(Object.create(Entity).init(gameWorld.shop.x - 18, gameWorld.shop.y + 12, 16, 16));
+			landing_pad.z = 100;
+			landing_pad.color = "gray", landing_pad.opacity = 0.5;
+			landing_pad.setCollision(Polygon);
+			landing_pad.collision.onHandle = function(object, other) {
+				console.log('collided');
+				if (other.family == "player" && !other.projectile) {
+					console.log('what do you know.');
+					other.locked = true;
+					other.velocity = {x: 0, y: 0};
+					other.acceleration = {x: 0, y: 0};
+					object.alive = false;
+					other.lerpx = other.addBehavior(Lerp, {object: other, field: "x", goal: landing_pad.x, rate: 5});
+					other.lerpy = other.addBehavior(Lerp, {object: other, field: "y", goal: landing_pad.y, rate: 5, callback: function () {
+						this.entity.removeBehavior(this.entity.lerpx);
+						this.entity.removeBehavior(this.entity.lerpy);
+						console.log('ready to go?');
+						gameWorld.scene.store.open();
+					}});
+				}
 			}
+		}
+		
+		var w = choose(this.waves);
+		gameWorld.playSound(Resources[choose(["spawn", "spawn2"])]);
+		for (var j = 0; j < w.length; j++) {
+			var enemy = spawn(this.bg, w[j], this.player_bot);
+			this.wave.push(enemy);
 		}
 	}
 }

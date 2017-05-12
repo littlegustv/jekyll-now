@@ -808,10 +808,6 @@ var Store = {
 		this.gems.text = "" + this.player.salvage;		
 		this.salvage.text = "$ " + this.player.salvage;
 		this.damageWheel.percentage = 100 * (this.player.health / MAXHEALTH);
-		//this.health_bar.w = 128 * (this.player.health / MAXHEALTH), this.health_bar.x = 3 * gameWorld.width / 4 - (128 - this.health_bar.w) / 2;
-		
-		//this.repair_cost = (MAXHEALTH - this.player.health) / this.player.salvage; // price calculated to cost ALL your money to repair completely
-		//this.repair_price_text.text = "$ " + Math.floor(this.repair_cost * 10) / 10;
 		
 		for (var i = 0; i < this.layer.entities.length; i++) {
 			this.layer.entities[i].lerp.goal = this.layer.entities[i].goal;
