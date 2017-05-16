@@ -7,7 +7,7 @@
 		{"path": "viper.png", "frames": 4, "animations": 2, "speed": 0.5},
 		{"path": "drone.png", "frames": 6, "animations": 1, "speed": 0.1},
 		{"path": "beamship.png", "frames": 2, "animations": 1, "speed": 0.4},
-		{"path": "projectile.png"},
+		{"path": "projectile.png", "frames": 2, "speed": 0.4},
 		{"path": "bomb.png", "frames": 3, "speed": 0.2},
 		{"path": "shop.png", "frames": 2, "speed": 0.2},
 		{"path": "claw.png", "frames": 1, "animations": 2, "speed": 0.2},
