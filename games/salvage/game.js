@@ -553,12 +553,12 @@ function spawn(layer, key, player) {
 	switch (key) {
 		case 1:
 			enemy = Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["walker"])]);
-      enemy.addBehavior(Surface, {speed: PI / 36, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 164});
+      enemy.addBehavior(Surface, {speed: PI / 36, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 82});
       enemy.angle = Math.random() * PI2;
       //enemy.addBehavior(Flip);
 			//enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
       enemy.velocity = {x: 0, y: 0};//enemy.x > 100 ? -20 : 20, y: 0};
-			enemy.shoot = Weapons.double;
+			enemy.shoot = Weapons.standard;
 			break;
 		case 2:
       enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["asteroid"])]);
@@ -597,7 +597,7 @@ function spawn(layer, key, player) {
 			// disable tanks for now...
 			var theta = Math.random() * PI2;
       enemy = Object.create(Sprite).init(gameWorld.width / 2 + 160 * Math.cos(theta), gameWorld.height / 2 + 60  + 160 * Math.sin(theta), Resources[choose(["tank"])]);
-			enemy.addBehavior(Surface, {speed: PI / 36, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 164});
+			enemy.addBehavior(Surface, {speed: PI / 36, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 82});
       enemy.angle = theta;
 			//enemy.origin = {x: 0, y: 160};
 			//enemy.offset = {x: 0, y: 2};

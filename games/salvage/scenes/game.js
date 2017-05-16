@@ -12,7 +12,7 @@ var onStart = function () {
   var fg = this.addLayer(Object.create(Layer).init(320,240));
 	fg.active = true;
 	
-	bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height)).color = "#111133";
+	bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height)).color = "#C13160";
 	
 	for (var i = 0; i < 100; i++) {
 		bg.add(Object.create(Entity).init(randint(0, gameWorld.width * 2), randint(0, gameWorld.height * 2), 1, 1)).color = "white";
@@ -20,7 +20,7 @@ var onStart = function () {
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	
-	var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 240, 2, PI / 8, "lightskyblue"));
+	var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 240, 2, PI / 8, "#e91e63"));
 	atmosphere.addBehavior(Velocity);
 	atmosphere.velocity = {x: 0, y: 0, angle: PI / 180};
 	atmosphere.addBehavior(Oscillate, {object: atmosphere, field: "amplitude", initial: 2, constant: 1, rate: 4});
@@ -260,11 +260,11 @@ var onStart = function () {
 	  s.bg.camera.addBehavior(Follow, {target: s.player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});  
   	s.fg.camera.addBehavior(Follow, {target: s.player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});
 
-    console.log('what?');
+    //console.log('what?');
   }});
 }
 var onUpdate = function (dt) {
-  
+  var s = this;
   if (this.intro) return; // for now...
 
 	for (var i = 0; i < this.wave.length; i++) {
@@ -281,16 +281,19 @@ var onUpdate = function (dt) {
 			landing_pad.setCollision(Polygon);
 			landing_pad.collision.onHandle = function(object, other) {
 				if (other.family == "player" && !other.projectile) {
-					console.log('what do you know.');
+					//console.log('what do you know.');
 					other.locked = true;
 					other.velocity = {x: 0, y: 0};
 					other.acceleration = {x: 0, y: 0};
 					object.alive = false;
 					other.lerpx = other.addBehavior(Lerp, {object: other, field: "x", goal: landing_pad.x, rate: 5});
 					other.lerpy = other.addBehavior(Lerp, {object: other, field: "y", goal: landing_pad.y, rate: 5, callback: function () {
+						s.player_top.angle = 0;
+						s.player_top.frame = 0;
+						s.player_top.animation = 0;
 						this.entity.removeBehavior(this.entity.lerpx);
 						this.entity.removeBehavior(this.entity.lerpy);
-						console.log('ready to go?');
+						//console.log('ready to go?');
 						gameWorld.scene.store.open();
 					}});
 				}
