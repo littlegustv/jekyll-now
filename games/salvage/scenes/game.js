@@ -12,19 +12,25 @@ var onStart = function () {
   var fg = this.addLayer(Object.create(Layer).init(320,240));
 	fg.active = true;
 	
-	bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height)).color = "#222255";
+	bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height)).color = "#111133";
+	
+	for (var i = 0; i < 100; i++) {
+		bg.add(Object.create(Entity).init(randint(0, gameWorld.width * 2), randint(0, gameWorld.height * 2), 1, 1)).color = "white";
+	}
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	
-	var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 320, 2, PI / 8, "white"));
+	var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 240, 2, PI / 8, "lightskyblue"));
 	atmosphere.addBehavior(Velocity);
 	atmosphere.velocity = {x: 0, y: 0, angle: PI / 180};
 	atmosphere.addBehavior(Oscillate, {object: atmosphere, field: "amplitude", initial: 2, constant: 1, rate: 4});
 	atmosphere.z = -2;
 	
+	// smaller
   //var atmosphere = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60, Resources.atmosphere));
-  var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 168, 2, PI / 8, "darkred"));
+	var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 236, 2, PI / 2, "aliceblue"));
 	atmosphere.addBehavior(Velocity);
+	atmosphere.angle = Math.random() * PI2;
 	atmosphere.velocity = {x: 0, y: 0, angle: PI / 180};
 	atmosphere.addBehavior(Oscillate, {object: atmosphere, field: "amplitude", initial: 2, constant: 1, rate: 4});
 	atmosphere.z = -2;
@@ -33,9 +39,9 @@ var onStart = function () {
 	planet.z = -1;
 	planet.addBehavior(Velocity);
 	
-	var silo = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 -100, Resources.silo));
-	silo.addBehavior(Silo);
-	silo.family = "enemy";
+	//var silo = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 -100, Resources.silo));
+	//silo.addBehavior(Silo);
+	//silo.family = "enemy";
 	
 	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width / 2 + 80, gameWorld.height / 2 - 60,  Resources.shop));
 	gameWorld.shop.family = "store";
@@ -56,7 +62,7 @@ var onStart = function () {
   player_bot.opacity = 0;
 	player_bot.health = MAXHEALTH;
 	
-	player_bot.addBehavior(Space, {cooldown: 0, rate: 1.5, target: planet, radius: 320, damage: 1});
+	player_bot.addBehavior(Space, {cooldown: 0, rate: 1.5, target: planet, radius: 240, damage: 1});
 	
 	player_bot.salvage = 0;
   player_bot.family = "player";
@@ -88,9 +94,9 @@ var onStart = function () {
     bg.add(Object.create(Sprite).init(i * 32 + 16, 4, Resources.barrier));
   }*/  
 
-  this.claw = fg.add(Object.create(Sprite).init(gameWorld.width / 2, - gameWorld.height / 2, Resources.claw));
-  this.arm = fg.add(Object.create(Entity).init(gameWorld.width / 2, - gameWorld.height, 4, gameWorld.height));
-  this.arm.addBehavior(Follow, {target: this.claw, offset: {x: 0, y: -gameWorld.height / 2 - 6}});
+  //this.claw = fg.add(Object.create(Sprite).init(gameWorld.width / 2, - gameWorld.height / 2, Resources.claw));
+  //this.arm = fg.add(Object.create(Entity).init(gameWorld.width / 2, - gameWorld.height, 4, gameWorld.height));
+  //this.arm.addBehavior(Follow, {target: this.claw, offset: {x: 0, y: -gameWorld.height / 2 - 6}});
 
   this.store = Object.create(Store).init(this.ui, this.player_bot);
   //for (var i = 0; i < gameWorld.width / 4; i++) {
