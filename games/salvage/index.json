@@ -37,7 +37,7 @@
 		{"path": "node.png"},
 		{"path": "bg.png"},
 		{"path": "small.png"},
-		{"path": "planet.png"},
+		{"path": "planet.png", "frames": 3, "speed": 0.7},
 		{"path": "building2.png"},
 		{"path": "silhouette.png"},
 		{"path": "hit.wav"},
