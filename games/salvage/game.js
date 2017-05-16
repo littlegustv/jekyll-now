@@ -23,6 +23,30 @@ function inverse(family) {
 	return family == "enemy" ? "player" : "enemy";
 }
 
+var Atmosphere = Object.create(Entity);
+Atmosphere.init = function (x, y, radius, amplitude, frequency, color) {
+	this.x = x, this.y = y, this.radius = radius, this.amplitude = amplitude, this.frequency = frequency, this.color = color || "black", this.time = 0;
+	this.behaviors = [];
+	return this;
+};
+Atmosphere.onDraw = function (ctx) {
+	var INTERVAL = Math.PI / 180;
+	ctx.beginPath();
+	var theta, radius;
+	for (var i = 0; i < Math.PI * 2; i += INTERVAL) {
+		theta = (Math.PI * 2 / this.frequency) * i;
+		radius = this.radius + Math.cos(theta) * this.amplitude;
+		if (i === 0) {
+			ctx.moveTo(this.x + Math.cos(i) * radius, this.y + Math.sin(i) * radius);
+		} else {
+			ctx.lineTo(this.x + Math.cos(i) * radius, this.y + Math.sin(i) * radius);
+		}
+	}
+	ctx.closePath();
+	ctx.fillStyle = this.color;
+	ctx.fill();
+};
+
 var Silo = Object.create(Behavior);
 Silo.update = function (dt) {
 	// a lot of redunancy here, and it's not even working properly!

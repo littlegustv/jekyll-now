@@ -16,11 +16,20 @@ var onStart = function () {
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	
-  var atmosphere = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60, Resources.atmosphere));
-  atmosphere.z = -2;
+	var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 320, 2, PI / 8, "white"));
+	atmosphere.addBehavior(Velocity);
+	atmosphere.velocity = {x: 0, y: 0, angle: PI / 180};
+	atmosphere.addBehavior(Oscillate, {object: atmosphere, field: "amplitude", initial: 2, constant: 1, rate: 4});
+	atmosphere.z = -2;
+	
+  //var atmosphere = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60, Resources.atmosphere));
+  var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 168, 2, PI / 8, "darkred"));
+	atmosphere.addBehavior(Velocity);
+	atmosphere.velocity = {x: 0, y: 0, angle: PI / 180};
+	atmosphere.addBehavior(Oscillate, {object: atmosphere, field: "amplitude", initial: 2, constant: 1, rate: 4});
+	atmosphere.z = -2;
 
-  //bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 10 * gameWorld.width, 10* gameWorld.height, Resources.bg)).z = -3;
-	var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60,  Resources.planet));
+  var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60,  Resources.planet));
 	planet.z = -1;
 	planet.addBehavior(Velocity);
 	
@@ -28,26 +37,12 @@ var onStart = function () {
 	silo.addBehavior(Silo);
 	silo.family = "enemy";
 	
-//	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 16, gameWorld.width, 64, Resources.silhouette)).opacity = 0.3;
-	//planet.velocity = {x: 0, y: 0, angle: PI / 72};
-
 	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width / 2 + 80, gameWorld.height / 2 - 60,  Resources.shop));
 	gameWorld.shop.family = "store";
 	gameWorld.shop.setCollision(Polygon);
 	
-	// player is on foreground, can rotate when game is paused
 	this.player_top = fg.add(Object.create(Sprite).init(gameWorld.width / 4, gameWorld.height / 4, Resources.viper));
-  //this.player_top.family = "player";
-  //this.player.addBehavior(Velocity);
-  //this.player.addBehavior(Accelerate);
-	//this.player.addBehavior(Contrail);
-  //this.player.health = MAXHEALTH;
-
-  //this.player.velocity = {x: 0, y: 0};
-  //this.player.cooldown = 0;
-	//this.player.salvage = 0;
   var p = this.player_top;
-	//this.player.shoot = Weapons.double;
   var player_bot = bg.add(Object.create(Entity).init(p.x, p.y, p.w, p.h));
   player_bot.color = "red";
   player_bot.setCollision(Polygon);
@@ -279,7 +274,6 @@ var onUpdate = function (dt) {
 			landing_pad.color = "gray", landing_pad.opacity = 0.5;
 			landing_pad.setCollision(Polygon);
 			landing_pad.collision.onHandle = function(object, other) {
-				console.log('collided');
 				if (other.family == "player" && !other.projectile) {
 					console.log('what do you know.');
 					other.locked = true;
