@@ -253,7 +253,7 @@ function lerp_angle (a1, a2, rate) {
 
 var Weapons = {
 	standard: function (layer) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.missile));
 			a.setCollision(Polygon);
 			gameWorld.playSound(Resources.laser);
 			a.collision.onHandle = projectileHit;
@@ -266,7 +266,7 @@ var Weapons = {
 	},
 	double: function (layer) {
 		for (var i = 0; i < 3; i++) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.missile));
 			a.setCollision(Polygon);
 			gameWorld.playSound(Resources.laser);
 			a.collision.onHandle = projectileHit;
