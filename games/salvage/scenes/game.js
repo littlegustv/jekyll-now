@@ -28,7 +28,7 @@ var onStart = function () {
 	
 	// smaller
   //var atmosphere = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60, Resources.atmosphere));
-	var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 236, 2, PI / 2, "aliceblue"));
+	var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 236, 2, PI / 2, "white"));
 	atmosphere.addBehavior(Velocity);
 	atmosphere.angle = Math.random() * PI2;
 	atmosphere.velocity = {x: 0, y: 0, angle: PI / 180};
@@ -38,6 +38,15 @@ var onStart = function () {
   var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60,  Resources.planet));
 	planet.z = -1;
 	planet.addBehavior(Velocity);
+	
+	for (var i = 0; i < 15; i++) {
+		var cloud = bg.add(Object.create(Entity).init(planet.x + randint(-80, 80), planet.y + randint(-80, 80), randint(160, 240), randint(1,5)));
+		cloud.color = "white";
+		cloud.opacity = Math.random() * 0.5 + 0.5;
+		cloud.addBehavior(Velocity);
+		cloud.addBehavior(Wrap, {min: {x: planet.x - 160, y: 0}, max: {x: planet.x + 160, y: gameWorld.height * 2}});
+		cloud.velocity = {x: randint(5,30), y: 0};
+	}
 	
 	//var silo = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 -100, Resources.silo));
 	//silo.addBehavior(Silo);
@@ -201,7 +210,11 @@ var onStart = function () {
           flash.z = -1;
 					s.player_bot.delay.set(delay);
 				}
-			}			
+			} else {
+				// shockwave testing here (as collision end for asteroids, maybe for destroyed enemies as well, they crash into the planet?)
+				var sw = s.bg.add(Object.create(Sprite).init(planet.x, planet.y - 75, Resources.shockwave));
+				sw.addBehavior(FadeOut, {delay: 5, duration: 0});
+			}	
 		}
   }
 	/*
@@ -270,7 +283,7 @@ var onUpdate = function (dt) {
 	for (var i = 0; i < this.wave.length; i++) {
 		if (!this.wave[i].alive) this.wave.splice(i, 1);
 	}
-	
+		
   if (!this.bg.paused && this.wave.length <= 0) {
 		console.log('new wave');
 		this.current_wave += 1;

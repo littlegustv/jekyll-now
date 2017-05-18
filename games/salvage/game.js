@@ -522,10 +522,8 @@ var Damage = Object.create(Behavior);
 Damage.update = function (dt) {
 	if (this.timer > 0) this.timer -= dt;
   if (Math.random() * 100 < (MAXHEALTH - this.entity.health)) {
-    var c = Object.create(Circle).init(this.entity.x, this.entity.y, 3);//Resources.smoke);
+    var c = Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.shard);//Resources.smoke);
     //var c = Object.create(Entity).init(this.entity.x, this.entity.y, 8, 8);
-    c.opacity = 1;
-		c.color = "black";
     c.addBehavior(FadeOut, {duration: 0.7});
     c.addBehavior(Velocity);
     c.z = this.entity.z - 1;

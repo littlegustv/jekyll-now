@@ -5,6 +5,7 @@
 	],
 	"resources": [
 		{"path": "viper.png", "frames": 4, "animations": 2, "speed": 0.5},
+		{"path": "shockwave.png", "frames": 5, "animations": 1, "speed": 0.2},
 		{"path": "drone.png", "frames": 6, "animations": 1, "speed": 0.1},
 		{"path": "beamship.png", "frames": 2, "animations": 1, "speed": 0.4},
 		{"path": "projectile.png", "frames": 2, "speed": 0.4},
@@ -25,6 +26,9 @@
 		{"path": "flash.png"},
 		{"path": "atmosphere.png"},
 		{"path": "spark.png"},
+		{"path": "spark1.png"},
+		{"path": "spark2.png"},
+		{"path": "shard.png"},
 		{"path": "title.png"},
 		{"path": "smoke.png"},
 		{"path": "dust.png", "frames": 4, "speed": 0.2},
