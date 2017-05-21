@@ -25,6 +25,19 @@ function inverse(family) {
 	return family == "enemy" ? "player" : "enemy";
 }
 
+var LerpFollow = Object.create(Behavior);
+LerpFollow.update = function (dt) {  
+  if (this.offset.x !== false)
+    this.entity.x = lerp(this.entity.x, this.target.x + (this.offset.x || 0), this.rate * dt);
+  if (this.offset.y !== false)
+    this.entity.y = lerp(this.entity.y, this.target.y + (this.offset.y || 0), this.rate * dt);
+  if (this.offset.z !== false)
+    this.entity.z = lerp(this.entity.z, this.target.z + (this.offset.z || 0), this.rate * dt);
+  if (this.offset.angle !== false)
+    this.entity.angle = lerp_angle(this.entity.angle, this.target.angle + (this.offset.angle || 0), this.rate * dt);
+  if (this.target.alive === false) this.entity.alive = false;
+};
+
 var Atmosphere = Object.create(Entity);
 Atmosphere.init = function (x, y, radius, amplitude, frequency, color) {
 	this.x = x, this.y = y, this.radius = radius, this.amplitude = amplitude, this.frequency = frequency, this.color = color || "black", this.time = 0;
@@ -650,8 +663,9 @@ function spawn(layer, key, player) {
 					player.salvage += object.value;
 					gameWorld.playSound(Resources.pickup);
 					for (var i = 0; i < randint(5, 10); i++) {
-						var p = object.layer.add(Object.create(Entity).init(object.x, object.y, 12, 12));
+						var p = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.particles));
 						p.color = "#0051ee";
+						p.animation = 0;
 						p.addBehavior(Velocity);
 						p.addBehavior(FadeOut, {duration: 0.3});
 						var theta = Math.random() * PI2;
@@ -674,6 +688,50 @@ function spawn(layer, key, player) {
 	enemy.addBehavior(Space, {cooldown: 0, rate: 1.5, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 320, damage: 1});
 	//enemy.addBehavior(Crop, {min: {x: -10, y: -10}, max: {x: gameWorld.width + 10, y: gameWorld.height + 20}});  
 	return enemy;
+}
+
+var Movement = {
+	standard: function (s) {
+		s.bg.paused = false;
+		s.fg.paused = false;
+		s.player_bot.angle = s.player_top.angle;
+		s.player_bot.animation = 1;
+		s.player_bot.velocity = {
+			x: Math.cos( s.player_bot.angle) * 100,
+			y: Math.sin( s.player_bot.angle) * 100
+		}
+		s.player_bot.acceleration = {
+			x: -s.player_bot.velocity.x,
+			y: -s.player_bot.velocity.y
+		}
+		// create contrail sprite
+		gameWorld.playSound(Resources.move);  
+		var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
+		d.addBehavior(Velocity);
+		d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
+		d.addBehavior(FadeOut, {duration: 0.8});
+		s.player_bot.delay.set();
+	},
+	blink: function (s) {
+		s.bg.paused = false;
+		s.fg.paused = false;
+		s.player_bot.angle = s.player_top.angle;
+		gameWorld.playSound(Resources.move);
+		var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
+		d.addBehavior(Velocity);
+		d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
+		d.addBehavior(FadeOut, {duration: 0.8});
+		s.player_bot.delay.set(0.5);
+		s.player_bot.opacity = 0.1;
+		s.player_bot.delay.callback = function () {
+			s.pause();
+			s.player_bot.x = s.player_bot.x + 50 * Math.cos(s.player_bot.angle), s.player_bot.y = s.player_bot.y + 50 * Math.sin(s.player_bot.angle);
+			var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
+			d.addBehavior(Velocity);
+			d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
+			d.addBehavior(FadeOut, {duration: 0.8});
+		}
+	}
 }
 
 var Store = {
@@ -866,8 +924,9 @@ var Store = {
 					object.alive = false;
 					gameWorld.playSound(Resources.pickup);
 					for (var i = 0; i < randint(5, 10); i++) {
-						var p = object.layer.add(Object.create(Entity).init(object.x, object.y, 12, 12));
+						var p = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.particles));
 						p.color = "#0051ee";
+						p.animation = 0;
 						p.addBehavior(Velocity);
 						p.addBehavior(FadeOut, {duration: 0.3});
 						var theta2 = Math.random() * PI2;

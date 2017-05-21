@@ -4,7 +4,7 @@ var onStart = function () {
       gameWorld.soundtrack = gameWorld.playSound(Resources.salvage);
       gameWorld.soundtrack.onended = gameWorld.musicLoop;
     }
-    gameWorld.musicLoop();
+    //gameWorld.musicLoop();
   }
 	
   var bg = this.addLayer(Object.create(Layer).init(320,240));
@@ -70,8 +70,9 @@ var onStart = function () {
   player_bot.color = "red";
   player_bot.setCollision(Polygon);
 	player_bot.damage = player_bot.addBehavior(Damage, {layer: bg, timer: 0, invulnerable: 1});
-	player_bot.shoot = Weapons.double;
-	
+	//player_bot.shoot = Weapons.double;
+	player_bot.move = Movement.standard;
+
 	player_bot.addBehavior(Accelerate);
 	player_bot.addBehavior(Velocity);
   player_bot.velocity = {x: 0, y: 0};
@@ -102,8 +103,8 @@ var onStart = function () {
 	this.player_bot = player_bot;
   var t = this;
 
-  bg.camera.addBehavior(Follow, {target: t.player_top, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: false}});  
-  fg.camera.addBehavior(Follow, {target: t.player_top, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: false}});
+  //bg.camera.addBehavior(LerpFollow, {target: player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}, rate: 2});  
+  //fg.camera.addBehavior(Follow, {target: bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
 
   //bg.camera.addBehavior(Bound, {min: {x: -160, y: -160}, max: {x: gameWorld.width + 160, y: gameWorld.height + 160}});
   //fg.camera.addBehavior(Bound, {min: {x: -160, y: -160}, max: {x: gameWorld.width + 160, y: gameWorld.height + 160}});	
@@ -180,70 +181,10 @@ var onStart = function () {
 			}
 			return;
 		} else if (!s.player_bot.locked && s.bg.paused != 0) {
-      s.bg.paused = false;
-      s.fg.paused = false;
-			s.player_bot.angle = s.player_top.angle;
-      s.player_bot.animation = 1;
-      s.player_bot.velocity = {
-        x: Math.cos( s.player_bot.angle) * 100,
-        y: Math.sin( s.player_bot.angle) * 100
-      }
-      s.player_bot.acceleration = {
-        x: -s.player_bot.velocity.x,
-        y: -s.player_bot.velocity.y
-      }
-      // create contrail sprite
-      gameWorld.playSound(Resources.move);  
-      var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
-      d.addBehavior(Velocity);
-      d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
-      d.addBehavior(FadeOut, {duration: 0.8});
-			s.player_bot.delay.set();
+      s.player_bot.move(s)
 		}
   }
-  this.onKeyPress = function (e) {
-		if (!s.player_bot.locked) {
-			if (e.keyCode == 122) {
-				if (s.bg.paused <= 0) return;
-				else {
-					s.bg.paused = false;      
-					s.fg.paused = false;
-					s.player_bot.angle = s.player_top.angle;
-					var delay = s.player_bot.shoot(s.bg)
-  				var flash = s.bg.add(Object.create(Sprite).init(s.player_bot.x + 9 * Math.cos(s.player_bot.angle),
-          s.player_bot.y + 9 * Math.sin(s.player_bot.angle), Resources.flash));
-          flash.opacity = 0;
-          flash.addBehavior(FadeIn, {duration: 0.1, maxOpacity: 1});
-          flash.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.1, delay: 0.2});
-          flash.z = -1;
-					s.player_bot.delay.set(delay);
-				}
-			} else {
-				// shockwave testing here (as collision end for asteroids, maybe for destroyed enemies as well, they crash into the planet?)
-				var sw = s.bg.add(Object.create(Sprite).init(planet.x, planet.y - 75, Resources.shockwave));
-				sw.addBehavior(FadeOut, {delay: 5, duration: 0});
-			}	
-		}
-  }
-	/*
-  this.onTouchStart = function (e) {			
-    s.pause();
-	}
-  this.onTouchEnd = function (e) {
-		if (!fullscreen) {
-			requestFullScreen();
-			return;
-		}
-    s.bg.paused = 0;
-		s.fg.paused = 0;      
-    s.player.velocity = {
-      x: Math.cos( s.player.angle) * 100,
-      y: Math.sin( s.player.angle) * 100
-    }
-  }
-  this.onTouchMove = function (e) {
-    s.player.angle = angle(s.player.x, s.player.y, e.x, e.y);
-  }*/
+
 	this.wave = [];
 	this.current_wave = 0;
 	this.waves = [
@@ -278,8 +219,9 @@ var onStart = function () {
     this.entity.removeBehavior(this.entity.lerpx);
     this.entity.removeBehavior(this.entity.lerpy);
 		
-	  s.bg.camera.addBehavior(Follow, {target: s.player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});  
-  	s.fg.camera.addBehavior(Follow, {target: s.player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}});
+	  s.bg.camera.addBehavior(LerpFollow, {target: s.player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}, rate: 2});  
+  	s.fg.camera.addBehavior(Follow, {target: s.bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
+    //s.fg.camera.addBehavior(LerpFollow, {target: s.player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}, rate: 2});
 
     //console.log('what?');
   }});
