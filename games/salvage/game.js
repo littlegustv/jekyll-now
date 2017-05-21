@@ -1,4 +1,4 @@
-// canvas filter (color style);
+// canvas filter (color style); grayscale(70%) contrast(250%) brightness(90%);
 
 var MAXHEALTH = 16, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(320, 180, "index.json");
@@ -839,15 +839,44 @@ var Store = {
 		for (var i = 0; i < this.layer.entities.length; i++) {
 			this.layer.entities[i].lerp.goal = this.layer.entities[i].goal;
 		}
+		var t = this;
+		this.layer.entities[0].lerp.callback = function () {
+			for (var i = 0; i < gameWorld.scene.layers.length; i++) {
+				gameWorld.scene.layers[i].paused = true;
+				t.layer.paused = false;
+			}	
+		}
 		this.layer.active = true;
 		for (var i = 0; i < gameWorld.scene.layers.length; i++) {
-			gameWorld.scene.layers[i].paused = true;
+			gameWorld.scene.layers[i].paused = false;
 		}
 		for (var key in this.weapons) {
 			this.weapons[key].price = Math.max(1, this.player.salvage - 1);
 			this.weapons[key].priceText.text = "$" + this.weapons[key].price;
 		}
-		this.layer.paused = false;
+		var theta = angle(this.player.x, this.player.y, gameWorld.shop.x, gameWorld.shop.y);
+		for (var i = 0; i < this.player.salvage; i++) {
+			var g = gameWorld.scene.bg.add(Object.create(Sprite).init(this.player.x, this.player.y, Resources.gem));
+			g.addBehavior(Velocity);
+			var s = randint(80, 110);
+			g.velocity = {x: s * Math.cos(theta), y: s * Math.sin(theta), angle: PI / 12};
+			g.setCollision(Polygon);
+			g.collision.onHandle = function (object, other) {
+				if (other.family == "store") {
+					object.alive = false;
+					gameWorld.playSound(Resources.pickup);
+					for (var i = 0; i < randint(5, 10); i++) {
+						var p = object.layer.add(Object.create(Entity).init(object.x, object.y, 12, 12));
+						p.color = "#0051ee";
+						p.addBehavior(Velocity);
+						p.addBehavior(FadeOut, {duration: 0.3});
+						var theta2 = Math.random() * PI2;
+						p.velocity = {x: 20 * Math.cos(theta2), y: 20 * Math.sin(theta)};
+					}
+				}
+			}
+		}
+		this.player.salvage = 0;		
 	},
 	close: function () {
 		var t = this;

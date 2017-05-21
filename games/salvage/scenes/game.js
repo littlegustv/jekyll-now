@@ -57,6 +57,12 @@ var onStart = function () {
 	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width / 2 + 80, gameWorld.height / 2 - 60,  Resources.shop));
 	gameWorld.shop.family = "store";
 	gameWorld.shop.setCollision(Polygon);
+  gameWorld.shop.setVertices([
+    {x: -14, y: -6},
+    {x: 0, y: -14},
+    {x: 14, y: -6},
+    {x: 0, y: 14}
+    ])
 	
 	this.player_top = fg.add(Object.create(Sprite).init(gameWorld.width / 4, gameWorld.height / 4, Resources.viper));
   var p = this.player_top;
