@@ -4,7 +4,7 @@ var onStart = function () {
       gameWorld.soundtrack = gameWorld.playSound(Resources.salvage);
       gameWorld.soundtrack.onended = gameWorld.musicLoop;
     }
-    //gameWorld.musicLoop();
+    gameWorld.musicLoop();
   }
 	
   var bg = this.addLayer(Object.create(Layer).init(320,240));
@@ -40,8 +40,10 @@ var onStart = function () {
 	planet.addBehavior(Velocity);
 	
 	for (var i = 0; i < 15; i++) {
-		var cloud = bg.add(Object.create(Entity).init(planet.x + randint(-80, 80), planet.y + randint(-80, 80), randint(160, 240), randint(1,5)));
-		cloud.color = "white";
+		//var cloud = bg.add(Object.create(Entity).init(planet.x + randint(-80, 80), planet.y + randint(-80, 80), randint(160, 240), randint(1,5)));
+		var cloud = bg.add(Object.create(Sprite).init(planet.x + randint(-planet.w / 2, planet.w / 2), planet.y + randint(-planet.h / 2, planet.h / 2), Resources.clouds));
+    cloud.animation = randint(0,2);
+    cloud.color = "white";
 		cloud.opacity = Math.random() * 0.5 + 0.5;
 		cloud.addBehavior(Velocity);
 		cloud.addBehavior(Wrap, {min: {x: planet.x - 160, y: 0}, max: {x: planet.x + 160, y: gameWorld.height * 2}});
