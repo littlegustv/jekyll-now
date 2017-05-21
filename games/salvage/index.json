@@ -28,9 +28,6 @@
 		{"path": "spark.png"},
 		{"path": "particles.png", "animations": 3},
 		{"path": "clouds.png", "animations": 2},
-		{"path": "spark1.png"},
-		{"path": "spark2.png"},
-		{"path": "shard.png"},
 		{"path": "title.png"},
 		{"path": "smoke.png"},
 		{"path": "dust.png", "frames": 4, "speed": 0.2},
@@ -42,6 +39,7 @@
 		{"path": "ground.png"},
 		{"path": "node.png"},
 		{"path": "missile.png"},
+		{"path": "projectiles.png", "animations": 4},
 		{"path": "bg.png"},
 		{"path": "small.png"},
 		{"path": "planet.png"},
@@ -52,9 +50,12 @@
 		{"path": "spawn.wav"},
 		{"path": "spawn2.wav"},
 		{"path": "salvage.wav"},
+		{"path": "blink1.wav"},
+		{"path": "blink2.wav"},
 		{"path": "pickup.wav"},
 		{"path": "store.wav"},
 		{"path": "move.wav"},
+		{"path": "spark_sound.wav"},
 		{"path": "shoot.wav"}
 	]
 }

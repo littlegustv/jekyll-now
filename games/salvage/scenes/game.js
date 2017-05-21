@@ -12,7 +12,9 @@ var onStart = function () {
   var fg = this.addLayer(Object.create(Layer).init(320,240));
 	fg.active = true;
 	
-	bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height)).color = "#C13160";
+	var b = bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height));
+  b.color = "#C13160";
+  b.z = -6;
 	
 	for (var i = 0; i < 100; i++) {
 		bg.add(Object.create(Entity).init(randint(0, gameWorld.width * 2), randint(0, gameWorld.height * 2), 1, 1)).color = "white";
@@ -24,7 +26,7 @@ var onStart = function () {
 	atmosphere.addBehavior(Velocity);
 	atmosphere.velocity = {x: 0, y: 0, angle: PI / 180};
 	atmosphere.addBehavior(Oscillate, {object: atmosphere, field: "amplitude", initial: 2, constant: 1, rate: 4});
-	atmosphere.z = -2;
+	atmosphere.z = -5;
 	
 	// smaller
   //var atmosphere = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60, Resources.atmosphere));
@@ -33,10 +35,10 @@ var onStart = function () {
 	atmosphere.angle = Math.random() * PI2;
 	atmosphere.velocity = {x: 0, y: 0, angle: PI / 180};
 	atmosphere.addBehavior(Oscillate, {object: atmosphere, field: "amplitude", initial: 2, constant: 1, rate: 4});
-	atmosphere.z = -2;
+	atmosphere.z = -4;
 
   var planet = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60,  Resources.planet));
-	planet.z = -1;
+	planet.z = -3;
 	planet.addBehavior(Velocity);
 	
 	for (var i = 0; i < 15; i++) {
@@ -145,8 +147,13 @@ var onStart = function () {
   fg.drawOrder = function () {
     return this.entities.sort(function (a, b) { 
       if (a.z && b.z && b.z != a.z) return a.z - b.z;
-      else if (a.y && b.y && a.y != b.y) return a.y - b.y;
-      else return a.x - b.x;
+      else return fg.entities.indexOf(a) - fg.entities.indexOf(b);
+    });
+  };
+  bg.drawOrder = function () {
+    return this.entities.sort(function (a, b) { 
+      if (a.z && b.z && b.z != a.z) return a.z - b.z;
+      else return bg.entities.indexOf(a) - bg.entities.indexOf(b);
     });
   };
   var s = this;
@@ -188,13 +195,13 @@ var onStart = function () {
 	this.wave = [];
 	this.current_wave = 0;
 	this.waves = [
-		[1,1,1,1,1],
-		[2,2,2,3,3,3],
+    [1,1,1,1,1],
+	]/*	[2,2,2,3,3,3],
 		[1,2,3,4,5,6,7],
 		[7,7,7],
 		[6,5,6,5,6,5],
 		[4,4,4,4,4,4,4,4]
-	];
+	];*/
 
   // intro animation
   this.intro = true;
