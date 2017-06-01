@@ -146,19 +146,30 @@ var onStart = function () {
   
   fg.drawOrder = function () {
     return this.entities.sort(function (a, b) { 
-      if (a.z && b.z && b.z != a.z) return a.z - b.z;
+      if (a.z && b.z && b.z !== a.z) return a.z - b.z;
       else return fg.entities.indexOf(a) - fg.entities.indexOf(b);
     });
   };
   bg.drawOrder = function () {
     return this.entities.sort(function (a, b) { 
-      if (a.z && b.z && b.z != a.z) return a.z - b.z;
+      if (a.z && b.z && b.z !== a.z) return a.z - b.z;
       else return bg.entities.indexOf(a) - bg.entities.indexOf(b);
     });
   };
   var s = this;
-  this.onMouseMove = function (e) {
-    if (s.ui.active) {
+	var down = function (e) {
+		if (s.ui.active) {
+			var b = s.ui.onButton(e.x, e.y);
+			if (b) {
+				b.trigger();
+			}
+			return;
+		} else if (!s.player_bot.locked && s.bg.paused != 0) {
+      s.player_bot.move(s)
+		}
+	}
+	var move = function (e) {
+		if (s.ui.active) {
       var b = s.ui.onButton(e.x, e.y);
       if (b) {
         b.hover();
@@ -176,22 +187,34 @@ var onStart = function () {
 				s.player_top.angle = angle(gameWorld.width / 2, gameWorld.height / 2, e.x, e.y);
 			//}
 		}
-  }
+	}
+	
+	var up = function (e) {
+		
+	}
+	
+	
+  this.onMouseMove = move;
   this.onMouseUp = function (e) {
 		return;
   }
-  this.onMouseDown = function (e) {
-		if (s.ui.active) {
-			var b = s.ui.onButton(e.x, e.y);
-			if (b) {
-				b.trigger();
-			}
-			return;
-		} else if (!s.player_bot.locked && s.bg.paused != 0) {
-      s.player_bot.move(s)
+  this.onMouseDown = down;
+	
+	this.onTouchStart = function (e) {
+		if (!fullscreen) {
+			requestFullScreen();
 		}
-  }
-
+	}
+	
+	this.onTouchEnd = function (e) {
+		e.x = e.touch.x, e.y = e.touch.y;
+		down(e);
+	};
+	this.onTouchMove = function (e) {
+		e.x = e.touch.x, e.y = e.touch.y;
+		move(e);
+	};
+	
 	this.wave = [];
 	this.current_wave = 0;
 	this.waves = [

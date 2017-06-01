@@ -339,11 +339,18 @@ function lerp_angle (a1, a2, rate) {
 	else return r;
 }
 
+var projectile_vertices = [
+	{x: -6, y: -3},
+	{x: 6, y: -3},
+	{x: 6, y: 3},
+	{x: -6, y: 3}
+]
 var Weapons = {
 	standard: function (layer) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
 			a.animation = 3;
 			a.setCollision(Polygon);
+			a.setVertices(projectile_vertices);
 			gameWorld.playSound(Resources.laser);
 			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
@@ -359,6 +366,7 @@ var Weapons = {
 		for (var i = 0; i < 3; i++) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
 			a.setCollision(Polygon);
+			a.setVertices(projectile_vertices);
 			a.animation = 2;
 			gameWorld.playSound(Resources.laser);
 			a.collision.onHandle = projectileHit;
@@ -374,6 +382,7 @@ var Weapons = {
 	homing: function (layer) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
 			a.setCollision(Polygon);
+			a.setVertices(projectile_vertices);
 			a.animation = 1;
 			//gameWorld.playSound(Resources.mortar);
 			a.collision.onHandle = projectileHit;
@@ -409,6 +418,7 @@ var Weapons = {
 			a.velocity = {x: 40 * Math.cos(theta), y: 40 * Math.sin(theta) };
 			a.addBehavior(FadeOut, {duration: 1});
 			a.setCollision(Polygon);
+			a.setVertices(projectile_vertices);
 			a.collision.onHandle = projectileHit;
 			a.family = this.family;
 			a.projectile = true;
@@ -859,6 +869,27 @@ var Movement = {
 			gameWorld.playSound(Resources.blink2);
 			s.player_bot.x = s.player_bot.x + 50 * Math.cos(s.player_bot.angle), s.player_bot.y = s.player_bot.y + 50 * Math.sin(s.player_bot.angle);
 			// blink arrive affect
+		}
+	},
+	chaos: function (s) {
+		s.fg.paused = false;
+		s.bg.paused = false;
+		gameWorld.playSound(Resources.move); // explosion?!
+		var theta = s.player_top.angle + Math.random() * PI /4 - PI / 8;
+		s.player_bot.angle = s.player_top.angle;
+		s.player_bot.animation = 1;
+		s.player_bot.velocity = {
+			x: Math.cos( theta) * 150,
+			y: Math.sin( theta) * 150
+		}
+		s.player_bot.acceleration = {
+			x: -s.player_bot.velocity.x / 1.5,
+			y: -s.player_bot.velocity.y / 1.5
+		}
+		s.player_bot.delay.set(1.5);
+		for (var i = 0; i < 5; i++) {
+			var e = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x + randint(-5, 5), s.player_bot.y + randint(-5, 5), Resources.explosion));
+			e.addBehavior(FadeOut, {delay: Math.random(), duration: 1 + Math.random()});
 		}
 	}
 }
