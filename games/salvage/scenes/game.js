@@ -7,9 +7,9 @@ var onStart = function () {
     //gameWorld.musicLoop();
   }
 	
-  var bg = this.addLayer(Object.create(Layer).init(320,240));
+  var bg = this.addLayer(Object.create(Layer).init(240,320));
 	bg.active = true;
-  var fg = this.addLayer(Object.create(Layer).init(320,240));
+  var fg = this.addLayer(Object.create(Layer).init(240,320));
 	fg.active = true;
 	
 	var b = bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height));
@@ -196,12 +196,17 @@ var onStart = function () {
 	this.current_wave = 0;
 	this.waves = [
     [1,1,1,1,1],
-	]/*	[2,2,2,3,3,3],
+		[2,2,2,3,3,3],
 		[1,2,3,4,5,6,7],
 		[7,7,7],
 		[6,5,6,5,6,5],
-		[4,4,4,4,4,4,4,4]
-	];*/
+		[4,4,4,4,4,4,4,4],
+		[8,8],
+		[1,2,3,8,8],
+		[3,3,6,6,1,1],
+		[2,2,4,5,6]
+	];
+//	this.waves = [[8]];
 
   // intro animation
   this.intro = true;
