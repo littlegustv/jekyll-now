@@ -50,6 +50,7 @@
 		{"path": "spawn.wav"},
 		{"path": "spawn2.wav"},
 		{"path": "salvage.wav"},
+		{"path": "beam.wav"},
 		{"path": "blink1.wav"},
 		{"path": "blink2.wav"},
 		{"path": "pickup.wav"},

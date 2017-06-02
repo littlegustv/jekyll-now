@@ -152,6 +152,7 @@ BeamShip.update = function (dt) {
 		b.addBehavior(FadeIn, {duration: 0.2, maxOpacity: 1});
 		b.opacity = 0;
 		b.z = 10;
+		gameWorld.playSound(Resources.beam);
 		
 	} else if (this.cooldown < -2) {
 		this.cooldown = 1
@@ -445,6 +446,7 @@ var Weapons = {
 		b.opacity = 0;
 		b.z = 10;
 		b.angle = this.angle;// - PI / 2;
+		gameWorld.playSound(Resources.beam);
 		//console.log(b);
 		return 5.5;
 	}
