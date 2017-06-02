@@ -89,8 +89,12 @@ var onStart = function () {
   player_bot.collision.onHandle = function (object, other) {
 		if (object.damage.timer > 0) return;
     if (other.family == "enemy") {
-      object.health -= 1;
-			object.damage.timer = DAMAGE_COOLDOWN;
+      if (!other.projectile && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2 ) {
+        // take no damage from the FRONT when it isn't a projectile...
+      } else {
+        object.health -= 1;
+  			object.damage.timer = DAMAGE_COOLDOWN;
+      }
     }
 		if (object.health <= 0) {
 			object.alive = false;
@@ -196,12 +200,13 @@ var onStart = function () {
 	this.current_wave = 0;
 	this.waves = [
     [1,1,1,1,1],
-	]/*	[2,2,2,3,3,3],
+		[2,2,2,3,3,3],
 		[1,2,3,4,5,6,7],
 		[7,7,7],
 		[6,5,6,5,6,5],
-		[4,4,4,4,4,4,4,4]
-	];*/
+    [2,2,2,2,2,2,2,2,2],
+    [4,4,4,4]
+  ];
 
   // intro animation
   this.intro = true;

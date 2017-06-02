@@ -595,6 +595,23 @@ Damage.hit = function (damage) {
 	}
 }
 
+var Asteroid = Object.create(Behavior);
+Asteroid.update = function (dt) {
+	if (distance(this.entity.x, this.entity.y, this.target.x, this.target.y) <= this.radius) {
+		this.entity.velocity = {x: 0, y: 0};
+		this.radius = 0;
+		this.entity.alive = false;
+		var e = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.explosion));
+		var s = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.shockwave));
+		e.addBehavior(FadeOut, {duration: 1});
+		s.addBehavior(FadeOut, {duration: 1, delay: 1});
+		s.z = 2;
+		e.z = 1;
+		gameWorld.playSound(Resources.hit);
+		s.angle = angle(this.entity.x, this.entity.y, this.target.x, this.target.y) - PI / 2;
+	}
+}
+
 function spawn(layer, key, player) {
 	var enemy;
 	switch (key) {
@@ -609,9 +626,12 @@ function spawn(layer, key, player) {
 			enemy.shoot = Weapons.beam;
 		break;
 		case 2:
-			enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["asteroid"])]);
-			enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
-			enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle)}; 			
+			enemy = Object.create(Sprite).init(randint(-gameWorld.width,gameWorld.width), randint(-gameWorld.height,gameWorld.height), Resources[choose(["asteroid"])]);
+			var theta = angle(enemy.x, enemy.y, gameWorld.width / 2, gameWorld.height / 2 + 60);
+			enemy.angle = Math.random() * PI2;  
+			enemy.addBehavior(Asteroid, {target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 78});
+			enemy.velocity = {x: Math.cos(theta) * 50, y: 50 * Math.sin(theta)};
+
 		break;
 		case 3:
 			enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["bomber"])]);
