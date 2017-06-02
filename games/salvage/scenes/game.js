@@ -7,9 +7,9 @@ var onStart = function () {
     //gameWorld.musicLoop();
   }
 	
-  var bg = this.addLayer(Object.create(Layer).init(320,240));
+  var bg = this.addLayer(Object.create(Layer).init(240,320));
 	bg.active = true;
-  var fg = this.addLayer(Object.create(Layer).init(320,240));
+  var fg = this.addLayer(Object.create(Layer).init(240,320));
 	fg.active = true;
 	
 	var b = bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height));
@@ -150,19 +150,30 @@ var onStart = function () {
   
   fg.drawOrder = function () {
     return this.entities.sort(function (a, b) { 
-      if (a.z && b.z && b.z != a.z) return a.z - b.z;
+      if (a.z && b.z && b.z !== a.z) return a.z - b.z;
       else return fg.entities.indexOf(a) - fg.entities.indexOf(b);
     });
   };
   bg.drawOrder = function () {
     return this.entities.sort(function (a, b) { 
-      if (a.z && b.z && b.z != a.z) return a.z - b.z;
+      if (a.z && b.z && b.z !== a.z) return a.z - b.z;
       else return bg.entities.indexOf(a) - bg.entities.indexOf(b);
     });
   };
   var s = this;
-  this.onMouseMove = function (e) {
-    if (s.ui.active) {
+	var down = function (e) {
+		if (s.ui.active) {
+			var b = s.ui.onButton(e.x, e.y);
+			if (b) {
+				b.trigger();
+			}
+			return;
+		} else if (!s.player_bot.locked && s.bg.paused != 0) {
+      s.player_bot.move(s)
+		}
+	}
+	var move = function (e) {
+		if (s.ui.active) {
       var b = s.ui.onButton(e.x, e.y);
       if (b) {
         b.hover();
@@ -180,22 +191,34 @@ var onStart = function () {
 				s.player_top.angle = angle(gameWorld.width / 2, gameWorld.height / 2, e.x, e.y);
 			//}
 		}
-  }
+	}
+	
+	var up = function (e) {
+		
+	}
+	
+	
+  this.onMouseMove = move;
   this.onMouseUp = function (e) {
 		return;
   }
-  this.onMouseDown = function (e) {
-		if (s.ui.active) {
-			var b = s.ui.onButton(e.x, e.y);
-			if (b) {
-				b.trigger();
-			}
-			return;
-		} else if (!s.player_bot.locked && s.bg.paused != 0) {
-      s.player_bot.move(s)
+  this.onMouseDown = down;
+	
+	this.onTouchStart = function (e) {
+		if (!fullscreen) {
+			requestFullScreen();
 		}
-  }
-
+	}
+	
+	this.onTouchEnd = function (e) {
+		e.x = e.touch.x, e.y = e.touch.y;
+		down(e);
+	};
+	this.onTouchMove = function (e) {
+		e.x = e.touch.x, e.y = e.touch.y;
+		move(e);
+	};
+	
 	this.wave = [];
 	this.current_wave = 0;
 	this.waves = [
@@ -204,9 +227,13 @@ var onStart = function () {
 		[1,2,3,4,5,6,7],
 		[7,7,7],
 		[6,5,6,5,6,5],
-    [2,2,2,2,2,2,2,2,2],
-    [4,4,4,4]
-  ];
+		[4,4,4,4,4,4,4,4],
+		[8,8],
+		[1,2,3,8,8],
+		[3,3,6,6,1,1],
+		[2,2,4,5,6]
+	];
+//	this.waves = [[8]];
 
   // intro animation
   this.intro = true;

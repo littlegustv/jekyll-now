@@ -37,6 +37,14 @@ var onStart =  function () {
 	this.onClick = function () {
 		gameWorld.setScene(1, true);
 	}
+	this.onTouchEnd = function (e) {
+		if (!fullscreen) {
+			requestFullScreen();
+			return;
+		} else {
+			gameWorld.setScene(1, true);
+		}
+	}
 }
 
 var onUpdate = function () {
