@@ -48,15 +48,14 @@
 		{"path": "hit.wav"},
 		{"path": "laser.wav"},
 		{"path": "spawn.wav"},
-		{"path": "spawn2.wav"},
-		{"path": "salvage.wav"},
 		{"path": "beam.wav"},
+		{"path": "boom.wav"},
+		{"path": "soundtrack.ogg"},
 		{"path": "blink1.wav"},
 		{"path": "blink2.wav"},
 		{"path": "pickup.wav"},
 		{"path": "store.wav"},
 		{"path": "move.wav"},
-		{"path": "spark_sound.wav"},
-		{"path": "shoot.wav"}
+		{"path": "spark_sound.wav"}
 	]
 }

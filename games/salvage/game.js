@@ -21,6 +21,38 @@ World.draw = function () {
 	}
 };
 
+World.playSound = function(sound, volume) {
+	if (AudioContext) {
+	  var volume = volume || 1;
+	  //console.log(sound);
+	  var buffer = sound.buffer;
+	  var source = this.audioContext.createBufferSource();
+	  source.buffer = buffer;
+	  
+	  source.connect(this.audioContext.gn);
+	  this.audioContext.gn.gain.value = volume;
+	  this.audioContext.gn.connect(this.audioContext.destination);
+	  source.start(0);
+	  
+	  return source;
+	} else {
+	  if (window.muted) {
+	    return;
+	  }
+	  else {
+	    sound.play();
+	    debug = sound;
+	    return sound;
+	  }
+	}
+}
+
+function volume (object) {
+	var v = Math.max(0,1 - distance(object.x, object.y, gameWorld.scene.layers[0].camera.x, gameWorld.scene.layers[0].camera.y) / (1.4 * gameWorld.height));
+	console.log(v);
+	return v;
+}
+
 function inverse(family) {
 	return family == "enemy" ? "player" : "enemy";
 }
@@ -143,7 +175,7 @@ BeamShip.update = function (dt) {
 			if (other.family != object.family && !other.projectile) {
 				var small = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.small));
 				small.addBehavior(FadeOut, {duration: 0.5});
-				gameWorld.playSound(Resources.hit);
+				gameWorld.playSound(Resources.hit, volume(small));
 			}
 		};
 		b.family = this.entity.family;
@@ -152,7 +184,7 @@ BeamShip.update = function (dt) {
 		b.addBehavior(FadeIn, {duration: 0.2, maxOpacity: 1});
 		b.opacity = 0;
 		b.z = 10;
-		gameWorld.playSound(Resources.beam);
+		gameWorld.playSound(Resources.beam, volume(b));
 		
 	} else if (this.cooldown < -2) {
 		this.cooldown = 1
@@ -276,12 +308,16 @@ Wheel.onDraw = function (ctx) {
   ctx.fill();
 }
 
+var Grow = Object.create(Behavior);
+Grow.update = function (dt) {
+	if (this.time === undefined) this.time = 0;
+	this.time += dt;
+	this.entity.scale = 1 + this.max * this.time / this.duration;
+}
+
 function projectileHit (object, other) {
 	if (other.family != object.family && !other.projectile) {
 		object.alive = false;
-		var small = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.small));
-		small.addBehavior(FadeOut, {duration: 0.5});
-		gameWorld.playSound(Resources.hit);
 	}
 }
 
@@ -327,7 +363,7 @@ HeatSeeking.update = function (dt) {
 	if (!this.controller.alive) {
 		this.entity.alive = false;
 		this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.small)).addBehavior(FadeOut, {duration: 0.5});
-		gameWorld.playSound(Resources.hit);
+		gameWorld.playSound(Resources.hit, volume(this.entity));
 	}
 	this.entity.angle = lerp_angle(this.entity.angle, angle(this.entity.x, this.entity.y, this.target.x, this.target.y), this.rate * dt);
 	this.entity.velocity = {x: this.speed * Math.cos(this.entity.angle), y: this.speed * Math.sin(this.entity.angle) };
@@ -352,7 +388,7 @@ var Weapons = {
 			a.animation = 3;
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
-			gameWorld.playSound(Resources.laser);
+			gameWorld.playSound(Resources.laser, volume(a));
 			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
 			a.family = this.family;//"player";
@@ -369,7 +405,7 @@ var Weapons = {
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
 			a.animation = 2;
-			gameWorld.playSound(Resources.laser);
+			gameWorld.playSound(Resources.laser, volume(a));
 			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
 			a.family = this.family;//"player";
@@ -423,7 +459,7 @@ var Weapons = {
 			a.collision.onHandle = projectileHit;
 			a.family = this.family;
 			a.projectile = true;
-			gameWorld.playSound(Resources.spark_sound);
+			gameWorld.playSound(Resources.spark_sound, volume(a));
 		}
 		return 1;
 	},
@@ -446,7 +482,7 @@ var Weapons = {
 		b.opacity = 0;
 		b.z = 10;
 		b.angle = this.angle;// - PI / 2;
-		gameWorld.playSound(Resources.beam);
+		gameWorld.playSound(Resources.beam, volume(b));
 		//console.log(b);
 		return 5.5;
 	}
@@ -808,11 +844,19 @@ function spawn(layer, key, player) {
 	enemy.die = function () {
 		this.collision.onHandle = function (a, b) { return false; };
 		this.velocity = {x: 0, y: 0};
+		this.behaviors = [];
 		this.addBehavior(FadeOut, {duration: 0.5});
-		var exp = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.explosion));
-		exp.addBehavior(FadeOut, {duration: 0.5, delay: 1});
-		exp.z = this.z - 1;
-		
+
+		for (var i = 0; i < 40; i++) {			
+			var e = this.layer.add(Object.create(Entity).init(this.x + randint(-3,3), this.y + randint(-3,3), 4, 4));
+			e.addBehavior(FadeIn, {maxOpacity: 1, duration: 0.2 + 0.5 * Math.random()});
+			e.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.2 + Math.random() * 0.5, delay: 0.8 + Math.random() * 0.6});
+			e.z = this.z - 1;
+			e.addBehavior(Velocity);
+			var theta = Math.random() * PI2, speed = choose([2, 2, 2, 10, 20]);
+			e.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
+		}
+
 		for (var i = 0; i < randint(2,5); i++) {
 			var salvage = this.layer.add(Object.create(Sprite).init(this.x + randint(0,10) - 5, this.y + randint(0, 10) - 5, Resources.gem));
 			salvage.addBehavior(FadeOut, {duration: 1, delay: 3});
@@ -911,6 +955,44 @@ var Movement = {
 			var e = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x + randint(-5, 5), s.player_bot.y + randint(-5, 5), Resources.explosion));
 			e.addBehavior(FadeOut, {delay: Math.random(), duration: 1 + Math.random()});
 		}
+	},
+	boom: function (s) {
+		s.fg.paused = false;
+		s.bg.paused = false;
+		s.player_bot.velocity = {x: 0, y: 0};
+		gameWorld.playSound(Resources.boom);
+		s.player_bot.delay.set(1);
+		s.player_bot.addBehavior(Delay, {duration: 0.3, callback: function () {
+			s.player_bot.angle = s.player_top.angle;
+			var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.explosion));
+			d.addBehavior(Velocity);
+			d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
+			d.addBehavior(FadeOut, {duration: 0.8});
+			for (var i = 0; i < 3; i++) {
+				var theta = s.player_bot.angle + PI - PI / 5 + i * PI / 5;
+				var a = s.bg.add(Object.create(Sprite).init(s.player_bot.x + Math.cos(theta) * 8, s.player_bot.y + Math.sin(theta) * 8, Resources.projectiles));
+				a.angle = theta;
+				a.addBehavior(Velocity);
+				a.velocity = {x: 40 * Math.cos(theta), y: 40 * Math.sin(theta) };
+				a.addBehavior(FadeOut, {duration: 1});
+				a.setCollision(Polygon);
+				a.setVertices(projectile_vertices);
+				a.collision.onHandle = projectileHit;
+				a.family = "player";
+				a.projectile = true;
+				//gameWorld.playSound(Resources.spark_sound);
+			}
+			s.player_bot.animation = 1;
+			s.player_bot.velocity = {
+				x: Math.cos( s.player_bot.angle) * 100,
+				y: Math.sin( s.player_bot.angle) * 100
+			}
+			s.player_bot.acceleration = {
+				x: -s.player_bot.velocity.x,
+				y: -s.player_bot.velocity.y
+			}
+			s.player_bot.removeBehavior(this);
+		}})
 	}
 }
 

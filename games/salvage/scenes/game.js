@@ -1,10 +1,10 @@
 var onStart = function () {
 	if (!gameWorld.soundtrack) { 
     gameWorld.musicLoop = function () {
-      gameWorld.soundtrack = gameWorld.playSound(Resources.salvage);
+      gameWorld.soundtrack = gameWorld.playSound(Resources.soundtrack, 1);
       gameWorld.soundtrack.onended = gameWorld.musicLoop;
     }
-    //gameWorld.musicLoop();
+    gameWorld.musicLoop();
   }
 	
   var bg = this.addLayer(Object.create(Layer).init(240,320));
@@ -92,6 +92,10 @@ var onStart = function () {
       if (!other.projectile && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2 ) {
         // take no damage from the FRONT when it isn't a projectile...
       } else {
+        var small = object.layer.add(Object.create(SpriteFont).init(object.x, object.y, Resources.expire_font, choose(["ow!", "oh no", ":("]), {spacing: -2, align: "center"}));
+        small.addBehavior(FadeOut, {duration: 1.5});
+        small.addBehavior(Grow, {duration: 1, max: 2});
+        gameWorld.playSound(Resources.hit, volume(small));
         object.health -= 1;
   			object.damage.timer = DAMAGE_COOLDOWN;
       }
@@ -194,7 +198,6 @@ var onStart = function () {
 	}
 	
 	var up = function (e) {
-		
 	}
 	
 	
@@ -303,7 +306,7 @@ var onUpdate = function (dt) {
 		}
 		
 		var w = choose(this.waves);
-		gameWorld.playSound(Resources[choose(["spawn", "spawn2"])]);
+		gameWorld.playSound(Resources[choose(["spawn"])]);
 		for (var j = 0; j < w.length; j++) {
 			var enemy = spawn(this.bg, w[j], this.player_bot);
 			this.wave.push(enemy);
