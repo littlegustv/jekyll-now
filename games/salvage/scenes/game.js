@@ -1,7 +1,17 @@
 var onStart = function () {
-	if (!gameWorld.soundtrack) { 
+	if (!gameWorld.soundtrack) {
+    if (AudioContext) {
+      gameWorld.filter = gameWorld.audioContext.createBiquadFilter();
+      // Create the audio graph.
+      gameWorld.filter.connect(gameWorld.audioContext.destination);
+      // Create and specify parameters for the low-pass filter.
+      gameWorld.filter.type = 'lowpass'; // Low-pass filter. See BiquadFilterNode docs
+      gameWorld.filter.frequency.value = 24000; // Set cutoff to 440 HZ
+    }
+   
     gameWorld.musicLoop = function () {
       gameWorld.soundtrack = gameWorld.playSound(Resources.soundtrack, 1);
+      gameWorld.soundtrack.connect(gameWorld.filter);
       gameWorld.soundtrack.onended = gameWorld.musicLoop;
     }
     gameWorld.musicLoop();
@@ -150,6 +160,10 @@ var onStart = function () {
     this.player_bot.acceleration = {x: 0, y: 0};
     this.player_bot.animation = 0;
   }
+  this.unpause = function () {
+    this.bg.paused = false;
+    this.fg.paused = false;
+  }
   this.pause();
   
   fg.drawOrder = function () {
@@ -275,6 +289,12 @@ var onUpdate = function (dt) {
 	for (var i = 0; i < this.wave.length; i++) {
 		if (!this.wave[i].alive) this.wave.splice(i, 1);
 	}
+
+  if (this.bg.paused) {
+    gameWorld.filter.frequency.value = lerp(gameWorld.filter.frequency.value, 220, dt);
+  } else {
+    gameWorld.filter.frequency.value = lerp(gameWorld.filter.frequency.value, 24000, dt);
+  }
 		
   if (!this.bg.paused && this.wave.length <= 0) {
 		console.log('new wave');

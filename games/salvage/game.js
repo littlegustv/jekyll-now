@@ -899,8 +899,7 @@ function spawn(layer, key, player) {
 
 var Movement = {
 	standard: function (s) {
-		s.bg.paused = false;
-		s.fg.paused = false;
+		s.unpause();
 		s.player_bot.angle = s.player_top.angle;
 		s.player_bot.animation = 1;
 		s.player_bot.velocity = {
@@ -920,8 +919,7 @@ var Movement = {
 		s.player_bot.delay.set();
 	},
 	blink: function (s) {
-		s.bg.paused = false;
-		s.fg.paused = false;
+		s.unpause();
 		gameWorld.playSound(Resources.blink1);
 		s.player_bot.angle = s.player_top.angle;
 		gameWorld.playSound(Resources.move);
@@ -936,8 +934,7 @@ var Movement = {
 		}
 	},
 	chaos: function (s) {
-		s.fg.paused = false;
-		s.bg.paused = false;
+		s.unpause();
 		gameWorld.playSound(Resources.move); // explosion?!
 		var theta = s.player_top.angle + Math.random() * PI /4 - PI / 8;
 		s.player_bot.angle = s.player_top.angle;
@@ -957,8 +954,7 @@ var Movement = {
 		}
 	},
 	boom: function (s) {
-		s.fg.paused = false;
-		s.bg.paused = false;
+		s.unpause();
 		s.player_bot.velocity = {x: 0, y: 0};
 		gameWorld.playSound(Resources.boom);
 		s.player_bot.delay.set(1);
