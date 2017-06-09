@@ -464,8 +464,12 @@ var Weapons = {
 		return 1;
 	},
 	beam: function (layer) {
-		var b = layer.add(Object.create(Entity).init(this.x, this.y, 2, 154));
-		b.color = "#e91e63";
+		if (this.animations > 1) {
+			this.animation = 1;
+		}
+		this.movement.speed = 0;
+		var b = layer.add(Object.create(Entity).init(this.x, this.y, 4, 154));
+		b.color = "#111";
 		b.setCollision(Polygon);
 		b.collision.onHandle = function (object, other) {
 			if (other.family != object.family && !other.projectile) {
@@ -474,13 +478,19 @@ var Weapons = {
 				gameWorld.playSound(Resources.hit);
 			}
 		};
+		var t = this;
 		b.family = this.family;
 		b.projectile = true;
-		b.addBehavior(Surface, {speed: PI / 36, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 160});
-		b.addBehavior(FadeOut, {delay: 1.3, duration: 0.3, maxOpacity: 1});
+		b.surface = b.addBehavior(Surface, {speed: 0, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 160});
+		b.addBehavior(FadeOut, {delay: 1.3, duration: 0.3, maxOpacity: 1})
+		b.addBehavior(Delay, {duration: 1.6, callback: function () {
+			t.animation = 0;
+			t.movement.speed = PI / 36;
+			console.log('mhm');
+		}});
 		b.addBehavior(FadeIn, {duration: 0.3, maxOpacity: 1});
 		b.opacity = 0;
-		b.z = 10;
+		b.z = this.z - 1;
 		b.angle = this.angle;// - PI / 2;
 		gameWorld.playSound(Resources.beam, volume(b));
 		//console.log(b);
@@ -730,6 +740,30 @@ Damage.hit = function (damage) {
 	}
 }
 
+var BoundDistance = Object.create(Behavior);
+BoundDistance.update = function (dt) {
+  var d = distance(this.entity.x, this.entity.y, this.target.x, this.target.y);
+	if (d > this.max) {
+  	this.entity.out_of_bounds = true;
+  	var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
+    this.entity.angle = lerp_angle(this.entity.angle, theta, this.rate * dt);
+    this.entity.velocity = {x: Math.cos(this.entity.angle) * this.speed, y: Math.sin(this.entity.angle) * this.speed};
+  } else if (d < this.min) {
+  	this.entity.out_of_bounds = true;
+  	var theta = angle(this.target.x, this.target.y, this.entity.x, this.entity.y);
+    this.entity.angle = lerp_angle(this.entity.angle, theta, this.rate * dt);
+    this.entity.velocity = {x: Math.cos(this.entity.angle) * this.speed, y: Math.sin(this.entity.angle) * this.speed};
+  } else {
+  	this.entity.out_of_bounds = false;
+  }
+  if (this.visible && this.entity.out_of_bounds) {
+  	var c = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y, randint(4,8)));
+    c.addBehavior(FadeIn, {duration: 0.1, delay: 0.1, maxOpacity: 1});
+    c.addBehavior(FadeOut, {duration: 1.1, delay: 0.1, maxOpacity: 1});
+    c.color = this.color || "white";
+  }
+};
+
 var Asteroid = Object.create(Behavior);
 Asteroid.update = function (dt) {
 	if (distance(this.entity.x, this.entity.y, this.target.x, this.target.y) <= this.radius) {
@@ -751,7 +785,7 @@ function spawn(layer, key, player) {
 	var enemy;
 	switch (key) {
 		case 1:
-			enemy = Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["walker"])]);
+			enemy = Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["monster"])]);
 			enemy.movement = enemy.addBehavior(Surface, {speed: PI / 36, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 82});
 			enemy.angle = Math.random() * PI2;
 			//enemy.addBehavior(Flip);
@@ -847,14 +881,14 @@ function spawn(layer, key, player) {
 		this.behaviors = [];
 		this.addBehavior(FadeOut, {duration: 0.5});
 
-		for (var i = 0; i < 40; i++) {			
-			var e = this.layer.add(Object.create(Entity).init(this.x + randint(-3,3), this.y + randint(-3,3), 4, 4));
-			e.addBehavior(FadeIn, {maxOpacity: 1, duration: 0.2 + 0.5 * Math.random()});
-			e.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.2 + Math.random() * 0.5, delay: 0.8 + Math.random() * 0.6});
+		for (var i = 0; i < 20; i++) {			
+			var e = this.layer.add(Object.create(Circle).init(this.x + randint(-4,4), this.y + randint(-4,4), randint(4,8)));
+			e.addBehavior(FadeIn, {maxOpacity: 1, duration: 0.1 + 0.2 * Math.random()});
+			e.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.2 * Math.random(), delay: 0.4 + Math.random() * 0.5});
 			e.z = this.z - 1;
-			e.addBehavior(Velocity);
-			var theta = Math.random() * PI2, speed = choose([2, 2, 2, 10, 20]);
-			e.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
+			//e.addBehavior(Velocity);
+			//var theta = Math.random() * PI2, speed = choose([2, 2, 2, 10, 20]);
+			//e.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
 		}
 
 		for (var i = 0; i < randint(2,5); i++) {

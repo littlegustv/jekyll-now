@@ -28,6 +28,7 @@
 		{"path": "spark.png"},
 		{"path": "particles.png", "animations": 3},
 		{"path": "clouds.png", "animations": 2},
+		{"path": "monster.png", "animations": 2, "frames": 2, "speed": 0.3},
 		{"path": "title.png"},
 		{"path": "smoke.png"},
 		{"path": "dust.png", "frames": 4, "speed": 0.2},

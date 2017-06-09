@@ -23,7 +23,7 @@ var onStart = function () {
 	fg.active = true;
 	
 	var b = bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height));
-  b.color = "#C13160";
+  b.color = "#111";
   b.z = -6;
 	
 	for (var i = 0; i < 100; i++) {
@@ -32,7 +32,7 @@ var onStart = function () {
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	
-	var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 240, 2, PI / 8, "#e91e63"));
+	var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 165, 2, PI / 8, "#ddd"));
 	atmosphere.addBehavior(Velocity);
 	atmosphere.velocity = {x: 0, y: 0, angle: PI / 180};
 	atmosphere.addBehavior(Oscillate, {object: atmosphere, field: "amplitude", initial: 2, constant: 1, rate: 4});
@@ -40,7 +40,7 @@ var onStart = function () {
 	
 	// smaller
   //var atmosphere = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60, Resources.atmosphere));
-	var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 236, 2, PI / 2, "white"));
+	var atmosphere = bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 160, 2, PI / 2, "white"));
 	atmosphere.addBehavior(Velocity);
 	atmosphere.angle = Math.random() * PI2;
 	atmosphere.velocity = {x: 0, y: 0, angle: PI / 180};
@@ -93,6 +93,7 @@ var onStart = function () {
 	player_bot.health = MAXHEALTH;
 	
 	player_bot.addBehavior(Space, {cooldown: 0, rate: 1.5, target: planet, radius: 240, damage: 1});
+  player_bot.addBehavior(BoundDistance, {target: planet, max: 160, min: 0, rate: 5, speed: 80, visible: true, color: "#ccc"});
 	
 	player_bot.salvage = 0;
   player_bot.family = "player";
@@ -126,8 +127,8 @@ var onStart = function () {
   //bg.camera.addBehavior(LerpFollow, {target: player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}, rate: 2});  
   //fg.camera.addBehavior(Follow, {target: bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
 
-  //bg.camera.addBehavior(Bound, {min: {x: -160, y: -160}, max: {x: gameWorld.width + 160, y: gameWorld.height + 160}});
-  //fg.camera.addBehavior(Bound, {min: {x: -160, y: -160}, max: {x: gameWorld.width + 160, y: gameWorld.height + 160}});	
+  bg.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}});
+  fg.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}});	
 /*  for (var i = 0; i < gameWorld.width / 32; i++) {
     bg.add(Object.create(Sprite).init(i * 32 + 16, 4, Resources.barrier));
   }*/  
@@ -186,7 +187,7 @@ var onStart = function () {
 				b.trigger();
 			}
 			return;
-		} else if (!s.player_bot.locked && s.bg.paused != 0) {
+		} else if (!s.player_bot.locked && s.player_bot.velocity.x == 0) {
       s.player_bot.move(s)
 		}
 	}
@@ -250,7 +251,7 @@ var onStart = function () {
 		[3,3,6,6,1,1],
 		[2,2,4,5,6]
 	];
-//	this.waves = [[8]];
+	this.waves = [[1,1,1,1]];
 
   // intro animation
   this.intro = true;
@@ -269,7 +270,7 @@ var onStart = function () {
     s.player_bot.delay = player_bot.addBehavior(Delay, {duration: 1, remove: false, callback: function () {
       this.entity.velocity = {x: 0, y: 0};
       this.entity.acceleration = {x: 0, y: 0};
-      s.pause();
+      //  s.pause();
     }});
     this.entity.removeBehavior(this.entity.lerp);
     this.entity.removeBehavior(this.entity.lerpx);
