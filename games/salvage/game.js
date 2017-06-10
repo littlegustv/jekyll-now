@@ -48,9 +48,9 @@ World.playSound = function(sound, volume) {
 }
 
 function volume (object) {
-	var v = Math.max(0,1 - distance(object.x, object.y, gameWorld.scene.layers[0].camera.x, gameWorld.scene.layers[0].camera.y) / (1.4 * gameWorld.height));
-	console.log(v);
-	return v;
+	//var v = Math.max(0,1 - distance(object.x, object.y, gameWorld.scene.layers[0].camera.x, gameWorld.scene.layers[0].camera.y) / (1.4 * gameWorld.height));
+	//console.log(v);
+	return 0.8;
 }
 
 function inverse(family) {
@@ -742,26 +742,28 @@ Damage.hit = function (damage) {
 
 var BoundDistance = Object.create(Behavior);
 BoundDistance.update = function (dt) {
-  var d = distance(this.entity.x, this.entity.y, this.target.x, this.target.y);
-	if (d > this.max) {
-  	this.entity.out_of_bounds = true;
-  	var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
-    this.entity.angle = lerp_angle(this.entity.angle, theta, this.rate * dt);
-    this.entity.velocity = {x: Math.cos(this.entity.angle) * this.speed, y: Math.sin(this.entity.angle) * this.speed};
-  } else if (d < this.min) {
-  	this.entity.out_of_bounds = true;
-  	var theta = angle(this.target.x, this.target.y, this.entity.x, this.entity.y);
-    this.entity.angle = lerp_angle(this.entity.angle, theta, this.rate * dt);
-    this.entity.velocity = {x: Math.cos(this.entity.angle) * this.speed, y: Math.sin(this.entity.angle) * this.speed};
-  } else {
-  	this.entity.out_of_bounds = false;
-  }
-  if (this.visible && this.entity.out_of_bounds) {
-  	var c = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y, randint(4,8)));
-    c.addBehavior(FadeIn, {duration: 0.1, delay: 0.1, maxOpacity: 1});
-    c.addBehavior(FadeOut, {duration: 1.1, delay: 0.1, maxOpacity: 1});
-    c.color = this.color || "white";
-  }
+  	var d = distance(this.entity.x, this.entity.y, this.target.x, this.target.y);
+  	if (d > this.max) {
+  		var speed = Math.sqrt(Math.pow(this.entity.velocity.x, 2) + Math.pow(this.entity.velocity.y, 2));
+	  	this.entity.out_of_bounds = true;
+	  	var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
+	    this.entity.angle = lerp_angle(this.entity.angle, theta, this.rate * dt);
+	    this.entity.velocity = {x: Math.cos(this.entity.angle) * speed, y: Math.sin(this.entity.angle) * speed};
+	} else if (d < this.min) {
+  		var speed = Math.sqrt(Math.pow(this.entity.velocity.x, 2) + Math.pow(this.entity.velocity.y, 2));
+	  	this.entity.out_of_bounds = true;
+	  	var theta = angle(this.target.x, this.target.y, this.entity.x, this.entity.y);
+	    this.entity.angle = lerp_angle(this.entity.angle, theta, this.rate * dt);
+	    this.entity.velocity = {x: Math.cos(this.entity.angle) * speed, y: Math.sin(this.entity.angle) * speed};
+	} else {
+	  	this.entity.out_of_bounds = false;
+	  }
+	if (this.visible && this.entity.out_of_bounds) {
+		var c = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y, randint(4,8)));
+		c.addBehavior(FadeIn, {duration: 0.1, delay: 0.1, maxOpacity: 1});
+		c.addBehavior(FadeOut, {duration: 1.1, delay: 0.1, maxOpacity: 1});
+		c.color = this.color || "white";
+	}
 };
 
 var Asteroid = Object.create(Behavior);
@@ -932,24 +934,44 @@ function spawn(layer, key, player) {
 }
 
 var Movement = {
+	constant: function (s) {
+		s.player_bot.angle = s.player_top.angle;		
+		s.player_bot.stopped = false; // hacky, since you are able to always change your movement with this style
+		s.player_bot.addBehavior(Lerp, {object: this.velocity, field: "x", goal: 75 * Math.cos(s.player_bot.angle), rate: 5, callback: function () {
+			this.entity.removeBehavior(this);
+			this.entity.stopped = true;
+		}});		
+		s.player_bot.addBehavior(Lerp, {object: this.velocity, field: "y", goal: 75 * Math.sin(s.player_bot.angle), rate: 5, callback: function () {
+			this.entity.removeBehavior(this);
+		}});
+		s.player_bot.delay.set(1000);
+		s.player_bot.animation = 1;
+	},
 	standard: function (s) {
 		s.unpause();
 		s.player_bot.angle = s.player_top.angle;
-		s.player_bot.animation = 1;
 		s.player_bot.velocity = {
 			x: Math.cos( s.player_bot.angle) * 100,
 			y: Math.sin( s.player_bot.angle) * 100
 		}
-		s.player_bot.acceleration = {
+		s.player_bot.addBehavior(Lerp, {object: this.velocity, field: "x", goal: 0, rate: 1, callback: function () {
+			this.entity.removeBehavior(this);
+		}});		
+		s.player_bot.addBehavior(Lerp, {object: this.velocity, field: "y", goal: 0, rate: 1, callback: function () {
+			this.entity.removeBehavior(this);
+		}});
+//		this.layer.entities[i].addBehavior(Lerp, {object: this.layer.entities[i], field: "angle", goal: 0, rate: 5});
+/*		s.player_bot.acceleration = {
 			x: -s.player_bot.velocity.x,
 			y: -s.player_bot.velocity.y
-		}
+		}*/
 		// create contrail sprite
 		gameWorld.playSound(Resources.move);  
 		var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
 		d.addBehavior(Velocity);
 		d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
 		d.addBehavior(FadeOut, {duration: 0.8});
+		s.player_bot.stopped = false;
 		s.player_bot.delay.set();
 	},
 	blink: function (s) {
@@ -960,6 +982,7 @@ var Movement = {
 		// blink vanish effect
 		s.player_bot.delay.set(0.5);
 		s.player_bot.opacity = 0.1;
+		s.player_bot.stopped = false;
 		s.player_bot.delay.callback = function () {
 			s.pause();
 			gameWorld.playSound(Resources.blink2);
@@ -977,6 +1000,7 @@ var Movement = {
 			x: Math.cos( theta) * 150,
 			y: Math.sin( theta) * 150
 		}
+		s.player_bot.stopped = false;
 		s.player_bot.acceleration = {
 			x: -s.player_bot.velocity.x / 1.5,
 			y: -s.player_bot.velocity.y / 1.5
@@ -992,6 +1016,7 @@ var Movement = {
 		s.player_bot.velocity = {x: 0, y: 0};
 		gameWorld.playSound(Resources.boom);
 		s.player_bot.delay.set(1);
+		s.player_bot.stopped = false;
 		s.player_bot.addBehavior(Delay, {duration: 0.3, callback: function () {
 			s.player_bot.angle = s.player_top.angle;
 			var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.explosion));
