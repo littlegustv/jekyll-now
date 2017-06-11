@@ -17,26 +17,28 @@ var onStart = function () {
     //gameWorld.musicLoop();
   }
 	
-  var super_bg = this.addLayer(Object.create(Layer).init(1000,1000));
-  super_bg.active = true;
-  var parallax = this.addLayer(Object.create(Layer).init(1000,1000));
+  //var super_bg = this.addLayer(Object.create(Layer).init(1000,1000));
+  //super_bg.active = true;
+  //var parallax = this.addLayer(Object.create(Layer).init(1000,1000));
   var bg = this.addLayer(Object.create(Layer).init(1000,1000));
 	bg.active = true;
   var fg = this.addLayer(Object.create(Layer).init(1000,1000));
 	fg.active = true;
-	parallax.active = true;
+	//parallax.active = true;
 
-	var b = super_bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height));
-  b.color = "#111";
+  
+	var b = bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height));
+  b.color = "#f8f8f8";
   b.z = -6;
 	
-	/*for (var i = 0; i < 100; i++) {
-		bg.add(Object.create(Entity).init(randint(0, gameWorld.width * 2), randint(0, gameWorld.height * 2), 1, 1)).color = "white";
-	}*/
+
+	for (var i = 0; i < 100; i++) {
+		bg.add(Object.create(Entity).init(randint(0, gameWorld.width), randint(0, gameWorld.height), 1, 1));
+	}
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	
-
+  /*
 	var atmosphere = super_bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 165, 2, PI / 8, "#ddd"));
 	atmosphere.addBehavior(Velocity);
 	atmosphere.velocity = {x: 0, y: 0, angle: PI / 180};
@@ -57,17 +59,17 @@ var onStart = function () {
 	planet.addBehavior(Velocity);
 
   for (var i = 0; i < 2; i++) {
-    var continents = parallax.add(Object.create(Sprite).init(gameWorld.width / 2 - i * Resources.continents.image.width, gameWorld.height / 2 + 60, Resources.continents));
+    var continents = parallax.add(Object.create(Sprite).init(gameWorld.width / 2 - 640 * i, gameWorld.height / 2 + 60, Resources.continents));
     continents.blend = "source-atop";
     continents.addBehavior(Velocity);
-    continents.velocity = {x: 50, y: 0};
-    continents.addBehavior(Wrap, {min: {x: -continents.w / 2, y: 0}, max: {x: continents.w / 2, y: gameWorld.height}})
+    continents.velocity = {x: 5, y: 0};
+    continents.addBehavior(Wrap, {min: {x: gameWorld.width / 2 - continents.w, y: 0}, max: {x: gameWorld.width / 2 + continents.w, y: gameWorld.height}})
   }
 
   var shadow = parallax.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60, Resources.shadow));
   shadow.blend = "source-atop";
 
-/*
+
 	for (var i = 0; i < 15; i++) {
 		//var cloud = bg.add(Object.create(Entity).init(planet.x + randint(-80, 80), planet.y + randint(-80, 80), randint(160, 240), randint(1,5)));
 		var cloud = parallax.add(Object.create(Sprite).init(planet.x + randint(-planet.w / 2, planet.w / 2), planet.y + randint(-planet.h / 2, planet.h / 2), Resources.clouds));
@@ -83,6 +85,7 @@ var onStart = function () {
 	//silo.addBehavior(Silo);
 	//silo.family = "enemy";
 	
+  /*
 	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width / 2 + 80, gameWorld.height / 2 - 60,  Resources.shop));
 	gameWorld.shop.family = "store";
 	gameWorld.shop.setCollision(Polygon);
@@ -92,10 +95,11 @@ var onStart = function () {
     {x: 14, y: -6},
     {x: 0, y: 14}
     ])
-	
-	this.player_top = fg.add(Object.create(Sprite).init(gameWorld.width / 4, gameWorld.height / 4, Resources.viper));
-  var p = this.player_top;
-  var player_bot = bg.add(Object.create(Entity).init(p.x, p.y, p.w, p.h));
+	*/
+
+	//this.player_top = fg.add(Object.create(Sprite).init(gameWorld.width / 4, gameWorld.height / 4, Resources.viper));
+  //var p = this.player_top;
+  var player_bot = bg.add(Object.create(Sprite).init(gameWorld.width / 4, gameWorld.height / 4, Resources.viper));
   player_bot.color = "red";
   player_bot.setCollision(Polygon);
 	player_bot.damage = player_bot.addBehavior(Damage, {layer: bg, timer: 0, invulnerable: 1});
@@ -106,11 +110,12 @@ var onStart = function () {
 	player_bot.addBehavior(Velocity);
   player_bot.velocity = {x: 0, y: 0};
   player_bot.acceleration = {x: 0, y: 0};
-  player_bot.opacity = 0;
+  player_bot.opacity = 1;
 	player_bot.health = MAXHEALTH;
 	
-	player_bot.addBehavior(Space, {cooldown: 0, rate: 1.5, target: planet, radius: 240, damage: 1});
-  player_bot.addBehavior(BoundDistance, {target: planet, max: 160, min: 0, rate: 5, speed: 80, visible: true, color: "#ccc"});
+	//player_bot.addBehavior(Space, {cooldown: 0, rate: 1.5, target: planet, radius: 240, damage: 1});
+  player_bot.addBehavior(Bound, {min: {x: 0, y: 0}, max: {x: gameWorld.width, y: gameWorld.height}});
+  //player_bot.addBehavior(BoundDistance, {target: planet, max: 160, min: 0, rate: 5, speed: 80, visible: true, color: "#ccc"});
 	
 	player_bot.salvage = 0;
   player_bot.family = "player";
@@ -130,14 +135,14 @@ var onStart = function () {
     }
 		if (object.health <= 0) {
 			object.alive = false;
-			p.alive = false;
+			//p.alive = false;
       gameWorld.playSound(Resources.hit);
 			gameWorld.setScene(0, true);
 		}
   }
 
   //player_bot.addBehavior(Follow, {target: p, offset: {angle: 0, x: false, y: false, z: false}});
-	this.player_top.addBehavior(Follow, {target: player_bot, offset: {angle: false, x: 0, y: 0, z: 0}});
+	//this.player_top.addBehavior(Follow, {target: player_bot, offset: {angle: false, x: 0, y: 0, z: 0}});
 	this.player_bot = player_bot;
   var t = this;
 
@@ -146,7 +151,7 @@ var onStart = function () {
 
   bg.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}});
   fg.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}}); 
-  parallax.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}}); 
+  //parallax.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}}); 
 /*  for (var i = 0; i < gameWorld.width / 32; i++) {
     bg.add(Object.create(Sprite).init(i * 32 + 16, 4, Resources.barrier));
   }*/  
@@ -185,12 +190,6 @@ var onStart = function () {
   }
   this.pause();
   
-  parallax.drawOrder = function () {
-    return this.entities.sort(function (a, b) { 
-      if (a.z && b.z && b.z !== a.z) return a.z - b.z;
-      else return fg.entities.indexOf(a) - fg.entities.indexOf(b);
-    });
-  };
   fg.drawOrder = function () {
     return this.entities.sort(function (a, b) { 
       if (a.z && b.z && b.z !== a.z) return a.z - b.z;
@@ -229,9 +228,9 @@ var onStart = function () {
       }
       return;
     }
-		if (!s.player_top.locked) {
+		if (!s.player_bot.locked) {
 			//if (s.player_bot.velocity.x === 0 && s.player_bot.velocity.y === 0) {
-				s.player_top.angle = angle(gameWorld.width / 2, gameWorld.height / 2, e.x, e.y);
+				s.player_bot.angle = angle(s.player_bot.x, s.player_bot.y, e.x, e.y);
 			//}
 		}
 	}
@@ -275,7 +274,7 @@ var onStart = function () {
 		[3,3,6,6,1,1],
 		[2,2,4,5,6]
 	];
-	this.waves = [[1,1,1,1]];
+	//this.waves = [[1,1,1,1]];
 
   // intro animation
   this.intro = true;
@@ -301,10 +300,10 @@ var onStart = function () {
     this.entity.removeBehavior(this.entity.lerpx);
     this.entity.removeBehavior(this.entity.lerpy);
 		
-	  s.bg.camera.addBehavior(LerpFollow, {target: s.player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}, rate: 2});  
-  	s.fg.camera.addBehavior(Follow, {target: s.bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
-    super_bg.camera.addBehavior(Follow, {target: s.bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
-    parallax.camera.addBehavior(Follow, {target: s.bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
+	  //s.bg.camera.addBehavior(LerpFollow, {target: s.player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}, rate: 2});  
+  	//s.fg.camera.addBehavior(Follow, {target: s.bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
+    //super_bg.camera.addBehavior(Follow, {target: s.bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
+    //parallax.camera.addBehavior(Follow, {target: s.bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
     //s.fg.camera.addBehavior(LerpFollow, {target: s.player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}, rate: 2});
 
     //console.log('what?');
@@ -328,7 +327,8 @@ var onUpdate = function (dt) {
 		console.log('new wave');
 		this.current_wave += 1;
 		if (this.current_wave % 2 === 1) {
-			var landing_pad = this.bg.add(Object.create(Entity).init(gameWorld.shop.x - 18, gameWorld.shop.y + 12, 16, 16));
+			/*
+      var landing_pad = this.bg.add(Object.create(Entity).init(gameWorld.shop.x - 18, gameWorld.shop.y + 12, 16, 16));
 			landing_pad.z = 100;
 			landing_pad.color = "gray", landing_pad.opacity = 0.5;
 			landing_pad.setCollision(Polygon);
@@ -350,7 +350,7 @@ var onUpdate = function (dt) {
 						gameWorld.scene.store.open();
 					}});
 				}
-			}
+			}*/
 		}
 		
 		var w = choose(this.waves);

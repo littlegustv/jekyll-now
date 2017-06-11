@@ -609,6 +609,7 @@ Drone.update = function (dt) {
     this.entity.x = lerp(this.entity.x, this.target.x + Math.cos(this.angle) * this.radius, dt * this.rate);
     this.entity.y = lerp(this.entity.y, this.target.y + Math.sin(this.angle) * this.radius, dt * this.rate);   
   }
+  this.entity.angle = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
 }
 
 var Bounce = Object.create(Behavior);
@@ -829,7 +830,7 @@ function spawn(layer, key, player) {
 			//enemy.shoot = function () {}; // none
 		break;
 		case 6:
-			enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["drone"])]);
+			enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources.bug);
 			enemy.addBehavior(Drone, {target: player, cooldown: 1, rate: 0.6, radius: 40, angle: Math.random() * PI2});
 			enemy.velocity = {x: 0, y: 10};
 			enemy.shoot = Weapons.spark;//function () {}; // 'static' electricity
@@ -884,9 +885,9 @@ function spawn(layer, key, player) {
 		this.addBehavior(FadeOut, {duration: 0.5});
 
 		for (var i = 0; i < 20; i++) {			
-			var e = this.layer.add(Object.create(Circle).init(this.x + randint(-4,4), this.y + randint(-4,4), randint(4,8)));
-			e.addBehavior(FadeIn, {maxOpacity: 1, duration: 0.1 + 0.2 * Math.random()});
-			e.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.2 * Math.random(), delay: 0.4 + Math.random() * 0.5});
+			var e = this.layer.add(Object.create(Circle).init(this.x + randint(-4,4), this.y + randint(-4,4), randint(2,5)));
+			e.addBehavior(FadeIn, {maxOpacity: 1, duration: 0, delay: 0.5 * Math.random()});
+			e.addBehavior(FadeOut, {maxOpacity: 1, duration: 0, delay: 0.5 + Math.random() * 0.5});
 			e.z = this.z - 1;
 			//e.addBehavior(Velocity);
 			//var theta = Math.random() * PI2, speed = choose([2, 2, 2, 10, 20]);
@@ -897,7 +898,7 @@ function spawn(layer, key, player) {
 			var salvage = this.layer.add(Object.create(Sprite).init(this.x + randint(0,10) - 5, this.y + randint(0, 10) - 5, Resources.gem));
 			salvage.addBehavior(FadeOut, {duration: 1, delay: 3});
 			salvage.value = 1;
-			salvage.addBehavior(Magnet, {target: gameWorld.shop, speed: 30});
+			//salvage.addBehavior(Magnet, {target: gameWorld.shop, speed: 30});
 			salvage.setCollision(Polygon);
 			salvage.collision.onHandle = function (object, other) {
 				if ((other.family == "player" || other.family == "store") && !other.projectile) {
@@ -935,7 +936,7 @@ function spawn(layer, key, player) {
 
 var Movement = {
 	constant: function (s) {
-		s.player_bot.angle = s.player_top.angle;		
+		//s.player_bot.angle = s.player_top.angle;		
 		s.player_bot.stopped = false; // hacky, since you are able to always change your movement with this style
 		s.player_bot.addBehavior(Lerp, {object: this.velocity, field: "x", goal: 75 * Math.cos(s.player_bot.angle), rate: 5, callback: function () {
 			this.entity.removeBehavior(this);
@@ -949,7 +950,7 @@ var Movement = {
 	},
 	standard: function (s) {
 		s.unpause();
-		s.player_bot.angle = s.player_top.angle;
+		//s.player_bot.angle = s.player_top.angle;
 		s.player_bot.velocity = {
 			x: Math.cos( s.player_bot.angle) * 100,
 			y: Math.sin( s.player_bot.angle) * 100
@@ -977,7 +978,7 @@ var Movement = {
 	blink: function (s) {
 		s.unpause();
 		gameWorld.playSound(Resources.blink1);
-		s.player_bot.angle = s.player_top.angle;
+		//s.player_bot.angle = s.player_top.angle;
 		gameWorld.playSound(Resources.move);
 		// blink vanish effect
 		s.player_bot.delay.set(0.5);
@@ -993,8 +994,8 @@ var Movement = {
 	chaos: function (s) {
 		s.unpause();
 		gameWorld.playSound(Resources.move); // explosion?!
-		var theta = s.player_top.angle + Math.random() * PI /4 - PI / 8;
-		s.player_bot.angle = s.player_top.angle;
+		//var theta = s.player_top.angle + Math.random() * PI /4 - PI / 8;
+		//s.player_bot.angle = s.player_top.angle;
 		s.player_bot.animation = 1;
 		s.player_bot.velocity = {
 			x: Math.cos( theta) * 150,
@@ -1018,7 +1019,7 @@ var Movement = {
 		s.player_bot.delay.set(1);
 		s.player_bot.stopped = false;
 		s.player_bot.addBehavior(Delay, {duration: 0.3, callback: function () {
-			s.player_bot.angle = s.player_top.angle;
+			//s.player_bot.angle = s.player_top.angle;
 			var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.explosion));
 			d.addBehavior(Velocity);
 			d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
