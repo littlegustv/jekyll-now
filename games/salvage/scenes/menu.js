@@ -9,8 +9,8 @@ var onStart =  function () {
 	this.bg.camera.y = -gameWorld.height / 4;
 	var bg = this.bg;
 	
-	bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height)).color = "#C13160";
-	
+	bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height)).color = "#fff";
+	/*
 	for (var i = 0; i < 100; i++) {
 		bg.add(Object.create(Entity).init(randint(0, gameWorld.width * 2), randint(0, gameWorld.height * 2), 1, 1)).color = "white";
 	}
@@ -30,7 +30,7 @@ var onStart =  function () {
 	atmosphere.addBehavior(Oscillate, {object: atmosphere, field: "amplitude", initial: 2, constant: 1, rate: 4});
 	atmosphere.z = -2;
 	
-	var planet = this.bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60, Resources.planet));
+	var planet = this.bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60, Resources.planet));*/
 	var title = this.fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2, Resources.title));
 	title.addBehavior(Oscillate, {field: "y", object: title, initial: gameWorld.height / 2, rate: 1, constant: 24});
 

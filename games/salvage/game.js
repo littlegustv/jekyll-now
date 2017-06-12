@@ -934,9 +934,12 @@ function spawn(layer, key, player) {
 	return enemy;
 }
 
+var current_movement_key = 0;
+var movement_keys = ["standard", "blink", "chaos", "boom"];
 var Movement = {
-	constant: function (s) {
-		//s.player_bot.angle = s.player_top.angle;		
+/*	constant: function (s) {
+		//s.player_bot.angle = s.player_top.angle;	
+		s.unpause();	
 		s.player_bot.stopped = false; // hacky, since you are able to always change your movement with this style
 		s.player_bot.addBehavior(Lerp, {object: this.velocity, field: "x", goal: 75 * Math.cos(s.player_bot.angle), rate: 5, callback: function () {
 			this.entity.removeBehavior(this);
@@ -947,7 +950,7 @@ var Movement = {
 		}});
 		s.player_bot.delay.set(1000);
 		s.player_bot.animation = 1;
-	},
+	},*/
 	standard: function (s) {
 		s.unpause();
 		//s.player_bot.angle = s.player_top.angle;
@@ -986,17 +989,21 @@ var Movement = {
 		s.player_bot.delay.set(0.5);
 		s.player_bot.opacity = 0.1;
 		s.player_bot.stopped = false;
+		s.player_bot.delay.old_callback = s.player_bot.delay.callback;
 		s.player_bot.delay.callback = function () {
 			s.pause();
+			s.player_bot.opacity = 1;
+			s.player_bot.stopped = true;
 			gameWorld.playSound(Resources.blink2);
 			s.player_bot.x = s.player_bot.x + 50 * Math.cos(s.player_bot.angle), s.player_bot.y = s.player_bot.y + 50 * Math.sin(s.player_bot.angle);
+			s.player_bot.delay.callback = s.player_bot.delay.old_callback;
 			// blink arrive affect
 		}
 	},
 	chaos: function (s) {
 		s.unpause();
 		gameWorld.playSound(Resources.move); // explosion?!
-		//var theta = s.player_top.angle + Math.random() * PI /4 - PI / 8;
+		var theta = s.player_bot.angle + Math.random() * PI /4 - PI / 8;
 		//s.player_bot.angle = s.player_top.angle;
 		s.player_bot.animation = 1;
 		s.player_bot.velocity = {
@@ -1030,9 +1037,10 @@ var Movement = {
 				var theta = s.player_bot.angle + PI - PI / 5 + i * PI / 5;
 				var a = s.bg.add(Object.create(Sprite).init(s.player_bot.x + Math.cos(theta) * 8, s.player_bot.y + Math.sin(theta) * 8, Resources.projectiles));
 				a.angle = theta;
+				a.animation = 4;
 				a.addBehavior(Velocity);
 				a.velocity = {x: 40 * Math.cos(theta), y: 40 * Math.sin(theta) };
-				a.addBehavior(FadeOut, {duration: 1});
+				//a.addBehavior(FadeOut, {duration: 0, delay: 1});
 				a.setCollision(Polygon);
 				a.setVertices(projectile_vertices);
 				a.collision.onHandle = projectileHit;

@@ -37,7 +37,45 @@ var onStart = function () {
 	}
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
-	
+	this.ui.active = true;
+
+  this.ui.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height - 8, gameWorld.width, 16)).color = "#6DC72E";
+  var name = this.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height - 8, Resources.expire_font, "Standard", {align: "center", spacing: -2}));
+  var l = this.ui.add(Object.create(Entity).init(8, gameWorld.height - 8, 16, 16));
+  var l_text = this.ui.add(Object.create(SpriteFont).init(4, gameWorld.height - 8, Resources.expire_font, "<", {align: "left"}));
+  l.color = "#6DC72E";
+  l.family = "button";
+  l.trigger = function () {
+    s.unpause();
+    s.player_bot.delay.set(0.5);
+    current_movement_key = modulo(current_movement_key - 1, movement_keys.length);
+    player_bot.move = Movement[movement_keys[current_movement_key]];
+    name.text = movement_keys[current_movement_key];
+  };
+  l.hover = function () {
+    l.opactity = 0.5;
+  };
+  l.unhover = function () {
+    this.opactity = 1;
+  };
+  var r = this.ui.add(Object.create(Entity).init(gameWorld.width - 8, gameWorld.height - 8, 16, 16));
+  var r_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width, gameWorld.height - 8, Resources.expire_font, ">", {align: "right"}));
+  r.family = "button";
+  r.color = "#6DC72E";
+  r.trigger = function () {
+    current_movement_key = modulo(current_movement_key + 1, movement_keys.length);
+    player_bot.move = Movement[movement_keys[current_movement_key]];
+    name.text = movement_keys[current_movement_key];
+    s.unpause();
+    s.player_bot.delay.set(0.5);
+  };
+  r.hover = function () {
+    l.opactity = 0.5;
+  };
+  r.unhover = function () {
+    this.opactity = 1;
+  };
+
   /*
 	var atmosphere = super_bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 165, 2, PI / 8, "#ddd"));
 	atmosphere.addBehavior(Velocity);
@@ -160,7 +198,7 @@ var onStart = function () {
   //this.arm = fg.add(Object.create(Entity).init(gameWorld.width / 2, - gameWorld.height, 4, gameWorld.height));
   //this.arm.addBehavior(Follow, {target: this.claw, offset: {x: 0, y: -gameWorld.height / 2 - 6}});
 
-  this.store = Object.create(Store).init(this.ui, this.player_bot);
+  //this.store = Object.create(Store).init(this.ui, this.player_bot);
   //for (var i = 0; i < gameWorld.width / 4; i++) {
    // bg.add(Object.create(Sprite).init(i * 4 + 2, 2, Resources.barrier));
 	/*
@@ -208,12 +246,13 @@ var onStart = function () {
 			var b = s.ui.onButton(e.x, e.y);
 			if (b) {
 				b.trigger();
-			}
-			return;
-		} else if (!s.player_bot.locked && s.player_bot.stopped) {
+  			return;
+      }
+		} 
+    if (!s.player_bot.locked && s.player_bot.stopped) {
       s.player_bot.move(s)
 		}
-    console.log(s.player_bot.locked, s.player_bot.stopped);
+    //console.log(s.player_bot.locked, s.player_bot.stopped);
 	}
 	var move = function (e) {
 		if (s.ui.active) {
@@ -227,7 +266,7 @@ var onStart = function () {
           buttons[i].unhover();
         }
       }
-      return;
+      //return;
     }
 		if (!s.player_bot.locked) {
 			//if (s.player_bot.velocity.x === 0 && s.player_bot.velocity.y === 0) {
