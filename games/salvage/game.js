@@ -955,17 +955,19 @@ var Movement = {
 			x: Math.cos( s.player_bot.angle) * 100,
 			y: Math.sin( s.player_bot.angle) * 100
 		}
-		s.player_bot.addBehavior(Lerp, {object: this.velocity, field: "x", goal: 0, rate: 1, callback: function () {
+		/*s.player_bot.addBehavior(Lerp, {object: this.velocity, field: "x", goal: 0, rate: 1, callback: function () {
 			this.entity.removeBehavior(this);
+			s.pause();
+			this.entity.stopped = true;
 		}});		
 		s.player_bot.addBehavior(Lerp, {object: this.velocity, field: "y", goal: 0, rate: 1, callback: function () {
 			this.entity.removeBehavior(this);
-		}});
+		}});*/
 //		this.layer.entities[i].addBehavior(Lerp, {object: this.layer.entities[i], field: "angle", goal: 0, rate: 5});
-/*		s.player_bot.acceleration = {
+		s.player_bot.acceleration = {
 			x: -s.player_bot.velocity.x,
 			y: -s.player_bot.velocity.y
-		}*/
+		};
 		// create contrail sprite
 		gameWorld.playSound(Resources.move);  
 		var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));

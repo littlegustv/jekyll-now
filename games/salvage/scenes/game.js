@@ -213,6 +213,7 @@ var onStart = function () {
 		} else if (!s.player_bot.locked && s.player_bot.stopped) {
       s.player_bot.move(s)
 		}
+    console.log(s.player_bot.locked, s.player_bot.stopped);
 	}
 	var move = function (e) {
 		if (s.ui.active) {
@@ -294,7 +295,7 @@ var onStart = function () {
       this.entity.velocity = {x: 0, y: 0};
       this.entity.acceleration = {x: 0, y: 0};
       this.entity.stopped = true;
-      //  s.pause();
+      s.pause();
     }});
     this.entity.removeBehavior(this.entity.lerp);
     this.entity.removeBehavior(this.entity.lerpx);
