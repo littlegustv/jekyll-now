@@ -484,8 +484,10 @@ var Weapons = {
 		if (this.animations > 1) {
 			this.animation = 1;
 		}
-		this.movement.speed = 0;
-		var b = layer.add(Object.create(Entity).init(this.x, this.y, 4, 154));
+		this.old_velocity = this.velocity;
+		this.velocity = {x: 0, y: 0};
+		//this.movement.speed = 0;
+		var b = layer.add(Object.create(Entity).init(gameWorld.width / 2, this.y, 4, gameWorld.width));
 		b.color = "#111";
 		b.setCollision(Polygon);
 		b.collision.onHandle = function (object, other) {
@@ -498,11 +500,12 @@ var Weapons = {
 		var t = this;
 		b.family = this.family;
 		b.projectile = true;
-		b.surface = b.addBehavior(Surface, {speed: 0, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 160});
+		//b.surface = b.addBehavior(Surface, {speed: 0, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 160});
 		b.addBehavior(FadeOut, {delay: 1.3, duration: 0.3, maxOpacity: 1})
 		b.addBehavior(Delay, {duration: 1.6, callback: function () {
 			t.animation = 0;
-			t.movement.speed = PI / 36;
+			//t.movement.speed = PI / 36;
+			t.velocity = t.old_velocity;
 			console.log('mhm');
 		}});
 		b.addBehavior(FadeIn, {duration: 0.3, maxOpacity: 1});
@@ -805,17 +808,22 @@ function spawn(layer, key, player) {
 	var enemy;
 	switch (key) {
 		case 1:
-			enemy = Object.create(Sprite).init(choose([16, gameWorld.width - 16]), gameWorld.height - 14, Resources[choose(["monster"])]);
-			enemy.movement = enemy.addBehavior(Surface, {speed: PI / 36, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 82});
-			enemy.angle = Math.random() * PI2;
+			enemy = Object.create(Sprite).init(choose([8, gameWorld.width - 8]), gameWorld.height - 14, Resources.monster);
+			//enemy.movement = enemy.addBehavior(Surface, {speed: PI / 36, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 82});
+			//enemy.angle = Math.random() * PI2;
 			//enemy.addBehavior(Flip);
 			//enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
-			enemy.velocity = {x: 0, y: 0};//enemy.x > 100 ? -20 : 20, y: 0};
+			enemy.velocity = {x: 0, y: randint(0,10) > 5 ? 15 : -15 };//enemy.x > 100 ? -20 : 20, y: 0};
 			enemy.z = 20;
+			if (enemy.x <= gameWorld.width / 2)
+				enemy.angle = PI / 2;
+			else
+				enemy.angle = 3 * PI / 2;
+			
 			enemy.shoot = Weapons.beam;
 		break;
 		case 2:
-			enemy = Object.create(Sprite).init(randint(-gameWorld.width,gameWorld.width), randint(-gameWorld.height,gameWorld.height), Resources[choose(["asteroid"])]);
+			enemy = Object.create(Sprite).init(randint(-gameWorld.width,gameWorld.width), randint(-gameWorld.height,gameWorld.height), Resources.asteroid);
 			var theta = angle(enemy.x, enemy.y, gameWorld.width / 2, gameWorld.height / 2 + 60);
 			enemy.angle = Math.random() * PI2;  
 			enemy.addBehavior(Asteroid, {target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 78});
@@ -823,48 +831,39 @@ function spawn(layer, key, player) {
 		break;
 		case 3:
 			var distance = randint(100, 180), theta = Math.random() * PI2;
-			enemy = Object.create(Sprite).init(gameWorld.width / 2 + Math.cos(theta) * distance, gameWorld.height / 2 + 60 + Math.sin(theta) * distance, Resources[choose(["bomber"])]);
+			enemy = Object.create(Sprite).init(randint(0, gameWorld.width), 0, Resources.bomber);
 			//enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
 			//enemy.velocity = {x: Math.cos(enemy.angle) * 150, y: 150 * Math.sin(enemy.angle)};
 			//enemy.addBehavior(Accelerate);
 			//enemy.acceleration = {x: 0, y: -100};
-			enemy.velocity = {x: 0, y: 0};
+			enemy.velocity = {x: 50, y: 0};
 			enemy.angle = theta + PI / 2;
-			enemy.addBehavior(Bomber, {radius: distance});
-			//enemy.shoot = Weapons.mine_layer;
+			enemy.addBehavior(Wrap, {min: {x: 8, y: -10}, max: {x: gameWorld.width - 8, y: gameWorld.height}});
+			//enemy.addBehavior(Bomber, {radius: distance});
+			enemy.shoot = Weapons.mine_layer;
 		break;
 		case 4:
-			enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["saucer"])]);
-			//enemy.addBehavior(Shoot, {target: player, cooldown: 1});
+			enemy = Object.create(Sprite).init(randint(8,gameWorld.width - 8), 0, Resources.saucer);
 			enemy.velocity = {x: 0, y: 10};
 			enemy.shoot = Weapons.standard;
 		break;
 		case 5:
-			enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources[choose(["x"])]);
+			enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources.x);
 			enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
 			enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle), angle: PI}; 
-			enemy.addBehavior(Bounce, {min: {x: 5, y: 0}, max: {x: gameWorld.width - 5, y: gameWorld.height - 16}});
-			//enemy.shoot = function () {}; // none
+			enemy.addBehavior(Bounce, {min: {x: 5, y: 0}, max: {x: gameWorld.width - 5, y: gameWorld.height - 16}});			
 		break;
 		case 6:
-			enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources.bug);
+			enemy = Object.create(Sprite).init(randint(8, gameWorld.width - 8), 0, Resources.drone);
 			enemy.addBehavior(Drone, {target: player, cooldown: 1, rate: 0.6, radius: 40, angle: Math.random() * PI2});
 			enemy.velocity = {x: 0, y: 10};
-			enemy.shoot = Weapons.spark;//function () {}; // 'static' electricity
+			enemy.shoot = Weapons.spark;
     	break;
 		case 7:
-			var theta = Math.random() * PI2;
-			enemy = Object.create(Sprite).init(gameWorld.width / 2 + 160 * Math.cos(theta), gameWorld.height / 2 + 60  + 160 * Math.sin(theta), Resources[choose(["tank"])]);
-			enemy.addBehavior(Surface, {speed: PI / 36, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 82});
-			enemy.angle = theta;
-			//enemy.origin = {x: 0, y: 160};
-			//enemy.offset = {x: 0, y: 2};
-			//enemy.mirrored = enemy.x > 100;
-			//enemy.addBehavior(Flip);
+			enemy = Object.create(Sprite).init(randint(0,10) > 5 ? gameWorld.width - 8 : 8, randint(-gameWorld.height, gameWorld.height), Resources.tank);
 			enemy.shoot = Weapons.homing;
-			//enemy.addBehavior(Mortar, {cooldown: 1});
-			//enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
-			enemy.velocity = {x: 0, y: 0 };
+			enemy.angle = enemy.x < gameWorld.width / 2 ? PI / 2 : 3 * PI / 2;
+			enemy.velocity = {x: 0, y: 30 };
     	break;
 		case 8:
 			enemy = Object.create(Sprite).init(0, choose([0, gameWorld.height + 120]), Resources.beamship);
