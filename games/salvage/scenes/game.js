@@ -76,6 +76,9 @@ var onStart = function () {
     this.opactity = 1;
   };
 
+	bg.add(Object.create(TiledBackground).init(-12, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2));
+	bg.add(Object.create(TiledBackground).init(gameWorld.width + 12, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2));
+	
   /*
 	var atmosphere = super_bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 165, 2, PI / 8, "#ddd"));
 	atmosphere.addBehavior(Velocity);
@@ -123,9 +126,8 @@ var onStart = function () {
 	//silo.addBehavior(Silo);
 	//silo.family = "enemy";
 	
-  /*
-	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width / 2 + 80, gameWorld.height / 2 - 60,  Resources.shop));
-	gameWorld.shop.family = "store";
+  
+	/*gameWorld.shop.family = "store";
 	gameWorld.shop.setCollision(Polygon);
   gameWorld.shop.setVertices([
     {x: -14, y: -6},
@@ -152,7 +154,7 @@ var onStart = function () {
 	player_bot.health = MAXHEALTH;
 	
 	//player_bot.addBehavior(Space, {cooldown: 0, rate: 1.5, target: planet, radius: 240, damage: 1});
-  player_bot.addBehavior(Bound, {min: {x: 0, y: 0}, max: {x: gameWorld.width, y: gameWorld.height}});
+  player_bot.addBehavior(Bound, {min: {x: 6, y: -gameWorld.height * 5}, max: {x: gameWorld.width - 6, y: 5 * gameWorld.height}});
   //player_bot.addBehavior(BoundDistance, {target: planet, max: 160, min: 0, rate: 5, speed: 80, visible: true, color: "#ccc"});
 	
 	player_bot.salvage = 0;
@@ -163,10 +165,16 @@ var onStart = function () {
       if (!other.projectile && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2 ) {
         // take no damage from the FRONT when it isn't a projectile...
       } else {
-        var small = object.layer.add(Object.create(SpriteFont).init(object.x, object.y, Resources.expire_font, choose(["ow!", "oh no", ":("]), {spacing: -2, align: "center"}));
-        small.addBehavior(FadeOut, {duration: 1.5});
-        small.addBehavior(Grow, {duration: 1, max: 2});
-        gameWorld.playSound(Resources.hit, volume(small));
+        var small = object.layer.add(Object.create(SpriteFont).init(object.x, object.y, Resources.expire_font, choose(["ow!", "oh no", ":(", "jeez", "ok.", "sorry."]), {spacing: -2, align: "center"}));
+        if (randint(0,10) < 5) {					
+					small.addBehavior(FadeOut, {duration: 1.5});
+					small.addBehavior(Grow, {duration: 1, max: 2});
+        } else {
+					small.addBehavior(FadeOut, {duration: 1.5});
+					small.addBehavior(Velocity);
+					small.velocity = {x: 0, y: 0, angle: PI};
+				}
+				gameWorld.playSound(Resources.hit, volume(small));
         object.health -= 1;
   			object.damage.timer = DAMAGE_COOLDOWN;
       }
@@ -179,6 +187,9 @@ var onStart = function () {
 		}
   }
 
+	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width - 48, gameWorld.height / 2 + 60,  Resources.shop));
+	gameWorld.shop.addBehavior(AI, {target: player_bot, rate: 5, value: 0});
+	
   //player_bot.addBehavior(Follow, {target: p, offset: {angle: 0, x: false, y: false, z: false}});
 	//this.player_top.addBehavior(Follow, {target: player_bot, offset: {angle: false, x: 0, y: 0, z: 0}});
 	this.player_bot = player_bot;
@@ -186,9 +197,10 @@ var onStart = function () {
 
   //bg.camera.addBehavior(LerpFollow, {target: player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}, rate: 2});  
   //fg.camera.addBehavior(Follow, {target: bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
-
-  bg.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}});
-  fg.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}}); 
+	bg.camera.addBehavior(Follow, {target: player_bot, offset: {x: false, y: -gameWorld.height / 2}});
+  //bg.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}});
+  fg.camera.addBehavior(Follow, {target: bg.camera, offset: {x: 0, y: 0}});
+	//fg.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}}); 
   //parallax.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}}); 
 /*  for (var i = 0; i < gameWorld.width / 32; i++) {
     bg.add(Object.create(Sprite).init(i * 32 + 16, 4, Resources.barrier));
@@ -270,7 +282,7 @@ var onStart = function () {
     }
 		if (!s.player_bot.locked) {
 			//if (s.player_bot.velocity.x === 0 && s.player_bot.velocity.y === 0) {
-				s.player_bot.angle = angle(s.player_bot.x, s.player_bot.y, e.x, e.y);
+				s.player_bot.angle = angle(s.player_bot.x - s.bg.camera.x, s.player_bot.y - s.bg.camera.y, e.x, e.y);
 			//}
 		}
 	}

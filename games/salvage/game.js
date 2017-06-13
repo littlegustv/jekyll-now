@@ -21,6 +21,23 @@ World.draw = function () {
 	}
 };
 
+var AI = Object.create(Behavior);
+AI.update = function (dt) {
+	if (this.time === undefined) this.time = 0;
+	this.time += dt;
+  // move to player, pay
+  if (this.value / this.time < 1) {
+  	this.entity.y = lerp(this.entity.y, this.target.y, this.rate * dt);
+    this.entity.x = lerp(this.entity.x, this.target.x + (this.target.x > gameWorld.width / 2 ? -24 : 24), this.rate * dt);
+  	//this.entity.x = lerp(this.entity.x, this.target.x, this.rate * dt);
+  }
+  // stick around, store is 'open'
+  // use above?
+  // ...
+  // leave for a while
+  // ...
+}
+
 World.playSound = function(sound, volume) {
 	if (AudioContext) {
 	  var volume = volume || 1;
