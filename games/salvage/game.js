@@ -818,7 +818,7 @@ Animate.update = function (dt) {
 
 function spawn(layer, key, player) {
 	var y = Math.floor(player.y / 16) * 16 + 8 + 16 * randint(-8, 8);
-	var enemy = Object.create(Sprite).init(gameWorld.width + 4, y, Resources.asteroid);
+	var enemy = Object.create(Sprite).init(gameWorld.width + 4, y, Resources[choose(["fighter", "shielded", "unshielded", "shielded fighter"])]);
 	enemy.addBehavior(Crop, {min: {x: -16, y: -1000}, max: {x: gameWorld.width + 16, y: 1000}});
 	enemy.addBehavior(Velocity);
 	enemy.z = 11;
