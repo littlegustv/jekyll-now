@@ -804,7 +804,37 @@ Asteroid.update = function (dt) {
 	}
 }
 
+Animate.update = function (dt) {
+	if (this.paused) return;
+	this.entity.frameDelay -= dt;
+	if (this.entity.frameDelay <= 0) {
+		this.entity.frameDelay = this.entity.maxFrameDelay;
+		this.entity.frame = (this.entity.frame + 1) % this.entity.maxFrame;
+		if (this.entity.frame == this.entity.maxFrame - 1 &&  this.onEnd) {
+			this.onEnd();
+		} 
+	}
+};
+
 function spawn(layer, key, player) {
+	var y = Math.floor(player.y / 16) * 16 + 8 + 16 * randint(-8, 8);
+	var enemy = Object.create(Sprite).init(gameWorld.width + 4, y, Resources.asteroid);
+	enemy.addBehavior(Crop, {min: {x: -16, y: -1000}, max: {x: gameWorld.width + 16, y: 1000}});
+	enemy.addBehavior(Velocity);
+	enemy.z = 11;
+	enemy.velocity = {x: -50, y: 0};
+	var hanger = layer.add(Object.create(Sprite).init(gameWorld.width, y, Resources.hanger));
+	hanger.z = 10;
+	hanger.behaviors[0].onEnd = function () {
+		this.entity.removeBehavior(this);
+		this.entity.addBehavior(FadeOut, {duration: 1, delay: 1, remove: true});
+		// spawn enemy here
+		layer.add(enemy);
+	}
+	return enemy;
+}
+
+function spawn2(layer, key, player) {
 	var enemy;
 	switch (key) {
 		case 1:

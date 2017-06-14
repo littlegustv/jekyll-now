@@ -76,8 +76,8 @@ var onStart = function () {
     this.opactity = 1;
   };
 
-	bg.add(Object.create(TiledBackground).init(-12, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2));
-	bg.add(Object.create(TiledBackground).init(gameWorld.width + 12, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2));
+	bg.add(Object.create(TiledBackground).init(-8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2));
+	bg.add(Object.create(TiledBackground).init(gameWorld.width + 8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2));
 	
   /*
 	var atmosphere = super_bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 165, 2, PI / 8, "#ddd"));
