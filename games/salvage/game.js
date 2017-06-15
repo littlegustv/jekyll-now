@@ -74,23 +74,6 @@ function inverse(family) {
 	return family == "enemy" ? "player" : "enemy";
 }
 
-var Asteroid = Object.create(Behavior);
-Asteroid.update = function (dt) {
-	if (distance(this.entity.x, this.entity.y, this.target.x, this.target.y) < this.radius) {
-		if (this.entity.die) 
-			this.entity.die();
-		else
-			this.entity.alive = false;
-		
-		this.entity.removeBehavior(this);
-		var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
-		var sw = this.entity.layer.add(Object.create(Sprite).init(this.entity.x + 8 * Math.cos(theta), this.entity.y + 8 * Math.sin(theta), Resources.shockwave));
-		sw.angle = theta + PI / 2;
-		sw.addBehavior(FadeOut, {duration: 0.1, delay: 1});
-		sw.z = 1;
-	}
-}
-
 var LerpFollow = Object.create(Behavior);
 LerpFollow.update = function (dt) {  
   if (this.offset.x !== false)
@@ -103,56 +86,6 @@ LerpFollow.update = function (dt) {
     this.entity.angle = lerp_angle(this.entity.angle, this.target.angle + (this.offset.angle || 0), this.rate * dt);
   if (this.target.alive === false) this.entity.alive = false;
 };
-
-var Atmosphere = Object.create(Entity);
-Atmosphere.init = function (x, y, radius, amplitude, frequency, color) {
-	this.x = x, this.y = y, this.radius = radius, this.amplitude = amplitude, this.frequency = frequency, this.color = color || "black", this.time = 0;
-	this.behaviors = [];
-	return this;
-};
-Atmosphere.onDraw = function (ctx) {
-	var INTERVAL = Math.PI / 180;
-	ctx.beginPath();
-	var theta, radius;
-	for (var i = 0; i < Math.PI * 2; i += INTERVAL) {
-		theta = (Math.PI * 2 / this.frequency) * i;
-		radius = this.radius + Math.cos(theta) * this.amplitude;
-		if (i === 0) {
-			ctx.moveTo(this.x + Math.cos(i) * radius, this.y + Math.sin(i) * radius);
-		} else {
-			ctx.lineTo(this.x + Math.cos(i) * radius, this.y + Math.sin(i) * radius);
-		}
-	}
-	ctx.closePath();
-	ctx.fillStyle = this.color;
-	ctx.fill();
-};
-
-var Silo = Object.create(Behavior);
-Silo.update = function (dt) {
-	// a lot of redunancy here, and it's not even working properly!
-	if (this.cooldown === undefined) this.cooldown = 0.5;
-	else if (this.cooldown > 0) this.cooldown -= dt;
-	else {
-		var p = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.beamship));
-		p.angle = this.entity.angle - PI / 2;
-		p.projectile = true;
-		p.velocity = {x: 30 * Math.cos(p.angle), y: 30 * Math.sin(p.angle)};
-		p.addBehavior(Velocity);
-		p.family = this.entity.family;
-		p.addBehavior(HeatSeeking, {family: inverse(this.entity.family), speed: 30, rate: 0.5 });
-		p.setCollision(Polygon);
-		p.collision.onHandle = projectileHit;
-		this.cooldown = 3;
-	}
-}
-
-var Surface = Object.create(Behavior);
-Surface.update = function (dt) {
-	this.entity.angle += this.speed * dt;
-	this.entity.x = this.target.x + this.radius * Math.cos(this.entity.angle - PI / 2);
-	this.entity.y = this.target.y + this.radius * Math.sin(this.entity.angle - PI / 2);
-}
 
 Delay.update = function (dt) {
   if (this.time === undefined) this.start();
@@ -255,7 +188,7 @@ Lerp.update = function (dt) {
 };
 
 function lerp (current, goal, rate, threshold) {
-  if (threshold == undefined) threshold = 1;
+  if (threshold === undefined) threshold = 1;
   if (Math.abs(goal - current) <= threshold) {
     return goal;
   } else {
@@ -281,48 +214,6 @@ Space.update = function (dt) {
 			e.addBehavior(FadeOut, {duration: 1, remove: true});
 		}
 	}
-}
-
-// target, speed
-var Magnet = Object.create(Behavior);
-Magnet.update = function (dt) {
-	var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
-	this.entity.velocity.x = lerp(this.entity.velocity.x, this.speed * Math.cos(theta), dt);
-	this.entity.velocity.y = lerp(this.entity.velocity.y, this.speed * Math.sin(theta), dt);
-}
-
-var Wheel = Object.create(Entity);
-Wheel.init = function (x, y, radius, border, slice, step, percentage, colors) {
-	this.x = x, this.y = y, this.radius = radius, this.border = border, this.slice = slice, this.step = step, this.percentage = percentage, this.colors = colors;
-	this.behaviors = [], this.offset = {x: 0, y: 0};
-	return this;
-} 
-Wheel.onDraw = function (ctx) {
-	ctx.fillStyle = this.colors[0];
-  ctx.beginPath();
-  ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
-  ctx.fill();
-
-	for (var i = 0; i < 100 / this.step; i += 1) {
-  	if (i < this.percentage / this.step)
-      ctx.fillStyle = this.colors[2];
-    else
-    	ctx.fillStyle = this.colors[1];
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y);
-    ctx.arc(this.x, this.y, this.radius - this.border, i * 2 * Math.PI / (100 / this.step) + this.slice, (i + 1) * 2 * Math.PI / (100 / this.step) - this.slice, false);
-    ctx.fill();
-	}
-  
-  ctx.fillStyle = this.colors[0];
-  ctx.beginPath();
-  ctx.arc(this.x, this.y, this.radius / 4 + this.border, 0, Math.PI * 2, false);
-  ctx.fill();
-  
-  ctx.fillStyle = this.colors[3];
-  ctx.beginPath();
-  ctx.arc(this.x, this.y, this.radius / 4, 0, Math.PI * 2, false);
-  ctx.fill();
 }
 
 var Grow = Object.create(Behavior);
@@ -353,38 +244,6 @@ SpriteFont.onDraw = function (ctx) {
   }
 }
 
-var Contrail = Object.create(Behavior);
-Contrail.update = function (dt) {
-	if (this.cooldown === undefined) this.cooldown = 0.1;
-	if (this.entity.velocity.x !== 0 && this.entity.velocity.y !== 0) {
-		if (this.cooldown <= 0 && randint(0,100) < 25) {
-			this.cooldown = 0.1;
-			var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
-			d.addBehavior(Velocity);
-			d.velocity = {x: -this.entity.velocity.x / 2, y: -this.entity.velocity.y / 2};
-			d.addBehavior(FadeOut, {duration: 0.8});
-		} else {
-			this.cooldown -= dt;
-		}
-	}
-}
-
-// goes to nearest enemy of acceptable 'family'
-var HeatSeeking = Object.create(Behavior);
-HeatSeeking.start = function () {
-	var t = this;
-	this.target = this.entity.layer.entities.filter(function (a) { return a.family == t.family && !a.projectile }).sort(function (a, b) { return distance(t.entity.x, t.entity.y, a.x, a.y) - distance(t.entity.x, t.entity.y, b.x, b.y); })[0];
-};
-HeatSeeking.update = function (dt) {
-	if (!this.target) this.start();
-	if (!this.controller.alive) {
-		this.entity.alive = false;
-		this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.small)).addBehavior(FadeOut, {duration: 0.5});
-		gameWorld.playSound(Resources.hit, volume(this.entity));
-	}
-	this.entity.angle = lerp_angle(this.entity.angle, angle(this.entity.x, this.entity.y, this.target.x, this.target.y), this.rate * dt);
-	this.entity.velocity = {x: this.speed * Math.cos(this.entity.angle), y: this.speed * Math.sin(this.entity.angle) };
-};
 
 // push to raindrop
 function lerp_angle (a1, a2, rate) {
@@ -398,7 +257,8 @@ var projectile_vertices = [
 	{x: 6, y: -3},
 	{x: 6, y: 3},
 	{x: -6, y: 3}
-]
+];
+
 var Weapons = {
 	standard: function (layer) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
@@ -441,13 +301,13 @@ var Weapons = {
 			//gameWorld.playSound(Resources.mortar);
 			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
-			a.addBehavior(HeatSeeking, {family: this.family == "player" ? "enemy" : "player" , speed: 50, rate: 1, controller: this});
+			a.addBehavior(Target, {target: this.target, turn_rate: 0.2, speed: 30});
 			a.family = this.family;
 			a.projectile = true;
 			var theta = this.angle;
 			a.velocity = {x: 90 * Math.cos(theta), y: 90 * Math.sin(theta)};
 			a.angle = theta;
-			return 0.6;			
+			return 1.6;			
 	},
 	proximity: function (layer) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bomb));
@@ -536,8 +396,6 @@ function requestFullScreen () {
   }
 }
 
-
-
 // push to raindrop 'active' flag for layer
 Scene.draw = function (ctx) {
 	for (var i = 0; i < this.layers.length; i++) {
@@ -565,59 +423,7 @@ Enemy.update = function (dt) {
 		this.cooldown = this.entity.shoot(this.entity.layer);
 	}
 }
-/*
-var Shoot = Object.create(Behavior);
-Shoot.update = function (dt) {
-	if (this.cooldown <= 0) {
-    gameWorld.playSound(Resources.laser);
-    var e = Object.create(Sprite).init(this.entity.x - 2, this.entity.y - 2, Resources.projectile);
-    e.addBehavior(Velocity);
-    e.setCollision(Polygon);
-    e.family = "enemy";
-    e.projectile = true;
-    e.collision.onHandle = function (object, other) {
-			if (other.solid) object.alive = false;
-      if (other.family == "player" && other.damage && other.damage.hit) {
-        other.damage.hit(1);
-      }
-      if (other.family != "enemy" && !other.projectile) object.alive = false;
-    }
-    var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
-    e.angle = theta;
-    e.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
-    this.entity.layer.add(e);
-    this.cooldown = randint(1,2);
-  } else {
-    this.cooldown -= dt;
-  }
-}
 
-var Walker = Object.create(Behavior);
-Walker.update = function (dt) {
-	if (this.cooldown > 0) this.cooldown -= dt;
-	else if (this.cooldown > -1) {
-		this.cooldown = -1;
-		var t = this;
-		var beam = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y, 2, gameWorld.height));
-		beam.addBehavior(Follow, {target: this.entity, offset: {x: 0, y: - gameWorld.height / 2 }});
-		beam.addBehavior(FadeIn, {duration: 0.4});
-		beam.setCollision(Polygon);
-		beam.family = "enemy";
-		beam.collision.onHandle = function (object, other) {
-			if (other.family == "player" && other.damage && other.damage.hit) {
-				console.log('what');
-        other.damage.hit(1);
-      }
-		}
-		beam.addBehavior(Delay, {duration: 2, callback: function () {
-			beam.addBehavior(FadeOut, {duration: 0.4});
-			t.cooldown = 2;
-		}});
-	} else {
-		
-	}
-}
-*/
 // target, radius, rate, angle
 var Drone = Object.create(Behavior);
 Drone.update = function (dt) {
@@ -650,50 +456,6 @@ Bounce.update = function (dt) {
   }
 }
 
-// behavior is good, needs visual improvement?
-// also add 'wrap' or 'bounce' to bombers to keep them around?
-var Bomber = Object.create(Behavior);
-Bomber.update = function (dt) {
-	if (this.cooldown === undefined) this.cooldown = 1;
-	this.entity.angle += dt;
-	this.entity.velocity.x = this.radius * Math.cos(this.entity.angle);
-	this.entity.velocity.y = this.radius * Math.sin(this.entity.angle);
-	
-	
-	if (this.cooldown <= 0) {
-		this.cooldown = 1;
-		var e = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.bomb));
-		e.addBehavior(Velocity);
-		var theta = angle(e.x, e.y, gameWorld.width / 2, gameWorld.height / 2 + 60);
-		e.velocity = {x: Math.cos(theta) * 40, y: Math.sin(theta) * 40};
-		e.setCollision(Polygon);
-		e.collision.onHandle = projectileHit;
-		e.projectile = true;
-		e.family = "enemy";
-		e.addBehavior(Asteroid, {target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 76});
-	} else {
-		this.cooldown -= dt;
-	}
-	/*if (this.entity.velocity.y <= 0 && !this.done) {
-		var e = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.bomb));
-		e.addBehavior(Velocity);
-		e.velocity = {x: 0, y: 0};
-		e.addBehavior(Accelerate);
-		e.acceleration = {x: 0, y: 100};
-    e.setCollision(Polygon);
-    e.family = "enemy";
-    e.projectile = true;
-    e.collision.onHandle = function (object, other) {
-      if (other.family == "player" && other.damage && other.damage.hit) {
-        other.damage.hit(1);
-      }
-      if (other.family != "enemy" && !other.projectile) object.alive = false;
-    }
-		this.done = true;
-		this.entity.angle = Math.atan2(this.entity.velocity.y, this.entity.velocity.x);
-	}*/
-}
-
 // push to raindrop
 Velocity.update = function (dt) {
 	this.entity.x += dt * this.entity.velocity.x;
@@ -705,62 +467,8 @@ FadeIn.start = function () {
   this.maxOpacity = 1;
   this.time = 0;
 };
-// end of push to riandrop
-/*
-var Mortar = Object.create(Behavior);
-Mortar.update = function (dt) {
-  if (this.cooldown <= 0) {
-    gameWorld.playSound(Resources.shoot);
-    var e = Object.create(Sprite).init(this.entity.x - 2, this.entity.y - 2, Resources.bomb);
-    e.addBehavior(Velocity);
-    e.setCollision(Polygon);
-    e.family = "enemy";
-    e.projectile = true;
-    e.collision.onHandle = function (object, other) {
-			if (other.solid) object.alive = false;
-      if (other.family == "player" && other.damage && other.damage.hit) {
-        other.damage.hit(1);
-      }
-      if (other.family != "enemy" && !other.projectile) object.alive = false;
-    }
-    e.velocity = {x: 0, y: -90};
-    this.entity.layer.add(e);
-    this.cooldown = randint(1,3);
-  } else {
-    this.cooldown -= dt;
-  }
-}*/
 
-// timer, invulnerable
-var Damage = Object.create(Behavior);
-Damage.update = function (dt) {
-	if (this.timer > 0) this.timer -= dt;
-  if (Math.random() * 100 < (MAXHEALTH - this.entity.health)) {
-    var c = Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.particles);//Resources.smoke);
-    //var c = Object.create(Entity).init(this.entity.x, this.entity.y, 8, 8);
-    c.animation = 2;
-    c.addBehavior(FadeOut, {duration: 0.7});
-    c.addBehavior(Velocity);
-    c.z = this.entity.z - 1;
-    c.velocity = {x: Math.random() * 32 - 16, y: -100};
-    //c.addBehavior(Oscillate, {object: c.offset, field: "x", constant: 10, rate: 4, time: 0});
-    this.layer.add(c);
-  }
-}
-Damage.hit = function (damage) {
-	if (this.timer <= 0) {
-		console.log('yeah');
-		this.entity.health -= damage;
-		if (this.entity.health <= 0) {
-			
-		}
-		this.timer = this.invulnerable;
-		return true;
-	} else {
-		return false;
-	}
-}
-
+// push to raindrop, maybe with certain modifications??
 var BoundDistance = Object.create(Behavior);
 BoundDistance.update = function (dt) {
   	var d = distance(this.entity.x, this.entity.y, this.target.x, this.target.y);
@@ -787,23 +495,7 @@ BoundDistance.update = function (dt) {
 	}
 };
 
-var Asteroid = Object.create(Behavior);
-Asteroid.update = function (dt) {
-	if (distance(this.entity.x, this.entity.y, this.target.x, this.target.y) <= this.radius) {
-		this.entity.velocity = {x: 0, y: 0};
-		this.radius = 0;
-		this.entity.alive = false;
-		var e = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.explosion));
-		var s = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.shockwave));
-		e.addBehavior(FadeOut, {duration: 1});
-		s.addBehavior(FadeOut, {duration: 1, delay: 1});
-		s.z = 2;
-		e.z = 1;
-		gameWorld.playSound(Resources.hit);
-		s.angle = angle(this.entity.x, this.entity.y, this.target.x, this.target.y) - PI / 2;
-	}
-}
-
+// push to raindrop -> animate 'onEnd'
 Animate.update = function (dt) {
 	if (this.paused) return;
 	this.entity.frameDelay -= dt;
@@ -824,42 +516,51 @@ Target.update = function (dt) {
 };
 
 
-var sprites = ["unshielded", "shielded", "fighter", "shielded fighter"]
+var sprites = ["unshielded", "shielded", "fighter", "shielded fighter", "tank"]
 function spawn(layer, key, player) {
 	var y = Math.floor(player.y / 16) * 16 + 8 + 16 * randint(-8, 8), x = randint(0,2) > 0 ? -4 : gameWorld.width + 4;
 	var enemy = Object.create(Sprite).init(x, y, Resources[sprites[key]]);
 	enemy.addBehavior(Crop, {min: {x: -16, y: -1000}, max: {x: gameWorld.width + 16, y: 1000}});
-	enemy.addBehavior(Velocity);
 	enemy.z = 11;
-	enemy.velocity = {x: -50, y: 0};
-	enemy.setCollision(Polygon);
-	switch (key) {
-		case 0:
-			enemy.addBehavior(Target, {target: player, speed: 35, turn_rate: 5});
-			break;
-		case 1:
-			enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 0.5});
-			enemy.shielded = true;
-			break;
-		case 2:
-			enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 2});
-			enemy.shoot = Weapons.standard;
-			break;
-		case 3:
-			enemy.addBehavior(Target, {target: player, speed: 15, turn_rate: 0.5});
-			enemy.shoot = Weapons.standard;
-			enemy.shielded = true;
-			break;
-	}
-	enemy.collision.onHandle = function (object, other) {
-		if (object.shielded && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2) {
-			console.log('shielded!');
-		} else if (other == player) {
-			enemy.alive = false;
-			enemy.die();
+	enemy.lerp = enemy.addBehavior(Lerp, {goal: x - sign(x) * 32, object: enemy, field: "x", rate: 5, callback: function () {
+		enemy.addBehavior(Velocity);
+		enemy.velocity = {x: -50, y: 0};
+		enemy.setCollision(Polygon);
+		switch (key) {
+			case 0:
+				enemy.addBehavior(Target, {target: player, speed: 35, turn_rate: 5});
+				break;
+			case 1:
+				enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 0.5});
+				enemy.shielded = true;
+				break;
+			case 2:
+				enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 2});
+				enemy.shoot = Weapons.standard;
+				break;
+			case 3:
+				enemy.addBehavior(Target, {target: player, speed: 15, turn_rate: 0.5});
+				enemy.shoot = Weapons.standard;
+				enemy.shielded = true;
+				break;
+			case 4:
+				enemy.angle += PI / 2;
+				enemy.velocity = {x: 0, y: choose([1, -1]) * 30};
+				enemy.target = player;
+				enemy.shoot = Weapons.homing;
+				break;
 		}
-	};
-	enemy.addBehavior(Enemy);
+		enemy.collision.onHandle = function (object, other) {
+			if (object.shielded && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2) {
+				console.log('shielded!');
+			} else if (other == player) {
+				enemy.alive = false;
+				enemy.die();
+			}
+		};
+		enemy.addBehavior(Enemy);
+		enemy.removeBehavior(enemy.lerp);
+	}});
 	var hanger = layer.add(Object.create(Sprite).init(x - sign(x) * 4, y, Resources.hanger));
 	hanger.z = 10;
 	hanger.angle = x > 0 ? 0 : PI;
@@ -881,185 +582,15 @@ function spawn(layer, key, player) {
 	return enemy;
 }
 
-function spawn2(layer, key, player) {
-	var enemy;
-	switch (key) {
-		case 1:
-			enemy = Object.create(Sprite).init(choose([8, gameWorld.width - 8]), gameWorld.height - 14, Resources.monster);
-			//enemy.movement = enemy.addBehavior(Surface, {speed: PI / 36, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 82});
-			//enemy.angle = Math.random() * PI2;
-			//enemy.addBehavior(Flip);
-			//enemy.addBehavior(Crop, {min: {x: -1, y: -1}, max: {x: gameWorld.width + 1, y: gameWorld.height}})
-			enemy.velocity = {x: 0, y: randint(0,10) > 5 ? 15 : -15 };//enemy.x > 100 ? -20 : 20, y: 0};
-			enemy.z = 20;
-			if (enemy.x <= gameWorld.width / 2)
-				enemy.angle = PI / 2;
-			else
-				enemy.angle = 3 * PI / 2;
-			
-			enemy.shoot = Weapons.beam;
-		break;
-		case 2:
-			enemy = Object.create(Sprite).init(randint(-gameWorld.width,gameWorld.width), randint(-gameWorld.height,gameWorld.height), Resources.asteroid);
-			var theta = angle(enemy.x, enemy.y, gameWorld.width / 2, gameWorld.height / 2 + 60);
-			enemy.angle = Math.random() * PI2;  
-			enemy.addBehavior(Asteroid, {target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 78});
-			enemy.velocity = {x: Math.cos(theta) * 50, y: 50 * Math.sin(theta)};
-		break;
-		case 3:
-			var distance = randint(100, 180), theta = Math.random() * PI2;
-			enemy = Object.create(Sprite).init(randint(0, gameWorld.width), 0, Resources.bomber);
-			//enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
-			//enemy.velocity = {x: Math.cos(enemy.angle) * 150, y: 150 * Math.sin(enemy.angle)};
-			//enemy.addBehavior(Accelerate);
-			//enemy.acceleration = {x: 0, y: -100};
-			enemy.velocity = {x: 50, y: 0};
-			enemy.angle = theta + PI / 2;
-			enemy.addBehavior(Wrap, {min: {x: 8, y: -10}, max: {x: gameWorld.width - 8, y: gameWorld.height}});
-			//enemy.addBehavior(Bomber, {radius: distance});
-			enemy.shoot = Weapons.mine_layer;
-		break;
-		case 4:
-			enemy = Object.create(Sprite).init(randint(8,gameWorld.width - 8), 0, Resources.saucer);
-			enemy.velocity = {x: 0, y: 10};
-			enemy.shoot = Weapons.standard;
-		break;
-		case 5:
-			enemy = Object.create(Sprite).init(randint(0,gameWorld.width), 0, Resources.x);
-			enemy.angle = Math.random() * PI / 6 + PI / 2 - PI / 12;              
-			enemy.velocity = {x: Math.cos(enemy.angle) * 50, y: 50 * Math.sin(enemy.angle), angle: PI}; 
-			enemy.addBehavior(Bounce, {min: {x: 5, y: 0}, max: {x: gameWorld.width - 5, y: gameWorld.height - 16}});			
-		break;
-		case 6:
-			enemy = Object.create(Sprite).init(randint(8, gameWorld.width - 8), 0, Resources.drone);
-			enemy.addBehavior(Drone, {target: player, cooldown: 1, rate: 0.6, radius: 40, angle: Math.random() * PI2});
-			enemy.velocity = {x: 0, y: 10};
-			enemy.shoot = Weapons.spark;
-    	break;
-		case 7:
-			enemy = Object.create(Sprite).init(randint(0,10) > 5 ? gameWorld.width - 8 : 8, randint(-gameWorld.height, gameWorld.height), Resources.tank);
-			enemy.shoot = Weapons.homing;
-			enemy.angle = enemy.x < gameWorld.width / 2 ? PI / 2 : 3 * PI / 2;
-			enemy.velocity = {x: 0, y: 30 };
-    	break;
-		case 8:
-			enemy = Object.create(Sprite).init(0, choose([0, gameWorld.height + 120]), Resources.beamship);
-			enemy.addBehavior(Velocity);
-			enemy.velocity = {x: 0, y: enemy.y > gameWorld.height / 2 ? -15 : 15};
-			enemy.addBehavior(BeamShip, {max: {y: gameWorld.height + 120}, min: {y: 0}});
-			//enemy.shoot = Weapons.beam;
-			break;
-	}
-	layer.add(enemy);
-	enemy.addBehavior(Velocity);
-	enemy.addBehavior(Enemy, {cooldown: 0});
-	enemy.setCollision(Polygon);
-	enemy.setVertices([
-		{x: 0, y: -6},
-		{x: -6, y: 0},
-		{x: 0, y: 6},
-		{x: 6, y: 0}
-	]);
-	enemy.target = gameWorld.scene.player_bot;
-	enemy.health = randint(1, 3);
-	enemy.family = "enemy";
-	enemy.collision.onHandle = function (object, other) {
-		if (other.solid) {
-			object.velocity = {x: -object.velocity.x, y: -object.velocity.y};
-		} else if (other.family != object.family) {
-			object.health -= 1;
-			if (object.health < 0) object.die();
-		}  
-	}
-	enemy.die = function () {
-		this.collision.onHandle = function (a, b) { return false; };
-		this.velocity = {x: 0, y: 0};
-		this.behaviors = [];
-		this.addBehavior(FadeOut, {duration: 0.5});
-
-		for (var i = 0; i < 20; i++) {			
-			var e = this.layer.add(Object.create(Circle).init(this.x + randint(-4,4), this.y + randint(-4,4), randint(2,5)));
-			e.addBehavior(FadeIn, {maxOpacity: 1, duration: 0, delay: 0.5 * Math.random()});
-			e.addBehavior(FadeOut, {maxOpacity: 1, duration: 0, delay: 0.5 + Math.random() * 0.5});
-			e.z = this.z - 1;
-			//e.addBehavior(Velocity);
-			//var theta = Math.random() * PI2, speed = choose([2, 2, 2, 10, 20]);
-			//e.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
-		}
-
-		for (var i = 0; i < randint(2,5); i++) {
-			var salvage = this.layer.add(Object.create(Sprite).init(this.x + randint(0,10) - 5, this.y + randint(0, 10) - 5, Resources.gem));
-			salvage.addBehavior(FadeOut, {duration: 1, delay: 3});
-			salvage.value = 1;
-			//salvage.addBehavior(Magnet, {target: gameWorld.shop, speed: 30});
-			salvage.setCollision(Polygon);
-			salvage.collision.onHandle = function (object, other) {
-				if ((other.family == "player" || other.family == "store") && !other.projectile) {
-					object.alive = false;
-					player.salvage += object.value;
-					gameWorld.playSound(Resources.pickup);
-					for (var i = 0; i < randint(5, 10); i++) {
-						var p = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.particles));
-						p.color = "#0051ee";
-						p.animation = 0;
-						p.addBehavior(Velocity);
-						p.addBehavior(FadeOut, {duration: 0.3});
-						var theta = Math.random() * PI2;
-						p.velocity = {x: 20 * Math.cos(theta), y: 20 * Math.sin(theta)};
-					}
-				} else if (other.solid) {
-					HandleCollision.handleSolid(object, other);
-				}
-			}
-			salvage.bounce = 0.5;
-			salvage.z = this.z - 1;
-			salvage.addBehavior(Velocity);
-			//salvage.addBehavior(Accelerate);
-			//salvage.acceleration = {x: 0, y: 100};
-			var theta = Math.random() * PI2;
-			salvage.velocity = {x: Math.cos(theta) * 30, y: Math.sin(theta) * 30, angle: PI};
-		}
-		gameWorld.playSound(Resources.hit);
-	}
-	enemy.addBehavior(Space, {cooldown: 0, rate: 1.5, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 320, damage: 1});
-	//enemy.addBehavior(Crop, {min: {x: -10, y: -10}, max: {x: gameWorld.width + 10, y: gameWorld.height + 20}});  
-	enemy.z = 10;
-	return enemy;
-}
-
 var current_movement_key = 0;
 var movement_keys = ["standard", "blink", "chaos", "boom"];
 var Movement = {
-/*	constant: function (s) {
-		//s.player_bot.angle = s.player_top.angle;	
-		s.unpause();	
-		s.player_bot.stopped = false; // hacky, since you are able to always change your movement with this style
-		s.player_bot.addBehavior(Lerp, {object: this.velocity, field: "x", goal: 75 * Math.cos(s.player_bot.angle), rate: 5, callback: function () {
-			this.entity.removeBehavior(this);
-			this.entity.stopped = true;
-		}});		
-		s.player_bot.addBehavior(Lerp, {object: this.velocity, field: "y", goal: 75 * Math.sin(s.player_bot.angle), rate: 5, callback: function () {
-			this.entity.removeBehavior(this);
-		}});
-		s.player_bot.delay.set(1000);
-		s.player_bot.animation = 1;
-	},*/
 	standard: function (s) {
 		s.unpause();
-		//s.player_bot.angle = s.player_top.angle;
 		s.player_bot.velocity = {
 			x: Math.cos( s.player_bot.angle) * 100,
 			y: Math.sin( s.player_bot.angle) * 100
 		}
-		/*s.player_bot.addBehavior(Lerp, {object: this.velocity, field: "x", goal: 0, rate: 1, callback: function () {
-			this.entity.removeBehavior(this);
-			s.pause();
-			this.entity.stopped = true;
-		}});		
-		s.player_bot.addBehavior(Lerp, {object: this.velocity, field: "y", goal: 0, rate: 1, callback: function () {
-			this.entity.removeBehavior(this);
-		}});*/
-//		this.layer.entities[i].addBehavior(Lerp, {object: this.layer.entities[i], field: "angle", goal: 0, rate: 5});
 		s.player_bot.acceleration = {
 			x: -s.player_bot.velocity.x,
 			y: -s.player_bot.velocity.y
@@ -1076,9 +607,7 @@ var Movement = {
 	blink: function (s) {
 		s.unpause();
 		gameWorld.playSound(Resources.blink1);
-		//s.player_bot.angle = s.player_top.angle;
 		gameWorld.playSound(Resources.move);
-		// blink vanish effect
 		s.player_bot.delay.set(0.5);
 		s.player_bot.opacity = 0.1;
 		s.player_bot.stopped = false;
@@ -1090,7 +619,6 @@ var Movement = {
 			gameWorld.playSound(Resources.blink2);
 			s.player_bot.x = s.player_bot.x + 50 * Math.cos(s.player_bot.angle), s.player_bot.y = s.player_bot.y + 50 * Math.sin(s.player_bot.angle);
 			s.player_bot.delay.callback = s.player_bot.delay.old_callback;
-			// blink arrive affect
 		}
 	},
 	chaos: function (s) {
@@ -1373,12 +901,3 @@ var Store = {
 		gameWorld.current_wave += 1;
 	}
 }
-
-/* MUSIC */
-/*
-
--end goal -> barrier with 'salvage' cost ?
--implement AI combat behavior
--add more enemies, waves, environmental hazards [volvanic eruption? ion clouds? asteroids? lightning?], etc.
--different 'levels' - locations with different environments/hazards?
-*/

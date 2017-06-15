@@ -142,7 +142,7 @@ var onStart = function () {
   var player_bot = bg.add(Object.create(Sprite).init(gameWorld.width / 4, gameWorld.height / 4, Resources.viper));
   player_bot.color = "red";
   player_bot.setCollision(Polygon);
-	player_bot.damage = player_bot.addBehavior(Damage, {layer: bg, timer: 0, invulnerable: 1});
+	//player_bot.damage = player_bot.addBehavior(Damage, {layer: bg, timer: 0, invulnerable: 1});
 	//player_bot.shoot = Weapons.double;
 	player_bot.move = Movement.standard;
 
@@ -152,6 +152,7 @@ var onStart = function () {
   player_bot.acceleration = {x: 0, y: 0};
   player_bot.opacity = 1;
 	player_bot.health = MAXHEALTH;
+	player_bot.z = 1000;
 	
 	//player_bot.addBehavior(Space, {cooldown: 0, rate: 1.5, target: planet, radius: 240, damage: 1});
   player_bot.addBehavior(Bound, {min: {x: 6, y: -gameWorld.height * 5}, max: {x: gameWorld.width - 6, y: 5 * gameWorld.height}});
@@ -160,7 +161,7 @@ var onStart = function () {
 	player_bot.salvage = 0;
   player_bot.family = "player";
   player_bot.collision.onHandle = function (object, other) {
-		if (object.damage.timer > 0) return;
+		//if (object.damage.timer > 0) return;
     if (other.family == "enemy") {
       if (!other.projectile && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2 ) {
         // take no damage from the FRONT when it isn't a projectile...
@@ -176,7 +177,7 @@ var onStart = function () {
 				}
 				gameWorld.playSound(Resources.hit, volume(small));
         object.health -= 1;
-  			object.damage.timer = DAMAGE_COOLDOWN;
+  			//object.damage.timer = DAMAGE_COOLDOWN;
       }
     }
 		if (object.health <= 0) {
@@ -326,7 +327,7 @@ var onStart = function () {
 		[3,3,6,6,1,1],
 		[2,2,4,5,6]
 	];
-	this.waves = [[2,2,2], [1,1,3,3]];
+	this.waves = [[2,2,2], [1,1,3,3], [0,4,4,0]];
 
   // intro animation
   this.intro = true;
