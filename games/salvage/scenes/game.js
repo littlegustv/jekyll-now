@@ -326,7 +326,7 @@ var onStart = function () {
 		[3,3,6,6,1,1],
 		[2,2,4,5,6]
 	];
-	//this.waves = [[1,1,1,1]];
+	this.waves = [[2,2,2], [1,1,3,3]];
 
   // intro animation
   this.intro = true;

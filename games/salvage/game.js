@@ -816,20 +816,67 @@ Animate.update = function (dt) {
 	}
 };
 
+// target, speed, turn_rate
+var Target = Object.create(Behavior);
+Target.update = function (dt) {
+	this.entity.angle = lerp_angle(this.entity.angle, angle(this.entity.x, this.entity.y, this.target.x, this.target.y), this.turn_rate * dt);
+	this.entity.velocity = {x: Math.cos(this.entity.angle) * this.speed, y: Math.sin(this.entity.angle) * this.speed};
+};
+
+
+var sprites = ["unshielded", "shielded", "fighter", "shielded fighter"]
 function spawn(layer, key, player) {
-	var y = Math.floor(player.y / 16) * 16 + 8 + 16 * randint(-8, 8);
-	var enemy = Object.create(Sprite).init(gameWorld.width + 4, y, Resources[choose(["fighter", "shielded", "unshielded", "shielded fighter"])]);
+	var y = Math.floor(player.y / 16) * 16 + 8 + 16 * randint(-8, 8), x = randint(0,2) > 0 ? -4 : gameWorld.width + 4;
+	var enemy = Object.create(Sprite).init(x, y, Resources[sprites[key]]);
 	enemy.addBehavior(Crop, {min: {x: -16, y: -1000}, max: {x: gameWorld.width + 16, y: 1000}});
 	enemy.addBehavior(Velocity);
 	enemy.z = 11;
 	enemy.velocity = {x: -50, y: 0};
-	var hanger = layer.add(Object.create(Sprite).init(gameWorld.width, y, Resources.hanger));
+	enemy.setCollision(Polygon);
+	switch (key) {
+		case 0:
+			enemy.addBehavior(Target, {target: player, speed: 35, turn_rate: 5});
+			break;
+		case 1:
+			enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 0.5});
+			enemy.shielded = true;
+			break;
+		case 2:
+			enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 2});
+			enemy.shoot = Weapons.standard;
+			break;
+		case 3:
+			enemy.addBehavior(Target, {target: player, speed: 15, turn_rate: 0.5});
+			enemy.shoot = Weapons.standard;
+			enemy.shielded = true;
+			break;
+	}
+	enemy.collision.onHandle = function (object, other) {
+		if (object.shielded && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2) {
+			console.log('shielded!');
+		} else if (other == player) {
+			enemy.alive = false;
+			enemy.die();
+		}
+	};
+	enemy.addBehavior(Enemy);
+	var hanger = layer.add(Object.create(Sprite).init(x - sign(x) * 4, y, Resources.hanger));
 	hanger.z = 10;
+	hanger.angle = x > 0 ? 0 : PI;
 	hanger.behaviors[0].onEnd = function () {
 		this.entity.removeBehavior(this);
-		this.entity.addBehavior(FadeOut, {duration: 1, delay: 1, remove: true});
+		this.entity.addBehavior(FadeOut, {duration: 0.1, delay: 1, remove: true});
 		// spawn enemy here
 		layer.add(enemy);
+	}
+	enemy.die = function () {
+		for (var i = 0; i < 20; i++) {
+			var p = this.layer.add(Object.create(Circle).init(this.x + randint(-4, 4), this.y + randint(-4, 4), randint(2,5)));
+			p.color = "darkred";
+			p.opacity = 0;
+			p.addBehavior(FadeIn, {duration: Math.random() * 0.2, maxOpacity: 1});
+			p.addBehavior(FadeOut, {delay: Math.random() * 0.5 + 0.6, duration: 0, maxOpacity: 1});			
+		}
 	}
 	return enemy;
 }
