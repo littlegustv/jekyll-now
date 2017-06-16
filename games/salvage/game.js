@@ -347,8 +347,9 @@ var Weapons = {
 		this.old_velocity = this.velocity;
 		this.velocity = {x: 0, y: 0};
 		//this.movement.speed = 0;
+		//layer.add(Object.create(Entity).init(gameWorld.width / 2, this.y, 4, gameWorld.width)).addBehavior(FadeOut, {duration: 0.2});
 		var b = layer.add(Object.create(Entity).init(gameWorld.width / 2, this.y, 4, gameWorld.width));
-		b.color = "#111";
+		b.color = "#e91e63";
 		b.setCollision(Polygon);
 		b.collision.onHandle = function (object, other) {
 			if (other.family != object.family && !other.projectile) {
@@ -366,15 +367,15 @@ var Weapons = {
 			t.animation = 0;
 			//t.movement.speed = PI / 36;
 			t.velocity = t.old_velocity;
-			console.log('mhm');
+			//console.log('mhm');
 		}});
-		b.addBehavior(FadeIn, {duration: 0.3, maxOpacity: 1});
+		b.addBehavior(FadeIn, {delay: 0.2, duration: 0.3, maxOpacity: 1});
 		b.opacity = 0;
 		b.z = this.z - 1;
 		b.angle = this.angle;// - PI / 2;
 		gameWorld.playSound(Resources.beam, volume(b));
 		//console.log(b);
-		return 5.5;
+		return 4.5;
 	}
 }
 
@@ -516,13 +517,13 @@ Target.update = function (dt) {
 };
 
 
-var sprites = ["unshielded", "shielded", "fighter", "shielded fighter", "tank"]
+var sprites = ["unshielded", "shielded", "fighter", "shielded fighter", "tank", "tank"]
 function spawn(layer, key, player) {
 	var y = Math.floor(player.y / 16) * 16 + 8 + 16 * randint(-8, 8), x = randint(0,2) > 0 ? -4 : gameWorld.width + 4;
 	var enemy = Object.create(Sprite).init(x, y, Resources[sprites[key]]);
 	enemy.addBehavior(Crop, {min: {x: -16, y: -1000}, max: {x: gameWorld.width + 16, y: 1000}});
 	enemy.z = 11;
-	enemy.lerp = enemy.addBehavior(Lerp, {goal: x - sign(x) * 32, object: enemy, field: "x", rate: 5, callback: function () {
+	enemy.lerp = enemy.addBehavior(Lerp, {goal: x - sign(x) * 18, object: enemy, field: "x", rate: 5, callback: function () {
 		enemy.addBehavior(Velocity);
 		enemy.velocity = {x: -50, y: 0};
 		enemy.setCollision(Polygon);
@@ -544,11 +545,16 @@ function spawn(layer, key, player) {
 				enemy.shielded = true;
 				break;
 			case 4:
-				enemy.angle += PI / 2;
-				enemy.velocity = {x: 0, y: choose([1, -1]) * 30};
+				enemy.angle = enemy.x > gameWorld.width / 2 ? - PI / 2 : PI / 2;
+				enemy.velocity = {x: 0, y: choose([1, -1]) * 10};
 				enemy.target = player;
 				enemy.shoot = Weapons.homing;
 				break;
+			case 5:
+				enemy.angle = enemy.x > gameWorld.width / 2 ? - PI / 2 : PI / 2;
+				enemy.velocity = {x: 0, y: choose([1, -1]) * 10};
+				enemy.shoot = Weapons.beam;
+				break
 		}
 		enemy.collision.onHandle = function (object, other) {
 			if (object.shielded && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2) {
