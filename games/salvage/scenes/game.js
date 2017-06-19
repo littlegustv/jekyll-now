@@ -189,6 +189,7 @@ var onStart = function () {
   }
 
 	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width - 48, gameWorld.height / 2 + 60,  Resources.shop));
+	gameWorld.shop.opacity = 0;
 	gameWorld.shop.addBehavior(AI, {target: player_bot, rate: 5, value: 0});
 	
   //player_bot.addBehavior(Follow, {target: p, offset: {angle: 0, x: false, y: false, z: false}});

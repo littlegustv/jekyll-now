@@ -227,6 +227,13 @@ Grow.update = function (dt) {
 function projectileHit (object, other) {
 	if (other.family != object.family && !other.projectile) {
 		object.alive = false;
+		for (var i = 0; i < 15; i++) {
+			var p = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.particles));
+			var theta = Math.random() * PI2;
+			p.addBehavior(FadeOut, {duration: 0, delay: Math.random() * 1 + 0.5});
+			p.addBehavior(Velocity);
+			p.velocity = {x: Math.cos(theta) * 4, y: Math.sin(theta) * 4};
+		}
 	}
 }
 
@@ -311,15 +318,16 @@ var Weapons = {
 			return 1.6;			
 	},
 	proximity: function (layer) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bomb));
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
+			a.animation = 5;
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
 			a.collision.onHandle = projectileHit;
-			a.addBehavior(Oscillate, {field: "angle", object: a, rate: 1, initial: 0, constant: PI2, offset: 0});
+			//a.addBehavior(Oscillate, {field: "scale", object: a, rate: 1, initial: 1, constant: 0.2, offset: 0});
 			a.addBehavior(Velocity);
 			a.family = this.family;
 			a.projectile = true;
-			a.velocity = {x: 0, y: 0, angle: PI / 4};
+			a.velocity = {x: 0, y: 0, angle: PI / 36};
 			return 0.8;			
 	},
 	spark: function (layer) {
@@ -598,11 +606,12 @@ function spawn(layer, key, player) {
 	}
 	enemy.die = function () {
 		for (var i = 0; i < 20; i++) {
-			var p = this.layer.add(Object.create(Circle).init(this.x + randint(-4, 4), this.y + randint(-4, 4), randint(2,5)));
-			p.color = "darkred";
-			p.opacity = 0;
-			p.addBehavior(FadeIn, {duration: Math.random() * 0.2, maxOpacity: 1});
-			p.addBehavior(FadeOut, {delay: Math.random() * 0.5 + 0.6, duration: 0, maxOpacity: 1});			
+			var p = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.particles));
+			var theta = Math.random() * PI2;
+			p.addBehavior(Velocity);
+			p.velocity = {x: 7 * Math.cos(theta), y: 7 * Math.sin(theta)};
+			p.animation = 3;
+			p.addBehavior(FadeOut, {delay: Math.random() * 1 + 0.5, duration: 0});			
 		}
 	}
 	return enemy;
