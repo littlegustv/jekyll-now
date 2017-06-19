@@ -328,6 +328,17 @@ var onStart = function () {
 		[2,2,4,5,6]
 	];
 	this.waves = [[5,5,5]];//[2,2,2], [1,1,3,3], [0,4,4,0]];
+  this.waves = [
+    [0,0,0,0,0,0], // learn to hit head-on
+    [1,1,1,0,0,0], // learn to hit where you need to
+    [2,2,2,2], // learn to close the distance
+    [2,2,2,2,0,0,0,0,0], // learn to prioritize
+    [5,5,5,0,0,0,0,1,1,1,1] // learn to anticipate
+  ];
+  this.waves = [
+    [6, 6, 6, 6, 4, 4, 5]
+  ]
+
 
   // intro animation
   this.intro = true;
@@ -406,7 +417,8 @@ var onUpdate = function (dt) {
 			}*/
 		}
 		
-		var w = choose(this.waves);
+		var w = this.waves[gameWorld.wave % this.waves.length];
+    gameWorld.wave++;
 		gameWorld.playSound(Resources[choose(["spawn"])]);
 		for (var j = 0; j < w.length; j++) {
 			var enemy = spawn(this.bg, w[j], this.player_bot);
