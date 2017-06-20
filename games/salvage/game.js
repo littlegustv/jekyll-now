@@ -22,6 +22,19 @@ World.draw = function () {
 	}
 };
 
+var Charge = Object.create(Behavior);
+// speed, target, rate
+Charge.update = function (dt) {
+	if (this.entity.velocity.x === 0 && this.entity.velocity.y === 0) {
+		var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
+		this.entity.angle = theta;
+		this.entity.velocity = {x: this.speed * Math.cos(theta), y: this.speed * Math.sin(theta)};
+	} else {
+		this.entity.velocity.x = lerp(this.entity.velocity.x, 0, this.rate * dt);
+		this.entity.velocity.y = lerp(this.entity.velocity.y, 0, this.rate * dt);
+	}
+}
+
 var AI = Object.create(Behavior);
 AI.update = function (dt) {
 	if (this.time === undefined) this.time = 0;
@@ -524,7 +537,6 @@ Target.update = function (dt) {
 	this.entity.velocity = {x: Math.cos(this.entity.angle) * this.speed, y: Math.sin(this.entity.angle) * this.speed};
 };
 
-
 var sprites = ["unshielded", "shielded", "fighter", "shielded fighter", "tank", "tank", "saucer"]
 function spawn(layer, key, player) {
 	var y = Math.floor(player.y / 16) * 16 + 8 + 16 * randint(-8, 8), x = randint(0,2) > 0 ? -4 : gameWorld.width + 4;
@@ -549,7 +561,7 @@ function spawn(layer, key, player) {
 				enemy.addBehavior(Target, {target: player, speed: 65, turn_rate: 2.5});
 				break;
 			case 1:
-				enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 0.5});
+				enemy.addBehavior(Charge, {target: player, speed: 100, rate: 2});
 				enemy.shielded = true;
 				break;
 			case 2:
