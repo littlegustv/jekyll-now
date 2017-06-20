@@ -27,7 +27,7 @@
 		{"path": "gem.png"},
 		{"path": "asteroid.png"},
 		{"path": "flash.png"},
-		{"path": "particles.png", "animations": 6},
+		{"path": "particles.png", "animations": 7},
 		{"path": "monster.png", "animations": 2, "frames": 2, "speed": 0.3},
 		{"path": "title.png"},
 		{"path": "dust.png", "frames": 4, "speed": 0.2},
@@ -49,6 +49,7 @@
 		{"path": "pickup.wav"},
 		{"path": "store.wav"},
 		{"path": "move.wav"},
-		{"path": "spark_sound.wav"}
+		{"path": "spark_sound.wav"},
+		{"path": "soundtrack.ogg"}
 	]
 }

@@ -14,7 +14,7 @@ var onStart = function () {
       gameWorld.soundtrack.connect(gameWorld.filter);
       gameWorld.soundtrack.onended = gameWorld.musicLoop;
     }
-    //gameWorld.musicLoop();
+    gameWorld.musicLoop();
   }
 	
   //var super_bg = this.addLayer(Object.create(Layer).init(1000,1000));
@@ -334,11 +334,9 @@ var onStart = function () {
     [1,1,1,0,0,0], // learn to hit where you need to
     [2,2,2,2], // learn to close the distance
     [2,2,2,2,0,0,0,0,0], // learn to prioritize
-    [5,5,5,0,0,0,0,1,1,1,1] // learn to anticipate
-  ];
-  this.waves = [
+    [5,5,5,0,0,0,0,1,1,1,1], // learn to anticipate
     [6, 6, 6, 6, 4, 4, 5]
-  ]
+  ];
 
 
   // intro animation

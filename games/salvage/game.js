@@ -234,6 +234,7 @@ function projectileHit (object, other) {
 			p.addBehavior(Velocity);
 			p.velocity = {x: Math.cos(theta) * 4, y: Math.sin(theta) * 4};
 		}
+		gameWorld.playSound(Resources.hit);
 	}
 }
 
@@ -327,7 +328,7 @@ var Weapons = {
 			a.addBehavior(Velocity);
 			a.family = this.family;
 			a.projectile = true;
-			a.velocity = {x: 0, y: 0, angle: PI / 36};
+			a.velocity = {x: 0, y: 0};
 			return 0.8;			
 	},
 	spark: function (layer) {
@@ -605,13 +606,13 @@ function spawn(layer, key, player) {
 		layer.add(enemy);
 	}
 	enemy.die = function () {
-		for (var i = 0; i < 20; i++) {
+		for (var i = 0; i < 40; i++) {
 			var p = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.particles));
-			var theta = Math.random() * PI2;
+			var theta = Math.random() * PI2, speed = randint(1,20);
 			p.addBehavior(Velocity);
-			p.velocity = {x: 7 * Math.cos(theta), y: 7 * Math.sin(theta)};
-			p.animation = 3;
-			p.addBehavior(FadeOut, {delay: Math.random() * 1 + 0.5, duration: 0});			
+			p.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
+			p.animation = 4;
+			p.addBehavior(FadeOut, {delay: Math.random() * 2 + 0.5, duration: 0});			
 		}
 	}
 	return enemy;
