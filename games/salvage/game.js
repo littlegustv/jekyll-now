@@ -4,6 +4,13 @@ var MAXHEALTH = 16, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(180, 320, "index.json");
 gameWorld.wave = 0;
 
+var Z = {
+	particle: 1,
+	projectile: 2,
+	entity: 3,
+	obstacle: 4
+}
+
 // push to raindrop -> making setScene(reload) work properly
 World.setScene = function (n, reload) {
 	if (this.scenes[n].reload || reload === true) {
@@ -147,7 +154,7 @@ BeamShip.update = function (dt) {
 		b.addBehavior(FadeOut, {delay: 0.7, duration: 0.2, maxOpacity: 1});
 		b.addBehavior(FadeIn, {duration: 0.2, maxOpacity: 1});
 		b.opacity = 0;
-		b.z = 10;
+		b.z = Z.projectile;
 		gameWorld.playSound(Resources.beam, volume(b));
 		
 	} else if (this.cooldown < -2) {
@@ -315,6 +322,28 @@ var Weapons = {
 		}
 		return 0.6;
 	},
+	burst: function (layer) {
+		if (this.count === undefined) this.count = 0;
+		var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
+		a.animation = 3;
+		a.setCollision(Polygon);
+		a.setVertices(projectile_vertices);
+		gameWorld.playSound(Resources.laser, volume(a));
+		a.collision.onHandle = projectileHit;
+		a.addBehavior(Velocity);
+		a.family = this.family;//"player";
+		a.projectile = true;
+		var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
+		if (this.target) console.log('target');
+		a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)	};
+		a.angle = theta;
+		this.count += 1;
+		if (this.count % 3 === 0) {
+			return 3;
+		} else {
+			return 0.5;
+		}
+	},
 	homing: function (layer) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
 			a.setCollision(Polygon);
@@ -333,7 +362,7 @@ var Weapons = {
 	},
 	proximity: function (layer) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
-			a.animation = 5;
+			a.animation = 4;
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
 			a.collision.onHandle = projectileHit;
@@ -341,8 +370,8 @@ var Weapons = {
 			a.addBehavior(Velocity);
 			a.family = this.family;
 			a.projectile = true;
-			a.velocity = {x: 0, y: 0};
-			return 0.8;			
+			a.velocity = {x: 0, y: 0, angle: PI / 6};
+			return 1.2;			
 	},
 	spark: function (layer) {
 		for (var i = 0; i < 5; i++) {
@@ -392,7 +421,7 @@ var Weapons = {
 		}});
 		b.addBehavior(FadeIn, {delay: 0.2, duration: 0.3, maxOpacity: 1});
 		b.opacity = 0;
-		b.z = -1;
+		b.z = Z.projectile;
 		b.angle = this.angle;// - PI / 2;
 		gameWorld.playSound(Resources.beam, volume(b));
 		//console.log(b);
@@ -530,6 +559,13 @@ Animate.update = function (dt) {
 	}
 };
 
+Entity.init = function (x, y, w, h) {
+	this.behaviors = [];
+	this.x = x, this.y = y, this.z = 1;
+	this.h = h || 4, this.w = w || 4;
+	return this;
+};
+
 // target, speed, turn_rate
 var Target = Object.create(Behavior);
 Target.update = function (dt) {
@@ -537,12 +573,12 @@ Target.update = function (dt) {
 	this.entity.velocity = {x: Math.cos(this.entity.angle) * this.speed, y: Math.sin(this.entity.angle) * this.speed};
 };
 
-var sprites = ["unshielded", "shielded", "fighter", "shielded fighter", "tank", "tank", "saucer"]
+var sprites = ["unshielded", "shielded", "fighter", "shielded fighter", "tank", "tank", "saucer", "beamship"]
 function spawn(layer, key, player) {
 	var y = Math.floor(player.y / 16) * 16 + 8 + 16 * randint(-8, 8), x = randint(0,2) > 0 ? -4 : gameWorld.width + 4;
 	var enemy = Object.create(Sprite).init(x, y, Resources[sprites[key]]);
 	enemy.addBehavior(Crop, {min: {x: -16, y: -1000}, max: {x: gameWorld.width + 16, y: 1000}});
-	enemy.z = 11;
+	enemy.z = Z.entity;
 	enemy.angle = enemy.x > gameWorld.width / 2 ? - PI : 0;
 	switch (key) {
 		case 5:
@@ -575,13 +611,13 @@ function spawn(layer, key, player) {
 				break;
 			case 4:
 				enemy.angle = enemy.x > gameWorld.width / 2 ? - PI / 2 : PI / 2;
-				enemy.velocity = {x: 0, y: choose([1, -1]) * 10};
+				enemy.velocity = {x: 0, y: player.y > enemy.y ? 10 : -10};
 				enemy.target = player;
 				enemy.shoot = Weapons.homing;
 				break;
 			case 5:
 				enemy.angle = enemy.x > gameWorld.width / 2 ? - PI / 2 : PI / 2;
-				enemy.velocity = {x: 0, y: choose([1, -1]) * 10};
+				enemy.velocity = {x: 0, y: player.y > enemy.y ? 10 : -10};
 				enemy.shoot = Weapons.beam;
 				break
 			case 6:
@@ -596,6 +632,10 @@ function spawn(layer, key, player) {
 					time: enemy.x > gameWorld.width / 2 ? PI / 2 : -PI / 2
 				});
 				break;
+			case 7:
+				enemy.shoot = Weapons.burst;
+				enemy.addBehavior(Target, {target: player, speed: 10, turn_rate: 4});
+				break;
 		}
 		enemy.collision.onHandle = function (object, other) {
 			if (object.shielded && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2) {
@@ -609,7 +649,7 @@ function spawn(layer, key, player) {
 		enemy.removeBehavior(enemy.lerp);
 	}});
 	var hanger = layer.add(Object.create(Sprite).init(x - sign(x) * 4, y, Resources.hanger));
-	hanger.z = 10;
+	hanger.z = Z.obstacle;
 	hanger.angle = x > 0 ? 0 : PI;
 	hanger.behaviors[0].onEnd = function () {
 		this.entity.removeBehavior(this);

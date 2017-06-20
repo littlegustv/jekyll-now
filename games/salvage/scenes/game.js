@@ -14,7 +14,7 @@ var onStart = function () {
       gameWorld.soundtrack.connect(gameWorld.filter);
       gameWorld.soundtrack.onended = gameWorld.musicLoop;
     }
-    gameWorld.musicLoop();
+    //gameWorld.musicLoop();
   }
 	
   //var super_bg = this.addLayer(Object.create(Layer).init(1000,1000));
@@ -29,7 +29,7 @@ var onStart = function () {
   
 	var b = bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height));
   b.color = "#f8f8f8";
-  b.z = -6;
+  b.z = 0;
 	
 
 	for (var i = 0; i < 100; i++) {
@@ -79,85 +79,18 @@ var onStart = function () {
 	bg.add(Object.create(TiledBackground).init(-8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2));
 	bg.add(Object.create(TiledBackground).init(gameWorld.width + 8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2));
 	
-  /*
-	var atmosphere = super_bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 165, 2, PI / 8, "#ddd"));
-	atmosphere.addBehavior(Velocity);
-	atmosphere.velocity = {x: 0, y: 0, angle: PI / 180};
-	atmosphere.addBehavior(Oscillate, {object: atmosphere, field: "amplitude", initial: 2, constant: 1, rate: 4});
-	atmosphere.z = -5;
-	
-	// smaller
-  //var atmosphere = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60, Resources.atmosphere));
-	var atmosphere = super_bg.add(Object.create(Atmosphere).init(gameWorld.width / 2, gameWorld.height / 2 + 60, 160, 2, PI / 2, "white"));
-	atmosphere.addBehavior(Velocity);
-	atmosphere.angle = Math.random() * PI2;
-	atmosphere.velocity = {x: 0, y: 0, angle: PI / 180};
-	atmosphere.addBehavior(Oscillate, {object: atmosphere, field: "amplitude", initial: 2, constant: 1, rate: 4});
-	atmosphere.z = -4;
-
-  var planet = parallax.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60,  Resources.ocean));
-	planet.z = -3;
-	planet.addBehavior(Velocity);
-
-  for (var i = 0; i < 2; i++) {
-    var continents = parallax.add(Object.create(Sprite).init(gameWorld.width / 2 - 640 * i, gameWorld.height / 2 + 60, Resources.continents));
-    continents.blend = "source-atop";
-    continents.addBehavior(Velocity);
-    continents.velocity = {x: 5, y: 0};
-    continents.addBehavior(Wrap, {min: {x: gameWorld.width / 2 - continents.w, y: 0}, max: {x: gameWorld.width / 2 + continents.w, y: gameWorld.height}})
-  }
-
-  var shadow = parallax.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 60, Resources.shadow));
-  shadow.blend = "source-atop";
-
-
-	for (var i = 0; i < 15; i++) {
-		//var cloud = bg.add(Object.create(Entity).init(planet.x + randint(-80, 80), planet.y + randint(-80, 80), randint(160, 240), randint(1,5)));
-		var cloud = parallax.add(Object.create(Sprite).init(planet.x + randint(-planet.w / 2, planet.w / 2), planet.y + randint(-planet.h / 2, planet.h / 2), Resources.clouds));
-    cloud.animation = randint(0,2);
-    cloud.color = "white";
-		cloud.opacity = Math.random() * 0.5 + 0.5;
-		cloud.addBehavior(Velocity);
-		cloud.addBehavior(Wrap, {min: {x: planet.x - 160, y: 0}, max: {x: planet.x + 160, y: gameWorld.height * 2}});
-		cloud.velocity = {x: randint(5,30), y: 0};
-	}*/
-	
-	//var silo = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 -100, Resources.silo));
-	//silo.addBehavior(Silo);
-	//silo.family = "enemy";
-	
-  
-	/*gameWorld.shop.family = "store";
-	gameWorld.shop.setCollision(Polygon);
-  gameWorld.shop.setVertices([
-    {x: -14, y: -6},
-    {x: 0, y: -14},
-    {x: 14, y: -6},
-    {x: 0, y: 14}
-    ])
-	*/
-
-	//this.player_top = fg.add(Object.create(Sprite).init(gameWorld.width / 4, gameWorld.height / 4, Resources.viper));
-  //var p = this.player_top;
   var player_bot = bg.add(Object.create(Sprite).init(gameWorld.width / 4, gameWorld.height / 4, Resources.viper));
   player_bot.color = "red";
   player_bot.setCollision(Polygon);
-	//player_bot.damage = player_bot.addBehavior(Damage, {layer: bg, timer: 0, invulnerable: 1});
-	//player_bot.shoot = Weapons.double;
 	player_bot.move = Movement.standard;
-
 	player_bot.addBehavior(Accelerate);
 	player_bot.addBehavior(Velocity);
   player_bot.velocity = {x: 0, y: 0};
   player_bot.acceleration = {x: 0, y: 0};
   player_bot.opacity = 1;
 	player_bot.health = MAXHEALTH;
-	player_bot.z = 1000;
-	
-	//player_bot.addBehavior(Space, {cooldown: 0, rate: 1.5, target: planet, radius: 240, damage: 1});
+	player_bot.z = Z.entity;
   player_bot.addBehavior(Bound, {min: {x: 6, y: -gameWorld.height * 5}, max: {x: gameWorld.width - 6, y: 5 * gameWorld.height}});
-  //player_bot.addBehavior(BoundDistance, {target: planet, max: 160, min: 0, rate: 5, speed: 80, visible: true, color: "#ccc"});
-	
 	player_bot.salvage = 0;
   player_bot.family = "player";
   player_bot.collision.onHandle = function (object, other) {
@@ -191,41 +124,13 @@ var onStart = function () {
 	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width - 48, gameWorld.height / 2 + 60,  Resources.shop));
 	gameWorld.shop.opacity = 0;
 	gameWorld.shop.addBehavior(AI, {target: player_bot, rate: 5, value: 0});
-	
-  //player_bot.addBehavior(Follow, {target: p, offset: {angle: 0, x: false, y: false, z: false}});
-	//this.player_top.addBehavior(Follow, {target: player_bot, offset: {angle: false, x: 0, y: 0, z: 0}});
+
 	this.player_bot = player_bot;
   var t = this;
 
-  //bg.camera.addBehavior(LerpFollow, {target: player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}, rate: 2});  
-  //fg.camera.addBehavior(Follow, {target: bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
 	bg.camera.addBehavior(Follow, {target: player_bot, offset: {x: false, y: -gameWorld.height / 2}});
-  //bg.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}});
   fg.camera.addBehavior(Follow, {target: bg.camera, offset: {x: 0, y: 0}});
-	//fg.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}}); 
-  //parallax.camera.addBehavior(Bound, {min: {x: -80, y: 0}, max: {x: gameWorld.width + 80, y: gameWorld.height}}); 
-/*  for (var i = 0; i < gameWorld.width / 32; i++) {
-    bg.add(Object.create(Sprite).init(i * 32 + 16, 4, Resources.barrier));
-  }*/  
-
-  //this.claw = fg.add(Object.create(Sprite).init(gameWorld.width / 2, - gameWorld.height / 2, Resources.claw));
-  //this.arm = fg.add(Object.create(Entity).init(gameWorld.width / 2, - gameWorld.height, 4, gameWorld.height));
-  //this.arm.addBehavior(Follow, {target: this.claw, offset: {x: 0, y: -gameWorld.height / 2 - 6}});
-
-  //this.store = Object.create(Store).init(this.ui, this.player_bot);
-  //for (var i = 0; i < gameWorld.width / 4; i++) {
-   // bg.add(Object.create(Sprite).init(i * 4 + 2, 2, Resources.barrier));
-	/*
-	var borders = [];
-	borders.push(bg.add(Object.create(TiledBackground).init(-6, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
-  borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width + 6, gameWorld.height / 2, 32, gameWorld.height, Resources.building2)));
-  borders.push(bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4,gameWorld.width,8,Resources.ground)));
-	borders.forEach(function (b) {
-		b.obstacle = true;
-  	b.setCollision(Polygon);  
-  	b.solid = true;
-	});*/
-
+	
   this.bg = bg;
   this.fg = fg;
 	
@@ -316,19 +221,6 @@ var onStart = function () {
 	
 	this.wave = [];
 	this.current_wave = 0;
-	this.waves = [
-    [1,1,1,1,1],
-		[2,2,2,3,3,3],
-		[1,2,3,4,5,6,7],
-		[7,7,7],
-		[6,5,6,5,6,5],
-		[4,4,4,4,4,4,4,4],
-		[8,8],
-		[1,2,3,8,8],
-		[3,3,6,6,1,1],
-		[2,2,4,5,6]
-	];
-	this.waves = [[5,5,5]];//[2,2,2], [1,1,3,3], [0,4,4,0]];
   this.waves = [
     [0,0,0,0,0,0], // learn to hit head-on
     [1,1,1,0,0,0], // learn to hit where you need to
@@ -337,7 +229,7 @@ var onStart = function () {
     [5,5,5,0,0,0,0,1,1,1,1], // learn to anticipate
     [6, 6, 6, 6, 4, 4, 5]
   ];
-
+	this.waves = [[6,6,7,7, 5, 5]];
 
   // intro animation
   this.intro = true;
@@ -390,30 +282,7 @@ var onUpdate = function (dt) {
 		console.log('new wave');
 		this.current_wave += 1;
 		if (this.current_wave % 2 === 1) {
-			/*
-      var landing_pad = this.bg.add(Object.create(Entity).init(gameWorld.shop.x - 18, gameWorld.shop.y + 12, 16, 16));
-			landing_pad.z = 100;
-			landing_pad.color = "gray", landing_pad.opacity = 0.5;
-			landing_pad.setCollision(Polygon);
-			landing_pad.collision.onHandle = function(object, other) {
-				if (other.family == "player" && !other.projectile) {
-					//console.log('what do you know.');
-					other.locked = true;
-					other.velocity = {x: 0, y: 0};
-					other.acceleration = {x: 0, y: 0};
-					object.alive = false;
-					other.lerpx = other.addBehavior(Lerp, {object: other, field: "x", goal: landing_pad.x, rate: 5});
-					other.lerpy = other.addBehavior(Lerp, {object: other, field: "y", goal: landing_pad.y, rate: 5, callback: function () {
-						s.player_top.angle = 0;
-						s.player_top.frame = 0;
-						s.player_top.animation = 0;
-						this.entity.removeBehavior(this.entity.lerpx);
-						this.entity.removeBehavior(this.entity.lerpy);
-						//console.log('ready to go?');
-						gameWorld.scene.store.open();
-					}});
-				}
-			}*/
+			// store is open for business?
 		}
 		
 		var w = this.waves[gameWorld.wave % this.waves.length];
