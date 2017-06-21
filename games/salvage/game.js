@@ -291,7 +291,7 @@ var projectile_vertices = [
 var Weapons = {
 	standard: function (layer) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
-			a.animation = 3;
+			a.animation = 5;
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
 			gameWorld.playSound(Resources.laser, volume(a));
@@ -310,7 +310,7 @@ var Weapons = {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
-			a.animation = 2;
+			a.animation = 5;
 			gameWorld.playSound(Resources.laser, volume(a));
 			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
@@ -325,7 +325,7 @@ var Weapons = {
 	burst: function (layer) {
 		if (this.count === undefined) this.count = 0;
 		var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
-		a.animation = 3;
+		a.animation = 5;
 		a.setCollision(Polygon);
 		a.setVertices(projectile_vertices);
 		gameWorld.playSound(Resources.laser, volume(a));
@@ -348,7 +348,7 @@ var Weapons = {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
-			a.animation = 1;
+			a.animation = 5;
 			//gameWorld.playSound(Resources.mortar);
 			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
@@ -362,7 +362,7 @@ var Weapons = {
 	},
 	proximity: function (layer) {
 			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
-			a.animation = 4;
+			a.animation = 5;
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
 			a.collision.onHandle = projectileHit;
@@ -667,7 +667,7 @@ function spawn(layer, key, player) {
 			p.acceleration = {x: 0, y: -10};
 			p.addBehavior(Accelerate);
 			p.addBehavior(Crop, {min: {x: 0, y: -1000}, max: {x: gameWorld.width, y: 2000}});
-			p.animation = 4;
+			p.animation = 6;
 			//p.addBehavior(FadeOut, {delay: Math.random() * 2 + 0.5, duration: 0});			
 		}
 	}

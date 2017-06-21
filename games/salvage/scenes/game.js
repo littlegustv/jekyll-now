@@ -29,12 +29,7 @@ var onStart = function () {
   
 	var b = bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height));
   b.color = "#f8f8f8";
-  b.z = 0;
-	
-
-	for (var i = 0; i < 100; i++) {
-		bg.add(Object.create(Entity).init(randint(0, gameWorld.width), randint(0, gameWorld.height), 1, 1));
-	}
+  b.z = -10;
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	this.ui.active = true;
@@ -111,6 +106,15 @@ var onStart = function () {
 				}
 				gameWorld.playSound(Resources.hit, volume(small));
         object.health -= 1;
+				for (var i = 0; i < 10; i++) {
+					var p = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.particles));
+					p.animation = 1;
+					p.addBehavior(Velocity);
+					var speed = randint(10,50), theta = Math.random() * PI2;
+					p.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
+					p.addBehavior(FadeOut, {duration: 0, delay: Math.random() * 0.5 + 0.5});
+					p.z = -1;
+				}
   			//object.damage.timer = DAMAGE_COOLDOWN;
       }
     }
@@ -228,9 +232,9 @@ var onStart = function () {
     [2,2,2,2], // learn to close the distance
     [2,2,2,2,0,0,0,0,0], // learn to prioritize
     [5,5,5,0,0,0,0,1,1,1,1], // learn to anticipate
-    [6, 6, 6, 6, 4, 4, 5]
-  ];
-	this.waves = [[6,6,7,7, 5, 5]];
+    [6, 6, 6, 6, 4, 4, 5],
+		[6,6,7,7, 5, 5]
+	];
 
   // intro animation
   this.intro = true;
