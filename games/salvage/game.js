@@ -645,6 +645,7 @@ function spawn(layer, key, player) {
 				enemy.die();
 			}
 		};
+		enemy.family = "enemy";
 		enemy.addBehavior(Enemy);
 		enemy.removeBehavior(enemy.lerp);
 	}});
@@ -658,13 +659,16 @@ function spawn(layer, key, player) {
 		layer.add(enemy);
 	}
 	enemy.die = function () {
-		for (var i = 0; i < 40; i++) {
+		for (var i = 0; i < 10; i++) {
 			var p = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.particles));
 			var theta = Math.random() * PI2, speed = randint(1,20);
 			p.addBehavior(Velocity);
 			p.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
+			p.acceleration = {x: 0, y: -10};
+			p.addBehavior(Accelerate);
+			p.addBehavior(Crop, {min: {x: 0, y: -1000}, max: {x: gameWorld.width, y: 2000}});
 			p.animation = 4;
-			p.addBehavior(FadeOut, {delay: Math.random() * 2 + 0.5, duration: 0});			
+			//p.addBehavior(FadeOut, {delay: Math.random() * 2 + 0.5, duration: 0});			
 		}
 	}
 	return enemy;

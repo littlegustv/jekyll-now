@@ -100,6 +100,7 @@ var onStart = function () {
         // take no damage from the FRONT when it isn't a projectile...
       } else {
         var small = object.layer.add(Object.create(SpriteFont).init(object.x, object.y, Resources.expire_font, choose(["ow!", "oh no", ":(", "jeez", "ok.", "sorry."]), {spacing: -2, align: "center"}));
+				small.z = Z.obstacle + 1;
         if (randint(0,10) < 5) {					
 					small.addBehavior(FadeOut, {duration: 1.5});
 					small.addBehavior(Grow, {duration: 1, max: 2});
