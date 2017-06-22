@@ -573,10 +573,12 @@ Target.update = function (dt) {
 	this.entity.velocity = {x: Math.cos(this.entity.angle) * this.speed, y: Math.sin(this.entity.angle) * this.speed};
 };
 
-var sprites = ["unshielded", "shielded", "fighter", "shielded fighter", "tank", "tank", "saucer", "beamship"]
+var sprites = ["unshielded", "shielded", "fighter", "shielded fighter", "tank", "tank", "saucer", "beamship"];
+var animations = [0, 1, 2, 3, 3, 4, 4, 5, 2];
 function spawn(layer, key, player) {
 	var y = Math.floor(player.y / 16) * 16 + 8 + 16 * randint(-8, 8), x = randint(0,2) > 0 ? -4 : gameWorld.width + 4;
-	var enemy = Object.create(Sprite).init(x, y, Resources[sprites[key]]);
+	var enemy = Object.create(Sprite).init(x, y, Resources.enemies);
+	enemy.animation = animations[key];
 	enemy.addBehavior(Crop, {min: {x: -16, y: -1000}, max: {x: gameWorld.width + 16, y: 1000}});
 	enemy.z = Z.entity;
 	enemy.angle = enemy.x > gameWorld.width / 2 ? - PI : 0;
@@ -667,7 +669,7 @@ function spawn(layer, key, player) {
 			p.acceleration = {x: 0, y: -10};
 			p.addBehavior(Accelerate);
 			p.addBehavior(Crop, {min: {x: 0, y: -1000}, max: {x: gameWorld.width, y: 2000}});
-			p.animation = 6;
+			p.animation = 3;
 			//p.addBehavior(FadeOut, {delay: Math.random() * 2 + 0.5, duration: 0});			
 		}
 	}
