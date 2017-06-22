@@ -290,8 +290,8 @@ var projectile_vertices = [
 
 var Weapons = {
 	standard: function (layer) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
-			a.animation = 5;
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+			//a.animation = 5;
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
 			gameWorld.playSound(Resources.laser, volume(a));
@@ -307,10 +307,10 @@ var Weapons = {
 	},
 	double: function (layer) {
 		for (var i = 0; i < 3; i++) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
-			a.animation = 5;
+			//a.animation = 5;
 			gameWorld.playSound(Resources.laser, volume(a));
 			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
@@ -324,8 +324,8 @@ var Weapons = {
 	},
 	burst: function (layer) {
 		if (this.count === undefined) this.count = 0;
-		var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
-		a.animation = 5;
+		var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+		//a.animation = 5;
 		a.setCollision(Polygon);
 		a.setVertices(projectile_vertices);
 		gameWorld.playSound(Resources.laser, volume(a));
@@ -345,10 +345,10 @@ var Weapons = {
 		}
 	},
 	homing: function (layer) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
-			a.animation = 5;
+			//a.animation = 5;
 			//gameWorld.playSound(Resources.mortar);
 			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
@@ -361,8 +361,8 @@ var Weapons = {
 			return 1.6;			
 	},
 	proximity: function (layer) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectiles));
-			a.animation = 5;
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+			//a.animation = 5;
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
 			a.collision.onHandle = projectileHit;
@@ -376,7 +376,7 @@ var Weapons = {
 	spark: function (layer) {
 		for (var i = 0; i < 5; i++) {
 			var theta = i * PI2 / 5;
-			var a = layer.add(Object.create(Sprite).init(this.x + Math.cos(theta) * 8, this.y + Math.sin(theta) * 8, Resources.projectiles));
+			var a = layer.add(Object.create(Sprite).init(this.x + Math.cos(theta) * 8, this.y + Math.sin(theta) * 8, Resources.projectile));
 			a.angle = theta;
 			a.addBehavior(Velocity);
 			a.velocity = {x: 40 * Math.cos(theta), y: 40 * Math.sin(theta) };
@@ -575,7 +575,7 @@ Target.update = function (dt) {
 };
 
 var sprites = ["unshielded", "shielded", "fighter", "shielded fighter", "tank", "tank", "saucer", "beamship"];
-var animations = [0, 1, 2, 3, 3, 4, 4, 5, 2];
+var animations = [0, 1, 2, 2, 4, 4, 3, 3, 2];
 function spawn(layer, key, player) {
 	var y = Math.floor(player.y / 16) * 16 + 8 + 16 * randint(-8, 8), x = randint(0,2) > 0 ? -4 : gameWorld.width + 4;
 	var enemy = Object.create(Sprite).init(x, y, Resources.enemies);
@@ -751,7 +751,7 @@ var Movement = {
 			d.addBehavior(FadeOut, {duration: 0.8});
 			for (var i = 0; i < 3; i++) {
 				var theta = s.player_bot.angle + PI - PI / 5 + i * PI / 5;
-				var a = s.bg.add(Object.create(Sprite).init(s.player_bot.x + Math.cos(theta) * 8, s.player_bot.y + Math.sin(theta) * 8, Resources.projectiles));
+				var a = s.bg.add(Object.create(Sprite).init(s.player_bot.x + Math.cos(theta) * 8, s.player_bot.y + Math.sin(theta) * 8, Resources.projectile));
 				a.angle = theta;
 				a.animation = 4;
 				a.addBehavior(Velocity);
