@@ -569,8 +569,9 @@ Entity.init = function (x, y, w, h) {
 // target, speed, turn_rate
 var Target = Object.create(Behavior);
 Target.update = function (dt) {
-	this.entity.angle = lerp_angle(this.entity.angle, angle(this.entity.x, this.entity.y, this.target.x, this.target.y), this.turn_rate * dt);
-	this.entity.velocity = {x: Math.cos(this.entity.angle) * this.speed, y: Math.sin(this.entity.angle) * this.speed};
+	if (this.angle === undefined) this.angle = 0;
+	this.angle =  lerp_angle(this.angle, angle(this.entity.x, this.entity.y, this.target.x, this.target.y), this.turn_rate * dt);
+	this.entity.velocity = {x: Math.cos(this.angle) * this.speed, y: Math.sin(this.angle) * this.speed};
 };
 
 var sprites = ["unshielded", "shielded", "fighter", "shielded fighter", "tank", "tank", "saucer", "beamship"];
