@@ -676,7 +676,8 @@ function spawn(layer, key, player) {
 			p.acceleration = {x: 0, y: -10};
 			p.addBehavior(Accelerate);
 			p.addBehavior(Crop, {min: {x: 0, y: -1000}, max: {x: gameWorld.width, y: 2000}});
-			p.animation = 3;
+			p.animation = 2;
+			p.z = 0;
 			//p.addBehavior(FadeOut, {delay: Math.random() * 2 + 0.5, duration: 0});			
 		}
 	}

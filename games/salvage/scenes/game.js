@@ -28,8 +28,10 @@ var onStart = function () {
 
   
 	var b = bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height));
-  b.color = "#f8f8f8";
+  b.color = "#ffffff";
   b.z = -10;
+	
+	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2 - 25, gameWorld.height / 4 + 25, 250, 50 * 20, Resources.grid)).z = -8;
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	this.ui.active = true;
@@ -71,10 +73,10 @@ var onStart = function () {
     this.opactity = 1;
   };
 
-	bg.add(Object.create(TiledBackground).init(-8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2));
-	bg.add(Object.create(TiledBackground).init(gameWorld.width + 8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2));
+	bg.add(Object.create(TiledBackground).init(-8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
+	bg.add(Object.create(TiledBackground).init(gameWorld.width + 8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
 	
-  var player_bot = bg.add(Object.create(Sprite).init(gameWorld.width / 4, gameWorld.height / 4, Resources.viper));
+  var player_bot = bg.add(Object.create(Sprite).init(15 + 50, gameWorld.height / 4, Resources.viper));
   player_bot.color = "red";
   player_bot.setCollision(Polygon);
 	player_bot.move = Movement.standard;
@@ -194,7 +196,7 @@ var onStart = function () {
     }
 		if (!s.player_bot.locked) {
 			//if (s.player_bot.velocity.x === 0 && s.player_bot.velocity.y === 0) {
-				s.player_bot.angle = angle(s.player_bot.x - s.bg.camera.x, s.player_bot.y - s.bg.camera.y, e.x, e.y);
+				s.player_bot.angle = Math.round(angle(s.player_bot.x - s.bg.camera.x, s.player_bot.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
 			//}
 		}
 	}
