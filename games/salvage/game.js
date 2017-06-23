@@ -399,7 +399,7 @@ var Weapons = {
 		//this.movement.speed = 0;
 		//layer.add(Object.create(Entity).init(gameWorld.width / 2, this.y, 4, gameWorld.width)).addBehavior(FadeOut, {duration: 0.2});
 		var b = layer.add(Object.create(Entity).init(gameWorld.width / 2, this.y, 4, gameWorld.width));
-		b.color = "#e91e63";
+		b.color = "#e50032";
 		b.setCollision(Polygon);
 		b.collision.onHandle = function (object, other) {
 			if (other.family != object.family && !other.projectile) {
@@ -422,6 +422,12 @@ var Weapons = {
 		b.addBehavior(FadeIn, {delay: 0.2, duration: 0.3, maxOpacity: 1});
 		b.opacity = 0;
 		b.z = Z.projectile;
+		var shadow = layer.add(Object.create(Entity).init(b.x, b.y + 2, b.w, b.h));
+		shadow.z = b.z - 1;
+		shadow.angle = this.angle;
+		shadow.color = "#670017";
+		shadow.addBehavior(FadeOut, {delay: 1.3, duration: 0.3, maxOpacity: 1})
+		shadow.addBehavior(FadeIn, {delay: 0.2, duration: 0.3, maxOpacity: 1});
 		b.angle = this.angle;// - PI / 2;
 		gameWorld.playSound(Resources.beam, volume(b));
 		//console.log(b);
