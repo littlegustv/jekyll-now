@@ -668,18 +668,15 @@ function spawn(layer, key, player) {
 		layer.add(enemy);
 	}
 	enemy.die = function () {
-		for (var i = 0; i < 10; i++) {
-			var p = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.particles));
-			var theta = Math.random() * PI2, speed = randint(1,20);
-			p.addBehavior(Velocity);
-			p.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
-			p.acceleration = {x: 0, y: -10};
-			p.addBehavior(Accelerate);
-			p.addBehavior(Crop, {min: {x: 0, y: -1000}, max: {x: gameWorld.width, y: 2000}});
-			p.animation = 2;
-			p.z = 0;
-			//p.addBehavior(FadeOut, {delay: Math.random() * 2 + 0.5, duration: 0});			
-		}
+		//var e = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, enemy.sprite));
+		//e.animation = enemy.animation;
+		//e.opacity = 0.8;
+		enemy.alive = false;
+		//e.angle = enemy.angle;
+		//e.addBehavior(Velocity);
+		//e.velocity = {x: 0, y: -40, angle: PI / 36};
+		var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, Resources.explosion));
+		expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
 	}
 	return enemy;
 }

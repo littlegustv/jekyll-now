@@ -96,8 +96,8 @@ var onStart = function () {
       if (!other.projectile && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2 ) {
         // take no damage from the FRONT when it isn't a projectile...
       } else {
-        var small = object.layer.add(Object.create(SpriteFont).init(object.x, object.y, Resources.expire_font, choose(["ow!", "oh no", ":(", "jeez", "ok.", "sorry."]), {spacing: -2, align: "center"}));
-				small.z = Z.obstacle + 1;
+        //var small = object.layer.add(Object.create(SpriteFont).init(object.x, object.y, Resources.expire_font, choose(["ow!", "oh no", ":(", "jeez", "ok.", "sorry."]), {spacing: -2, align: "center"}));
+				/*small.z = Z.obstacle + 1;
         if (randint(0,10) < 5) {					
 					small.addBehavior(FadeOut, {duration: 1.5});
 					small.addBehavior(Grow, {duration: 1, max: 2});
@@ -105,18 +105,11 @@ var onStart = function () {
 					small.addBehavior(FadeOut, {duration: 1.5});
 					small.addBehavior(Velocity);
 					small.velocity = {x: 0, y: 0, angle: PI};
-				}
-				gameWorld.playSound(Resources.hit, volume(small));
+				}*/
+				gameWorld.playSound(Resources.hit);
         object.health -= 1;
-				for (var i = 0; i < 10; i++) {
-					var p = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.particles));
-					p.animation = 1;
-					p.addBehavior(Velocity);
-					var speed = randint(10,50), theta = Math.random() * PI2;
-					p.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
-					p.addBehavior(FadeOut, {duration: 0, delay: Math.random() * 0.5 + 0.5});
-					p.z = -1;
-				}
+				var expl = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.explosion));
+				expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
   			//object.damage.timer = DAMAGE_COOLDOWN;
       }
     }
