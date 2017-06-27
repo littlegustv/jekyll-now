@@ -573,13 +573,12 @@ Target.update = function (dt) {
 	this.entity.velocity = {x: Math.cos(this.angle) * this.speed, y: Math.sin(this.angle) * this.speed};
 };
 
-var sprites = ["unshielded", "shielded", "fighter", "shielded fighter", "tank", "tank", "saucer", "beamship"];
-var animations = [0, 1, 2, 2, 4, 4, 3, 3, 2];
+//var animations = [0, 1, 2, 2, 4, 4, 3, 3, 2];
 function spawn(layer, key, player) {
 	var theta = Math.random() * PI2;
 	var x = gameWorld.height * Math.cos(theta) + player.x, y = gameWorld.height * Math.sin(theta) + player.y;
-	var enemy = Object.create(Sprite).init(x, y, Resources.enemies);
-	enemy.animation = animations[key];
+	var enemy = Object.create(Sprite).init(x, y, Resources.saucer);
+	//enemy.animation = animations[key];
 	//enemy.addBehavior(Crop, {min: {x: -16, y: -1000}, max: {x: gameWorld.width + 16, y: 1000}});
 	enemy.z = Z.entity;
 	//enemy.angle = enemy.x > gameWorld.width / 2 ? - PI : 0;
@@ -589,6 +588,7 @@ function spawn(layer, key, player) {
 	switch (key) {
 		case 0:
 			enemy.addBehavior(Target, {target: player, speed: 65, turn_rate: 2.5});
+			enemy.shoot = Weapons.standard;
 			break;
 		case 1:
 			enemy.addBehavior(Charge, {target: player, speed: 100, rate: 2});

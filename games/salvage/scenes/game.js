@@ -35,6 +35,11 @@ var onStart = function () {
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	this.ui.active = true;
+	
+	this.health_bar = [];
+	for (var i = 0; i < MAXHEALTH; i++) {
+		this.health_bar.push(this.ui.add(Object.create(Entity).init(8.5 + i * Math.ceil((gameWorld.width - 16) / MAXHEALTH), gameWorld.height - 10, Math.ceil((gameWorld.width - 16) / MAXHEALTH) - 2, 16)));
+	}
 /*
   this.ui.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height - 8, gameWorld.width, 16)).color = "#6DC72E";
   var name = this.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height - 8, Resources.expire_font, "Standard", {align: "center", spacing: -2}));
@@ -131,6 +136,13 @@ var onStart = function () {
 				}*/
 				gameWorld.playSound(Resources.hit);
         object.health -= 1;
+				for (var i = 0; i < s.health_bar.length; i++) {
+					if (i < object.health) {
+						s.health_bar[i].color = "black";
+					} else {
+						s.health_bar[i].color = "#999";
+					}
+				}
 				var expl = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.explosion));
 				expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
   			//object.damage.timer = DAMAGE_COOLDOWN;
@@ -248,8 +260,8 @@ var onStart = function () {
 	this.wave = [];
 	this.current_wave = 0;
   this.waves = [
-    [0,0,0,0,0,0], // learn to hit head-on
-    [1,1,1,0,0,0], // learn to hit where you need to
+    [0,0,0,0,0,0,0,0,0,0,0], // learn to hit head-on
+    [1,1,1,0,0,0,0,0,0,1,1], // learn to hit where you need to
     [2,2,2,2], // learn to close the distance
     [2,2,2,2,0,0,0,0,0], // learn to prioritize
     [5,5,5,0,0,0,0,1,1,1,1], // learn to anticipate
