@@ -35,7 +35,7 @@ var onStart = function () {
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	this.ui.active = true;
-
+/*
   this.ui.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height - 8, gameWorld.width, 16)).color = "#6DC72E";
   var name = this.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height - 8, Resources.expire_font, "Standard", {align: "center", spacing: -2}));
   var l = this.ui.add(Object.create(Entity).init(8, gameWorld.height - 8, 16, 16));
@@ -45,8 +45,12 @@ var onStart = function () {
   l.trigger = function () {
     s.unpause();
     s.player_bot.delay.set(0.5);
-    current_movement_key = modulo(current_movement_key - 1, movement_keys.length);
-    player_bot.move = Movement[movement_keys[current_movement_key]];
+		s.player_bot.thrust = modulo(s.player_bot.thrust - 1, s.player_bot.thrusts.length);
+		s.player_bot.speed = s.player_bot.thrusts[s.player_bot.thrust].speed;
+		s.player_bot.distance = s.player_bot.thrusts[s.player_bot.thrust].distance;
+    //current_movement_key = modulo(current_movement_key - 1, movement_keys.length);
+    //player_bot.move = Movement[movement_keys[current_movement_key]];
+    name.text = s.player_bot.speed + ", " + s.player_bot.distance;
     name.text = movement_keys[current_movement_key];
   };
   l.hover = function () {
@@ -60,9 +64,12 @@ var onStart = function () {
   r.family = "button";
   r.color = "#6DC72E";
   r.trigger = function () {
-    current_movement_key = modulo(current_movement_key + 1, movement_keys.length);
-    player_bot.move = Movement[movement_keys[current_movement_key]];
-    name.text = movement_keys[current_movement_key];
+		s.player_bot.thrust = modulo(s.player_bot.thrust + 1, s.player_bot.thrusts.length);
+		s.player_bot.speed = s.player_bot.thrusts[s.player_bot.thrust].speed;
+		s.player_bot.distance = s.player_bot.thrusts[s.player_bot.thrust].distance;
+    //current_movement_key = modulo(current_movement_key + 1, movement_keys.length);
+    //player_bot.move = Movement[movement_keys[current_movement_key]];
+    name.text = s.player_bot.speed + ", " + s.player_bot.distance;
     s.unpause();
     s.player_bot.delay.set(0.5);
   };
@@ -71,7 +78,7 @@ var onStart = function () {
   };
   r.unhover = function () {
     this.opactity = 1;
-  };
+  };*/
 
 	//bg.add(Object.create(TiledBackground).init(-8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
 	//bg.add(Object.create(TiledBackground).init(gameWorld.width + 8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
@@ -89,6 +96,19 @@ var onStart = function () {
 	player_bot.z = Z.entity;
   //player_bot.addBehavior(Bound, {min: {x: 6, y: -gameWorld.height * 5}, max: {x: gameWorld.width - 6, y: 5 * gameWorld.height}});
 	player_bot.salvage = 0;
+	// new movement settings
+	player_bot.speed = 5.5;
+	player_bot.distance = 50;
+	player_bot.thrust = 1;
+	
+	player_bot.thrusts = [
+		{speed: 5.5, distance: 0},
+		{speed: 5.5, distance: 50},
+		{speed: 5.5, distance: 100},
+		{speed: 5.5, distance: 150},
+		{speed: 5.5, distance: 200}
+	];
+	
   player_bot.family = "player";
 	player_bot.stopped = function () {
 		return !this.lerpx && !this.lerpy;
@@ -139,10 +159,12 @@ var onStart = function () {
 	
   this.keydown = false;
   this.pause = function () {
-    this.bg.paused = true;
-    this.player_bot.velocity = {x: 0, y: 0};
-    this.player_bot.acceleration = {x: 0, y: 0};
-    this.player_bot.animation = 0;
+		if (!this.player_bot.lerpx && !this.player_bot.lerpy) {			
+			this.bg.paused = true;
+			this.player_bot.velocity = {x: 0, y: 0};
+			this.player_bot.acceleration = {x: 0, y: 0};
+			this.player_bot.animation = 0;
+		}
   }
   this.unpause = function () {
     this.bg.paused = false;

@@ -283,7 +283,7 @@ var projectile_vertices = [
 
 var Weapons = {
 	standard: function (layer) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 			//a.animation = 5;
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
@@ -300,7 +300,7 @@ var Weapons = {
 	},
 	double: function (layer) {
 		for (var i = 0; i < 3; i++) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
 			//a.animation = 5;
@@ -317,7 +317,7 @@ var Weapons = {
 	},
 	burst: function (layer) {
 		if (this.count === undefined) this.count = 0;
-		var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+		var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 		//a.animation = 5;
 		a.setCollision(Polygon);
 		a.setVertices(projectile_vertices);
@@ -338,7 +338,7 @@ var Weapons = {
 		}
 	},
 	homing: function (layer) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
 			//a.animation = 5;
@@ -354,7 +354,7 @@ var Weapons = {
 			return 1.6;			
 	},
 	proximity: function (layer) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 			//a.animation = 5;
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
@@ -576,90 +576,66 @@ Target.update = function (dt) {
 var sprites = ["unshielded", "shielded", "fighter", "shielded fighter", "tank", "tank", "saucer", "beamship"];
 var animations = [0, 1, 2, 2, 4, 4, 3, 3, 2];
 function spawn(layer, key, player) {
-	var y = Math.floor(player.y / 16) * 16 + 8 + 16 * randint(-8, 8), x = randint(0,2) > 0 ? -4 : gameWorld.width + 4;
+	var theta = Math.random() * PI2;
+	var x = gameWorld.height * Math.cos(theta) + player.x, y = gameWorld.height * Math.sin(theta) + player.y;
 	var enemy = Object.create(Sprite).init(x, y, Resources.enemies);
 	enemy.animation = animations[key];
-	enemy.addBehavior(Crop, {min: {x: -16, y: -1000}, max: {x: gameWorld.width + 16, y: 1000}});
+	//enemy.addBehavior(Crop, {min: {x: -16, y: -1000}, max: {x: gameWorld.width + 16, y: 1000}});
 	enemy.z = Z.entity;
-	enemy.angle = enemy.x > gameWorld.width / 2 ? - PI : 0;
+	//enemy.angle = enemy.x > gameWorld.width / 2 ? - PI : 0;
+	enemy.addBehavior(Velocity);
+	enemy.velocity = {x: -50, y: 0};
+	enemy.setCollision(Polygon);
 	switch (key) {
+		case 0:
+			enemy.addBehavior(Target, {target: player, speed: 65, turn_rate: 2.5});
+			break;
+		case 1:
+			enemy.addBehavior(Charge, {target: player, speed: 100, rate: 2});
+			enemy.shielded = true;
+			break;
+		case 2:
+			enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 2});
+			enemy.shoot = Weapons.standard;
+			break;
+		case 3:
+			enemy.addBehavior(Target, {target: player, speed: 15, turn_rate: 0.5});
+			enemy.shoot = Weapons.standard;
+			enemy.shielded = true;
+			break;
+		case 4:
+			enemy.angle = enemy.x > gameWorld.width / 2 ? - PI / 2 : PI / 2;
+			enemy.velocity = {x: 0, y: player.y > enemy.y ? 10 : -10};
+			enemy.target = player;
+			enemy.shoot = Weapons.homing;
+			break;
 		case 5:
 			enemy.angle = enemy.x > gameWorld.width / 2 ? - PI / 2 : PI / 2;
-			break;
+			enemy.velocity = {x: 0, y: player.y > enemy.y ? 10 : -10};
+			enemy.shoot = Weapons.double;
+			break
 		case 6:
-			enemy.angle = 0;
+			enemy.shoot = Weapons.proximity;
+			enemy.velocity = {x: 0, y: 20};
+			enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 0.1});
+			break;
+		case 7:
+			enemy.shoot = Weapons.burst;
+			enemy.addBehavior(Target, {target: player, speed: 10, turn_rate: 4});
 			break;
 	}
-	enemy.lerp = enemy.addBehavior(Lerp, {goal: x - sign(x) * 18, object: enemy, field: "x", rate: 5, callback: function () {
-		enemy.addBehavior(Velocity);
-		enemy.velocity = {x: -50, y: 0};
-		enemy.setCollision(Polygon);
-		switch (key) {
-			case 0:
-				enemy.addBehavior(Target, {target: player, speed: 65, turn_rate: 2.5});
-				break;
-			case 1:
-				enemy.addBehavior(Charge, {target: player, speed: 100, rate: 2});
-				enemy.shielded = true;
-				break;
-			case 2:
-				enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 2});
-				enemy.shoot = Weapons.standard;
-				break;
-			case 3:
-				enemy.addBehavior(Target, {target: player, speed: 15, turn_rate: 0.5});
-				enemy.shoot = Weapons.standard;
-				enemy.shielded = true;
-				break;
-			case 4:
-				enemy.angle = enemy.x > gameWorld.width / 2 ? - PI / 2 : PI / 2;
-				enemy.velocity = {x: 0, y: player.y > enemy.y ? 10 : -10};
-				enemy.target = player;
-				enemy.shoot = Weapons.homing;
-				break;
-			case 5:
-				enemy.angle = enemy.x > gameWorld.width / 2 ? - PI / 2 : PI / 2;
-				enemy.velocity = {x: 0, y: player.y > enemy.y ? 10 : -10};
-				enemy.shoot = Weapons.beam;
-				break
-			case 6:
-				enemy.shoot = Weapons.proximity;
-				enemy.velocity = {x: 0, y: 20};
-				enemy.addBehavior(Oscillate, {
-					object: enemy, 
-					field: "x", 
-					constant: gameWorld.width / 2 - 16, 
-					initial: gameWorld.width / 2, 
-					rate: enemy.x > gameWorld.width / 2 ? 1 : -1, 
-					time: enemy.x > gameWorld.width / 2 ? PI / 2 : -PI / 2
-				});
-				break;
-			case 7:
-				enemy.shoot = Weapons.burst;
-				enemy.addBehavior(Target, {target: player, speed: 10, turn_rate: 4});
-				break;
+	enemy.collision.onHandle = function (object, other) {
+		if (object.shielded && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2) {
+			console.log('shielded!');
+		} else if (other == player) {
+			enemy.alive = false;
+			enemy.die();
 		}
-		enemy.collision.onHandle = function (object, other) {
-			if (object.shielded && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2) {
-				console.log('shielded!');
-			} else if (other == player) {
-				enemy.alive = false;
-				enemy.die();
-			}
-		};
-		enemy.family = "enemy";
-		enemy.addBehavior(Enemy);
-		enemy.removeBehavior(enemy.lerp);
-	}});
-	var hanger = layer.add(Object.create(Sprite).init(x - sign(x) * 4, y, Resources.hanger));
-	hanger.z = Z.obstacle;
-	hanger.angle = x > 0 ? 0 : PI;
-	hanger.behaviors[0].onEnd = function () {
-		this.entity.removeBehavior(this);
-		this.entity.addBehavior(FadeOut, {duration: 0.1, delay: 1, remove: true});
-		// spawn enemy here
-		layer.add(enemy);
-	}
+	};
+	enemy.family = "enemy";
+	enemy.addBehavior(Enemy);
+
+	layer.add(enemy);
 	enemy.die = function () {
 		enemy.alive = false;
 		var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
@@ -684,15 +660,15 @@ var movement_keys = ["standard", "blink", "double", "chaos"];
 var Movement = {
 	standard: function (s) {
 		s.unpause();
-		s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: Math.round(s.player_bot.x + 50 * Math.cos(s.player_bot.angle)), rate: 5.5, object: s.player_bot, callback: function () {
-			console.log('why');
+		s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: Math.round(s.player_bot.x + this.distance * Math.cos(s.player_bot.angle)), rate: this.speed, object: s.player_bot, callback: function () {
 			this.entity.removeBehavior(this);
 			this.entity.lerpx = undefined;
+			s.pause();
 		}});
-		s.player_bot.lerpy = s.player_bot.addBehavior(Lerp, {field: "y", goal: Math.round(s.player_bot.y + 50 * Math.sin(s.player_bot.angle)), rate: 5.5, object: s.player_bot, callback: function () {
-			console.log(this.entity.behaviors.length);
+		s.player_bot.lerpy = s.player_bot.addBehavior(Lerp, {field: "y", goal: Math.round(s.player_bot.y + this.distance * Math.sin(s.player_bot.angle)), rate: this.speed, object: s.player_bot, callback: function () {
 			this.entity.removeBehavior(this);
 			this.entity.lerpy = undefined;
+			s.pause();
 		}});
 		
 		// create contrail sprite
@@ -702,7 +678,7 @@ var Movement = {
 		d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
 		d.addBehavior(FadeOut, {duration: 0.8});
 		//s.player_bot.stopped = false;
-		s.player_bot.delay.set();
+		//s.player_bot.delay.set();
 	},
 	blink: function (s) {
 		s.unpause();
