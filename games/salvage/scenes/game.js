@@ -31,7 +31,7 @@ var onStart = function () {
   b.color = "#ffffff";
   b.z = -10;
 	
-	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2 - 25, gameWorld.height / 4 + 25, 250, 50 * 20, Resources.grid)).z = -8;
+	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2 - 25, gameWorld.height / 4 + 25, 50 * gameWorld.width, 50 * gameWorld.height, Resources.grid)).z = -8;
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	this.ui.active = true;
@@ -73,8 +73,8 @@ var onStart = function () {
     this.opactity = 1;
   };
 
-	bg.add(Object.create(TiledBackground).init(-8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
-	bg.add(Object.create(TiledBackground).init(gameWorld.width + 8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
+	//bg.add(Object.create(TiledBackground).init(-8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
+	//bg.add(Object.create(TiledBackground).init(gameWorld.width + 8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
 	
   var player_bot = bg.add(Object.create(Sprite).init(15 + 50, gameWorld.height / 4, Resources.viper));
   player_bot.color = "red";
@@ -87,9 +87,12 @@ var onStart = function () {
   player_bot.opacity = 1;
 	player_bot.health = MAXHEALTH;
 	player_bot.z = Z.entity;
-  player_bot.addBehavior(Bound, {min: {x: 6, y: -gameWorld.height * 5}, max: {x: gameWorld.width - 6, y: 5 * gameWorld.height}});
+  //player_bot.addBehavior(Bound, {min: {x: 6, y: -gameWorld.height * 5}, max: {x: gameWorld.width - 6, y: 5 * gameWorld.height}});
 	player_bot.salvage = 0;
   player_bot.family = "player";
+	player_bot.stopped = function () {
+		return !this.lerpx && !this.lerpy;
+	}
   player_bot.collision.onHandle = function (object, other) {
 		//if (object.damage.timer > 0) return;
     if (other.family == "enemy") {
@@ -128,7 +131,7 @@ var onStart = function () {
 	this.player_bot = player_bot;
   var t = this;
 
-	bg.camera.addBehavior(Follow, {target: player_bot, offset: {x: false, y: -gameWorld.height / 2}});
+	bg.camera.addBehavior(LerpFollow, {target: player_bot, offset: {x: -gameWorld.width / 2, y: -gameWorld.height / 2}, rate: 5});
   fg.camera.addBehavior(Follow, {target: bg.camera, offset: {x: 0, y: 0}});
 	
   this.bg = bg;
@@ -156,7 +159,8 @@ var onStart = function () {
   bg.drawOrder = function () {
     return this.entities.sort(function (a, b) { 
       if (a.z && b.z && b.z !== a.z) return a.z - b.z;
-      else return bg.entities.indexOf(a) - bg.entities.indexOf(b);
+      else if (a.y !== b.y) return a.y - b.y;
+			else return a.x - b.x;
     });
   };
   var s = this;
@@ -168,7 +172,7 @@ var onStart = function () {
   			return;
       }
 		} 
-    if (!s.player_bot.locked && s.player_bot.stopped) {
+    if (!s.player_bot.locked && s.player_bot.stopped()) {
       s.player_bot.move(s)
 		}
     //console.log(s.player_bot.locked, s.player_bot.stopped);
@@ -248,7 +252,7 @@ var onStart = function () {
     s.player_bot.delay = player_bot.addBehavior(Delay, {duration: 1, remove: false, callback: function () {
       this.entity.velocity = {x: 0, y: 0};
       this.entity.acceleration = {x: 0, y: 0};
-      this.entity.stopped = true;
+      //this.entity.stopped = true;
       s.pause();
     }});
     this.entity.removeBehavior(this.entity.lerp);

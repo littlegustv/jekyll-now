@@ -246,14 +246,7 @@ Grow.update = function (dt) {
 
 function projectileHit (object, other) {
 	if (other.family != object.family && !other.projectile) {
-		object.alive = false;
-		for (var i = 0; i < 15; i++) {
-			var p = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.particles));
-			var theta = Math.random() * PI2;
-			p.addBehavior(FadeOut, {duration: 0, delay: Math.random() * 1 + 0.5});
-			p.addBehavior(Velocity);
-			p.velocity = {x: Math.cos(theta) * 4, y: Math.sin(theta) * 4};
-		}
+		object.alive = false;		
 		gameWorld.playSound(Resources.hit);
 	}
 }
@@ -668,39 +661,47 @@ function spawn(layer, key, player) {
 		layer.add(enemy);
 	}
 	enemy.die = function () {
-		//var e = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, enemy.sprite));
-		//e.animation = enemy.animation;
-		//e.opacity = 0.8;
 		enemy.alive = false;
-		//e.angle = enemy.angle;
-		//e.addBehavior(Velocity);
-		//e.velocity = {x: 0, y: -40, angle: PI / 36};
-		var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, Resources.explosion));
+		var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
 		expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
+		expl.animation = 1;
+		expl.z = 1;
+		for (var i = 0; i < 3; i++) {
+			expl.addBehavior(Delay, {duration: Math.random() * 0.6 + 0.2, callback: function () {
+				var e = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
+				e.addBehavior(FadeOut, {duration: 0, delay: 0.8});
+				e.animation = 1;
+				e.z = 1;
+				this.entity.removeBehavior(this);
+			}})
+		}
 	}
 	return enemy;
 }
 
 var current_movement_key = 0;
-var movement_keys = ["standard", "blink", "chaos", "boom"];
+var movement_keys = ["standard", "blink", "double", "chaos"];
 var Movement = {
 	standard: function (s) {
 		s.unpause();
-		s.player_bot.velocity = {
-			x: Math.cos( s.player_bot.angle) * 100,
-			y: Math.sin( s.player_bot.angle) * 100
-		}
-		s.player_bot.acceleration = {
-			x: -s.player_bot.velocity.x,
-			y: -s.player_bot.velocity.y
-		};
+		s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: Math.round(s.player_bot.x + 50 * Math.cos(s.player_bot.angle)), rate: 5.5, object: s.player_bot, callback: function () {
+			console.log('why');
+			this.entity.removeBehavior(this);
+			this.entity.lerpx = undefined;
+		}});
+		s.player_bot.lerpy = s.player_bot.addBehavior(Lerp, {field: "y", goal: Math.round(s.player_bot.y + 50 * Math.sin(s.player_bot.angle)), rate: 5.5, object: s.player_bot, callback: function () {
+			console.log(this.entity.behaviors.length);
+			this.entity.removeBehavior(this);
+			this.entity.lerpy = undefined;
+		}});
+		
 		// create contrail sprite
 		gameWorld.playSound(Resources.move);  
 		var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
 		d.addBehavior(Velocity);
 		d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
 		d.addBehavior(FadeOut, {duration: 0.8});
-		s.player_bot.stopped = false;
+		//s.player_bot.stopped = false;
 		s.player_bot.delay.set();
 	},
 	blink: function (s) {
@@ -709,44 +710,68 @@ var Movement = {
 		gameWorld.playSound(Resources.move);
 		s.player_bot.delay.set(0.5);
 		s.player_bot.opacity = 0.1;
-		s.player_bot.stopped = false;
+		s.player_bot.lerpx = true;
+		//s.player_bot.stopped = false;
 		s.player_bot.delay.old_callback = s.player_bot.delay.callback;
 		s.player_bot.delay.callback = function () {
 			s.pause();
 			s.player_bot.opacity = 1;
-			s.player_bot.stopped = true;
+			s.player_bot.lerpx = false;
+			//s.player_bot.stopped = true;
 			gameWorld.playSound(Resources.blink2);
 			s.player_bot.x = s.player_bot.x + 50 * Math.cos(s.player_bot.angle), s.player_bot.y = s.player_bot.y + 50 * Math.sin(s.player_bot.angle);
 			s.player_bot.delay.callback = s.player_bot.delay.old_callback;
 		}
 	},
+	// just 'double' movement now, a commitment, slower (?)
+	double: function (s) {
+		s.unpause();
+		s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: Math.round(s.player_bot.x + 100 * Math.cos(s.player_bot.angle)), rate: 2.5, object: s.player_bot, callback: function () {
+			this.entity.removeBehavior(this);
+			this.entity.lerpx = undefined;
+		}});
+		s.player_bot.lerpy = s.player_bot.addBehavior(Lerp, {field: "y", goal: Math.round(s.player_bot.y + 100 * Math.sin(s.player_bot.angle)), rate: 2.5, object: s.player_bot, callback: function () {
+			this.entity.removeBehavior(this);
+			this.entity.lerpy = undefined;
+		}});
+		
+		// create contrail sprite
+		gameWorld.playSound(Resources.move);  
+		var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
+		d.addBehavior(Velocity);
+		d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
+		d.addBehavior(FadeOut, {duration: 0.8});
+		//s.player_bot.stopped = false;
+		s.player_bot.delay.set(2);
+	},
+	// triple movement in random direction
 	chaos: function (s) {
 		s.unpause();
-		gameWorld.playSound(Resources.move); // explosion?!
-		var theta = s.player_bot.angle + Math.random() * PI /4 - PI / 8;
-		//s.player_bot.angle = s.player_top.angle;
-		s.player_bot.animation = 1;
-		s.player_bot.velocity = {
-			x: Math.cos( theta) * 150,
-			y: Math.sin( theta) * 150
-		}
-		s.player_bot.stopped = false;
-		s.player_bot.acceleration = {
-			x: -s.player_bot.velocity.x / 1.5,
-			y: -s.player_bot.velocity.y / 1.5
-		}
-		s.player_bot.delay.set(1.5);
-		for (var i = 0; i < 5; i++) {
-			var e = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x + randint(-5, 5), s.player_bot.y + randint(-5, 5), Resources.explosion));
-			e.addBehavior(FadeOut, {delay: Math.random(), duration: 1 + Math.random()});
-		}
+		s.player_bot.angle = randint(0,4) * PI / 2;
+		s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: Math.round(s.player_bot.x + 150 * Math.cos(s.player_bot.angle)), rate: 4.5, object: s.player_bot, callback: function () {
+			this.entity.removeBehavior(this);
+			this.entity.lerpx = undefined;
+		}});
+		s.player_bot.lerpy = s.player_bot.addBehavior(Lerp, {field: "y", goal: Math.round(s.player_bot.y + 150 * Math.sin(s.player_bot.angle)), rate: 4.5, object: s.player_bot, callback: function () {
+			this.entity.removeBehavior(this);
+			this.entity.lerpy = undefined;
+		}});
+		
+		// create contrail sprite
+		gameWorld.playSound(Resources.move);  
+		var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
+		d.addBehavior(Velocity);
+		d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
+		d.addBehavior(FadeOut, {duration: 0.8});
+		//s.player_bot.stopped = false;
+		s.player_bot.delay.set(2);
 	},
 	boom: function (s) {
 		s.unpause();
 		s.player_bot.velocity = {x: 0, y: 0};
 		gameWorld.playSound(Resources.boom);
 		s.player_bot.delay.set(1);
-		s.player_bot.stopped = false;
+		//s.player_bot.stopped = false;
 		s.player_bot.addBehavior(Delay, {duration: 0.3, callback: function () {
 			//s.player_bot.angle = s.player_top.angle;
 			var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.explosion));
