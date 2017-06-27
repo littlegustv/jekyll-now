@@ -34,7 +34,7 @@ var Charge = Object.create(Behavior);
 Charge.update = function (dt) {
 	if (this.entity.velocity.x === 0 && this.entity.velocity.y === 0) {
 		var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
-		this.entity.angle = theta;
+		//this.entity.angle = theta;
 		this.entity.velocity = {x: this.speed * Math.cos(theta), y: this.speed * Math.sin(theta)};
 	} else {
 		this.entity.velocity.x = lerp(this.entity.velocity.x, 0, this.rate * dt);
@@ -573,6 +573,16 @@ Target.update = function (dt) {
 	this.entity.velocity = {x: Math.cos(this.angle) * this.speed, y: Math.sin(this.angle) * this.speed};
 };
 
+var TractorBeam = Object.create(Target);
+TractorBeam.draw = function (ctx) {
+	ctx.beginPath();
+	ctx.strokeStyle = this.color || "black";
+	ctx.lineWidth = this.width || 2;
+	ctx.moveTo(this.entity.x, this.entity.y);
+	ctx.lineTo(this.target.x, this.target.y);
+	ctx.stroke();
+}
+
 //var animations = [0, 1, 2, 2, 4, 4, 3, 3, 2];
 function spawn(layer, key, player) {
 	var theta = Math.random() * PI2;
@@ -650,6 +660,20 @@ function spawn(layer, key, player) {
 				e.z = 1;
 				this.entity.removeBehavior(this);
 			}})
+		}
+		var scrap = enemy.layer.add(Object.create(Entity).init(enemy.x, enemy.y, 4, 4));
+		scrap.addBehavior(TractorBeam, {target: gameWorld.boss, turn_rate: 5, speed: 50, color: "#00f4ff", width: 1.5});
+		scrap.addBehavior(Velocity);
+		scrap.velocity = {x: 0, y: 0};
+		scrap.setCollision(Polygon);
+		scrap.collision.onHandle = function (object, other) {
+			if (other == gameWorld.boss) {
+				object.alive = false;
+				var p = other.layer.add(Object.create(Entity).init(object.x, other.y, 6, 6));
+				p.addBehavior(Velocity);
+				p.velocity = {x: 0, y: -50};
+				p.addBehavior(FadeOut, {duration: 0.5, delay: 0.3});
+			}
 		}
 	}
 	return enemy;

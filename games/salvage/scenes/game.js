@@ -225,7 +225,7 @@ var onStart = function () {
       }
       //return;
     }
-		if (!s.player_bot.locked) {
+		if (!s.player_bot.locked && s.player_bot.stopped()) {
 			//if (s.player_bot.velocity.x === 0 && s.player_bot.velocity.y === 0) {
 				s.player_bot.angle = Math.round(angle(s.player_bot.x - s.bg.camera.x, s.player_bot.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
 			//}
@@ -269,6 +269,11 @@ var onStart = function () {
 		[6,6,7,7, 5, 5]
 	];
 
+	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.boss));
+	boss.addBehavior(LerpFollow, {target: player_bot, offset: {x: 0, y: -gameWorld.height / 3, angle: false}, rate: 0.3});
+	boss.setCollision(Polygon);
+	gameWorld.boss = boss;
+	
   // intro animation
   this.intro = true;
   this.bg.paused = false;
