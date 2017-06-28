@@ -31,7 +31,7 @@ var onStart = function () {
   b.color = "#ffffff";
   b.z = -10;
 	
-	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2 - 25, gameWorld.height / 4 + 25, 50 * gameWorld.width, 50 * gameWorld.height, Resources.grid)).z = -8;
+	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 48 * gameWorld.width, 48 * gameWorld.height, Resources.grid)).z = -8;
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	this.ui.active = true;
@@ -40,6 +40,40 @@ var onStart = function () {
 	for (var i = 0; i < MAXHEALTH; i++) {
 		this.health_bar.push(this.ui.add(Object.create(Entity).init(8.5 + i * Math.ceil((gameWorld.width - 16) / MAXHEALTH), gameWorld.height - 10, Math.ceil((gameWorld.width - 16) / MAXHEALTH) - 2, 16)));
 	}
+	
+	var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 12, Resources.expire_font, "menu", {align: "center", spacing: -2}));
+	var menu_button = this.ui.add(Object.create(Entity).init(24, 12, 48, 24));
+	menu_button.family = "button";
+	menu_button.opacity = 0;
+	menu_button.trigger = function () {
+		if (s.bg.paused) {
+			gameWorld.setScene(0);
+		}
+	};
+	menu_button.hover = function () {
+		menu_text.scale = 1.2;
+		menu_text.angle = 0.01;
+	};
+	menu_button.unhover = function () {
+		menu_text.scale = 1;
+		menu_text.angle = 0;
+	};
+	
+	var mute_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width - 24, 12, Resources.expire_font, "mute", {align: "center", spacing: -2}));
+	var mute_button = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, 12, 48, 24));
+	mute_button.family = "button";
+	mute_button.opacity = 0;
+	mute_button.trigger = function () {
+		// mute!
+	};
+	mute_button.hover = function () {
+		mute_text.scale = 1.2;
+		mute_text.angle = -0.01;
+	};
+	mute_button.unhover = function () {
+		mute_text.scale = 1;
+		mute_text.angle = 0;
+	};
 /*
   this.ui.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height - 8, gameWorld.width, 16)).color = "#6DC72E";
   var name = this.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height - 8, Resources.expire_font, "Standard", {align: "center", spacing: -2}));
@@ -88,7 +122,7 @@ var onStart = function () {
 	//bg.add(Object.create(TiledBackground).init(-8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
 	//bg.add(Object.create(TiledBackground).init(gameWorld.width + 8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
 	
-  var player_bot = bg.add(Object.create(Sprite).init(15 + 50, gameWorld.height / 4, Resources.viper));
+  var player_bot = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2, Resources.viper));
   player_bot.color = "red";
   player_bot.setCollision(Polygon);
 	player_bot.move = Movement.standard;
@@ -103,16 +137,7 @@ var onStart = function () {
 	player_bot.salvage = 0;
 	// new movement settings
 	player_bot.speed = 5.5;
-	player_bot.distance = 50;
-	player_bot.thrust = 1;
-	
-	player_bot.thrusts = [
-		{speed: 5.5, distance: 0},
-		{speed: 5.5, distance: 50},
-		{speed: 5.5, distance: 100},
-		{speed: 5.5, distance: 150},
-		{speed: 5.5, distance: 200}
-	];
+	player_bot.distance = 48;
 	
   player_bot.family = "player";
 	player_bot.stopped = function () {
