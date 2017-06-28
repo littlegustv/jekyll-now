@@ -33,8 +33,9 @@ var Charge = Object.create(Behavior);
 // speed, target, rate
 Charge.update = function (dt) {
 	if (this.entity.velocity.x === 0 && this.entity.velocity.y === 0) {
-		var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
-		//this.entity.angle = theta;
+		var theta = (PI / 2) * Math.round(angle(this.entity.x, this.entity.y, this.target.x, this.target.y) / (PI / 2));
+		//var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
+		this.entity.angle = theta;
 		this.entity.velocity = {x: this.speed * Math.cos(theta), y: this.speed * Math.sin(theta)};
 	} else {
 		this.entity.velocity.x = lerp(this.entity.velocity.x, 0, this.rate * dt);
@@ -584,7 +585,7 @@ TractorBeam.draw = function (ctx) {
 }
 
 //var animations = [0, 1, 2, 2, 4, 4, 3, 3, 2];
-var sprites = ["drone", "beamship", "saucer", "bomber", "saucer", "drone", "bug"];
+var sprites = ["drone", "beamship", "asteroid", "bomber", "saucer", "drone", "bug"];
 function spawn(layer, key, player) {
 	var theta = Math.random() * PI2;
 	var x = gameWorld.height * Math.cos(theta) + player.x, y = gameWorld.height * Math.sin(theta) + player.y;
@@ -606,8 +607,9 @@ function spawn(layer, key, player) {
 			enemy.shielded = true;
 			break;
 		case 2:
-			enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 2});
-			enemy.shoot = Weapons.standard;
+			var theta = angle(x, y, player.x, player.y);
+			enemy.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
+			console.log(enemy);
 			break;
 		case 3:
 			enemy.addBehavior(Target, {target: player, speed: 15, turn_rate: 0.5});
