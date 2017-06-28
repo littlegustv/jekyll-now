@@ -170,6 +170,7 @@ var onStart = function () {
 				}
 				var expl = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.explosion));
 				expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
+				
   			//object.damage.timer = DAMAGE_COOLDOWN;
       }
     }

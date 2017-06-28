@@ -584,10 +584,11 @@ TractorBeam.draw = function (ctx) {
 }
 
 //var animations = [0, 1, 2, 2, 4, 4, 3, 3, 2];
+var sprites = ["drone", "beamship", "saucer", "bomber", "saucer", "drone", "bug"];
 function spawn(layer, key, player) {
 	var theta = Math.random() * PI2;
 	var x = gameWorld.height * Math.cos(theta) + player.x, y = gameWorld.height * Math.sin(theta) + player.y;
-	var enemy = Object.create(Sprite).init(x, y, Resources.saucer);
+	var enemy = Object.create(Sprite).init(x, y, Resources[sprites[key % sprites.length]]);
 	//enemy.animation = animations[key];
 	//enemy.addBehavior(Crop, {min: {x: -16, y: -1000}, max: {x: gameWorld.width + 16, y: 1000}});
 	enemy.z = Z.entity;
@@ -652,12 +653,14 @@ function spawn(layer, key, player) {
 		expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
 		expl.animation = 1;
 		expl.z = 1;
+		gameWorld.playSound(Resources.hit);        
 		for (var i = 0; i < 3; i++) {
 			expl.addBehavior(Delay, {duration: Math.random() * 0.6 + 0.2, callback: function () {
 				var e = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
 				e.addBehavior(FadeOut, {duration: 0, delay: 0.8});
 				e.animation = 1;
 				e.z = 1;
+				gameWorld.playSound(Resources.hit);        
 				this.entity.removeBehavior(this);
 			}})
 		}
