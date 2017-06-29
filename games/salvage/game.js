@@ -617,7 +617,7 @@ function spawn(layer, key, player) {
 			break;
 		case 1:
 			enemy.x = Math.round(enemy.x / 48) * 48 - 30, enemy.y = Math.round(enemy.y / 48) * 48 + 18;
-			enemy.addBehavior(Charge, {target: player, speed: 100, rate: 2});
+			enemy.addBehavior(Charge, {target: player, speed: 96, rate: 2});
 			enemy.shielded = true;
 			break;
 		case 2:
