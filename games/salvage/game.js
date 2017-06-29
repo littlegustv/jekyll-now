@@ -296,7 +296,8 @@ var Weapons = {
 			var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
 			if (this.target) console.log('target');
 			a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)	};
-			a.angle = theta;
+			a.angle = theta;		
+			a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
 			return 1.3;
 	},
 	double: function (layer) {
@@ -312,6 +313,7 @@ var Weapons = {
 			a.projectile = true;
 			var theta = this.angle - PI / 6 + i * PI / 6;
 			a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
+			a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
 			a.angle = theta;
 		}
 		return 0.6;
@@ -326,6 +328,7 @@ var Weapons = {
 		a.collision.onHandle = projectileHit;
 		a.addBehavior(Velocity);
 		a.family = this.family;//"player";
+		a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
 		a.projectile = true;
 		var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
 		if (this.target) console.log('target');
@@ -348,6 +351,7 @@ var Weapons = {
 			a.addBehavior(Velocity);
 			a.addBehavior(Target, {target: this.target, turn_rate: 0.2, speed: 30});
 			a.family = this.family;
+			a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
 			a.projectile = true;
 			var theta = this.angle;
 			a.velocity = {x: 90 * Math.cos(theta), y: 90 * Math.sin(theta)};
@@ -360,6 +364,7 @@ var Weapons = {
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
 			a.collision.onHandle = projectileHit;
+			a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
 			//a.addBehavior(Oscillate, {field: "scale", object: a, rate: 1, initial: 1, constant: 0.2, offset: 0});
 			a.addBehavior(Velocity);
 			a.family = this.family;
@@ -546,6 +551,14 @@ BoundDistance.update = function (dt) {
 	}
 };
 
+var CropDistance = Object.create(Behavior);
+CropDistance.update = function (dt) {
+	var d = distance(this.entity.x, this.entity.y, this.target.x, this.target.y);
+	if (d > this.max) {
+		this.entity.alive = false;
+	}
+}
+
 // push to raindrop -> animate 'onEnd'
 Animate.update = function (dt) {
 	if (this.paused) return;
@@ -603,13 +616,12 @@ function spawn(layer, key, player) {
 			enemy.shoot = Weapons.standard;
 			break;
 		case 1:
+			enemy.x = Math.round(enemy.x / 48) * 48 - 30, enemy.y = Math.round(enemy.y / 48) * 48 + 18;
 			enemy.addBehavior(Charge, {target: player, speed: 100, rate: 2});
 			enemy.shielded = true;
 			break;
 		case 2:
-			var theta = angle(x, y, player.x, player.y);
-			enemy.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)};
-			console.log(enemy);
+			enemy.addBehavior(Target, {target: player, speed: 60, turn_rate: 0.4});
 			break;
 		case 3:
 			enemy.addBehavior(Target, {target: player, speed: 15, turn_rate: 0.5});
@@ -680,7 +692,8 @@ function spawn(layer, key, player) {
 				p.addBehavior(FadeOut, {duration: 0.5, delay: 0.3});
 			}
 		}
-	}
+	};
+	enemy.addBehavior(CropDistance, {target: player, max: 10 * gameWorld.distance});
 	return enemy;
 }
 
