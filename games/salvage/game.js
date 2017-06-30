@@ -32,15 +32,26 @@ World.draw = function () {
 var Charge = Object.create(Behavior);
 // speed, target, rate
 Charge.update = function (dt) {
-	if (this.entity.velocity.x === 0 && this.entity.velocity.y === 0) {
+	if (!this.entity.lerpx &&  !this.entity.lerpy) {
 		var theta = (PI / 2) * Math.round(angle(this.entity.x, this.entity.y, this.target.x, this.target.y) / (PI / 2));
 		//var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
 		this.entity.angle = theta;
-		this.entity.velocity = {x: this.speed * Math.cos(theta), y: this.speed * Math.sin(theta)};
-	} else {
-		this.entity.velocity.x = lerp(this.entity.velocity.x, 0, this.rate * dt);
-		this.entity.velocity.y = lerp(this.entity.velocity.y, 0, this.rate * dt);
+		this.entity.lerpx = this.entity.addBehavior(Lerp, {rate: this.rate, goal: this.entity.x + Math.cos(theta) * this.distance, object: this.entity, field: "x", callback: function () {
+			console.log('removing lerpx');
+			this.entity.removeBehavior(this.entity.lerpx);
+			this.entity.lerpx = undefined;
+		}});		
+		this.entity.lerpy = this.entity.addBehavior(Lerp, {rate: this.rate, goal: this.entity.y + Math.sin(theta) * this.distance, object: this.entity, field: "y", callback: function () {
+			console.log('removing lerpy');
+			this.entity.removeBehavior(this.entity.lerpy);
+			this.entity.lerpy = undefined;
+		}});
 	}
+}
+Charge.draw = function (ctx) {
+	ctx.beginPath();
+	ctx.arc(this.entity.x, this.entity.y, 18, this.entity.angle - PI / 4, this.entity.angle + PI / 4, false);
+	ctx.stroke();
 }
 
 var AI = Object.create(Behavior);
@@ -616,8 +627,9 @@ function spawn(layer, key, player) {
 			enemy.shoot = Weapons.standard;
 			break;
 		case 1:
-			enemy.x = Math.round(enemy.x / 48) * 48 - 30, enemy.y = Math.round(enemy.y / 48) * 48 + 18;
-			enemy.addBehavior(Charge, {target: player, speed: 96, rate: 2});
+			enemy.x = player.x - 48, enemy.y = player.y - 48;
+			enemy.addBehavior(Charge, {target: player, distance: 48, rate: 3});
+			enemy.velocity = {x: 0, y: 0};
 			enemy.shielded = true;
 			break;
 		case 2:
@@ -650,7 +662,7 @@ function spawn(layer, key, player) {
 			break;
 	}
 	enemy.collision.onHandle = function (object, other) {
-		if (object.shielded && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2) {
+		if (object.shielded && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 4) {
 			console.log('shielded!');
 		} else if (other == player) {
 			enemy.alive = false;
@@ -693,7 +705,7 @@ function spawn(layer, key, player) {
 			}
 		}
 	};
-	enemy.addBehavior(CropDistance, {target: player, max: 10 * gameWorld.distance});
+	enemy.addBehavior(CropDistance, {target: player, max: 10 * gameWorld.width});
 	return enemy;
 }
 

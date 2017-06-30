@@ -1,4 +1,5 @@
 var onStart = function () {
+	
 	if (!gameWorld.soundtrack) {
     if (AudioContext) {
       gameWorld.filter = gameWorld.audioContext.createBiquadFilter();
@@ -144,9 +145,10 @@ var onStart = function () {
 		return !this.lerpx && !this.lerpy;
 	}
   player_bot.collision.onHandle = function (object, other) {
-		//if (object.damage.timer > 0) return;
+		if (object.noCollide) return;
+		
     if (other.family == "enemy") {
-      if (!other.projectile && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 2 ) {
+      if (!other.projectile && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 4 ) {
         // take no damage from the FRONT when it isn't a projectile...
       } else {
         //var small = object.layer.add(Object.create(SpriteFont).init(object.x, object.y, Resources.expire_font, choose(["ow!", "oh no", ":(", "jeez", "ok.", "sorry."]), {spacing: -2, align: "center"}));
@@ -173,6 +175,8 @@ var onStart = function () {
 				
   			//object.damage.timer = DAMAGE_COOLDOWN;
       }
+			object.noCollide = true;
+			object.addBehavior(Delay, {duration: 0.5, callback: function () { this.entity.noCollide = false; }})
     }
 		if (object.health <= 0) {
 			object.alive = false;
@@ -294,6 +298,7 @@ var onStart = function () {
     [6, 6, 6, 6, 4, 4, 5],
 		[6,6,7,7, 5, 5]
 	];
+	this.waves = [[1]]
 
 	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.boss));
 	boss.addBehavior(LerpFollow, {target: player_bot, offset: {x: 0, y: -gameWorld.height / 3, angle: false}, rate: 0.3});
