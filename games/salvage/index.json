@@ -12,6 +12,7 @@
 		{"path": "beamship.png", "frames": 2, "animations": 1, "speed": 0.4},
 		{"path": "boss.png", "frames": 2, "animations": 1, "speed": 0.4},
 		{"path": "projectile.png"},
+		{"path": "bullet.png"},
 		{"path": "grid.png"},
 		{"path": "bomb.png", "frames": 3, "speed": 0.2},
 		{"path": "shop.png", "frames": 7, "speed": 0.08},

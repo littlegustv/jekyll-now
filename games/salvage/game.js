@@ -1,6 +1,6 @@
 // canvas filter (color style); grayscale(70%) contrast(250%) brightness(90%);
 
-var MAXHEALTH = 16, DAMAGE_COOLDOWN = 0.5;
+var MAXHEALTH = 4, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(180, 320, "index.json");
 gameWorld.wave = 0;
 
@@ -295,7 +295,8 @@ var projectile_vertices = [
 
 var Weapons = {
 	standard: function (layer) {
-			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
+//			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 			//a.animation = 5;
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
@@ -306,14 +307,15 @@ var Weapons = {
 			a.projectile = true;
 			var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
 			if (this.target) console.log('target');
-			a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)	};
+			a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)	};
 			a.angle = theta;		
 			a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
-			return 1.3;
+			return 1.6;
 	},
 	double: function (layer) {
 		for (var i = 0; i < 3; i++) {
-			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
+//var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
 			//a.animation = 5;
@@ -331,7 +333,8 @@ var Weapons = {
 	},
 	burst: function (layer) {
 		if (this.count === undefined) this.count = 0;
-		var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
+		var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
+//var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 		//a.animation = 5;
 		a.setCollision(Polygon);
 		a.setVertices(projectile_vertices);
@@ -353,7 +356,8 @@ var Weapons = {
 		}
 	},
 	homing: function (layer) {
-			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
+//			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
 			//a.animation = 5;
@@ -370,7 +374,8 @@ var Weapons = {
 			return 1.6;			
 	},
 	proximity: function (layer) {
-			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
+			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
+//			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 			//a.animation = 5;
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
@@ -623,42 +628,63 @@ function spawn(layer, key, player) {
 	enemy.setCollision(Polygon);
 	switch (key) {
 		case 0:
-			enemy.addBehavior(Target, {target: player, speed: 65, turn_rate: 2.5});
+			enemy.addBehavior(Target, {target: player, speed: 55, turn_rate: 2.5});
 			enemy.shoot = Weapons.standard;
+			enemy.target = player;
+			enemy.setVertices([
+				{x: -3, y: -3}, {x: -3, y: 3}, {x: 3, y: 3}, {x: 3, y: -3}
+			]);
 			break;
 		case 1:
 			enemy.x = player.x - 48, enemy.y = player.y - 48;
 			enemy.addBehavior(Charge, {target: player, distance: 48, rate: 3});
 			enemy.velocity = {x: 0, y: 0};
 			enemy.shielded = true;
+			enemy.setVertices([
+				{x: -5, y: -3}, {x: -5, y: 3}, {x: 5, y: 3}, {x: 5, y: -3}
+			]);
 			break;
 		case 2:
 			enemy.addBehavior(Target, {target: player, speed: 60, turn_rate: 0.4});
+			enemy.setVertices([
+				{x: -4, y: 0}, {x: 0, y: 4}, {x: 4, y: 0}, {x: 0, y: -4}
+			]);
 			break;
 		case 3:
 			enemy.addBehavior(Target, {target: player, speed: 15, turn_rate: 0.5});
 			enemy.shoot = Weapons.standard;
 			enemy.shielded = true;
+			enemy.setVertices([
+				{x: -5, y: -3}, {x: -5, y: 3}, {x: 5, y: 3}, {x: 5, y: -3}
+			]);
 			break;
 		case 4:
-			enemy.angle = enemy.x > gameWorld.width / 2 ? - PI / 2 : PI / 2;
-			enemy.velocity = {x: 0, y: player.y > enemy.y ? 10 : -10};
+			enemy.addBehavior(Target, {target: player, speed: 5, turn_rate: 1});
 			enemy.target = player;
 			enemy.shoot = Weapons.homing;
+			enemy.setVertices([
+				{x: -6, y: -3}, {x: -6, y: 3}, {x: 6, y: 3}, {x: 6, y: -3}
+			]);
 			break;
 		case 5:
-			enemy.angle = enemy.x > gameWorld.width / 2 ? - PI / 2 : PI / 2;
-			enemy.velocity = {x: 0, y: player.y > enemy.y ? 10 : -10};
+			enemy.addBehavior(Target, {target: player, speed: 5, turn_rate: 1});
 			enemy.shoot = Weapons.double;
+			enemy.setVertices([
+				{x: -3, y: -3}, {x: -3, y: 3}, {x: 3, y: 3}, {x: 3, y: -3}
+			]);
 			break
 		case 6:
 			enemy.shoot = Weapons.proximity;
 			enemy.velocity = {x: 0, y: 20};
-			enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 0.1});
+			enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 0.1});enemy.setVertices([
+				{x: -3, y: -3}, {x: -3, y: 3}, {x: 3, y: 3}, {x: 3, y: -3}
+			]);
 			break;
 		case 7:
 			enemy.shoot = Weapons.burst;
-			enemy.addBehavior(Target, {target: player, speed: 10, turn_rate: 4});
+			enemy.addBehavior(Target, {target: player, speed: 10, turn_rate: 4});enemy.setVertices([
+				{x: -3, y: -3}, {x: -3, y: 3}, {x: 3, y: 3}, {x: 3, y: -3}
+			]);
 			break;
 	}
 	enemy.collision.onHandle = function (object, other) {

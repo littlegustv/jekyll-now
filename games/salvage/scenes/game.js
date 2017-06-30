@@ -38,8 +38,8 @@ var onStart = function () {
 	this.ui.active = true;
 	
 	this.health_bar = [];
-	for (var i = 0; i < MAXHEALTH; i++) {
-		this.health_bar.push(this.ui.add(Object.create(Entity).init(8.5 + i * Math.ceil((gameWorld.width - 16) / MAXHEALTH), gameWorld.height - 10, Math.ceil((gameWorld.width - 16) / MAXHEALTH) - 2, 16)));
+	for (var i = 0.5; i < MAXHEALTH + 0.5; i++) {
+		this.health_bar.push(this.ui.add(Object.create(Entity).init(8 + i * Math.ceil((gameWorld.width - 16) / MAXHEALTH), gameWorld.height - 10, Math.ceil((gameWorld.width - 16) / MAXHEALTH) - 2, 16)));
 	}
 	
 	var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 12, Resources.expire_font, "menu", {align: "center", spacing: -2}));
@@ -298,7 +298,7 @@ var onStart = function () {
     [6, 6, 6, 6, 4, 4, 5],
 		[6,6,7,7, 5, 5]
 	];
-	this.waves = [[1]]
+	this.waves = [[0,0,0,0,0,0,0,0]];
 
 	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.boss));
 	boss.addBehavior(LerpFollow, {target: player_bot, offset: {x: 0, y: -gameWorld.height / 3, angle: false}, rate: 0.3});
