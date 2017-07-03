@@ -15,7 +15,7 @@ var onStart = function () {
       gameWorld.soundtrack.connect(gameWorld.filter);
       gameWorld.soundtrack.onended = gameWorld.musicLoop;
     }
-    //gameWorld.musicLoop();
+    gameWorld.musicLoop();
   }
 	
   //var super_bg = this.addLayer(Object.create(Layer).init(1000,1000));
@@ -36,7 +36,7 @@ var onStart = function () {
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	this.ui.active = true;
-	
+
 	this.health_bar = [];
 	for (var i = 0.5; i < MAXHEALTH + 0.5; i++) {
 		this.health_bar.push(this.ui.add(Object.create(Entity).init(8 + i * Math.ceil((gameWorld.width - 16) / MAXHEALTH), gameWorld.height - 10, Math.ceil((gameWorld.width - 16) / MAXHEALTH) - 2, 16)));
@@ -52,12 +52,10 @@ var onStart = function () {
 		}
 	};
 	menu_button.hover = function () {
-		menu_text.scale = 1.2;
-		menu_text.angle = 0.01;
+		menu_text.scale = 2;
 	};
 	menu_button.unhover = function () {
 		menu_text.scale = 1;
-		menu_text.angle = 0;
 	};
 	
 	var mute_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width - 24, 12, Resources.expire_font, "mute", {align: "center", spacing: -2}));
@@ -68,12 +66,10 @@ var onStart = function () {
 		// mute!
 	};
 	mute_button.hover = function () {
-		mute_text.scale = 1.2;
-		mute_text.angle = -0.01;
+		mute_text.scale = 2;
 	};
 	mute_button.unhover = function () {
 		mute_text.scale = 1;
-		mute_text.angle = 0;
 	};
 /*
   this.ui.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height - 8, gameWorld.width, 16)).color = "#6DC72E";
@@ -186,6 +182,24 @@ var onStart = function () {
 		}
   }
 
+  this.store_layer = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
+  var store = Object.create(Store).init(this.store_layer, player_bot);
+  this.store = store;
+
+  var e = this.ui.add(Object.create(Entity).init(gameWorld.width / 2, 12, 48, 24));
+  var store_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, 12, Resources.expire_font, "store", {align: "center", spacing: -2}));
+  e.family = "button";
+  e.opacity = 0;
+  e.trigger = function () {
+    store.open();
+  }
+  e.hover = function () {
+    store_text.scale = 2;
+  };
+  e.unhover = function () {
+    store_text.scale = 1;
+  };
+
 	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width - 48, gameWorld.height / 2 + 60,  Resources.shop));
 	gameWorld.shop.opacity = 0;
 	gameWorld.shop.addBehavior(AI, {target: player_bot, rate: 5, value: 0});
@@ -237,6 +251,7 @@ var onStart = function () {
       }
 		} 
     if (!s.player_bot.locked && s.player_bot.stopped()) {
+      s.player_bot.angle = Math.round(angle(s.player_bot.x - s.bg.camera.x, s.player_bot.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
       s.player_bot.move(s)
 		}
     //console.log(s.player_bot.locked, s.player_bot.stopped);
@@ -290,16 +305,18 @@ var onStart = function () {
 	this.wave = [];
 	this.current_wave = 0;
   this.waves = [
-    [0,0,0,0,0,0,0,0,0,0,0], // learn to hit head-on
-    [1,1,1,0,0,0,0,0,0,1,1], // learn to hit where you need to
-    [2,2,2,2], // learn to close the distance
-    [2,2,2,2,0,0,0,0,0], // learn to prioritize
-    [5,5,5,0,0,0,0,1,1,1,1], // learn to anticipate
+    [0,0,0,0,0,0], // learn to hit head-on
+    [1,1,1,0,0,0,0], // learn to hit where you need to
+    [2,2,1,1,0,0], // learn to close the distance
+    [2,2,2,0,0,0,0,0], // learn to prioritize
+    [5,5,0,0,0,0,1,1], // learn to anticipate
+    [3,3,3,0,0],
+    [4,4,2,1,1,1],
+    [5,5,5,0,0,0,0],
     [6, 6, 6, 6, 4, 4, 5],
-		[6,6,7,7, 5, 5]
+		[6,6, 5]
 	];
-	this.waves = [[0,0,0,0,0,0,0,0]];
-
+	
 	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.boss));
 	boss.addBehavior(LerpFollow, {target: player_bot, offset: {x: 0, y: -gameWorld.height / 3, angle: false}, rate: 0.3});
 	boss.setCollision(Polygon);
