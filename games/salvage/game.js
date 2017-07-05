@@ -690,13 +690,16 @@ TractorBeam.update = function (dt) {
 	if (!this.reached) {
 		this.origin.x = lerp(this.origin.x, this.target.x, this.rate * dt);
 		this.origin.y = lerp(this.origin.y, this.target.y, this.rate * dt);
-		if (this.origin.x === this.target.x && this.origin.y === this.target.y) {
+		if (distance(this.origin.x, this.origin.y, this.target.x, this.target.y) <= 2) {
+			console.log('reached');
 			this.reached = true;
 		}
 	} else {
 		this.origin.x = lerp(this.origin.x, this.entity.x, this.rate * dt);
 		this.origin.y = lerp(this.origin.y, this.entity.y, this.rate * dt);
-		if (this.origin.x === this.entity.x && this.origin.y === this.entity.y) {
+		this.target.x = this.origin.x;
+		this.target.y = this.origin.y;
+		if (distance(this.origin.x, this.origin.y, this.entity.x, this.entity.y) <= 2) {
 			this.entity.removeBehavior(this);
 			if (this.callback) this.callback();
 		}
@@ -705,9 +708,11 @@ TractorBeam.update = function (dt) {
 TractorBeam.draw = function (ctx) {
 	ctx.beginPath();
 	ctx.strokeStyle = this.color || "black";
-	ctx.lineWidth = this.width || 2;
+	ctx.lineWidth = 1;//this.width || 2;
 	ctx.moveTo(this.entity.x, this.entity.y);
-	ctx.lineTo(this.origin.x, this.origin.y);
+	ctx.lineTo(this.origin.x - this.target.w / 2, this.origin.y);
+	ctx.moveTo(this.entity.x, this.entity.y);
+	ctx.lineTo(this.origin.x + this.target.w / 2, this.origin.y);
 	ctx.stroke();
 };
 
@@ -819,7 +824,7 @@ function spawn(layer, key, player) {
 			}})
 		}
 		var scrap = enemy.layer.add(Object.create(Entity).init(enemy.x, enemy.y, 4, 4));
-		scrap.addBehavior(TractorBeam, {target: gameWorld.boss, turn_rate: 5, speed: 50, color: "#47aeff", width: 3.5});
+		gameWorld.boss.addBehavior(TractorBeam, {target: scrap, turn_rate: 5, speed: 50, color: "#47aeff", width: 3.5, rate: 6, origin: {x: gameWorld.boss.x, y: gameWorld.boss.y}});
 		scrap.addBehavior(Velocity);
 		scrap.velocity = {x: 0, y: 0};
 		scrap.setCollision(Polygon);

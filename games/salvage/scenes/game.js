@@ -374,6 +374,23 @@ var onUpdate = function (dt) {
 		this.current_wave += 1;
 		if (this.current_wave % 2 === 1) {
 			// store is open for business?
+			// drop cash
+			// 'adding'
+			var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
+			cash.addBehavior(Velocity);
+			cash.velocity = {x: 0, y: 20};
+			cash.setCollision(Polygon);
+			cash.collision.onHandle = function (object, other) {
+				if (other == s.player_bot) {
+					object.alive = false;
+					for (var i = 0; i < 20; i++) {
+						var p = object.layer.add(Object.create(SpriteFont).init(other.x, other.y, Resources.expire_font, "$", {align: "center"}));
+						p.addBehavior(Velocity);
+						p.addBehavior(FadeOut, {duration: 0, delay: Math.random()});
+						p.velocity = {x: randint(-20,20), y: randint(-20,20)};
+					}
+				}
+			}
 		}
 		
 		var w = this.waves[gameWorld.wave % this.waves.length];
