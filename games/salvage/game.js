@@ -683,15 +683,33 @@ Wheel.onDraw = function (ctx) {
   ctx.fill();
 }
 
-var TractorBeam = Object.create(Target);
+
+// target object, origin object, destination object (default = entity), rate, color, width
+var TractorBeam = Object.create(Behavior);
+TractorBeam.update = function (dt) {
+	if (!this.reached) {
+		this.origin.x = lerp(this.origin.x, this.target.x, this.rate * dt);
+		this.origin.y = lerp(this.origin.y, this.target.y, this.rate * dt);
+		if (this.origin.x === this.target.x && this.origin.y === this.target.y) {
+			this.reached = true;
+		}
+	} else {
+		this.origin.x = lerp(this.origin.x, this.entity.x, this.rate * dt);
+		this.origin.y = lerp(this.origin.y, this.entity.y, this.rate * dt);
+		if (this.origin.x === this.entity.x && this.origin.y === this.entity.y) {
+			this.entity.removeBehavior(this);
+			if (this.callback) this.callback();
+		}
+	}
+};
 TractorBeam.draw = function (ctx) {
 	ctx.beginPath();
 	ctx.strokeStyle = this.color || "black";
 	ctx.lineWidth = this.width || 2;
 	ctx.moveTo(this.entity.x, this.entity.y);
-	ctx.lineTo(this.target.x, this.target.y);
+	ctx.lineTo(this.origin.x, this.origin.y);
 	ctx.stroke();
-}
+};
 
 //var animations = [0, 1, 2, 2, 4, 4, 3, 3, 2];
 var sprites = ["drone", "saucer", "unshielded", "bomber", "saucer", "drone", "unshielded"];
