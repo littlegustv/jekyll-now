@@ -11,7 +11,7 @@ var onStart = function () {
     }
    
     gameWorld.musicLoop = function () {
-      gameWorld.soundtrack = gameWorld.playSound(Resources.soundtrack, 1);
+      gameWorld.soundtrack = gameWorld.playSound(Resources.salvage, 1);
       gameWorld.soundtrack.connect(gameWorld.filter);
       gameWorld.soundtrack.onended = gameWorld.musicLoop;
     }
@@ -159,6 +159,7 @@ var onStart = function () {
 				}*/
 				gameWorld.playSound(Resources.hit);
         object.health -= 1;
+				player_bot.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
 				for (var i = 0; i < s.health_bar.length; i++) {
 					if (i < object.health) {
 						s.health_bar[i].color = "black";
@@ -243,13 +244,15 @@ var onStart = function () {
   };
   var s = this;
 	var down = function (e) {
-		if (s.ui.active) {
-			var b = s.ui.onButton(e.x, e.y);
+		var layer = s.store_layer.active ? s.store_layer : s.ui;		
+		if (layer.active && s.bg.paused) {
+			var b = layer.onButton(e.x, e.y);
 			if (b) {
 				b.trigger();
   			return;
       }
-		} 
+		}
+		if (s.store_layer.active) return;
     if (!s.player_bot.locked && s.player_bot.stopped()) {
       s.player_bot.angle = Math.round(angle(s.player_bot.x - s.bg.camera.x, s.player_bot.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
       s.player_bot.move(s)
@@ -257,12 +260,13 @@ var onStart = function () {
     //console.log(s.player_bot.locked, s.player_bot.stopped);
 	}
 	var move = function (e) {
-		if (s.ui.active) {
-      var b = s.ui.onButton(e.x, e.y);
+		var layer = s.store_layer.active ? s.store_layer : s.ui;
+		if (layer.active) {
+      var b = layer.onButton(e.x, e.y);
       if (b) {
         b.hover();
       }
-      var buttons = s.ui.entities.filter( function (e) { return e.family == "button"; });
+      var buttons = layer.entities.filter( function (e) { return e.family == "button"; });
       for (var i = 0; i < buttons.length; i++) {
         if (buttons[i] != b && buttons[i].unhover) {
           buttons[i].unhover();

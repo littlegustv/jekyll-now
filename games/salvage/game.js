@@ -11,6 +11,29 @@ var Z = {
 	obstacle: 4
 }
 
+var Shake = Object.create(Behavior);
+Shake.update = function (dt) {
+	if (this.time === undefined) this.time = 0;
+	this.time += dt;
+	if (this.time >= this.duration) this.entity.removeBehavior(this);
+	else {
+		this.entity.x += randint(this.min, this.max) * dt;
+		this.entity.y += randint(this.min, this.max) * dt;
+	}
+}
+
+var DrawEnergy = Object.create(Behavior);
+DrawEnergy.draw = function (ctx) {
+	ctx.strokeStyle = this.color || "blue";
+	ctx.lineWidth = this.width || 1;
+	ctx.beginPath();
+	ctx.moveTo(this.entity.x, this.entity.y);
+	ctx.lineTo(this.entity.x - this.w / 2, this.entity.y + this.h);
+	ctx.moveTo(this.entity.x, this.entity.y);
+	ctx.lineTo(this.entity.x + this.w / 2, this.entity.y + this.h);
+	ctx.stroke();
+}
+
 // push to raindrop -> making setScene(reload) work properly
 World.setScene = function (n, reload) {
 	if (this.scenes[n].reload || reload === true) {
@@ -287,10 +310,10 @@ function lerp_angle (a1, a2, rate) {
 }
 
 var projectile_vertices = [
-	{x: -6, y: -3},
-	{x: 6, y: -3},
-	{x: 6, y: 3},
-	{x: -6, y: 3}
+	{x: -2, y: -2},
+	{x: 2, y: -2},
+	{x: 2, y: 2},
+	{x: -2, y: 2}
 ];
 
 // add cooldown visuals (circle shrinks/brightens, then POW)
@@ -417,66 +440,6 @@ var Weapons = {
 			a.projectile = true;
 			a.velocity = {x: 0, y: 0, angle: PI / 6};
 			return 1.2;			
-	},
-	spark: function (layer) {
-		for (var i = 0; i < 5; i++) {
-			var theta = i * PI2 / 5;
-			var a = layer.add(Object.create(Sprite).init(this.x + Math.cos(theta) * 8, this.y + Math.sin(theta) * 8, Resources.projectile));
-			a.angle = theta;
-			a.addBehavior(Velocity);
-			a.velocity = {x: 40 * Math.cos(theta), y: 40 * Math.sin(theta) };
-			a.addBehavior(FadeOut, {duration: 1});
-			a.setCollision(Polygon);
-			a.setVertices(projectile_vertices);
-			a.collision.onHandle = projectileHit;
-			a.family = this.family;
-			a.projectile = true;
-			gameWorld.playSound(Resources.spark_sound, volume(a));
-		}
-		return 1;
-	},
-	beam: function (layer) {
-		if (this.animations > 1) {
-			this.animation = 1;
-		}
-		this.old_velocity = this.velocity;
-		this.velocity = {x: 0, y: 0};
-		//this.movement.speed = 0;
-		//layer.add(Object.create(Entity).init(gameWorld.width / 2, this.y, 4, gameWorld.width)).addBehavior(FadeOut, {duration: 0.2});
-		var b = layer.add(Object.create(Entity).init(gameWorld.width / 2, this.y, 4, gameWorld.width));
-		b.color = "#e50032";
-		b.setCollision(Polygon);
-		b.collision.onHandle = function (object, other) {
-			if (other.family != object.family && !other.projectile) {
-				var small = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.small));
-				small.addBehavior(FadeOut, {duration: 0.5});
-				gameWorld.playSound(Resources.hit);
-			}
-		};
-		var t = this;
-		b.family = this.family;
-		b.projectile = true;
-		//b.surface = b.addBehavior(Surface, {speed: 0, target: {x: gameWorld.width / 2, y: gameWorld.height / 2 + 60}, radius: 160});
-		b.addBehavior(FadeOut, {delay: 1.3, duration: 0.3, maxOpacity: 1})
-		b.addBehavior(Delay, {duration: 1.6, callback: function () {
-			t.animation = 0;
-			//t.movement.speed = PI / 36;
-			t.velocity = t.old_velocity;
-			//console.log('mhm');
-		}});
-		b.addBehavior(FadeIn, {delay: 0.2, duration: 0.3, maxOpacity: 1});
-		b.opacity = 0;
-		b.z = Z.projectile;
-		var shadow = layer.add(Object.create(Entity).init(b.x, b.y + 2, b.w, b.h));
-		shadow.z = b.z - 1;
-		shadow.angle = this.angle;
-		shadow.color = "#670017";
-		shadow.addBehavior(FadeOut, {delay: 1.3, duration: 0.3, maxOpacity: 1})
-		shadow.addBehavior(FadeIn, {delay: 0.2, duration: 0.3, maxOpacity: 1});
-		b.angle = this.angle;// - PI / 2;
-		gameWorld.playSound(Resources.beam, volume(b));
-		//console.log(b);
-		return 4.5;
 	}
 }
 
@@ -987,20 +950,20 @@ var Store = {
 	},
 	createUI: function () {
 
-		var border = this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 4 + 26, gameWorld.height / 2, 32, gameWorld.height, Resources.building2));
+		var border = this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 128, gameWorld.height / 2, Resources.building2));
 		
-		var b1 = this.layer.add(Object.create(Entity).init(16, gameWorld.height / 2 + 1, gameWorld.width / 2 + 34, gameWorld.height * 2));
-		b1.color = "#000000";
-		var b2 = this.layer.add(Object.create(Entity).init(15, gameWorld.height / 2 + 1, gameWorld.width / 2 + 30, gameWorld.height - 6));
-		b2.color = "white";
+		var b1 = this.layer.add(Object.create(Entity).init(border.x, border.y + 1, border.w - 8, border.h - 16));
+		b1.color = "#000";
+		var b2 = this.layer.add(Object.create(Entity).init(border.x, border.y + 2, border.w - 16, border.h - 24));
+		b2.color = "#fff";
 		
 		var r = [];
 
-		var outer = this.layer.add(Object.create(Sprite).init(3 * gameWorld.width / 4 + 8, gameWorld.height - 16, Resources.silhouette));
+		//var outer = this.layer.add(Object.create(Sprite).init(3 * gameWorld.width / 4 + 8, gameWorld.height - 16, Resources.silhouette));
 		
 		var t = this;
-		var close = this.layer.add(Object.create(Entity).init(gameWorld.width / 6, gameWorld.height - 16, gameWorld.width / 3, 16));
-		this.layer.add(Object.create(SpriteFont).init(12, gameWorld.height - 16, Resources.expire_font, "done...", {align: "left", spacing: -2}));
+		var close = this.layer.add(Object.create(Entity).init(gameWorld.width / 2, 3 * gameWorld.height / 4 - 24, gameWorld.width / 2, 16));
+		this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, 3 * gameWorld.height / 4 - 24, Resources.expire_font, "DONE", {align: "center", spacing: -2}));
 		close.family = "button";
 		close.trigger = function () {
 			t.player.salvage -= t.spent;
@@ -1015,13 +978,14 @@ var Store = {
 		close.unhover = function () {
 			this.color = "white";
 		}
-		this.weapons = {};
-		this.salvage = this.layer.add(Object.create(SpriteFont).init(80, 16, Resources.expire_font, "$ 0", {align: "right", spacing: -2}));
+		//this.weapons = {};
+		this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 4 + 24, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
 		
-		this.layer.add(Object.create(Sprite).init(12, 16, Resources.gem)).velocity = {x: 0, y: 0, angle: PI / 2};
-		this.gems = this.layer.add(Object.create(SpriteFont).init(24, 16, Resources.expire_font, String(t.player.salvage), {align: "left", spacing: -2}));
+		//this.layer.add(Object.create(Sprite).init(12, 16, Resources.gem)).velocity = {x: 0, y: 0, angle: PI / 2};
+		//this.gems = this.layer.add(Object.create(SpriteFont).init(24, 16, Resources.expire_font, String(t.player.salvage), {align: "left", spacing: -2}));
 		
 		var i = 0, j = 0;
+		/*
 		for (var k in Weapons) {
 			if (j <= 2) { // limit to 3
 				(function () {	
@@ -1067,10 +1031,11 @@ var Store = {
 				})();
 				j++; // limit to 3
 			}
-		}
+		}*/
 		
-		this.damageWheel = t.layer.add(Object.create(Wheel).init(52, 44 + (i + 1) * 18, 32, 4, 0.01, 5, 60, ["#000", "#333", "#6DC72E", "#fff"]));
+		//this.damageWheel = t.layer.add(Object.create(Wheel).init(52, 44 + (i + 1) * 18, 32, 4, 0.01, 5, 60, ["#000", "#333", "#6DC72E", "#fff"]));
 		
+		/*
 		var plus = t.layer.add(Object.create(Sprite).init(8, 32 + (++i) * 18, Resources.icons));
 		plus.animation = 1;
 		plus.family = "button";
@@ -1100,11 +1065,11 @@ var Store = {
 				t.salvage.text = "$" + (t.player.salvage - t.spent);
 				//t.health_bar.w = 128 * (t.player.health / MAXHEALTH), t.health_bar.x = gameWorld.width / 6 - (128 - t.health_bar.w) / 2;
 			}
-		};
+		};*/
 
-		minus.hover = function () { this.opacity = 0.6 }
-		minus.unhover = function () { this.opacity = 1 }
-		r.push(minus);
+		//minus.hover = function () { this.opacity = 0.6 }
+		//minus.unhover = function () { this.opacity = 1 }
+		//r.push(minus);
 		
 		for (var i = 0; i < this.layer.entities.length; i++) {
 			this.layer.entities[i].origin = {x: 0, y: 240};
@@ -1115,8 +1080,8 @@ var Store = {
 			this.layer.entities[i].original = this.layer.entities[i].angle;
 		}
 		
-		outer.lerp.goal = -PI / 36;
-		outer.goal = outer.lerp.goal;
+		//outer.lerp.goal = -PI / 36;
+		//outer.goal = outer.lerp.goal;
 		
 		// special exception for off-kilter border
 		//b1.lerp.goal = PI / 36;
@@ -1126,9 +1091,8 @@ var Store = {
 		
 	},
 	open: function () {
-		this.gems.text = "" + this.player.salvage;		
 		this.salvage.text = "$ " + this.player.salvage;
-		this.damageWheel.percentage = 100 * (this.player.health / MAXHEALTH);
+		//this.damageWheel.percentage = 100 * (this.player.health / MAXHEALTH);
 		
 		for (var i = 0; i < this.layer.entities.length; i++) {
 			this.layer.entities[i].lerp.goal = this.layer.entities[i].goal;
@@ -1144,34 +1108,16 @@ var Store = {
 		for (var i = 0; i < gameWorld.scene.layers.length; i++) {
 			gameWorld.scene.layers[i].paused = false;
 		}
-		for (var key in this.weapons) {
-			this.weapons[key].price = Math.max(1, this.player.salvage - 1);
-			this.weapons[key].priceText.text = "$" + this.weapons[key].price;
-		}
-		var theta = angle(this.player.x, this.player.y, gameWorld.shop.x, gameWorld.shop.y);
-		for (var i = 0; i < this.player.salvage; i++) {
-			var g = gameWorld.scene.bg.add(Object.create(Sprite).init(this.player.x, this.player.y, Resources.gem));
-			g.addBehavior(Velocity);
-			var s = randint(80, 110);
-			g.velocity = {x: s * Math.cos(theta), y: s * Math.sin(theta), angle: PI / 12};
-			g.setCollision(Polygon);
-			g.collision.onHandle = function (object, other) {
-				if (other.family == "store") {
-					object.alive = false;
-					gameWorld.playSound(Resources.pickup);
-					for (var i = 0; i < randint(5, 10); i++) {
-						var p = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.particles));
-						p.color = "#0051ee";
-						p.animation = 0;
-						p.addBehavior(Velocity);
-						p.addBehavior(FadeOut, {duration: 0.3});
-						var theta2 = Math.random() * PI2;
-						p.velocity = {x: 20 * Math.cos(theta2), y: 20 * Math.sin(theta)};
-					}
-				}
-			}
-		}
-		this.player.salvage = 0;		
+		gameWorld.scene.bg.camera.addBehavior(Lerp, {object: gameWorld.scene.bg.camera.behaviors[0].offset, field: "y", goal: -7 * gameWorld.height / 8, rate: 10, callback: function () {
+			this.entity.removeBehavior(this);
+		}});
+		gameWorld.boss.energy = gameWorld.boss.addBehavior(DrawEnergy, {h: 32, w: gameWorld.width / 2, color: "#47aeff"});
+		gameWorld.scene.player_bot.energy = gameWorld.scene.player_bot.addBehavior(DrawEnergy, {h: -32, w: gameWorld.width / 2, color: "#47aeff"});
+		gameWorld.boss.addBehavior(Lerp, {object: gameWorld.boss.behaviors[1].offset, field: "y", goal: -3 * gameWorld.height / 4, rate: 10, callback: function () {
+			this.entity.removeBehavior(this);
+		}});
+		gameWorld.boss.behaviors[1].old_rate = gameWorld.boss.behaviors[1].rate;
+		gameWorld.boss.behaviors[1].rate = 10;
 	},
 	close: function () {
 		var t = this;
@@ -1183,8 +1129,18 @@ var Store = {
 			t.layer.active = false;
 			t.player.locked = false;
 		}
-		//gameWorld.scene.claw.lerpx = gameWorld.scene.claw.addBehavior(Lerp, {object: gameWorld.scene.claw, field: "x", goal: gameWorld.width / 2, rate: 5, callback: function () { this.entity.removeBehavior(this.entity.lerpx); }});
-		//gameWorld.scene.claw.lerpy = gameWorld.scene.claw.addBehavior(Lerp, {object: gameWorld.scene.claw, field: "y", goal: - gameWorld.height, rate: 5, callback: function () { this.entity.removeBehavior(this.entity.lerpy); }});
 		gameWorld.current_wave += 1;
+		
+		gameWorld.scene.bg.camera.addBehavior(Lerp, {object: gameWorld.scene.bg.camera.behaviors[0].offset, field: "y", goal: -gameWorld.height / 2, rate: 10, callback: function () {
+			this.entity.removeBehavior(this);
+		}});
+		gameWorld.boss.removeBehavior(gameWorld.boss.energy);
+		gameWorld.scene.player_bot.removeBehavior(gameWorld.scene.player_bot.energy);
+		gameWorld.boss.energy = undefined;
+		gameWorld.scene.player_bot.energy = undefined;
+		gameWorld.boss.addBehavior(Lerp, {object: gameWorld.boss.behaviors[1].offset, field: "y", goal: - gameWorld.height / 3, rate: 10, callback: function () {
+			this.entity.removeBehavior(this);
+			gameWorld.boss.behaviors[1].rate = gameWorld.boss.behaviors[1].old_rate;
+		}});
 	}
 }
