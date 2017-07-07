@@ -39,8 +39,18 @@ var onStart = function () {
 
 	this.health_bar = [];
 	for (var i = 0.5; i < MAXHEALTH + 0.5; i++) {
-		this.health_bar.push(this.ui.add(Object.create(Entity).init(8 + i * Math.ceil((gameWorld.width - 16) / MAXHEALTH), gameWorld.height - 10, Math.ceil((gameWorld.width - 16) / MAXHEALTH) - 2, 16)));
+		this.health_bar.push(this.ui.add(Object.create(Sprite).init(i * 16, gameWorld.height - 12, Resources.icons)));
 	}
+	this.updateHealthBar = function (object) {
+		for (var i = 0; i < s.health_bar.length; i++) {
+			if (i < object.health) {
+				s.health_bar[i].opacity = 1;
+			} else {
+				s.health_bar[i].opacity = 0.3;
+			}
+		}
+	}
+	
 	
 	var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 12, Resources.expire_font, "menu", {align: "center", spacing: -2}));
 	var menu_button = this.ui.add(Object.create(Entity).init(24, 12, 48, 24));
@@ -160,13 +170,7 @@ var onStart = function () {
 				gameWorld.playSound(Resources.hit);
         object.health -= 1;
 				player_bot.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
-				for (var i = 0; i < s.health_bar.length; i++) {
-					if (i < object.health) {
-						s.health_bar[i].color = "black";
-					} else {
-						s.health_bar[i].color = "#999";
-					}
-				}
+				s.updateHealthBar(object);
 				var expl = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.explosion));
 				expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
 				
@@ -176,13 +180,35 @@ var onStart = function () {
 			object.addBehavior(Delay, {duration: 0.5, callback: function () { this.entity.noCollide = false; }})
     }
 		if (object.health <= 0) {
-			object.alive = false;
+			object.die();
 			//p.alive = false;
-      gameWorld.playSound(Resources.hit);
-			gameWorld.setScene(0, true);
 		}
   }
-
+	player_bot.die = function () {
+		s.unpause();
+		s.pause = function () {};
+		player_bot.death = player_bot.addBehavior(Delay, {duration: 1.5, callback: function () {
+			player_bot.alive = false;
+			player_bot.death = undefined;
+			gameWorld.setScene(0, true);
+		}});
+		var expl = player_bot.layer.add(Object.create(Sprite).init(player_bot.x + randint(-8, 8), player_bot.y + randint(-8, 8), Resources.explosion));
+		expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
+		expl.animation = 1;
+		expl.z = 1;
+		gameWorld.playSound(Resources.hit);        
+		for (var i = 0; i < 3; i++) {
+			expl.addBehavior(Delay, {duration: Math.random() * 0.6 + 0.2, callback: function () {
+				var e = player_bot.layer.add(Object.create(Sprite).init(player_bot.x + randint(-8, 8), player_bot.y + randint(-8, 8), Resources.explosion));
+				e.addBehavior(FadeOut, {duration: 0, delay: 0.8});
+				e.animation = 1;
+				e.z = 1;
+				gameWorld.playSound(Resources.hit);        
+				this.entity.removeBehavior(this);
+			}})
+		}
+	}
+	
   this.store_layer = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
   var store = Object.create(Store).init(this.store_layer, player_bot);
   this.store = store;
@@ -253,7 +279,10 @@ var onStart = function () {
       }
 		}
 		if (s.store_layer.active) return;
-    if (!s.player_bot.locked && s.player_bot.stopped()) {
+		if (s.player_bot.death) {
+			s.player_bot.death.duration = 0;
+			return;
+		} else if (!s.player_bot.locked && s.player_bot.stopped()) {
       s.player_bot.angle = Math.round(angle(s.player_bot.x - s.bg.camera.x, s.player_bot.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
       s.player_bot.move(s)
 		}
@@ -387,6 +416,7 @@ var onUpdate = function (dt) {
 			cash.collision.onHandle = function (object, other) {
 				if (other == s.player_bot) {
 					object.alive = false;
+					other.salvage += 1;
 					for (var i = 0; i < 20; i++) {
 						var p = object.layer.add(Object.create(SpriteFont).init(other.x, other.y, Resources.expire_font, "$", {align: "center"}));
 						p.addBehavior(Velocity);

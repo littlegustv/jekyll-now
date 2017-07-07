@@ -37,7 +37,7 @@
 		{"path": "title.png"},
 		{"path": "dust.png", "frames": 4, "speed": 0.2},
 		{"path": "item.png"},
-		{"path": "icons.png", "animations": 13},
+		{"path": "icons.png", "animations": 5},
 		{"path": "missile.png"},
 		{"path": "projectiles.png", "animations": 6},
 		{"path": "small.png"},

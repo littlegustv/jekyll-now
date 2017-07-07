@@ -1035,25 +1035,24 @@ var Store = {
 		
 		//this.damageWheel = t.layer.add(Object.create(Wheel).init(52, 44 + (i + 1) * 18, 32, 4, 0.01, 5, 60, ["#000", "#333", "#6DC72E", "#fff"]));
 		
-		/*
-		var plus = t.layer.add(Object.create(Sprite).init(8, 32 + (++i) * 18, Resources.icons));
-		plus.animation = 1;
+		
+		var plus = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 32, Resources.icons));
+		plus.animation = 0;
 		plus.family = "button";
 		plus.trigger = function () {
 			console.log('repair plus');
 			if (t.player.health < MAXHEALTH && t.spent < t.player.salvage) {
 				t.spent += 1;
 				t.player.health += 1;
-				t.damageWheel.percentage = 100 * (t.player.health / MAXHEALTH);
 				t.salvage.text = "$" + (t.player.salvage - t.spent);
-				//t.health_bar.w = 128 * t.player.health / MAXHEALTH;
-				//t.health_bar.w = 128 * (t.player.health / MAXHEALTH), t.health_bar.x = gameWorld.width / 6 - (128 - t.health_bar.w) / 2;
+				gameWorld.scene.updateHealthBar(t.player);
+				// update healthbar display
 			}
 		};
 		plus.hover = function () { this.opacity = 0.6;}
 		plus.unhover = function () { this.opacity = 1;}
 		r.push(plus);
-		var minus = t.layer.add(Object.create(Sprite).init(8, 32 + (++i) * 18, Resources.icons));
+		/*var minus = t.layer.add(Object.create(Sprite).init(8, 32 + (++i) * 18, Resources.icons));
 		minus.animation = 2;
 		minus.family = "button";
 		minus.trigger = function () { 
