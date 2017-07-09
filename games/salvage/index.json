@@ -50,10 +50,15 @@
 		{"path": "boom.wav"},
 		{"path": "blink1.wav"},
 		{"path": "blink2.wav"},
+		{"path": "buy.wav"},
+		{"path": "coins.wav"},
 		{"path": "pickup.wav"},
 		{"path": "store.wav"},
+		{"path": "hover.wav"},
+		{"path": "select.wav"},
 		{"path": "move.wav"},
 		{"path": "spark_sound.wav"},
+		{"path": "menu.ogg"},
 		{"path": "salvage.ogg"}
 	]
 }

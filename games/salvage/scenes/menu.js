@@ -8,6 +8,27 @@ var onStart =  function () {
 	this.bg.camera.x = -gameWorld.width / 4;
 	this.bg.camera.y = -gameWorld.height / 4;
 	var bg = this.bg;
+
+	Resources.music = Resources.menu;
+	if (!gameWorld.soundtrack) {
+		if (AudioContext) {
+		  gameWorld.filter = gameWorld.audioContext.createBiquadFilter();
+		  // Create the audio graph.
+		  gameWorld.filter.connect(gameWorld.audioContext.destination);
+		  // Create and specify parameters for the low-pass filter.
+		  gameWorld.filter.type = 'lowpass'; // Low-pass filter. See BiquadFilterNode docs
+		  gameWorld.filter.frequency.value = 24000; // Set cutoff to 440 HZ
+		}
+
+		gameWorld.musicLoop = function () {
+		  gameWorld.soundtrack = gameWorld.playSound(Resources.music, 1);
+		  gameWorld.soundtrack.connect(gameWorld.filter);
+		  gameWorld.soundtrack.onended = gameWorld.musicLoop;
+		}
+		gameWorld.musicLoop();
+	}
+
+
 	
 	bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height)).color = "#fff";
 	/*

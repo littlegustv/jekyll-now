@@ -1,23 +1,6 @@
 var onStart = function () {
 	
-	if (!gameWorld.soundtrack) {
-    if (AudioContext) {
-      gameWorld.filter = gameWorld.audioContext.createBiquadFilter();
-      // Create the audio graph.
-      gameWorld.filter.connect(gameWorld.audioContext.destination);
-      // Create and specify parameters for the low-pass filter.
-      gameWorld.filter.type = 'lowpass'; // Low-pass filter. See BiquadFilterNode docs
-      gameWorld.filter.frequency.value = 24000; // Set cutoff to 440 HZ
-    }
-   
-    gameWorld.musicLoop = function () {
-      gameWorld.soundtrack = gameWorld.playSound(Resources.salvage, 1);
-      gameWorld.soundtrack.connect(gameWorld.filter);
-      gameWorld.soundtrack.onended = gameWorld.musicLoop;
-    }
-    gameWorld.musicLoop();
-  }
-	
+	Resources.music = Resources.salvage;
   //var super_bg = this.addLayer(Object.create(Layer).init(1000,1000));
   //super_bg.active = true;
   //var parallax = this.addLayer(Object.create(Layer).init(1000,1000));
@@ -59,10 +42,12 @@ var onStart = function () {
 	menu_button.trigger = function () {
 		if (s.bg.paused) {
 			gameWorld.setScene(0);
+      gameWorld.playSound(Resources.select);
 		}
 	};
-	menu_button.hover = function () {
-		menu_text.scale = 2;
+	menu_button.hover = function () {		
+    if (menu_text.scale != 2) gameWorld.playSound(Resources.hover);
+    menu_text.scale = 2;
 	};
 	menu_button.unhover = function () {
 		menu_text.scale = 1;
@@ -73,10 +58,12 @@ var onStart = function () {
 	mute_button.family = "button";
 	mute_button.opacity = 0;
 	mute_button.trigger = function () {
+      gameWorld.playSound(Resources.select);
 		// mute!
 	};
 	mute_button.hover = function () {
-		mute_text.scale = 2;
+    if (mute_text.scale != 2) gameWorld.playSound(Resources.hover);
+    mute_text.scale = 2;
 	};
 	mute_button.unhover = function () {
 		mute_text.scale = 1;
@@ -199,7 +186,7 @@ var onStart = function () {
 		gameWorld.playSound(Resources.hit);        
 		for (var i = 0; i < 3; i++) {
 			expl.addBehavior(Delay, {duration: Math.random() * 0.6 + 0.2, callback: function () {
-				var e = player_bot.layer.add(Object.create(Sprite).init(player_bot.x + randint(-8, 8), player_bot.y + randint(-8, 8), Resources.explosion));
+				var e = player_bot.layer.add(Object.create(Sprite).init(player_bot.x + randint(-32, 32), player_bot.y + randint(-32, 32), Resources.explosion));
 				e.addBehavior(FadeOut, {duration: 0, delay: 0.8});
 				e.animation = 1;
 				e.z = 1;
@@ -219,8 +206,10 @@ var onStart = function () {
   e.opacity = 0;
   e.trigger = function () {
     store.open();
+    gameWorld.playSound(Resources.select);
   }
   e.hover = function () {
+    if (store_text.scale != 2) gameWorld.playSound(Resources.hover);
     store_text.scale = 2;
   };
   e.unhover = function () {
@@ -417,6 +406,7 @@ var onUpdate = function (dt) {
 				if (other == s.player_bot) {
 					object.alive = false;
 					other.salvage += 1;
+          gameWorld.playSound(Resources.coins);
 					for (var i = 0; i < 20; i++) {
 						var p = object.layer.add(Object.create(SpriteFont).init(other.x, other.y, Resources.expire_font, "$", {align: "center"}));
 						p.addBehavior(Velocity);
