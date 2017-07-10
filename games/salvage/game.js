@@ -602,24 +602,8 @@ Entity.init = function (x, y, w, h) {
 var Target = Object.create(Behavior);
 Target.update = function (dt) {
 	if (this.angle === undefined) this.angle = 0;
-	if (distance(this.entity.x, this.entity.y, this.target.x, this.target.y) < this.min) {
-		// move towards offset point
-		if (this.target.orbiting === undefined) this.target.orbiting = [];
-		if (this.target.orbiting.indexOf(this.entity) == -1) this.target.orbiting.push(this.entity);
-
-		var theta = this.target.orbiting.indexOf(this.entity) * PI2 / this.target.orbiting.length;
-		console.log('theta', theta);
-		this.angle =  lerp_angle(this.angle, angle(this.entity.x, this.entity.y, this.target.x + Math.cos(theta) * this.min, this.target.y + Math.sin(theta) * this.min) + PI / 2, this.turn_rate * dt);
-		this.entity.velocity = {x: Math.cos(this.angle) * this.speed, y: Math.sin(this.angle) * this.speed};		
-	} else {
-		if (this.target.orbiting && this.target.orbiting.indexOf(this.entity) != -1) {
-			console.log('b4', this.target.orbiting.length);
-			this.target.orbiting.splice(this.target.orbiting.indexOf(this.entity), 1);
-			console.log('aftah', this.target.orbiting.length);			
-		}
-		this.angle =  lerp_angle(this.angle, angle(this.entity.x, this.entity.y, this.target.x, this.target.y), this.turn_rate * dt);
-		this.entity.velocity = {x: Math.cos(this.angle) * this.speed, y: Math.sin(this.angle) * this.speed};		
-	}
+	this.angle =  lerp_angle(this.angle, angle(this.entity.x, this.entity.y, this.target.x + this.offset.x, this.target.y + this.offset.y), this.turn_rate * dt);
+	this.entity.velocity = {x: Math.cos(this.angle) * this.speed, y: Math.sin(this.angle) * this.speed};		
 };
 
 var Wheel = Object.create(Entity);
@@ -705,7 +689,7 @@ function spawn(layer, key, player) {
 	enemy.setCollision(Polygon);
 	switch (key) {
 		case 0:
-			enemy.addBehavior(Target, {target: player, speed: 55, turn_rate: 2.5, min: 32});
+			enemy.addBehavior(Target, {target: player, speed: 55, turn_rate: 2.5, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
 			enemy.shoot = Weapons.standard;
 			enemy.target = player;
 			enemy.setVertices([
@@ -713,7 +697,7 @@ function spawn(layer, key, player) {
 			]);
 			break;
 		case 1:
-			enemy.addBehavior(Target, {target: player, speed: 25, turn_rate: 2.5, min: 32});
+			enemy.addBehavior(Target, {target: player, speed: 25, turn_rate: 2.5, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
 			enemy.shoot = Weapons.triple;
 			enemy.target = player;
 			enemy.setVertices([
@@ -721,7 +705,7 @@ function spawn(layer, key, player) {
 			]);			
 			break;
 		case 2:
-			enemy.addBehavior(Target, {target: player, speed: 5, turn_rate: 1, min: 32});
+			enemy.addBehavior(Target, {target: player, speed: 5, turn_rate: 1, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
 			enemy.shoot = Weapons.burst;
 			enemy.target = player;
 			enemy.setVertices([
@@ -741,7 +725,7 @@ function spawn(layer, key, player) {
 		case 4:
 		// needs a bit of tweaking for balance/difficulty - maybe only useful in combination? - 
 		// - perhaps more explicit movement (tried to make box around you, e.g) would be better
-			enemy.addBehavior(Target, {target: player, speed: 35, turn_rate: 1, min: 32});
+			enemy.addBehavior(Target, {target: player, speed: 35, turn_rate: 1, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
 			enemy.shoot = Weapons.proximity;
 			enemy.setVertices([
 				{x: -4, y: 0}, {x: 0, y: 4}, {x: 4, y: 0}, {x: 0, y: -4}
@@ -749,7 +733,7 @@ function spawn(layer, key, player) {
 			break;
 		case 5:
 		// homing should A: start in the right direction, B: be faster?
-			enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 5, min: 32});
+			enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 5, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
 			enemy.target = player;
 			enemy.shoot = Weapons.homing;
 			enemy.setVertices([

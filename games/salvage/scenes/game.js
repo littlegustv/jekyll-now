@@ -141,7 +141,7 @@ var onStart = function () {
 		if (object.noCollide) return;
 		
     if (other.family == "enemy") {
-      if (!other.projectile && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 4 ) {
+      if (!other.projectile) {//} && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 4 ) {
         // take no damage from the FRONT when it isn't a projectile...
       } else {
         //var small = object.layer.add(Object.create(SpriteFont).init(object.x, object.y, Resources.expire_font, choose(["ow!", "oh no", ":(", "jeez", "ok.", "sorry."]), {spacing: -2, align: "center"}));
@@ -338,6 +338,7 @@ var onStart = function () {
     [6, 6, 6, 6, 4, 4, 5],
 		[6,6, 5]
 	];
+	this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 	
 	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.boss));
 	boss.addBehavior(LerpFollow, {target: player_bot, offset: {x: 0, y: -gameWorld.height / 3, angle: false}, rate: 0.3});
