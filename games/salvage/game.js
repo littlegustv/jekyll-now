@@ -25,7 +25,7 @@ Shake.update = function (dt) {
 var DrawEnergy = Object.create(Behavior);
 DrawEnergy.draw = function (ctx) {
 	ctx.strokeStyle = this.color || "blue";
-	ctx.lineWidth = this.width || 1;
+	ctx.lineWidth = this.thickness || 1;
 	ctx.beginPath();
 	ctx.moveTo(this.entity.x, this.entity.y);
 	ctx.lineTo(this.entity.x - this.w / 2, this.entity.y + this.h);
@@ -665,7 +665,7 @@ TractorBeam.update = function (dt) {
 TractorBeam.draw = function (ctx) {
 	ctx.beginPath();
 	ctx.strokeStyle = this.color || "black";
-	ctx.lineWidth = 1;//this.width || 2;
+	ctx.lineWidth = this.thickness || 2;
 	ctx.moveTo(this.entity.x, this.entity.y);
 	ctx.lineTo(this.origin.x - this.target.w / 2, this.origin.y);
 	ctx.moveTo(this.entity.x, this.entity.y);
@@ -781,7 +781,7 @@ function spawn(layer, key, player) {
 			}})
 		}
 		var scrap = enemy.layer.add(Object.create(Entity).init(enemy.x, enemy.y, 4, 4));
-		gameWorld.boss.addBehavior(TractorBeam, {target: scrap, turn_rate: 5, speed: 50, color: "#47aeff", width: 3.5, rate: 6, origin: {x: gameWorld.boss.x, y: gameWorld.boss.y}});
+		gameWorld.boss.addBehavior(TractorBeam, {target: scrap, turn_rate: 5, speed: 50, color: "#000", thickness: 2, width: 3.5, rate: 6, origin: {x: gameWorld.boss.x, y: gameWorld.boss.y}});
 		scrap.addBehavior(Velocity);
 		scrap.velocity = {x: 0, y: 0};
 		scrap.setCollision(Polygon);
@@ -1098,25 +1098,32 @@ var Store = {
 		}
 		var t = this;
 		this.layer.entities[0].lerp.callback = function () {
-			for (var i = 0; i < gameWorld.scene.layers.length; i++) {
+			/*for (var i = 0; i < gameWorld.scene.layers.length; i++) {
 				gameWorld.scene.layers[i].paused = true;
 				t.layer.paused = false;
-			}	
+			}*/	
 		}
 		this.layer.active = true;
 		for (var i = 0; i < gameWorld.scene.layers.length; i++) {
-			gameWorld.scene.layers[i].paused = false;
+			gameWorld.scene.layers[i].paused = true;
 		}
+		this.layer.paused = false;
+
 		gameWorld.scene.bg.camera.addBehavior(Lerp, {object: gameWorld.scene.bg.camera.behaviors[0].offset, field: "y", goal: -7 * gameWorld.height / 8, rate: 10, callback: function () {
 			this.entity.removeBehavior(this);
 		}});
-		gameWorld.boss.energy = gameWorld.boss.addBehavior(DrawEnergy, {h: 32, w: gameWorld.width / 2, color: "#47aeff"});
-		gameWorld.scene.player_bot.energy = gameWorld.scene.player_bot.addBehavior(DrawEnergy, {h: -32, w: gameWorld.width / 2, color: "#47aeff"});
-		gameWorld.boss.addBehavior(Lerp, {object: gameWorld.boss.behaviors[1].offset, field: "y", goal: -3 * gameWorld.height / 4, rate: 10, callback: function () {
+		gameWorld.boss.energy = gameWorld.boss.addBehavior(DrawEnergy, {h: 32, w: gameWorld.width / 2, color: "#000", thickness: 2});
+		gameWorld.scene.player_bot.energy = gameWorld.scene.player_bot.addBehavior(DrawEnergy, {h: -32, w: gameWorld.width / 2, color: "#000", thickness: 2});
+		gameWorld.boss.old_x = gameWorld.boss.x;
+		gameWorld.boss.old_y = gameWorld.boss.y;
+		gameWorld.boss.x = this.player.x;
+		gameWorld.boss.y = this.player.y - 3 * gameWorld.height / 4;
+		gameWorld.boss.lerpFollow.old_rate = gameWorld.boss.lerpFollow.rate;
+		gameWorld.boss.lerpFollow.rate = 0;
+/*		gameWorld.boss.addBehavior(Lerp, {object: gameWorld.boss.behaviors[1].offset, field: "y", goal: -3 * gameWorld.height / 4, rate: 10, callback: function () {
 			this.entity.removeBehavior(this);
-		}});
-		gameWorld.boss.behaviors[1].old_rate = gameWorld.boss.behaviors[1].rate;
-		gameWorld.boss.behaviors[1].rate = 10;
+		}});*/
+		//gameWorld.boss.behaviors[1].rate = 10;
 	},
 	close: function () {
 		var t = this;

@@ -341,7 +341,7 @@ var onStart = function () {
 	this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 	
 	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.boss));
-	boss.addBehavior(LerpFollow, {target: player_bot, offset: {x: 0, y: -gameWorld.height / 3, angle: false}, rate: 0.3});
+	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, offset: {x: 0, y: -gameWorld.height / 3, angle: false}, rate: 0.3});
 	boss.setCollision(Polygon);
 	gameWorld.boss = boss;
 	
