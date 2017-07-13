@@ -20,20 +20,24 @@ var onStart = function () {
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	this.ui.active = true;
 
-	this.health_bar = [];
+	this.health_bar = [];	
 	for (var i = 0.5; i < MAXHEALTH + 0.5; i++) {
 		this.health_bar.push(this.ui.add(Object.create(Sprite).init(i * 16, gameWorld.height - 12, Resources.icons)));
 	}
+	this.shield = this.ui.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 12, Resources.icons));
+	this.shield.animation = 1;
+	
+	var s = this;
 	this.updateHealthBar = function (object) {
 		for (var i = 0; i < s.health_bar.length; i++) {
 			if (i < object.health) {
 				s.health_bar[i].opacity = 1;
-			} else {
+			} else if (i < MAXHEALTH) {
 				s.health_bar[i].opacity = 0.3;
-			}
+			} 
 		}
+		this.shield.opacity = object.shield;
 	}
-	
 	
 	var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 12, Resources.expire_font, "menu", {align: "center", spacing: -2}));
 	var menu_button = this.ui.add(Object.create(Entity).init(24, 12, 48, 24));
@@ -126,6 +130,8 @@ var onStart = function () {
   player_bot.acceleration = {x: 0, y: 0};
   player_bot.opacity = 1;
 	player_bot.health = MAXHEALTH;
+	player_bot.shield = 0;
+	player_bot.shield_sprite = this.shield;
 	player_bot.z = Z.entity;
   //player_bot.addBehavior(Bound, {min: {x: 6, y: -gameWorld.height * 5}, max: {x: gameWorld.width - 6, y: 5 * gameWorld.height}});
 	player_bot.salvage = 0;
@@ -137,34 +143,42 @@ var onStart = function () {
 	player_bot.stopped = function () {
 		return !this.lerpx && !this.lerpy;
 	}
+	
+	this.updateHealthBar(player_bot);
   player_bot.collision.onHandle = function (object, other) {
 		if (object.noCollide) return;
 		
     if (other.family == "enemy") {
-      if (!other.projectile) {//} && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 4 ) {
-        // take no damage from the FRONT when it isn't a projectile...
+      if (!other.projectile) {
       } else {
-        //var small = object.layer.add(Object.create(SpriteFont).init(object.x, object.y, Resources.expire_font, choose(["ow!", "oh no", ":(", "jeez", "ok.", "sorry."]), {spacing: -2, align: "center"}));
-				/*small.z = Z.obstacle + 1;
-        if (randint(0,10) < 5) {					
-					small.addBehavior(FadeOut, {duration: 1.5});
-					small.addBehavior(Grow, {duration: 1, max: 2});
-        } else {
-					small.addBehavior(FadeOut, {duration: 1.5});
-					small.addBehavior(Velocity);
-					small.velocity = {x: 0, y: 0, angle: PI};
-				}*/
 				gameWorld.playSound(Resources.hit);
-        object.health -= 1;
-				player_bot.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
+				if (object.shield >= 1) {
+					object.shield = 0;
+					//object.addBehavior(Delay, {duration: 1.5, callback: function () { this.entity.noCollide = false; }})
+				} else {
+        	object.health -= 1;
+					object.addBehavior(Delay, {duration: 0.5, callback: function () { this.entity.noCollide = false; }})
+				}
+				object.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
 				s.updateHealthBar(object);
 				var expl = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.explosion));
 				expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
 				
+				if (object.retaliate >= 1) {
+					for (var i = 0; i < 3; i++) {
+						var theta = i * PI2 / 3;
+						var p =object.layer.add(Object.create(Entity).init(object.x, object.y, 4, 4));
+						p.addBehavior(Velocity);
+						p.velocity = {x: 40 * Math.cos(theta), y: 40 * Math.sin(theta)};
+						p.projectile = true;
+						p.family = object.family;
+						p.setCollision(Polygon);
+					}
+				}
+				
   			//object.damage.timer = DAMAGE_COOLDOWN;
       }
 			object.noCollide = true;
-			object.addBehavior(Delay, {duration: 0.5, callback: function () { this.entity.noCollide = false; }})
     }
 		if (object.health <= 0) {
 			object.die();
@@ -223,7 +237,7 @@ var onStart = function () {
 	this.player_bot = player_bot;
   var t = this;
 
-	bg.camera.addBehavior(LerpFollow, {target: player_bot, offset: {x: -gameWorld.width / 2, y: -gameWorld.height / 2}, rate: 5});
+	bg.camera.addBehavior(Follow, {target: player_bot, offset: {x: -gameWorld.width / 2, y: -gameWorld.height / 2}, rate: 5});
   fg.camera.addBehavior(Follow, {target: bg.camera, offset: {x: 0, y: 0}});
 	
   this.bg = bg;
@@ -338,7 +352,7 @@ var onStart = function () {
     [6, 6, 6, 6, 4, 4, 5],
 		[6,6, 5]
 	];
-	this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
+	//this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 	
 	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.boss));
 	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, offset: {x: 0, y: -gameWorld.height / 3, angle: false}, rate: 0.3});

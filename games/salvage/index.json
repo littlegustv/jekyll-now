@@ -57,8 +57,6 @@
 		{"path": "hover.wav"},
 		{"path": "select.wav"},
 		{"path": "move.wav"},
-		{"path": "spark_sound.wav"},
-		{"path": "menu.ogg"},
-		{"path": "salvage.ogg"}
+		{"path": "spark_sound.wav"}
 	]
 }

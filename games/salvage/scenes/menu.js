@@ -25,7 +25,10 @@ var onStart =  function () {
 		  gameWorld.soundtrack.connect(gameWorld.filter);
 		  gameWorld.soundtrack.onended = gameWorld.musicLoop;
 		}
-		gameWorld.musicLoop();
+		//gameWorld.musicLoop();
+		/*,
+		{"path": "menu.ogg"},
+		{"path": "salvage.ogg"}*/
 	}
 
 

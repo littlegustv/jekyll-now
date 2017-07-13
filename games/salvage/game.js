@@ -10,7 +10,31 @@ var Z = {
 	entity: 3,
 	obstacle: 4
 }
- 
+
+var buttonHover = function () { 
+	if (this.opacity != 0.6) gameWorld.playSound(Resources.hover);
+	this.opacity = 0.6;
+};
+var buttonUnHover = function () { this.opacity = 1;};
+
+// very custom, so avoid passing parameters and just assume them...
+var Radar = Object.create(Behavior);
+Radar.draw = function(ctx) {
+	var t = this;
+	var concerning = this.entity.layer.entities.filter(function (e) { return e.family == "enemy" && !e.projectile && (!between(e.x, t.entity.x - gameWorld.width / 2, t.entity.x + gameWorld.width / 2) || !between(e.y, t.entity.y - gameWorld.height / 2, t.entity.y + gameWorld.height / 2)); });
+	ctx.fillStyle = "black";
+	for (var i = 0; i < concerning.length; i++) {
+		ctx.fillRect(clamp(concerning[i].x, this.entity.x - gameWorld.width / 2, this.entity.x + gameWorld.width / 2) - 2, clamp(concerning[i].y, this.entity.y - gameWorld.height / 2, this.entity.y + gameWorld.height / 2) - 2, 4, 4);
+	}
+}
+
+var Shielded = Object.create(Behavior);
+Shielded.update = function (dt) {
+	if (this.entity.shield < 1) this.entity.shield += dt * this.rate;
+	else this.entity.shield = 1;
+	this.entity.shield_sprite.opacity = this.entity.shield;
+}
+
 var Shake = Object.create(Behavior);
 Shake.update = function (dt) {
 	if (this.time === undefined) this.time = 0;
@@ -754,7 +778,7 @@ function spawn(layer, key, player) {
 	enemy.collision.onHandle = function (object, other) {
 		if (object.shielded && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 4) {
 			console.log('shielded!');
-		} else if (other == player) {
+		} else if (other.family == "player") {
 			enemy.alive = false;
 			enemy.die();
 		}
@@ -976,67 +1000,28 @@ var Store = {
 		}
 		//this.weapons = {};
 		this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 4 + 24, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
-		
-		//this.layer.add(Object.create(Sprite).init(12, 16, Resources.gem)).velocity = {x: 0, y: 0, angle: PI / 2};
-		//this.gems = this.layer.add(Object.create(SpriteFont).init(24, 16, Resources.expire_font, String(t.player.salvage), {align: "left", spacing: -2}));
-		
-		var i = 0, j = 0;
-		/*
-		for (var k in Weapons) {
-			if (j <= 2) { // limit to 3
-				(function () {	
-					var key = k;
-					var b = t.layer.add(Object.create(Entity).init(gameWorld.width / 6, 40 + i * 18, gameWorld.width / 3, 16));
-					b.color = "white";				
-
-					var icon = t.layer.add(Object.create(Sprite).init(8, 40 + i * 18, Resources.icons));
-					b.name = t.layer.add(Object.create(SpriteFont).init(26, 40 + i * 18, Resources.expire_font, k, {align: "left", spacing: -2}));
-					b.icon = icon;
-					t.weapons[key] = b;
-					icon.animation = (i + 3) % Resources.icons.animations;
-					b.family = "button";
-					b.purchase = key;
-					b.price = 1;
-					b.priceText = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 3, 40 + i * 18, Resources.expire_font, "$" + b.price, {align: "right", spacing: -2}));
-					b.trigger = function () {
-						if (t.weapon == key && t.spent >= this.price) {
-							t.weapon = undefined;
-							t.spend(-1 * this.price);
-							this.color = "white";
-							//this.opacity = 1;
-						} else {
-							if (t.weapon) {
-								t.weapons[t.weapon].color = "white";
-								t.spend(-1 * this.price);
-							}
-							if (t.player.salvage > (t.spent + this.price)) {
-								t.weapon = key;
-								this.color = "#6DC72E";
-								t.spend(this.price);
-							}
-						}
-					}
-					b.hover = function () {
-						this.color = "#6DC72E";
-					}
-					b.unhover = function () {
-						if (t.weapon != this.purchase)
-							this.color = "white";
-					}
-					i++;
-				})();
-				j++; // limit to 3
+				
+		var buy_shield = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 48, Resources.icons));
+		buy_shield.animation = 1;
+		buy_shield.family = "button";
+		buy_shield.trigger = function () {
+			gameWorld.playSound(Resources.select);
+			if (t.spent < t.player.salvage) {
+				t.spent += 1;
+				t.player.addBehavior(Shielded, {rate: 1});
+				t.salvage.text = "$" + (t.player.salvage - t.spent);
+				gameWorld.scene.updateHealthBar(t.player);
+				// update healthbar display
 			}
-		}*/
-		
-		//this.damageWheel = t.layer.add(Object.create(Wheel).init(52, 44 + (i + 1) * 18, 32, 4, 0.01, 5, 60, ["#000", "#333", "#6DC72E", "#fff"]));
-		
+		};
+		buy_shield.hover = buttonHover;
+		buy_shield.unhover = buttonUnHover;
+		r.push(buy_shield);
 		
 		var plus = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 32, Resources.icons));
 		plus.animation = 0;
 		plus.family = "button";
 		plus.trigger = function () {
-			console.log('repair plus');			
 			gameWorld.playSound(Resources.select);
 			if (t.player.health < MAXHEALTH && t.spent < t.player.salvage) {
 				t.spent += 1;
@@ -1046,12 +1031,24 @@ var Store = {
 				// update healthbar display
 			}
 		};
-		plus.hover = function () { 
-		    if (this.opacity != 0.6) gameWorld.playSound(Resources.hover);
-			this.opacity = 0.6;
-		}
-		plus.unhover = function () { this.opacity = 1;}
+		plus.hover = buttonHover;
+		plus.unhover = buttonUnHover
 		r.push(plus);
+		
+		var buy_radar = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 64, Resources.icons));
+		buy_radar.animation = 2;
+		buy_radar.family = "button";
+		buy_radar.trigger = function () {
+			gameWorld.playSound(Resources.select);
+			if (t.spent < t.player.salvage) {
+				t.spent += 1;
+				t.salvage.text = "$" + (t.player.salvage - t.spent);
+				t.player.addBehavior(Radar);
+			}
+		};
+		buy_radar.hover = buttonHover;
+		buy_radar.unhover = buttonUnHover
+		r.push(buy_radar);
 		/*var minus = t.layer.add(Object.create(Sprite).init(8, 32 + (++i) * 18, Resources.icons));
 		minus.animation = 2;
 		minus.family = "button";
