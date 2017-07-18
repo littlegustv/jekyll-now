@@ -5,6 +5,7 @@
 	],
 	"resources": [
 		{"path": "viper.png", "frames": 4, "animations": 1, "speed": 0.5},
+		{"path": "modules.png", "frames": 4, "animations": 1, "speed": 0.5},
 		{"path": "shockwave.png", "frames": 5, "animations": 1, "speed": 0.2},
 		{"path": "hanger.png", "frames": 4, "animations": 1, "speed": 0.2},
 		{"path": "bug.png", "frames": 4, "animations": 1, "speed": 0.1},
