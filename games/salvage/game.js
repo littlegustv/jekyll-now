@@ -808,14 +808,12 @@ function spawn(layer, key, player) {
 		enemy.alive = false;
 		var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
 		expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
-		expl.animation = 1;
 		expl.z = 1;
 		gameWorld.playSound(Resources.hit);        
 		for (var i = 0; i < 3; i++) {
 			expl.addBehavior(Delay, {duration: Math.random() * 0.6 + 0.2, callback: function () {
 				var e = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
 				e.addBehavior(FadeOut, {duration: 0, delay: 0.8});
-				e.animation = 1;
 				e.z = 1;
 				gameWorld.playSound(Resources.hit);        
 				this.entity.removeBehavior(this);

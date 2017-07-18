@@ -4,7 +4,7 @@
 		{"name": "game", "reload": true}
 	],
 	"resources": [
-		{"path": "viper.png", "frames": 2, "animations": 1, "speed": 0.5},
+		{"path": "viper.png", "frames": 4, "animations": 1, "speed": 0.5},
 		{"path": "shockwave.png", "frames": 5, "animations": 1, "speed": 0.2},
 		{"path": "hanger.png", "frames": 4, "animations": 1, "speed": 0.2},
 		{"path": "bug.png", "frames": 4, "animations": 1, "speed": 0.1},
@@ -21,7 +21,7 @@
 		{"path": "bomber.png", "frames": 2, "animations": 1, "speed": 0.5},
 		{"path": "x.png", "frames": 2, "animations": 1, "speed": 0.5},
 		{"path": "saucer.png", "frames": 5, "animations": 1, "speed": 0.5},
-		{"path": "explosion.png", "frames": 8, "animations": 3, "speed": 0.1},
+		{"path": "explosion.png", "frames": 9, "animations": 1, "speed": 0.08},
 		{"path": "unshielded.png", "frames": 5, "animations": 1, "speed": 0.2},
 		{"path": "shielded.png", "frames": 5, "animations": 1, "speed": 0.2},
 		{"path": "fighter.png", "frames": 5, "animations": 1, "speed": 0.2},

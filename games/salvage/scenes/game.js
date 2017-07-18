@@ -195,14 +195,14 @@ var onStart = function () {
 		}});
 		var expl = player_bot.layer.add(Object.create(Sprite).init(player_bot.x + randint(-8, 8), player_bot.y + randint(-8, 8), Resources.explosion));
 		expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
-		expl.animation = 1;
+		//expl.animation = 1;
 		expl.z = 1;
 		gameWorld.playSound(Resources.hit);        
 		for (var i = 0; i < 3; i++) {
 			expl.addBehavior(Delay, {duration: Math.random() * 0.6 + 0.2, callback: function () {
 				var e = player_bot.layer.add(Object.create(Sprite).init(player_bot.x + randint(-32, 32), player_bot.y + randint(-32, 32), Resources.explosion));
 				e.addBehavior(FadeOut, {duration: 0, delay: 0.8});
-				e.animation = 1;
+				//e.animation = 1;
 				e.z = 1;
 				gameWorld.playSound(Resources.hit);        
 				this.entity.removeBehavior(this);
