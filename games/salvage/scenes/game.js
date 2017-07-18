@@ -15,7 +15,7 @@ var onStart = function () {
   b.color = "#ffffff";
   b.z = -10;
 	
-	bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 48 * gameWorld.width, 48 * gameWorld.height, Resources.grid)).z = -8;
+	bg.add(Object.create(TiledBackground).init(0, 0, 48 * gameWorld.width, 48 * gameWorld.height, Resources.grid)).z = -8;
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	this.ui.active = true;
@@ -120,7 +120,7 @@ var onStart = function () {
 	//bg.add(Object.create(TiledBackground).init(-8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
 	//bg.add(Object.create(TiledBackground).init(gameWorld.width + 8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
 	
-  var player_bot = bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2, Resources.viper));
+  var player_bot = bg.add(Object.create(Sprite).init(48, 48, Resources.viper));
   player_bot.color = "red";
   player_bot.setCollision(Polygon);
 	player_bot.move = Movement.standard;

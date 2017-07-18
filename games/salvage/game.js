@@ -626,8 +626,25 @@ Entity.init = function (x, y, w, h) {
 var Target = Object.create(Behavior);
 Target.update = function (dt) {
 	if (this.angle === undefined) this.angle = 0;
+	if (!this.offset) {
+			this.entity.opacity = 0.5;
+		return;
+	}
 	this.angle =  lerp_angle(this.angle, angle(this.entity.x, this.entity.y, this.target.x + this.offset.x, this.target.y + this.offset.y), this.turn_rate * dt);
 	this.entity.velocity = {x: Math.cos(this.angle) * this.speed, y: Math.sin(this.angle) * this.speed};		
+};
+
+// target, speed, goal, tilesize
+var NewTarget = Object.create(Behavior);
+NewTarget.update = function (dt) {
+	if (this.entity.x === this.goal.x && this.entity.y === this.goal.y) {
+		// new goal
+		var sx = sign(this.target.x - this.entity.x), sy = sign(this.target.y - this.entity.y);
+		this.goal = {x: Math.round(this.entity.x / this.tilesize) * this.tilesize + sx * this.tilesize, y: Math.round(this.entity.y / this.tilesize) * this.tilesize + sy * this.tilesize};
+	} else {
+		this.entity.x = lerp(this.entity.x, this.goal.x, 0.5 * this.speed * dt);
+		this.entity.y = lerp(this.entity.y, this.goal.y, this.speed * dt);
+	}
 };
 
 var Wheel = Object.create(Entity);
@@ -702,7 +719,7 @@ var sprites = ["drone", "saucer", "unshielded", "bomber", "saucer", "drone", "un
 function spawn(layer, key, player) {
 	var theta = Math.random() * PI2;
 	var x = player.x + randint(- gameWorld.width / 2,  gameWorld.width / 2), y = player.y + randint(-gameWorld.height / 2, gameWorld.height / 2);
-	var enemy = Object.create(Sprite).init(x, y, Resources[sprites[key % sprites.length]]);
+	var enemy = Object.create(Sprite).init(Math.round(x / 48) * 48, Math.round(y / 48) * 48, Resources[sprites[key % sprites.length]]);
 
 	//enemy.animation = animations[key];
 	//enemy.addBehavior(Crop, {min: {x: -16, y: -1000}, max: {x: gameWorld.width + 16, y: 1000}});
@@ -713,7 +730,7 @@ function spawn(layer, key, player) {
 	enemy.setCollision(Polygon);
 	switch (key) {
 		case 0:
-			enemy.addBehavior(Target, {target: player, speed: 55, turn_rate: 2.5, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
+			enemy.addBehavior(NewTarget, {target: player, speed: 2, tilesize: 48, goal: {x: enemy.x, y: enemy.y}});
 			enemy.shoot = Weapons.standard;
 			enemy.target = player;
 			enemy.setVertices([
@@ -729,7 +746,7 @@ function spawn(layer, key, player) {
 			]);			
 			break;
 		case 2:
-			enemy.addBehavior(Target, {target: player, speed: 5, turn_rate: 1, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
+			enemy.addBehavior(Target, {target: player, speed: 0, turn_rate: 0, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
 			enemy.shoot = Weapons.burst;
 			enemy.target = player;
 			enemy.setVertices([
@@ -738,8 +755,8 @@ function spawn(layer, key, player) {
 			break;
 		case 3:
 		// fix me: collisions still a bit bad; need feedback/bounceback for failed hit especially
-			enemy.x = Math.round(enemy.x / 48) * 48, enemy.y = Math.round(enemy.y / 48) * 48;
-			enemy.addBehavior(Charge, {target: player, distance: 48, rate: 3});
+			//enemy.x = Math.round(enemy.x / 48) * 48, enemy.y = Math.round(enemy.y / 48) * 48;
+			//enemy.addBehavior(Charge, {target: player, distance: 48, rate: 3});
 			enemy.velocity = {x: 0, y: 0};
 			enemy.shielded = true;
 			enemy.setVertices([
