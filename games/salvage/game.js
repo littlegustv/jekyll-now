@@ -155,15 +155,16 @@ function inverse(family) {
 }
 
 var LerpFollow = Object.create(Behavior);
-LerpFollow.update = function (dt) {  
+LerpFollow.update = function (dt) { 
+	//console.log(this.entity.x, this.entity.y, this.target.x, this.target.y);
   if (this.offset.x !== false)
-    this.entity.x = lerp(this.entity.x, this.target.x + (this.offset.x || 0), this.rate * dt);
+    this.entity.x = lerp(this.entity.x, this.target.x + this.offset.x, this.rate * dt);
   if (this.offset.y !== false)
-    this.entity.y = lerp(this.entity.y, this.target.y + (this.offset.y || 0), this.rate * dt);
+    this.entity.y = lerp(this.entity.y, this.target.y + this.offset.y, this.rate * dt);
   if (this.offset.z !== false)
-    this.entity.z = lerp(this.entity.z, this.target.z + (this.offset.z || 0), this.rate * dt);
+    this.entity.z = lerp(this.entity.z, this.target.z + this.offset.z, this.rate * dt);
   if (this.offset.angle !== false)
-    this.entity.angle = lerp_angle(this.entity.angle, this.target.angle + (this.offset.angle || 0), this.rate * dt);
+    this.entity.angle = lerp_angle(this.entity.angle, this.target.angle + this.offset.angle, this.rate * dt);
   if (this.target.alive === false) this.entity.alive = false;
 };
 
@@ -615,13 +616,6 @@ Animate.update = function (dt) {
 	}
 };
 
-Entity.init = function (x, y, w, h) {
-	this.behaviors = [];
-	this.x = x, this.y = y, this.z = 1;
-	this.h = h || 4, this.w = w || 4;
-	return this;
-};
-
 // target, speed, turn_rate
 var Target = Object.create(Behavior);
 Target.update = function (dt) {
@@ -714,8 +708,19 @@ TractorBeam.draw = function (ctx) {
 	ctx.stroke();
 };
 
+// target, color, width
+var Joined = Object.create(Behavior);
+Joined.draw = function (ctx) {
+	ctx.strokeStyle = this.color;
+	ctx.lineWidth = this.width;
+	ctx.beginPath();
+	ctx.moveTo(this.entity.x, this.entity.y);
+	ctx.lineTo(this.target.x, this.target.y);
+	ctx.stroke();
+}
+
 //var animations = [0, 1, 2, 2, 4, 4, 3, 3, 2];
-var sprites = ["drone", "saucer", "unshielded", "bomber", "saucer", "drone", "unshielded"];
+var sprites = ["drone", "saucer", "modules", "bomber", "saucer", "drone", "modules"];
 function spawn(layer, key, player) {
 	var theta = Math.random() * PI2;
 	var x = player.x + randint(- gameWorld.width / 2,  gameWorld.width / 2), y = player.y + randint(-gameWorld.height / 2, gameWorld.height / 2);
@@ -749,6 +754,7 @@ function spawn(layer, key, player) {
 			enemy.addBehavior(Target, {target: player, speed: 0, turn_rate: 0, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
 			enemy.shoot = Weapons.burst;
 			enemy.target = player;
+			enemy.animation = 2;
 			enemy.setVertices([
 				{x: -3, y: -3}, {x: -3, y: 3}, {x: 3, y: 3}, {x: 3, y: -3}
 			]);			
@@ -784,6 +790,7 @@ function spawn(layer, key, player) {
 		case 6:
 			//enemy.addBehavior(Target, {target: player, speed: 60, turn_rate: 1, min: 80});
 			enemy.shoot = Weapons.hitscan;
+			enemy.animation = 0;
 			enemy.target = player;
 			enemy.setVertices([
 				{x: -6, y: -3}, {x: -6, y: 3}, {x: 6, y: 3}, {x: 6, y: -3}
@@ -1158,7 +1165,7 @@ var Store = {
 		gameWorld.scene.player_bot.energy = undefined;
 		gameWorld.boss.addBehavior(Lerp, {object: gameWorld.boss.behaviors[1].offset, field: "y", goal: - gameWorld.height / 3, rate: 10, callback: function () {
 			this.entity.removeBehavior(this);
-			gameWorld.boss.behaviors[1].rate = gameWorld.boss.behaviors[1].old_rate;
+			if (gameWorld.boss.lerpFollow.old_rate) gameWorld.boss.lerpFollow.rate = gameWorld.boss.lerpFollow.old_rate;
 		}});
 	}
 }

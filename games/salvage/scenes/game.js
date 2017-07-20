@@ -211,6 +211,7 @@ var onStart = function () {
 	}
 	
   this.store_layer = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
+	this.store_layer.active = false;
   var store = Object.create(Store).init(this.store_layer, player_bot);
   this.store = store;
 
@@ -257,20 +258,6 @@ var onStart = function () {
     this.fg.paused = false;
   }
   this.pause();
-  
-  fg.drawOrder = function () {
-    return this.entities.sort(function (a, b) { 
-      if (a.z && b.z && b.z !== a.z) return a.z - b.z;
-      else return fg.entities.indexOf(a) - fg.entities.indexOf(b);
-    });
-  };
-  bg.drawOrder = function () {
-    return this.entities.sort(function (a, b) { 
-      if (a.z && b.z && b.z !== a.z) return a.z - b.z;
-      else if (a.y !== b.y) return a.y - b.y;
-			else return a.x - b.x;
-    });
-  };
   var s = this;
 	var down = function (e) {
 		var layer = s.store_layer.active ? s.store_layer : s.ui;		
@@ -354,10 +341,23 @@ var onStart = function () {
 	];
 	//this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 	
-	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.boss));
-	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, offset: {x: 0, y: -gameWorld.height / 3, angle: false}, rate: 0.3});
+	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.modules));
+	boss.animation = 4;
+	boss.mobules = [];
+	boss.z = 10;
+	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false}});
 	boss.setCollision(Polygon);
 	gameWorld.boss = boss;
+	
+	for (var i = 0; i < 4; i++) {
+		var theta = (i + 1) * PI2 / 5;
+		var b = this.bg.add(Object.create(Sprite).init(boss.x, boss.y, Resources.modules));
+		b.animation = i;
+		b.z = 1;
+		b.addBehavior(LerpFollow, {target: boss, offset: {x: 20 * Math.cos(theta), y: 20 * Math.sin(theta), angle: false}, rate: 1.5});
+		b.setCollision(Polygon);
+		b.addBehavior(Joined, {target: boss, color: "#2196f3", width: 4});
+	}
 	
   // intro animation
   this.intro = true;
