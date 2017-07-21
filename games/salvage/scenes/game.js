@@ -1,3 +1,4 @@
+/* global Resources, Layer, gameWorld, MAXHEALTH, Entity, TiledBackground, Sprite, SpriteFont */
 var onStart = function () {
 	
 	Resources.music = Resources.salvage;
