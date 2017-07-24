@@ -62,6 +62,15 @@ HyperDrive.update = function (dt) {
 	}
 }
 
+// try this out...
+Layer.drawOrder = function () {
+    var t = this;
+    return this.entities.sort(function (a, b) {
+      if (a.z < b.z) return -1;
+      else return 1;
+    });
+};
+
 var DrawEnergy = Object.create(Behavior);
 DrawEnergy.draw = function (ctx) {
 	ctx.strokeStyle = this.color || "blue";
@@ -1022,20 +1031,23 @@ var Store = {
 	createUI: function () {
 
 		var border = this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 128, gameWorld.height / 2, Resources.building2));
-		
+		border.z = -10;
 		var b1 = this.layer.add(Object.create(Entity).init(border.x, border.y + 1, border.w - 8, border.h - 16));
 		b1.color = "#000";
+		b1.z = -9;
 		var b2 = this.layer.add(Object.create(Entity).init(border.x, border.y + 2, border.w - 16, border.h - 24));
 		b2.color = "#fff";
-		
+		b2.z = -8;
 		var r = [];
 
 		//var outer = this.layer.add(Object.create(Sprite).init(3 * gameWorld.width / 4 + 8, gameWorld.height - 16, Resources.silhouette));
 		
 		var t = this;
 		var close = this.layer.add(Object.create(Entity).init(gameWorld.width / 2, 3 * gameWorld.height / 4 - 24, gameWorld.width / 2, 16));
-		this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, 3 * gameWorld.height / 4 - 24, Resources.expire_font, "DONE", {align: "center", spacing: -2}));
+		close.z = -7;
+		this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, 3 * gameWorld.height / 4 - 24, Resources.expire_font, "DONE", {align: "center", spacing: -2})).z = -6;
 		close.family = "button";
+		close.color = "white";
 		close.trigger = function () {
 			t.player.salvage -= t.spent;
 			t.spent = 0;
