@@ -158,7 +158,7 @@ var onStart = function () {
 					//object.addBehavior(Delay, {duration: 1.5, callback: function () { this.entity.noCollide = false; }})
 				} else {
         	object.health -= 1;
-					object.addBehavior(Delay, {duration: 0.5, callback: function () { this.entity.noCollide = false; }})
+					object.addBehavior(Delay, {duration: 0.5, callback: function () { this.entity.noCollide = false; }});
 				}
 				object.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
 				s.updateHealthBar(object);

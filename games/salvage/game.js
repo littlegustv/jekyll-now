@@ -46,6 +46,22 @@ Shake.update = function (dt) {
 	}
 }
 
+var HyperDrive = Object.create(Behavior);
+HyperDrive.update = function (dt) {
+	if (this.done === undefined) {
+		console.log('heyt');
+		this.entity.layer.paused = false;
+		this.entity.behaviors = [this.entity.behaviors[0], this]; // :O ... keep animate and this, remove all other behaviors
+		this.entity.addBehavior(Velocity);
+		this.entity.health = 100;
+		this.entity.addBehavior(Accelerate);
+		this.entity.velocity = {x: 0, y: 0};
+		this.entity.angle = 0;
+		this.entity.acceleration = {x: 100, y: 0};
+		this.done = true;
+	}
+}
+
 var DrawEnergy = Object.create(Behavior);
 DrawEnergy.draw = function (ctx) {
 	ctx.strokeStyle = this.color || "blue";
@@ -719,6 +735,18 @@ Joined.draw = function (ctx) {
 	ctx.stroke();
 }
 
+var Repair = Object.create(Behavior);
+Repair.update = function (dt) {
+	if (this.time === undefined) this.time = 0;
+	this.time += dt;
+	if (this.time > 1 && this.entity.material > 0) {
+		this.entity.material -= 1;
+		this.time = 0;
+		this.entity.health = Math.min(MAXHEALTH, this.entity.health + 1);
+		gameWorld.scene.updateHealthBar(this.entity);
+	}
+}
+
 //var animations = [0, 1, 2, 2, 4, 4, 3, 3, 2];
 var sprites = ["drone", "saucer", "modules", "bomber", "saucer", "drone", "modules"];
 function spawn(layer, key, player) {
@@ -838,6 +866,9 @@ function spawn(layer, key, player) {
 				p.addBehavior(Velocity);
 				p.velocity = {x: 0, y: -50};
 				p.addBehavior(FadeOut, {duration: 0.5, delay: 0.3});
+			} else if (other == player && other.material !== undefined) {
+				object.alive =false;
+				other.material += 1;
 			}
 		}
 	};
@@ -1023,7 +1054,7 @@ var Store = {
 		//this.weapons = {};
 		this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 4 + 24, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
 				
-		var buy_shield = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 48, Resources.icons));
+		var buy_shield = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 32, Resources.icons));
 		buy_shield.animation = 1;
 		buy_shield.family = "button";
 		buy_shield.trigger = function () {
@@ -1040,7 +1071,7 @@ var Store = {
 		buy_shield.unhover = buttonUnHover;
 		r.push(buy_shield);
 		
-		var plus = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 32, Resources.icons));
+		var plus = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 16, Resources.icons));
 		plus.animation = 0;
 		plus.family = "button";
 		plus.trigger = function () {
@@ -1057,7 +1088,7 @@ var Store = {
 		plus.unhover = buttonUnHover
 		r.push(plus);
 		
-		var buy_radar = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 64, Resources.icons));
+		var buy_radar = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 48, Resources.icons));
 		buy_radar.animation = 2;
 		buy_radar.family = "button";
 		buy_radar.trigger = function () {
@@ -1088,6 +1119,53 @@ var Store = {
 		//minus.hover = function () { this.opacity = 0.6 }
 		//minus.unhover = function () { this.opacity = 1 }
 		//r.push(minus);
+		
+		var buy_retaliate = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 64, Resources.icons));
+		buy_retaliate.animation = 4;
+		buy_retaliate.family = "button";
+		buy_retaliate.trigger = function () {
+			gameWorld.playSound(Resources.select);
+			if (t.spent < t.player.salvage) {
+				t.spent += 1;
+				t.salvage.text = "$" + (t.player.salvage - t.spent);
+				t.player.retaliate = 1;
+			}
+		};
+		buy_retaliate.hover = buttonHover;
+		buy_retaliate.unhover = buttonUnHover;
+		r.push(buy_retaliate);
+		
+		var buy_repair = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 80, Resources.icons));
+		buy_repair.animation = 3;
+		buy_repair.family = "button";
+		buy_repair.trigger = function () {
+			gameWorld.playSound(Resources.select);
+			if (t.spent < t.player.salvage) {
+				t.spent += 1;
+				t.salvage.text = "$" + (t.player.salvage - t.spent);
+				t.player.addBehavior(Repair);
+				t.player.material = 0;
+			}
+		};
+		buy_repair.hover = buttonHover;
+		buy_repair.unhover = buttonUnHover;
+		r.push(buy_repair);
+		
+		var buy_hyper = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 96, Resources.icons));
+		buy_hyper.animation = 5;
+		buy_hyper.family = "button";
+		buy_hyper.trigger = function () {
+			gameWorld.playSound(Resources.select);
+			if (t.spent < t.player.salvage) {
+				t.spent += 1;
+				t.salvage.text = "$" + (t.player.salvage - t.spent);
+				t.player.addBehavior(HyperDrive);
+			}
+		};
+		buy_hyper.hover = buttonHover;
+		buy_hyper.unhover = buttonUnHover;
+		r.push(buy_hyper);
+		
 		
 		for (var i = 0; i < this.layer.entities.length; i++) {
 			this.layer.entities[i].origin = {x: 0, y: 240};
