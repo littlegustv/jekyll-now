@@ -1,3 +1,4 @@
+/* global Resources, Entity, Sprite, SpriteFont, TiledBackground, Behavior, World, randint, clamp, between */
 // canvas filter (color style); grayscale(70%) contrast(250%) brightness(90%);
 
 var MAXHEALTH = 4, DAMAGE_COOLDOWN = 0.5;
@@ -67,6 +68,10 @@ Layer.drawOrder = function () {
     var t = this;
     return this.entities.sort(function (a, b) {
       if (a.z < b.z) return -1;
+      else if (a.z === b.z) {
+      	if (a.y < b.y) return -1;
+      	else return 1;
+      }
       else return 1;
     });
 };
@@ -887,6 +892,7 @@ function spawn(layer, key, player) {
 
 var current_movement_key = 0;
 var movement_keys = ["standard", "blink", "double", "chaos"];
+// fix me: can remove
 var Movement = {
 	standard: function (s) {
 		s.unpause();
@@ -1020,6 +1026,7 @@ var Store = {
 		this.createUI();
 		return this;
 	},
+	// is this used?
 	spend: function (amount) {
 		if (this.player.salvage - this.spent < amount) return false; // can't afford
 		else if (amount < 0 && this.spent + amount < 0) return false; // can't unspend more than you've spent
@@ -1028,6 +1035,73 @@ var Store = {
 			this.salvage.text = "$ " + (this.player.salvage - this.spent);
 		}
 	},
+	buttons: [
+		{ name: "Health", price: 1, icon: 0, trigger: function (t) {
+			// fix me: don't allow if already at max-health
+				if (t.player.health < MAXHEALTH) {
+					t.player.health++;
+					gameWorld.scene.updateHealthBar(t.player);
+					return true;
+				} else {
+					return false;
+				}
+			}
+		},
+		{
+			name: "Shield", price: 2, icon: 1, trigger: function (t) {
+				if (!t.player.has_shield) {
+					t.player.has_shield = t.player.addBehavior(Shielded, {rate: 1});
+					gameWorld.scene.updateHealthBar(t.player);
+					return true;
+				} else {
+					return false;
+				}
+			}
+		},
+		{
+			name: "Radar", price: 3, icon: 2, trigger: function (t) {
+				if (!t.player.has_rader) {
+					t.player.has_radar = t.player.addBehavior(Radar);
+					return true;
+				} else {
+					return false;
+				}
+			}
+		},
+		{
+			name: "Retaliate", price: 5, icon: 4, trigger: function (t) {
+				if (!t.player.has_retaliate) {
+					gameWorld.playSound(Resources.select);
+					t.player.retaliate = 1;
+					t.player.has_retaliate = true;
+					return true;
+				} else {
+					return false;
+				}
+			}
+		},
+		{
+			name: "Repair", price: 6, icon: 3, trigger: function (t) {
+				if (!t.player.has_repair) {
+					t.player.has_repair = t.player.addBehavior(Repair);
+					t.player.material = 0;
+					return true;
+				} else {
+					return false;
+				}
+			}
+		},
+		{
+			name: "FTL", price: 15, icon: 5, trigger: function (t) {
+				if (!t.player.hasFTL) {
+					t.player.hasFTL = t.player.addBehavior(HyperDrive); // maybe do this HERE instead of in random behavior...
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}
+	],
 	createUI: function () {
 
 		var border = this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 128, gameWorld.height / 2, Resources.building2));
@@ -1038,12 +1112,10 @@ var Store = {
 		var b2 = this.layer.add(Object.create(Entity).init(border.x, border.y + 2, border.w - 16, border.h - 24));
 		b2.color = "#fff";
 		b2.z = -8;
-		var r = [];
 
-		//var outer = this.layer.add(Object.create(Sprite).init(3 * gameWorld.width / 4 + 8, gameWorld.height - 16, Resources.silhouette));
-		
 		var t = this;
-		var close = this.layer.add(Object.create(Entity).init(gameWorld.width / 2, 3 * gameWorld.height / 4 - 24, gameWorld.width / 2, 16));
+		
+		var close = this.layer.add(Object.create(Entity).init(gameWorld.width / 2, 3 * gameWorld.height / 4 - 24, gameWorld.width / 2 + 24, 16));
 		close.z = -7;
 		this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, 3 * gameWorld.height / 4 - 24, Resources.expire_font, "DONE", {align: "center", spacing: -2})).z = -6;
 		close.family = "button";
@@ -1052,150 +1124,63 @@ var Store = {
 			t.player.salvage -= t.spent;
 			t.spent = 0;
 			gameWorld.playSound(Resources.buy);
-			if (t.weapon) t.player.shoot = Weapons[t.weapon];
-			t.weapon = undefined;
 			t.close();
-		}
+		};
 		close.hover = function () {
 		    if (this.color != "#6DC72E") gameWorld.playSound(Resources.hover);
 			this.color = "#6DC72E";
-		}
+		};
 		close.unhover = function () {
 			this.color = "white";
-		}
+		};
 		//this.weapons = {};
 		this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 4 + 24, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
-				
-		var buy_shield = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 32, Resources.icons));
-		buy_shield.animation = 1;
-		buy_shield.family = "button";
-		buy_shield.trigger = function () {
-			gameWorld.playSound(Resources.select);
-			if (t.spent < t.player.salvage) {
-				t.spent += 1;
-				t.player.addBehavior(Shielded, {rate: 1});
-				t.salvage.text = "$" + (t.player.salvage - t.spent);
-				gameWorld.scene.updateHealthBar(t.player);
-				// update healthbar display
-			}
-		};
-		buy_shield.hover = buttonHover;
-		buy_shield.unhover = buttonUnHover;
-		r.push(buy_shield);
 		
-		var plus = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 16, Resources.icons));
-		plus.animation = 0;
-		plus.family = "button";
-		plus.trigger = function () {
-			gameWorld.playSound(Resources.select);
-			if (t.player.health < MAXHEALTH && t.spent < t.player.salvage) {
-				t.spent += 1;
-				t.player.health += 1;
-				t.salvage.text = "$" + (t.player.salvage - t.spent);
-				gameWorld.scene.updateHealthBar(t.player);
-				// update healthbar display
-			}
-		};
-		plus.hover = buttonHover;
-		plus.unhover = buttonUnHover
-		r.push(plus);
-		
-		var buy_radar = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 48, Resources.icons));
-		buy_radar.animation = 2;
-		buy_radar.family = "button";
-		buy_radar.trigger = function () {
-			gameWorld.playSound(Resources.select);
-			if (t.spent < t.player.salvage) {
-				t.spent += 1;
-				t.salvage.text = "$" + (t.player.salvage - t.spent);
-				t.player.addBehavior(Radar);
-			}
-		};
-		buy_radar.hover = buttonHover;
-		buy_radar.unhover = buttonUnHover
-		r.push(buy_radar);
-		/*var minus = t.layer.add(Object.create(Sprite).init(8, 32 + (++i) * 18, Resources.icons));
-		minus.animation = 2;
-		minus.family = "button";
-		minus.trigger = function () { 
-			console.log('repair minus');
-			if (t.player.health > 0 && t.spent > 0) {
-				t.spent -= 1;
-				t.player.health -= 1;
-				t.damageWheel.percentage = 100 * (t.player.health / MAXHEALTH);
-				t.salvage.text = "$" + (t.player.salvage - t.spent);
-				//t.health_bar.w = 128 * (t.player.health / MAXHEALTH), t.health_bar.x = gameWorld.width / 6 - (128 - t.health_bar.w) / 2;
-			}
-		};*/
-
-		//minus.hover = function () { this.opacity = 0.6 }
-		//minus.unhover = function () { this.opacity = 1 }
-		//r.push(minus);
-		
-		var buy_retaliate = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 64, Resources.icons));
-		buy_retaliate.animation = 4;
-		buy_retaliate.family = "button";
-		buy_retaliate.trigger = function () {
-			gameWorld.playSound(Resources.select);
-			if (t.spent < t.player.salvage) {
-				t.spent += 1;
-				t.salvage.text = "$" + (t.player.salvage - t.spent);
-				t.player.retaliate = 1;
-			}
-		};
-		buy_retaliate.hover = buttonHover;
-		buy_retaliate.unhover = buttonUnHover;
-		r.push(buy_retaliate);
-		
-		var buy_repair = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 80, Resources.icons));
-		buy_repair.animation = 3;
-		buy_repair.family = "button";
-		buy_repair.trigger = function () {
-			gameWorld.playSound(Resources.select);
-			if (t.spent < t.player.salvage) {
-				t.spent += 1;
-				t.salvage.text = "$" + (t.player.salvage - t.spent);
-				t.player.addBehavior(Repair);
-				t.player.material = 0;
-			}
-		};
-		buy_repair.hover = buttonHover;
-		buy_repair.unhover = buttonUnHover;
-		r.push(buy_repair);
-		
-		var buy_hyper = t.layer.add(Object.create(Sprite).init(gameWorld.width / 3, t.salvage.y + 96, Resources.icons));
-		buy_hyper.animation = 5;
-		buy_hyper.family = "button";
-		buy_hyper.trigger = function () {
-			gameWorld.playSound(Resources.select);
-			if (t.spent < t.player.salvage) {
-				t.spent += 1;
-				t.salvage.text = "$" + (t.player.salvage - t.spent);
-				t.player.addBehavior(HyperDrive);
-			}
-		};
-		buy_hyper.hover = buttonHover;
-		buy_hyper.unhover = buttonUnHover;
-		r.push(buy_hyper);
-		
+		for (var i = 0; i < this.buttons.length; i++) {
+			// probably need closure here
+			(function () {
+				var j = i;
+				var button = t.layer.add(Object.create(Entity).init(gameWorld.width  / 2, t.salvage.y + 16 * (1 + i), gameWorld.width / 2 + 24, 16));
+				var icon = t.layer.add(Object.create(Sprite).init(gameWorld.width / 4, t.salvage.y + 16 * (i + 1), Resources.icons));
+				var name = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, t.salvage.y + 16 * (i + 1), Resources.expire_font, t.buttons[i].name, {spacing: -2, align: "center"}));
+				var price = t.layer.add(Object.create(SpriteFont).init(3 * gameWorld.width / 4 + 8, t.salvage.y + 16 * (i + 1), Resources.expire_font, "$" + t.buttons[i].price, {spacing: -2, align: "right"}));
+				button.color = "white";
+				button.family = "button";
+				button.price = t.buttons[j].price;
+				button.hover = function () {
+					var color = (t.player.salvage - t.spent >= this.price) ? "#6DC72E" : "#dddddd";
+					// check if you can afford it here, change color accordingly
+				    if (this.color != color) {
+				    	gameWorld.playSound(Resources.hover);
+						this.color = color;
+				    }
+				}
+				button.unhover = function () {
+					this.color = "white";
+				}
+				button.z = -2, icon.z = -1, name.z = -1;
+				icon.animation = t.buttons[i].icon;
+				button.trigger = function () {
+					// check price HERE
+					if (t.player.salvage - t.spent >= this.price)
+					{
+						if (t.buttons[j].trigger(t)) {
+							t.spent += this.price;
+							t.salvage.text = "$" + (t.player.salvage - t.spent);
+							gameWorld.playSound(Resources.select);
+						}
+					}
+				}
+			})();
+		}
 		
 		for (var i = 0; i < this.layer.entities.length; i++) {
 			this.layer.entities[i].origin = {x: 0, y: 240};
 			this.layer.entities[i].angle = -PI/2;
 			this.layer.entities[i].lerp = this.layer.entities[i].addBehavior(Lerp, {object: this.layer.entities[i], field: "angle", goal: 0, rate: 5});
-			//this.layer.entities[i].lerp = this.layer.entities[i].addBehavior(Lerp, {object: this.layer.entities[i], field: "y", goal: this.layer.entities[i].y + gameWorld.height * 2, rate: 10});
 			this.layer.entities[i].goal = this.layer.entities[i].lerp.goal;
 			this.layer.entities[i].original = this.layer.entities[i].angle;
 		}
-		
-		//outer.lerp.goal = -PI / 36;
-		//outer.goal = outer.lerp.goal;
-		
-		// special exception for off-kilter border
-		//b1.lerp.goal = PI / 36;
-		//b1.goal = b1.lerp.goal;
-		//b2.lerp.goal = PI / 72;
-		//b2.goal = b2.lerp.goal;
 		
 	},
 	open: function () {
