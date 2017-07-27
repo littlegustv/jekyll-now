@@ -356,6 +356,23 @@ SpriteFont.onDraw = function (ctx) {
   }
 }
 
+var Triangle = Object.create(Entity);
+Triangle.init = function (x, y, r) {
+	this.instance();
+	this.x = x, this.y = y, this.r = r;
+	return this;
+}
+Triangle.onDraw = function (ctx) {
+	ctx.fillStyle = this.color;
+	ctx.beginPath();
+	var theta = PI2 / 3;
+	ctx.moveTo(this.x + Math.cos(this.angle) * this.r, this.y + Math.sin(this.angle) * this.r);
+	ctx.lineTo(this.x + Math.cos(this.angle + theta) * this.r, this.y + Math.sin(this.angle + theta) * this.r);
+	ctx.lineTo(this.x + Math.cos(this.angle + 2 * theta) * this.r, this.y + Math.sin(this.angle + 2 * theta) * this.r);
+	ctx.closePath();
+	ctx.fill();
+}
+
 
 // push to raindrop
 function lerp_angle (a1, a2, rate) {
@@ -397,26 +414,30 @@ var Weapons = {
 		return 1.6;
 	},
 	standard: function (layer) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
+		//var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
+		var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
+		a.color = "limegreen";
 //			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
-			//a.animation = 5;
-			a.setCollision(Polygon);
-			a.setVertices(projectile_vertices);
-			gameWorld.playSound(Resources.laser, volume(a));
-			a.collision.onHandle = projectileHit;
-			a.addBehavior(Velocity);
-			a.family = this.family;//"player";
-			a.projectile = true;
-			var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
-			if (this.target) console.log('target');
-			a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)	};
-			a.angle = theta;		
-			a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
-			return 1.6;
+		//a.animation = 5;
+		a.setCollision(Polygon);
+		a.setVertices(projectile_vertices);
+		gameWorld.playSound(Resources.laser, volume(a));
+		a.collision.onHandle = projectileHit;
+		a.addBehavior(Velocity);
+		a.family = this.family;//"player";
+		a.projectile = true;
+		var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
+		if (this.target) console.log('target');
+		a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)	};
+		a.angle = theta;		
+		a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
+		return 1.6;
 	},
 	triple: function (layer) {
 		if (this.count === undefined) this.count = 0;
-		var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
+		//var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
+		var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
+		a.color = "limegreen";
 //var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 		//a.animation = 5;
 		a.setCollision(Polygon);
@@ -440,7 +461,9 @@ var Weapons = {
 	},
 	burst: function (layer) {
 		if (this.count === undefined) this.count = 0;
-		var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
+		var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
+		a.color = "limegreen";
+		//var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
 //var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 		//a.animation = 5;
 		a.setCollision(Polygon);
@@ -464,7 +487,9 @@ var Weapons = {
 		}
 	},
 	homing: function (layer) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
+			var a = layer.add(Object.create(Triangle).init(this.x, this.y, 5));
+			a.color = "#4CAF52";
+			//var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
 //			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 			a.setCollision(Polygon);
 			a.setVertices(projectile_vertices);
@@ -472,7 +497,7 @@ var Weapons = {
 			//gameWorld.playSound(Resources.mortar);
 			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
-			a.addBehavior(Target, {target: this.target, turn_rate: 0.2, speed: 30});
+			a.addBehavior(Target, {target: this.target, turn_rate: 0.2, speed: 30, offset: {x: 0, y: 0}, set_angle: true});
 			a.family = this.family;
 			a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
 			a.projectile = true;
@@ -482,8 +507,10 @@ var Weapons = {
 			return 1.6;			
 	},
 	proximity: function (layer) {
-			var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
-//			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
+			//var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
+			var a = layer.add(Object.create(Entity).init(this.x, this.y, 8, 8));
+			a.color = "#8bc34a";
+			a.angle = PI / 4;
 			//a.animation = 5;
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
@@ -493,7 +520,7 @@ var Weapons = {
 			a.addBehavior(Velocity);
 			a.family = this.family;
 			a.projectile = true;
-			a.velocity = {x: 0, y: 0, angle: PI / 6};
+			a.velocity = {x: 0, y: 0};//, angle: PI / 6};
 			return 1.2;			
 	}
 }
@@ -651,10 +678,11 @@ var Target = Object.create(Behavior);
 Target.update = function (dt) {
 	if (this.angle === undefined) this.angle = 0;
 	if (!this.offset) {
-			this.entity.opacity = 0.5;
+		this.entity.opacity = 0.5;
 		return;
 	}
 	this.angle =  lerp_angle(this.angle, angle(this.entity.x, this.entity.y, this.target.x + this.offset.x, this.target.y + this.offset.y), this.turn_rate * dt);
+	if (this.set_angle) this.entity.angle = this.angle;
 	this.entity.velocity = {x: Math.cos(this.angle) * this.speed, y: Math.sin(this.angle) * this.speed};		
 };
 
