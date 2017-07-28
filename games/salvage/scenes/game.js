@@ -351,7 +351,7 @@ var onStart = function () {
 	
 	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.modules));
 	boss.animation = 4;
-	boss.mobules = [];
+	boss.modules = [];
 	boss.z = 12;
 	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
 	boss.setCollision(Polygon);
@@ -365,6 +365,7 @@ var onStart = function () {
 		b.addBehavior(Follow, {target: boss, offset: {x: (i + 1) * 32, y: 0, angle: false, z: false}, rate: 1.5})
 		//b.addBehavior(LerpFollow, {target: boss, offset: {x: 20 * Math.cos(theta), y: 20 * Math.sin(theta), angle: false, z: false}, rate: 1.5});
 		b.setCollision(Polygon);
+		boss.modules.push(b);
 		b.addBehavior(Joined, {target: boss, color: COLORS.tertiary, width: 4});
 	}
 	
