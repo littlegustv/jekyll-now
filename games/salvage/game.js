@@ -5,6 +5,12 @@ var MAXHEALTH = 4, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(180, 320, "index.json");
 gameWorld.wave = 0;
 
+var COLORS = {
+	primary: "#32CD32", //#ff6347 -> used for enemy weapons, projectiles -> signifies 'energy'
+	secondary: "#FF953E", // -> used for explosions
+	tertiary: "#940455" // -> used for... everything else? emphasis, particles?
+}
+
 var Z = {
 	particle: 1,
 	projectile: 2,
@@ -23,9 +29,16 @@ var Radar = Object.create(Behavior);
 Radar.draw = function(ctx) {
 	var t = this;
 	var concerning = this.entity.layer.entities.filter(function (e) { return e.family == "enemy" && !e.projectile && (!between(e.x, t.entity.x - gameWorld.width / 2, t.entity.x + gameWorld.width / 2) || !between(e.y, t.entity.y - gameWorld.height / 2, t.entity.y + gameWorld.height / 2)); });
-	ctx.fillStyle = "black";
+	ctx.fillStyle = COLORS.tertiary;
 	for (var i = 0; i < concerning.length; i++) {
-		ctx.fillRect(clamp(concerning[i].x, this.entity.x - gameWorld.width / 2, this.entity.x + gameWorld.width / 2) - 2, clamp(concerning[i].y, this.entity.y - gameWorld.height / 2, this.entity.y + gameWorld.height / 2) - 2, 4, 4);
+		var x = clamp(concerning[i].x, this.entity.x - gameWorld.width / 2, this.entity.x + gameWorld.width / 2) - 2;
+		var y = clamp(concerning[i].y, this.entity.y - gameWorld.height / 2, this.entity.y + gameWorld.height / 2) - 2;
+		var theta = angle(this.entity.x, this.entity.y, x, y);
+		ctx.moveTo(x, y);
+		ctx.lineTo(x - 16 * Math.cos(theta + PI / 6), y - 16 * Math.sin(theta + PI / 6));
+		ctx.lineTo(x - 16 * Math.cos(theta - PI / 6), y - 16 * Math.sin(theta - PI / 6));
+		ctx.closePath();
+		ctx.fill();
 	}
 }
 
@@ -371,8 +384,30 @@ Triangle.onDraw = function (ctx) {
 	ctx.lineTo(this.x + Math.cos(this.angle + 2 * theta) * this.r, this.y + Math.sin(this.angle + 2 * theta) * this.r);
 	ctx.closePath();
 	ctx.fill();
+	if (this.stroke) {
+		ctx.lineWidth = this.width;
+		ctx.strokeStyle = this.strokeColor;
+		ctx.stroke();
+	}
 }
-
+Circle.oldDraw = Circle.onDraw;
+Circle.onDraw = function (ctx) {
+	this.oldDraw(ctx);
+	if (this.stroke) {
+		ctx.lineWidth = this.width;
+		ctx.strokeStyle = this.strokeColor;
+		ctx.stroke();
+	}
+}
+Entity.oldDraw = Entity.onDraw;
+Entity.onDraw = function (ctx) {
+	this.oldDraw(ctx);
+	if (this.stroke) {
+		ctx.lineWidth = this.width;
+		ctx.strokeStyle = this.strokeColor;
+		ctx.strokeRect(this.x - this.w / 2, this.y - this.h / 2, this.w, this.h);
+	}	
+};
 
 // push to raindrop
 function lerp_angle (a1, a2, rate) {
@@ -393,7 +428,7 @@ var Weapons = {
 	hitscan: function (layer) {
 		var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
 		var warn = layer.add(Object.create(Entity).init(this.x + Math.cos(theta) * gameWorld.height, this.y + Math.sin(theta) * gameWorld.height, gameWorld.height * 2, 8));
-		warn.color = "#ff6347";
+		warn.color = COLORS.primary; //"#ff6347";
 		warn.opacity = 0;
 		warn.angle = theta;
 		warn.z = 0;
@@ -416,7 +451,10 @@ var Weapons = {
 	standard: function (layer) {
 		//var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
 		var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
-		a.color = "limegreen";
+		a.color = "black";
+		a.stroke = true;
+		a.strokeColor = COLORS.primary;
+		a.width = 2;
 //			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 		//a.animation = 5;
 		a.setCollision(Polygon);
@@ -437,7 +475,10 @@ var Weapons = {
 		if (this.count === undefined) this.count = 0;
 		//var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
 		var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
-		a.color = "limegreen";
+		a.color = "black";
+		a.stroke = true;
+		a.strokeColor = COLORS.primary;
+		a.width = 2;
 //var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 		//a.animation = 5;
 		a.setCollision(Polygon);
@@ -462,7 +503,10 @@ var Weapons = {
 	burst: function (layer) {
 		if (this.count === undefined) this.count = 0;
 		var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
-		a.color = "limegreen";
+		a.color = "black";
+		a.stroke = true;
+		a.strokeColor = COLORS.primary;
+		a.width = 2;
 		//var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
 //var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 		//a.animation = 5;
@@ -488,7 +532,10 @@ var Weapons = {
 	},
 	homing: function (layer) {
 			var a = layer.add(Object.create(Triangle).init(this.x, this.y, 5));
-			a.color = "#4CAF52";
+			a.color = "black"; //"#4CAF52";
+			a.stroke = true;
+			a.strokeColor = COLORS.primary;
+			a.width = 2;
 			//var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
 //			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 			a.setCollision(Polygon);
@@ -508,9 +555,12 @@ var Weapons = {
 	},
 	proximity: function (layer) {
 			//var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
-			var a = layer.add(Object.create(Entity).init(this.x, this.y, 8, 8));
-			a.color = "#8bc34a";
+			var a = layer.add(Object.create(Entity).init(this.x, this.y, 7, 7));
+			a.color = "black";//"#8bc34a";
 			a.angle = PI / 4;
+			a.stroke = true;
+			a.strokeColor = COLORS.primary;
+			a.width = 2;
 			//a.animation = 5;
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
@@ -574,7 +624,7 @@ Enemy.draw = function (ctx) {
 	if (this.cooldown > 0 && this.cooldown < 1) {
 		ctx.beginPath();
 		ctx.arc(this.entity.x, this.entity.y, this.cooldown * 2 * this.entity.w, 0, PI2, true);
-		ctx.fillStyle = "#ff6347";
+		ctx.fillStyle = COLORS.primary; //"#ff6347";
 		ctx.globalAlpha = 1 - (this.cooldown / 2);
 		ctx.fill();
 		ctx.globalAlpha = 1;
@@ -867,6 +917,7 @@ function spawn(layer, key, player) {
 			]);
 			break;
 	}
+	// FIX ME: update to use color-based shape primitives instead
 	var flash = layer.add(Object.create(Sprite).init(enemy.x, enemy.y, Resources.blink));
 	flash.addBehavior(FadeOut, {duration: 0, delay: 0.7});
 	enemy.collision.onHandle = function (object, other) {
@@ -883,11 +934,16 @@ function spawn(layer, key, player) {
 	layer.add(enemy);
 	enemy.die = function () {
 		enemy.alive = false;
-		var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
-		expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
+		var expl = enemy.layer.add(Object.create(Circle).init(enemy.x, enemy.y, 24));
+		//var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
+		expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
 		expl.z = 1;
+		var flash = enemy.layer.add(Object.create(Circle).init(enemy.x, enemy.y, 32));
+		flash.z = 2;
+		flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
+		flash.color = COLORS.secondary;
 		gameWorld.playSound(Resources.hit);        
-		for (var i = 0; i < 3; i++) {
+		/*for (var i = 0; i < 3; i++) {
 			expl.addBehavior(Delay, {duration: Math.random() * 0.6 + 0.2, callback: function () {
 				var e = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
 				e.addBehavior(FadeOut, {duration: 0, delay: 0.8});
@@ -895,9 +951,9 @@ function spawn(layer, key, player) {
 				gameWorld.playSound(Resources.hit);        
 				this.entity.removeBehavior(this);
 			}})
-		}
+		}*/
 		var scrap = enemy.layer.add(Object.create(Entity).init(enemy.x, enemy.y, 4, 4));
-		gameWorld.boss.addBehavior(TractorBeam, {target: scrap, turn_rate: 5, speed: 50, color: "#000", thickness: 2, width: 3.5, rate: 6, origin: {x: gameWorld.boss.x, y: gameWorld.boss.y}});
+		gameWorld.boss.addBehavior(TractorBeam, {target: scrap, turn_rate: 5, speed: 50, color: COLORS.tertiary, thickness: 2, width: 3.5, rate: 6, origin: {x: gameWorld.boss.x, y: gameWorld.boss.y}});
 		scrap.addBehavior(Velocity);
 		scrap.velocity = {x: 0, y: 0};
 		scrap.setCollision(Polygon);
@@ -1234,7 +1290,7 @@ var Store = {
 		gameWorld.scene.bg.camera.addBehavior(Lerp, {object: gameWorld.scene.bg.camera.behaviors[0].offset, field: "y", goal: -7 * gameWorld.height / 8, rate: 10, callback: function () {
 			this.entity.removeBehavior(this);
 		}});
-		gameWorld.boss.energy = gameWorld.boss.addBehavior(DrawEnergy, {h: 32, w: gameWorld.width / 2, color: "#000", thickness: 2});
+		gameWorld.boss.energy = gameWorld.boss.addBehavior(DrawEnergy, {h: 32, w: gameWorld.width / 2, color: COLORS.tertiary, thickness: 2});
 		gameWorld.scene.player_bot.energy = gameWorld.scene.player_bot.addBehavior(DrawEnergy, {h: -32, w: gameWorld.width / 2, color: "#000", thickness: 2});
 		gameWorld.boss.old_x = gameWorld.boss.x;
 		gameWorld.boss.old_y = gameWorld.boss.y;

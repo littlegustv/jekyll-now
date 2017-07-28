@@ -139,6 +139,7 @@ var onStart = function () {
 	// new movement settings
 	player_bot.speed = 5.5;
 	player_bot.distance = 48;
+	player_bot.noCollide = false;
 	
   player_bot.family = "player";
 	player_bot.stopped = function () {
@@ -158,12 +159,22 @@ var onStart = function () {
 					//object.addBehavior(Delay, {duration: 1.5, callback: function () { this.entity.noCollide = false; }})
 				} else {
         	object.health -= 1;
-					object.addBehavior(Delay, {duration: 0.5, callback: function () { this.entity.noCollide = false; }});
 				}
 				object.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
 				s.updateHealthBar(object);
-				var expl = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.explosion));
-				expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
+				
+				var expl = other.layer.add(Object.create(Circle).init(other.x, other.y, 8));
+				//var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
+				expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
+				expl.z = 1;
+				var flash = other.layer.add(Object.create(Circle).init(other.x, other.y, 12));
+				flash.z = 2;
+				flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
+				flash.color = COLORS.secondary;
+				gameWorld.playSound(Resources.hit);        
+				
+				//var expl = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.explosion));
+				//expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
 				
 				if (object.retaliate >= 1) {
 					for (var i = 0; i < 3; i++) {
@@ -180,6 +191,7 @@ var onStart = function () {
   			//object.damage.timer = DAMAGE_COOLDOWN;
       }
 			object.noCollide = true;
+			object.addBehavior(Delay, {duration: 0.5, callback: function () { this.entity.noCollide = false; }});
     }
 		if (object.health <= 0) {
 			object.die();
@@ -194,21 +206,15 @@ var onStart = function () {
 			player_bot.death = undefined;
 			gameWorld.setScene(0, true);
 		}});
-		var expl = player_bot.layer.add(Object.create(Sprite).init(player_bot.x + randint(-8, 8), player_bot.y + randint(-8, 8), Resources.explosion));
-		expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
-		//expl.animation = 1;
+		var expl = this.layer.add(Object.create(Circle).init(this.x, this.y, 32));
+		//var expl = enemy.layer.add(Object.create(Sprite).init(thi));
+		expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
 		expl.z = 1;
-		gameWorld.playSound(Resources.hit);        
-		for (var i = 0; i < 3; i++) {
-			expl.addBehavior(Delay, {duration: Math.random() * 0.6 + 0.2, callback: function () {
-				var e = player_bot.layer.add(Object.create(Sprite).init(player_bot.x + randint(-32, 32), player_bot.y + randint(-32, 32), Resources.explosion));
-				e.addBehavior(FadeOut, {duration: 0, delay: 0.8});
-				//e.animation = 1;
-				e.z = 1;
-				gameWorld.playSound(Resources.hit);        
-				this.entity.removeBehavior(this);
-			}})
-		}
+		var flash = this.layer.add(Object.create(Circle).init(this.x, this.y, 38));
+		flash.z = 2;
+		flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
+		flash.color = COLORS.secondary;
+		gameWorld.playSound(Resources.hit);   
 	}
 	
   this.store_layer = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
@@ -340,7 +346,7 @@ var onStart = function () {
     [6, 6, 6, 6, 4, 4, 5],
 		[6,6, 5]
 	];
-	this.waves = [[0]];
+	//this.waves = [[0]];
 	//this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 	
 	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.modules));
@@ -355,10 +361,11 @@ var onStart = function () {
 		var theta = (i + 1) * PI2 / 5;
 		var b = this.bg.add(Object.create(Sprite).init(boss.x, boss.y, Resources.modules));
 		b.animation = i;
-		b.z = 9 + 0.1 * i;
-		b.addBehavior(LerpFollow, {target: boss, offset: {x: 20 * Math.cos(theta), y: 20 * Math.sin(theta), angle: false, z: false}, rate: 1.5});
+		b.z = 9 - 0.1 * i;
+		b.addBehavior(Follow, {target: boss, offset: {x: (i + 1) * 32, y: 0, angle: false, z: false}, rate: 1.5})
+		//b.addBehavior(LerpFollow, {target: boss, offset: {x: 20 * Math.cos(theta), y: 20 * Math.sin(theta), angle: false, z: false}, rate: 1.5});
 		b.setCollision(Polygon);
-		b.addBehavior(Joined, {target: boss, color: "#2196f3", width: 4});
+		b.addBehavior(Joined, {target: boss, color: COLORS.tertiary, width: 4});
 	}
 	
   // intro animation
