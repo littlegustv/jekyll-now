@@ -9,8 +9,9 @@ var onStart = function () {
   this.grid = [];
 
   this.light_layer = this.addLayer(Object.create(Layer).init(320,180));
-  var water = this.bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 8 * TILESIZE, 8 * TILESIZE, Resources.water));
-  water.z = -1;
+  var water = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, 8 * TILESIZE, 8 * TILESIZE));
+  water.color = "#6d6d6d";
+  water.z = 0;
 
   // grid
   for (var i = 0; i < 8; i++) {
@@ -21,12 +22,19 @@ var onStart = function () {
       if (randint(0,10) < 1) {
         g.solid = true;
         //g.color = "darkgreen";
-        this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j, Resources.post));
+        this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j,TILESIZE - 2, TILESIZE - 2)).z = 3;
       } else if (randint(0, 10) < 1) {
         g.swamp = true;
         //g.color = "darkcyan";
       } else {
-        this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j, Resources.tile));
+        var land = this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j, TILESIZE, TILESIZE));
+        land.color = "white";
+        land.z = 2;
+        var ripple = this.bg.add(Object.create(Entity).init(land.x, land.y, TILESIZE + 2, TILESIZE + 2));
+        ripple.z = 1;
+        ripple.addBehavior(Oscillate, {object: ripple, field: "w", constant: 2, initial: TILESIZE + 2, rate: 5});
+        ripple.addBehavior(Oscillate, {object: ripple, field: "h", constant: 2, initial: TILESIZE + 2, rate: 5});
+        ripple.color = "#555555";
       }
       this.grid[i].push({solid: g.solid, swamp: g.swamp});        
     }
@@ -114,7 +122,7 @@ var onStart = function () {
       if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) this.entity.alive = false;
     }});
     m.hungry = m.addBehavior(Hungry, {target:p});
-    m.z = 2;
+    m.z = 3;
     this.mobs.push(m);
   }
 

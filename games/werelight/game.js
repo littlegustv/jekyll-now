@@ -20,12 +20,21 @@ Layer.update = function (dt) {
     }
   }
 };
-Layer.drawOrder = function () {
-	return this.entities.sort(function (a, b) { 
-		if (a.z && b.z && b.z != a.z) return a.z - b.z;
-		else if (a.y && b.y && a.y != b.y) return a.y - b.y;
-		else return a.x - b.x;
-	});
+Layer.draw = function (ctx) {
+  this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  this.ctx.save();
+  this.camera.draw(this.ctx);
+
+  if (this.drawOrder) {
+    var entities = this.drawOrder();
+  } else {
+    var entities = this.entities;
+  }
+
+  for (var i = 0; i < entities.length; i++) {
+    entities[i].draw(this.ctx);
+  }
+  this.ctx.restore();
 };
 
 // tilesize, min, rate, max... grid
