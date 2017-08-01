@@ -3,6 +3,8 @@
 		{"name": "game", "reload": true}
 	],
 	"resources": [
+		{"path": "levels.json"},
+		{"path": "werelight.png", "frames": 10, "animations": 3},
 		{"path": "tile.png"},
 		{"path": "post.png"},
 		{"path": "water.png"},

@@ -13,6 +13,10 @@ var onStart = function () {
   water.color = "#6d6d6d";
   water.z = 0;
 
+  for(var i = 0; i < Resources.levels.layers.length; i++) {
+    var l = this.bg.add(Object.create(TiledMap).init(gameWorld.width / 2, gameWorld.height / 2, Resources.werelight, Resources.levels.layers[i]));
+    l.z = i + 1;
+  }
   // grid
   for (var i = 0; i < 8; i++) {
     this.grid.push([]);
@@ -22,23 +26,25 @@ var onStart = function () {
       if (randint(0,10) < 1) {
         g.solid = true;
         //g.color = "darkgreen";
-        this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j,TILESIZE - 2, TILESIZE - 2)).z = 3;
+        this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j,TILESIZE - 2, TILESIZE - 2)).z = 5;
       } else if (randint(0, 10) < 1) {
         g.swamp = true;
         //g.color = "darkcyan";
       } else {
-        var land = this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j, TILESIZE, TILESIZE));
+        /*var land = this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j, TILESIZE, TILESIZE));
         land.color = "white";
         land.z = 2;
         var ripple = this.bg.add(Object.create(Entity).init(land.x, land.y, TILESIZE + 2, TILESIZE + 2));
         ripple.z = 1;
         ripple.addBehavior(Oscillate, {object: ripple, field: "w", constant: 2, initial: TILESIZE + 2, rate: 5});
         ripple.addBehavior(Oscillate, {object: ripple, field: "h", constant: 2, initial: TILESIZE + 2, rate: 5});
-        ripple.color = "#555555";
+        ripple.color = "#555555";*/
       }
       this.grid[i].push({solid: g.solid, swamp: g.swamp});        
     }
   };
+  
+  
   
   //dark
   this.light_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height)).z = 9;
