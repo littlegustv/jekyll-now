@@ -30,31 +30,79 @@ var onStart = function () {
       }
       this.grid[i].push({solid: g.solid, swamp: g.swamp});        
     }
-  }/*
-  var map = [];
-  for (var i = 0; i < this.grid.length; i++) {
-    map.push([]);
-    for (var j = 0; j < this.grid.length; j++) {
-      if (this.grid[i][j].solid) map[i].push({x: 2, y: 0});
-      else if (this.grid[i][j].swamp) map[i].push({x: 1, y: 0});
-      else map[i].push({x: 0, y: 0});
+  };
+  
+  //dark
+  this.light_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height)).z = 9;
+  
+  // lights
+  this.lights = [];
+  for (var i = 0; i < 8; i++) {
+    this.lights.push([]);
+    for (var j = 0; j < 8; j++) {
+      var l = this.light_layer.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j, TILESIZE, TILESIZE));
+      l.color = "white";
+      l.blend = "destination-out";
+      l.z = 10;
+      l.opacity = 0.5;
+      this.lights[i].push(l);
     }
-  }*/
-  //var t = this.bg.add(Object.create(TileMap).init(gameWorld.width / 2, gameWorld.height / 2, Resources.tiles, map));
-
+  }
+  this.lit = function () {
+    var p = this.player.grid.toGrid(this.player);
+    for (var i = 0; i < this.lights.length; i++) {
+      for (var j = 0; j < this.lights[i].length; j++) {
+        this.lights[i][j].opacity = 0.5;
+      }
+    }
+    for (var i = p.x; i < 8; i++) {
+      if (this.grid[i][p.y].solid) {
+        break;
+      } else {
+        this.lights[i][p.y].opacity = 1;
+      }
+    }
+    for (var i = p.x; i >= 0; i--) {
+      if (this.grid[i][p.y].solid) {
+        break;
+      } else {
+        this.lights[i][p.y].opacity = 1;
+      }
+    }
+    for (var i = p.y; i < 8; i++) {
+      if (this.grid[p.x][i].solid) {
+        break;
+      } else {
+        this.lights[p.x][i].opacity = 1;
+      }
+    }
+    for (var i = p.y; i >= 0; i--) {
+      if (this.grid[p.x][i].solid) {
+        break;
+      } else {
+        this.lights[p.x][i].opacity = 1;
+      }
+    }
+  }
+  
   this.player = this.fg.add(Object.create(Sprite).init(170,40,Resources.wisp));
   this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: OFFSET.x + 7 * TILESIZE, y: OFFSET.y + 7 * TILESIZE}, tilesize: TILESIZE, callback: function () {
+    s.lit();
     for (var i = 0; i < s.mobs.length; i++) {
-      s.mobs[i].hungry.setTarget();
+      var m = s.mobs[i].grid.toGrid(s.mobs[i]);
+      if (s.lights[m.x][m.y].opacity >= 1) {
+        console.log('hello', m.x, m.y, s.lights[m.x][m.y].opacity);
+        s.mobs[i].hungry.setTarget();
+      }
     }
-    //console.log(s.lights[g.x][g.y]);
     s.bg.paused = false;
-    //s.lit();
     this.entity.addBehavior(Delay, {duration: 0.8, callback: function () {
       s.bg.paused = true;
     }});
   }, grid: this.grid});
   var p = this.player;
+  this.lit();
+  
   this.player.offset = {x: 0, y: -6};
   this.player.z = 10;
   this.mobs = [];
