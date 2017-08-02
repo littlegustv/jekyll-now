@@ -10,44 +10,43 @@ var onStart = function () {
 
   this.light_layer = this.addLayer(Object.create(Layer).init(320,180));
   var water = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, 8 * TILESIZE, 8 * TILESIZE));
-  water.color = "#6d6d6d";
-  water.z = 0;
+  water.color = "darkslategray";
+  water.z = 1;
 
-  for(var i = 0; i < Resources.levels.layers.length; i++) {
+  for(var i = 0; i < 3; i++) {
     var l = this.bg.add(Object.create(TiledMap).init(gameWorld.width / 2, gameWorld.height / 2, Resources.werelight, Resources.levels.layers[i]));
-    l.z = i + 1;
+    l.z = (i + 2);
   }
-  // grid
+  
   for (var i = 0; i < 8; i++) {
     this.grid.push([]);
     for (var j = 0; j < 8; j++) {
       var g = {};
-      //var g = this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j, TILESIZE, TILESIZE));
-      if (randint(0,10) < 1) {
-        g.solid = true;
-        //g.color = "darkgreen";
-        this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j,TILESIZE - 2, TILESIZE - 2)).z = 5;
-      } else if (randint(0, 10) < 1) {
+      if (Resources.levels.layers[1].data[i + j * 8] !== 12) {
         g.swamp = true;
-        //g.color = "darkcyan";
-      } else {
-        /*var land = this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j, TILESIZE, TILESIZE));
-        land.color = "white";
-        land.z = 2;
+        /*var swamp = this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j,TILESIZE - 2, TILESIZE - 2));
+        swamp.z = 200;
+        swamp.color = "darkgreen";*/
+      } else if (randint(0, 10) < 1) {
+        g.solid = true;
+        var solid = this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j,TILESIZE - 2, TILESIZE - 2));
+        solid.z = 200;
+      }
+      /*
+      if (!g.swamp) {
         var ripple = this.bg.add(Object.create(Entity).init(land.x, land.y, TILESIZE + 2, TILESIZE + 2));
         ripple.z = 1;
         ripple.addBehavior(Oscillate, {object: ripple, field: "w", constant: 2, initial: TILESIZE + 2, rate: 5});
         ripple.addBehavior(Oscillate, {object: ripple, field: "h", constant: 2, initial: TILESIZE + 2, rate: 5});
-        ripple.color = "#555555";*/
+        ripple.color = "#555555";
       }
+      */
       this.grid[i].push({solid: g.solid, swamp: g.swamp});        
-    }
-  };
-  
-  
-  
-  //dark
-  this.light_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height)).z = 9;
+    }  
+  }
+
+  var dark = this.light_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
+  dark.z = 9;;
   
   // lights
   this.lights = [];
@@ -99,13 +98,16 @@ var onStart = function () {
     }
   }
   
-  this.player = this.fg.add(Object.create(Sprite).init(170,40,Resources.wisp));
+  this.player = this.fg.add(Object.create(Sprite).init(OFFSET.x + 2 * TILESIZE, OFFSET.y + 2 *TILESIZE,Resources.wisp));
+  this.player.point_light = this.light_layer.add(Object.create(Circle).init(this.player.x, this.player.y, TILESIZE));
+  this.player.point_light.blend = "destination-out";
+  this.player.point_light.addBehavior(Follow, {target: this.player, offset: {x: 0, y: -8}});
+  
   this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: OFFSET.x + 7 * TILESIZE, y: OFFSET.y + 7 * TILESIZE}, tilesize: TILESIZE, callback: function () {
     s.lit();
     for (var i = 0; i < s.mobs.length; i++) {
       var m = s.mobs[i].grid.toGrid(s.mobs[i]);
       if (s.lights[m.x][m.y].opacity >= 1) {
-        console.log('hello', m.x, m.y, s.lights[m.x][m.y].opacity);
         s.mobs[i].hungry.setTarget();
       }
     }
@@ -121,14 +123,14 @@ var onStart = function () {
   this.player.z = 10;
   this.mobs = [];
   for (var i = 0; i < 10; i++) {
-    var m = this.bg.add(Object.create(Entity).init(randint(0,8) * TILESIZE + OFFSET.x, randint(0,8) * OFFSET.y + TILESIZE, 8, 8));
+    var m = this.bg.add(Object.create(Entity).init(randint(0,8) * TILESIZE + OFFSET.x, randint(0,8) * TILESIZE + OFFSET.y, 8, 8));
     m.color = "tomato";
     m.grid = m.addBehavior(Pawn, {min: {x: OFFSET.x, y: OFFSET.y}, max: {x: gameWorld.width - OFFSET.x - TILESIZE, y: gameWorld.height - OFFSET.y}, rate: 5, tilesize: TILESIZE, grid: this.grid, callback: function () {
       var g = this.toGrid(this.entity);
       if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) this.entity.alive = false;
     }});
     m.hungry = m.addBehavior(Hungry, {target:p});
-    m.z = 3;
+    m.z = 18;
     this.mobs.push(m);
   }
 

@@ -20,6 +20,13 @@ Layer.update = function (dt) {
     }
   }
 };
+// raindrop push maybe, simpler, can be overriden for orthoganal, etc.
+Layer.drawOrder = function () {
+    var t = this;
+    return this.entities.sort(function (a, b) {
+      if (a.z < b.z) return -1;
+    });
+};
 Layer.draw = function (ctx) {
   this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   this.ctx.save();
@@ -53,6 +60,7 @@ Grid.toXY = function (coord) {
 	return {x: coord.x * this.tilesize + this.min.x, y: coord.y * this.tilesize + this.min.y};
 }
 Grid.toGrid = function (coord) {
+  console.log(coord.x, coord.y, this.tilesize);
 	return {
   	x: Math.round((coord.x - this.min.x) / this.tilesize),
   	y: Math.round((coord.y - this.min.y) / this.tilesize)
@@ -76,7 +84,7 @@ Grid.select = function (coord) {
 }
 Grid.draw = function (ctx) {
 	if (this.show) {
-		ctx.strokeStyle = "white";
+		ctx.strokeStyle = "red";
   	for (var i = this.min.x; i <= this.max.x; i += this.tilesize) {
     	for (var j = this.min.y; j <= this.max.y; j += this.tilesize) {
       	if (this.possible({x: i, y: j})) {
@@ -142,7 +150,6 @@ World.loadResources = function () {
       var e = res.indexOf(".");
       var name = res.substring(0, e);
       var ext = res.substring(e, res.length);
-      console.log(ext);
       if (ext == ".png") {
         Resources[name] = {image: new Image(), frames: w.gameInfo.resources[i].frames || 1, speed: w.gameInfo.resources[i].speed || 1, animations: w.gameInfo.resources[i].animations || 1 };
         Resources[name].image.src = "res/" + res;
@@ -183,5 +190,5 @@ World.loadResources = function () {
   }
 };
 
-var TILESIZE = 16, OFFSET = {x: 90, y: 20};
+var TILESIZE = 16, OFFSET = {x: 104, y: 34};
 var gameWorld = Object.create(World).init(320, 180, "index.json");
