@@ -10,7 +10,7 @@ var onStart = function () {
 
   this.light_layer = this.addLayer(Object.create(Layer).init(320,180));
   var water = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, 8 * TILESIZE, 8 * TILESIZE));
-  water.color = "darkslategray";
+  water.color = "#2f4f4f"; // darkslategray
   water.z = 1;
 
   for(var i = 0; i < 3; i++) {
@@ -151,4 +151,13 @@ var onStart = function () {
   }
 }
 var onUpdate = function (dt) {
+  /* rain (needs work)
+  for (var i = 0; i < 5; i++) {
+    var rain = this.fg.add(Object.create(Entity).init(randint(0, OFFSET.x + 8 * TILESIZE), randint(0, OFFSET.y + 8 * TILESIZE), 2, 8));
+    rain.addBehavior(Velocity);
+    rain.velocity = {x: 0, y: 20};
+    rain.color = "darkslategray";
+    rain.opacity = 0.6;
+    rain.addBehavior(FadeOut, {duration: 0, delay: 1});
+  }*/
 }
