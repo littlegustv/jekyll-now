@@ -22,12 +22,12 @@ var onStart = function () {
     this.grid.push([]);
     for (var j = 0; j < 8; j++) {
       var g = {};
-      if (Resources.levels.layers[1].data[i + j * 8] !== 12) {
+      if (Resources.levels.layers[1].data[i + j * 8] === 0) {
         g.swamp = true;
         /*var swamp = this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j,TILESIZE - 2, TILESIZE - 2));
         swamp.z = 200;
         swamp.color = "darkgreen";*/
-      } else if (randint(0, 10) < 1) {
+      } else if (randint(0, 10) <= 1) {
         g.solid = true;
         var solid = this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 4, Resources.box));//TILESIZE - 2, TILESIZE - 2));
         solid.z = 200;
