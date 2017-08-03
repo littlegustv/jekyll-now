@@ -18,6 +18,28 @@ var onStart = function () {
     l.z = (i + 2);
   }
   
+  this.mobs = [];
+  
+  this.player = this.fg.add(Object.create(Sprite).init(OFFSET.x + 2 * TILESIZE, OFFSET.y + 2 *TILESIZE,Resources.wisp));
+  this.player.point_light = this.light_layer.add(Object.create(Circle).init(this.player.x, this.player.y, TILESIZE));
+  this.player.point_light.blend = "destination-out";
+  this.player.point_light.addBehavior(Follow, {target: this.player, offset: {x: 0, y: -8}});
+  
+  this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: OFFSET.x + 7 * TILESIZE, y: OFFSET.y + 7 * TILESIZE}, tilesize: TILESIZE, callback: function () {
+    s.lit();
+    for (var i = 0; i < s.mobs.length; i++) {
+      var m = s.mobs[i].grid.toGrid(s.mobs[i]);
+      if (s.lights[m.x][m.y].opacity >= 1) {
+        s.mobs[i].hungry.setTarget();
+      }
+    }
+    s.bg.paused = false;
+    this.entity.addBehavior(Delay, {duration: 0.8, callback: function () {
+      s.bg.paused = true;
+    }});
+  }, grid: this.grid});
+  var p = this.player;
+  
   for (var i = 0; i < 8; i++) {
     this.grid.push([]);
     for (var j = 0; j < 8; j++) {
@@ -31,6 +53,19 @@ var onStart = function () {
         g.solid = true;
         var solid = this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 4, Resources.box));//TILESIZE - 2, TILESIZE - 2));
         solid.z = 200;
+      } else {
+        // mobs; eventually load from data
+        if (randint(0,10) <= 1) {
+          var m = this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 8, 8, 16));
+          m.color = "tomato";
+          m.grid = m.addBehavior(Pawn, {min: {x: OFFSET.x, y: OFFSET.y - 8}, max: {x: gameWorld.width - OFFSET.x - TILESIZE, y: gameWorld.height - OFFSET.y - 8}, rate: 5, tilesize: TILESIZE, grid: this.grid, callback: function () {
+            var g = this.toGrid(this.entity);
+            if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) this.entity.alive = false;
+          }});
+          m.hungry = m.addBehavior(Hungry, {target:p});
+          m.z = 201;
+          this.mobs.push(m);
+        }
       }
       /*
       if (!g.swamp) {
@@ -98,40 +133,13 @@ var onStart = function () {
     }
   }
   
-  this.player = this.fg.add(Object.create(Sprite).init(OFFSET.x + 2 * TILESIZE, OFFSET.y + 2 *TILESIZE,Resources.wisp));
-  this.player.point_light = this.light_layer.add(Object.create(Circle).init(this.player.x, this.player.y, TILESIZE));
-  this.player.point_light.blend = "destination-out";
-  this.player.point_light.addBehavior(Follow, {target: this.player, offset: {x: 0, y: -8}});
   
-  this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: OFFSET.x + 7 * TILESIZE, y: OFFSET.y + 7 * TILESIZE}, tilesize: TILESIZE, callback: function () {
-    s.lit();
-    for (var i = 0; i < s.mobs.length; i++) {
-      var m = s.mobs[i].grid.toGrid(s.mobs[i]);
-      if (s.lights[m.x][m.y].opacity >= 1) {
-        s.mobs[i].hungry.setTarget();
-      }
-    }
-    s.bg.paused = false;
-    this.entity.addBehavior(Delay, {duration: 0.8, callback: function () {
-      s.bg.paused = true;
-    }});
-  }, grid: this.grid});
-  var p = this.player;
   this.lit();
   
   this.player.offset = {x: 0, y: -6};
   this.player.z = 10;
-  this.mobs = [];
   for (var i = 0; i < 10; i++) {
-    var m = this.bg.add(Object.create(Entity).init(randint(0,8) * TILESIZE + OFFSET.x, randint(0,8) * TILESIZE + OFFSET.y, 8, 8));
-    m.color = "tomato";
-    m.grid = m.addBehavior(Pawn, {min: {x: OFFSET.x, y: OFFSET.y}, max: {x: gameWorld.width - OFFSET.x - TILESIZE, y: gameWorld.height - OFFSET.y}, rate: 5, tilesize: TILESIZE, grid: this.grid, callback: function () {
-      var g = this.toGrid(this.entity);
-      if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) this.entity.alive = false;
-    }});
-    m.hungry = m.addBehavior(Hungry, {target:p});
-    m.z = 18;
-    this.mobs.push(m);
+    
   }
 
   s.onClick = function (e) {
