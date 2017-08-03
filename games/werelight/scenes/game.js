@@ -29,7 +29,7 @@ var onStart = function () {
         swamp.color = "darkgreen";*/
       } else if (randint(0, 10) < 1) {
         g.solid = true;
-        var solid = this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j,TILESIZE - 2, TILESIZE - 2));
+        var solid = this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 4, Resources.box));//TILESIZE - 2, TILESIZE - 2));
         solid.z = 200;
       }
       /*
