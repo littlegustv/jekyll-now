@@ -154,7 +154,7 @@ var onStart = function () {
   // game editor
   if (true) {
     this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
-    var bg = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, gameWorld.height / 2, 48, gameWorld.height));
+    var bg = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, gameWorld.height / 2, 54, gameWorld.height));
     bg.color = "white";
     bg.z = 99;
     
@@ -162,12 +162,17 @@ var onStart = function () {
     
     // button to move object
     
-    var move = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, 6, 48, 12));
+    var move = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, 10, 46, 14));
     move.color = "green";
     move.family = "button";
+    //move.opacity = 0;
+    move.shown = this.ui.add(Object.create(TileMap).init(move.x, move.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
+    move.text = this.ui.add(Object.create(SpriteFont).init(move.x, move.y, Resources.expire_font, "Move", {align: "center", spacing: -3}));
+    move.text.z = 102;
+    move.shown.z = 100;
     move.hover = btn_hover;
     move.unhover = btn_unhover;
-    move.z = 100;
+    move.z = 101;
     move.trigger = function () {
       s.grabbing = true;
       s.action = "move";
@@ -175,12 +180,17 @@ var onStart = function () {
     
     // button to delete object
     
-    var remove = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, 18, 48, 12));
+    var remove = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, 30, 46, 14));
     remove.color = "red";
     remove.family = "button";
     remove.hover = btn_hover;
     remove.unhover = btn_unhover;
-    remove.z = 100;
+    //remove.opacity = 0;
+    remove.shown = this.ui.add(Object.create(TileMap).init(remove.x, remove.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
+    remove.text = this.ui.add(Object.create(SpriteFont).init(remove.x, remove.y, Resources.expire_font, "remove", {align: "center", spacing: -3}));
+    remove.text.z = 102;
+    remove.shown.z = 100;
+    remove.z = 101;
     remove.trigger = function () {
       s.grabbing = true;
       s.action = "remove";
@@ -188,12 +198,17 @@ var onStart = function () {
     
     // button to add solid
     
-    var addsolid = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, 30, 48, 12));
+    var addsolid = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, 50, 46, 14));
     addsolid.color = "gray";
     addsolid.family = "button";
     addsolid.hover = btn_hover;
     addsolid.unhover = btn_unhover;
-    addsolid.z = 100;
+    //addsolid.opacity = 0;
+    addsolid.shown = this.ui.add(Object.create(TileMap).init(addsolid.x, addsolid.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
+    addsolid.text = this.ui.add(Object.create(SpriteFont).init(addsolid.x, addsolid.y, Resources.expire_font, "+solid", {align: "center", spacing: -3}));
+    addsolid.text.z = 102;
+    addsolid.shown.z = 100;
+    addsolid.z = 101;
     addsolid.trigger = function () {
       s.adding = true;
       s.action = "solid";
@@ -202,23 +217,33 @@ var onStart = function () {
     // button to add water
     // button to add person
     
-    var addperson = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, 42, 48, 12));
+    var addperson = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, 70, 46, 14));
     addperson.color = "darksalmon";
     addperson.family = "button";
     addperson.hover = btn_hover;
     addperson.unhover = btn_unhover;
-    addperson.z = 100;
+    addperson.z = 101;
+    //addperson.opacity = 0;
+    addperson.shown = this.ui.add(Object.create(TileMap).init(addperson.x, addperson.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
+    addperson.text = this.ui.add(Object.create(SpriteFont).init(addperson.x, addperson.y, Resources.expire_font, "+person", {align: "center", spacing: -3}));
+    addperson.text.z = 102;
+    addperson.shown.z = 100;
     addperson.trigger = function () {
       s.adding = true;
       s.action = "person";
     };
     
-    var addswamp = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, 54, 48, 12));
+    var addswamp = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, 90, 46, 14));
     addswamp.color = "darkslategray";
     addswamp.family = "button";
     addswamp.hover = btn_hover;
     addswamp.unhover = btn_unhover;
-    addswamp.z = 100;
+    addswamp.z = 101;
+    //addswamp.opacity = 0;
+    addswamp.shown = this.ui.add(Object.create(TileMap).init(addswamp.x, addswamp.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
+    addswamp.text = this.ui.add(Object.create(SpriteFont).init(addswamp.x, addswamp.y, Resources.expire_font, "+swamp", {align: "center", spacing: -3}));
+    addswamp.text.z = 102;
+    addswamp.shown.z = 100;
     addswamp.trigger = function () {
       s.adding = true;
       s.action = "swamp";

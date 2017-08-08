@@ -5,9 +5,9 @@
 	"resources": [
 		{"path": "levels.json"},
 		{"path": "werelight.png", "frames": 10, "animations": 3},
-		{"path": "tile.png"},
+		{"path": "expire_font.png", "frames": 95, "animations": 1},
+		{"path": "keys.png", "frames": 4, "animations": 2},
 		{"path": "box.png"},
-		{"path": "water.png"},
 		{"path": "wisp.png", "frames": 2, "animations": 1, "speed": 0.4}
 	]
 }
