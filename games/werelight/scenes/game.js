@@ -58,7 +58,7 @@ var onStart = function () {
       } else {
         // mobs; eventually load from data
         if (randint(0,10) <= 1) {
-          var m = this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 8, 8, 16));
+          var m = this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 8, Resources.person));
           m.color = "tomato";
           m.grid = m.addBehavior(Pawn, {min: {x: OFFSET.x, y: OFFSET.y - 8}, max: {x: gameWorld.width - OFFSET.x - TILESIZE, y: gameWorld.height - OFFSET.y - 8}, rate: 5, tilesize: TILESIZE, grid: this.grid, callback: function () {
             var g = this.toGrid(this.entity);
