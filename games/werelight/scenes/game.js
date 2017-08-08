@@ -21,6 +21,7 @@ var onStart = function () {
   this.mobs = [];
   
   this.player = this.fg.add(Object.create(Sprite).init(OFFSET.x + 2 * TILESIZE, OFFSET.y + 2 *TILESIZE,Resources.wisp));
+  this.player.family = "action";
   this.player.point_light = this.light_layer.add(Object.create(Circle).init(this.player.x, this.player.y, TILESIZE));
   this.player.point_light.blend = "destination-out";
   this.player.point_light.addBehavior(Follow, {target: this.player, offset: {x: 0, y: -8}});
@@ -53,6 +54,7 @@ var onStart = function () {
         g.solid = true;
         var solid = this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 4, Resources.box));//TILESIZE - 2, TILESIZE - 2));
         solid.z = 200;
+        solid.family = "action";
       } else {
         // mobs; eventually load from data
         if (randint(0,10) <= 1) {
@@ -64,6 +66,7 @@ var onStart = function () {
           }});
           m.hungry = m.addBehavior(Hungry, {target:p});
           m.z = 201;
+          m.family = "action";
           this.mobs.push(m);
         }
       }
@@ -82,6 +85,12 @@ var onStart = function () {
 
   var dark = this.light_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
   dark.z = 9;;
+  
+  var l = this.light_layer.add(Object.create(Entity).init(gameWorld.width / 2, OFFSET.y - TILESIZE / 2, 8 * TILESIZE, TILESIZE));
+  l.color = "white";
+  l.blend = "destination-out";
+  l.z = 10;
+  l.opacity = 0.5;
   
   // lights
   this.lights = [];
@@ -142,8 +151,134 @@ var onStart = function () {
     
   }
 
-  s.onClick = function (e) {
+  // game editor
+  if (true) {
+    this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
+    var bg = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, gameWorld.height / 2, 48, gameWorld.height));
+    bg.color = "white";
+    bg.z = 99;
+    
+    // button to toggle between editor and game
+    
+    // button to move object
+    
+    var move = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, 6, 48, 12));
+    move.color = "green";
+    move.family = "button";
+    move.hover = btn_hover;
+    move.unhover = btn_unhover;
+    move.z = 100;
+    move.trigger = function () {
+      s.grabbing = true;
+      s.action = "move";
+    };
+    
+    // button to delete object
+    
+    var remove = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, 18, 48, 12));
+    remove.color = "red";
+    remove.family = "button";
+    remove.hover = btn_hover;
+    remove.unhover = btn_unhover;
+    remove.z = 100;
+    remove.trigger = function () {
+      s.grabbing = true;
+      s.action = "remove";
+    };
+    
+    // button to add solid
+    
+    var addsolid = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, 30, 48, 12));
+    addsolid.color = "gray";
+    addsolid.family = "button";
+    addsolid.hover = btn_hover;
+    addsolid.unhover = btn_unhover;
+    addsolid.z = 100;
+    addsolid.trigger = function () {
+      s.adding = true;
+      s.action = "solid";
+    };
+    
+    // button to add water
+    // button to add person
+    
+    var addperson = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, 42, 48, 12));
+    addperson.color = "darksalmon";
+    addperson.family = "button";
+    addperson.hover = btn_hover;
+    addperson.unhover = btn_unhover;
+    addperson.z = 100;
+    addperson.trigger = function () {
+      s.adding = true;
+      s.action = "person";
+    };
+    
+    var addswamp = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, 54, 48, 12));
+    addswamp.color = "darkslategray";
+    addswamp.family = "button";
+    addswamp.hover = btn_hover;
+    addswamp.unhover = btn_unhover;
+    addswamp.z = 100;
+    addswamp.trigger = function () {
+      s.adding = true;
+      s.action = "swamp";
+    };
   }
+
+  s.onClick = function (e) {
+    var b = s.ui.onButton(e.x, e.y);
+    if (b) {
+      b.trigger();
+    }
+    else if (s.grabbing) {
+      var entity = select([s.fg, s.bg], e, "action");
+      if (entity) {
+        s.grabbing = false;
+        if (s.action == "move") {
+          s.grabbed = entity;
+        } else if (s.action == "remove") {
+          // bg has to be unpaused for this to work...
+          entity.alive = false;
+        }
+      }
+    } else if (s.grabbed) {
+      s.grabbed = undefined;
+    } else if (s.adding) {
+      var x = Math.round((e.x - OFFSET.x) / TILESIZE), y = Math.round((e.y - OFFSET.y) / TILESIZE);
+      if (s.action == "solid") {
+        var box = s.bg.add(Object.create(Sprite).init(x * TILESIZE + OFFSET.x, y * TILESIZE + OFFSET.y - 4, Resources.box));
+        box.z = 200;
+        box.family = "action";
+        s.grid[x][y].solid = true;
+        s.lit();
+        s.adding = false;
+        // update grid
+      } else if (s.action == "person") {
+        var person = s.bg.add(Object.create(Entity).init(x * TILESIZE + OFFSET.x, y * TILESIZE + OFFSET.y - 8, 8, 16));
+        person.color = "darksalmon";
+        person.z = 201;
+        person.family = "action";
+        s.adding = false;
+
+        // add behaviors!
+      } else if (s.action == "swamp") {
+        // set water
+        s.grid[x][y].swamp = true;
+        s.grid[x][y].solid = false; // incompatible !
+        s.adding = false;
+
+        // fix me: reconstruct tiledmap appearance
+      }
+    }
+  }
+  
+  s.onMouseMove = function (e) {
+    if (s.grabbed) {
+      s.grabbed.x = Math.round((e.x - OFFSET.x) / TILESIZE) * TILESIZE + OFFSET.x;
+      s.grabbed.y = Math.round((e.y - OFFSET.y) / TILESIZE) * TILESIZE + OFFSET.y;
+    }
+  }
+  /*
   s.onMouseDown = function (e) {
     if (s.bg.paused) {
       s.player.grid.show = true;
@@ -156,7 +291,9 @@ var onStart = function () {
     }
   }
   s.onKeyDown = function (e) {
-  }
+  }*/
+  
+  
 }
 var onUpdate = function (dt) {
   /* rain (needs work)

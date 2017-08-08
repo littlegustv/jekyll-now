@@ -20,11 +20,13 @@ Layer.update = function (dt) {
     }
   }
 };
-// raindrop push maybe, simpler, can be overriden for orthoganal, etc.
+// raindrop push
 Layer.drawOrder = function () {
     var t = this;
     return this.entities.sort(function (a, b) {
       if (a.z < b.z) return -1;
+      else if (a.z === b.z && a.y < b.y) return -1;
+      else return 1;
     });
 };
 Layer.draw = function (ctx) {
@@ -189,6 +191,27 @@ World.loadResources = function () {
     })();
   }
 };
+
+function btn_hover () {
+  this.opacity = 0.5;
+  this.scale = 1.2;
+}
+function btn_unhover () {
+  this.opacity = 1;
+  this.scale = 1;
+}
+// fix me: add this to layer, replace 'on-button'
+function select (layers, e, family) {
+  for (var i = 0; i < layers.length; i++) {
+    for (var j = 0; j <layers[i].entities.length; j++) {
+      var entity = layers[i].entities[j];
+      if (family && entity.family !== family) {}
+      else if (e.x >= entity.x - entity.w/2 && e.x <= entity.x + entity.w/2 && e.y >= entity.y - entity.h/2 && e.y <= entity.y + entity.h/2) {
+        return entity;
+      }
+    }
+  }
+}
 
 var TILESIZE = 16, OFFSET = {x: 104, y: 34};
 var gameWorld = Object.create(World).init(320, 180, "index.json");
