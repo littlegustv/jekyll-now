@@ -1,5 +1,6 @@
 var onStart = function () {
   var s = this;
+  this.water_layer = this.addLayer(Object.create(Layer).init(320, 180));
   this.bg = this.addLayer(Object.create(Layer).init(320,180));
   this.bg.paused = true;
 
@@ -9,7 +10,8 @@ var onStart = function () {
   this.grid = [];
 
   this.light_layer = this.addLayer(Object.create(Layer).init(320,180));
-  var water = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, 8 * TILESIZE, 8 * TILESIZE));
+  
+  var water = this.water_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
   water.color = "#2f4f4f";
   water.z = 1;
   
@@ -65,26 +67,23 @@ var onStart = function () {
           this.mobs.push(m);
         }
       }
-      /*
-      if (!g.swamp) {
-        var ripple = this.bg.add(Object.create(Entity).init(land.x, land.y, TILESIZE + 2, TILESIZE + 2));
-        ripple.z = 1;
-        ripple.addBehavior(Oscillate, {object: ripple, field: "w", constant: 2, initial: TILESIZE + 2, rate: 5});
-        ripple.addBehavior(Oscillate, {object: ripple, field: "h", constant: 2, initial: TILESIZE + 2, rate: 5});
-        ripple.color = "#555555";
-      }
-      */
       
       if (!g.swamp) {
         g.x = 0, g.y = 0;
-      } else if (!this.grid[i][j-1] || !this.grid[i][j-1].swamp) {
-        if (!this.grid[i-1] || !this.grid[i-1][j].swamp) {
+        // fix me: need to clear and refresh this on map edit... or maybe it's trivial, since that's only for editor
+        var ripple = this.water_layer.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j + 4, TILESIZE + 2, TILESIZE + 2));
+        ripple.z = 2;
+        ripple.addBehavior(Oscillate, {object: ripple, field: "w", constant: 2, initial: TILESIZE + 4, rate: 5});
+        ripple.addBehavior(Oscillate, {object: ripple, field: "h", constant: 2, initial: TILESIZE + 4, rate: 5});
+        ripple.color = "#0f2f2f";
+      } else if (this.grid[i][j-1] && !this.grid[i][j-1].swamp) {
+        if (this.grid[i-1] && !this.grid[i-1][j].swamp) {
           g.x = 1, g.y = 1;
         } else {
           g.x = 0, g.y = 1;
         }
       } else {
-        if (!this.grid[i-1] || !this.grid[i-1][j].swamp) {
+        if (this.grid[i-1] && !this.grid[i-1][j].swamp) {
           g.x = 1, g.y = 0;
         } else {
           g.x = 4, g.y = 0;
@@ -99,14 +98,9 @@ var onStart = function () {
 
   var dark = this.light_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
   dark.z = 9;;
+  dark.opacity = 1;
   
-  var l = this.light_layer.add(Object.create(Entity).init(gameWorld.width / 2, OFFSET.y - TILESIZE / 2, 8 * TILESIZE, TILESIZE));
-  l.color = "white";
-  l.blend = "destination-out";
-  l.z = 10;
-  l.opacity = 0.5;
-  
-  // lights
+  // lights.. need to go out of 8x8 grid if 'floating island effect' is wanted... (FIX ME)
   this.lights = [];
   for (var i = 0; i < 8; i++) {
     this.lights.push([]);
@@ -361,14 +355,14 @@ var onStart = function () {
             var g = s.grid[i][j];
             if (!g.swamp) {
               g.x = 0, g.y = 0;
-            } else if (!s.grid[i][j-1] || !s.grid[i][j-1].swamp) {
-              if (!s.grid[i-1] || !s.grid[i-1][j].swamp) {
+            } else if (s.grid[i][j-1] && !s.grid[i][j-1].swamp) {
+              if (s.grid[i-1] && !s.grid[i-1][j].swamp) {
                 g.x = 1, g.y = 1;
               } else {
                 g.x = 0, g.y = 1;
               }
             } else {
-              if (!s.grid[i-1] || !s.grid[i-1][j].swamp) {
+              if (s.grid[i-1] && !s.grid[i-1][j].swamp) {
                 g.x = 1, g.y = 0;
               } else {
                 g.x = 4, g.y = 0;
