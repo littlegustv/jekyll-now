@@ -10,13 +10,8 @@ var onStart = function () {
 
   this.light_layer = this.addLayer(Object.create(Layer).init(320,180));
   var water = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, 8 * TILESIZE, 8 * TILESIZE));
-  water.color = "#2f4f4f"; // darkslategray
+  water.color = "#2f4f4f";
   water.z = 1;
-
-  for(var i = 0; i < 3; i++) {
-    var l = this.bg.add(Object.create(TiledMap).init(gameWorld.width / 2, gameWorld.height / 2, Resources.werelight, Resources.levels.layers[i]));
-    l.z = (i + 2);
-  }
   
   this.mobs = [];
   
@@ -79,9 +74,28 @@ var onStart = function () {
         ripple.color = "#555555";
       }
       */
-      this.grid[i].push({solid: g.solid, swamp: g.swamp});        
+      
+      if (!g.swamp) {
+        g.x = 0, g.y = 0;
+      } else if (!this.grid[i][j-1] || !this.grid[i][j-1].swamp) {
+        if (!this.grid[i-1] || !this.grid[i-1][j].swamp) {
+          g.x = 1, g.y = 1;
+        } else {
+          g.x = 0, g.y = 1;
+        }
+      } else {
+        if (!this.grid[i-1] || !this.grid[i-1][j].swamp) {
+          g.x = 1, g.y = 0;
+        } else {
+          g.x = 4, g.y = 0;
+        }
+      }
+      this.grid[i].push({solid: g.solid, swamp: g.swamp, x: g.x, y: g.y});
     }  
   }
+  this.map = this.bg.add(Object.create(TileMap).init(gameWorld.width / 2, gameWorld.height / 2, Resources.werelight, this.grid));
+  this.map.z = 2;
+  //console.log(map);
 
   var dark = this.light_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
   dark.z = 9;;
@@ -147,9 +161,6 @@ var onStart = function () {
   
   this.player.offset = {x: 0, y: -6};
   this.player.z = 10;
-  for (var i = 0; i < 10; i++) {
-    
-  }
 
   // game editor
   if (true) {
@@ -248,6 +259,52 @@ var onStart = function () {
       s.adding = true;
       s.action = "swamp";
     };
+    
+    var addfloor = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, 110, 46, 14));
+    addfloor.color = "#eeeeee";
+    addfloor.family = "button";
+    addfloor.hover = btn_hover;
+    addfloor.unhover = btn_unhover;
+    addfloor.z = 101;
+    //addswamp.opacity = 0;
+    addfloor.shown = this.ui.add(Object.create(TileMap).init(addfloor.x, addfloor.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
+    addfloor.text = this.ui.add(Object.create(SpriteFont).init(addfloor.x, addfloor.y, Resources.expire_font, "+floor", {align: "center", spacing: -3}));
+    addfloor.text.z = 102;
+    addfloor.shown.z = 100;
+    addfloor.trigger = function () {
+      s.adding = true;
+      s.action = "floor";
+    };
+    
+    var toggleui = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, gameWorld.height - 10, 46, 14));
+    toggleui.color = "cyan";
+    toggleui.family = "button";
+    toggleui.hover = btn_hover;
+    toggleui.unhover = btn_unhover;
+    toggleui.z = 101;
+    //addswamp.opacity = 0;
+    toggleui.shown = this.ui.add(Object.create(TileMap).init(toggleui.x, toggleui.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
+    toggleui.text = this.ui.add(Object.create(SpriteFont).init(toggleui.x, toggleui.y, Resources.expire_font, "toggle", {align: "center", spacing: -3}));
+    toggleui.text.z = 102;
+    toggleui.shown.z = 100;
+    toggleui.trigger = function () {
+      s.editor = !s.editor;
+    };
+    
+    var save = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, gameWorld.height - 30, 46, 14));
+    save.color = "purple";
+    save.family = "button";
+    save.hover = btn_hover;
+    save.unhover = btn_unhover;
+    save.z = 101;
+    //addswamp.opacity = 0;
+    save.shown = this.ui.add(Object.create(TileMap).init(save.x, save.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
+    save.text = this.ui.add(Object.create(SpriteFont).init(save.x, save.y, Resources.expire_font, "@save", {align: "center", spacing: -3}));
+    save.text.z = 102;
+    save.shown.z = 100;
+    save.trigger = function () {
+      console.log('saving', JSON.stringify(s.grid));
+    };
   }
 
   s.onClick = function (e) {
@@ -255,7 +312,9 @@ var onStart = function () {
     if (b) {
       b.trigger();
     }
-    else if (s.grabbing) {
+    else if (!s.editor) {
+      return;
+    } else if (s.grabbing) {
       var entity = select([s.fg, s.bg], e, "action");
       if (entity) {
         s.grabbing = false;
@@ -276,24 +335,49 @@ var onStart = function () {
         box.family = "action";
         s.grid[x][y].solid = true;
         s.lit();
-        s.adding = false;
         // update grid
       } else if (s.action == "person") {
         var person = s.bg.add(Object.create(Entity).init(x * TILESIZE + OFFSET.x, y * TILESIZE + OFFSET.y - 8, 8, 16));
         person.color = "darksalmon";
         person.z = 201;
         person.family = "action";
-        s.adding = false;
-
         // add behaviors!
       } else if (s.action == "swamp") {
         // set water
         s.grid[x][y].swamp = true;
         s.grid[x][y].solid = false; // incompatible !
-        s.adding = false;
-
-        // fix me: reconstruct tiledmap appearance
+      } else if (s.action == "floor") {
+        s.grid[x][y].swamp = false;
       }
+      s.adding = false;
+      // reconstruct tiledmap appearance
+      for (var k = 0; k <= 1; k++) {
+        for (var l = 0; l <= 1; l++) {
+          var i = x + k, j = y + l;
+          
+          if (i >= s.grid.length) {}
+          else if (j >= s.grid[i].length) {}
+          else {
+            var g = s.grid[i][j];
+            if (!g.swamp) {
+              g.x = 0, g.y = 0;
+            } else if (!s.grid[i][j-1] || !s.grid[i][j-1].swamp) {
+              if (!s.grid[i-1] || !s.grid[i-1][j].swamp) {
+                g.x = 1, g.y = 1;
+              } else {
+                g.x = 0, g.y = 1;
+              }
+            } else {
+              if (!s.grid[i-1] || !s.grid[i-1][j].swamp) {
+                g.x = 1, g.y = 0;
+              } else {
+                g.x = 4, g.y = 0;
+              }
+            }
+          }
+        }
+      }
+      s.map.map = s.grid;
     }
   }
   
@@ -302,21 +386,33 @@ var onStart = function () {
       s.grabbed.x = Math.round((e.x - OFFSET.x) / TILESIZE) * TILESIZE + OFFSET.x;
       s.grabbed.y = Math.round((e.y - OFFSET.y) / TILESIZE) * TILESIZE + OFFSET.y;
     }
+    var b = s.ui.onButton(e.x, e.y);
+    if (b) {
+      b.hover();
+    }
+    var buttons = s.ui.entities.filter(function (e) { return e.family === "button" });
+    for (var i = 0; i < buttons.length; i++) {
+      if (buttons[i] !== b) {
+        buttons[i].unhover();
+      }
+    }
   }
-  /*
+  
   s.onMouseDown = function (e) {
-    if (s.bg.paused) {
+    if (s.editor) return;
+    else if (s.bg.paused) {
       s.player.grid.show = true;
     }
   }
   s.onMouseUp = function (e) {
-    if (s.bg.paused) {
+    if (s.editor) return;
+    else if (s.bg.paused) {
       s.player.grid.show = false;
       s.player.grid.select(e);
     }
   }
   s.onKeyDown = function (e) {
-  }*/
+  }
   
   
 }

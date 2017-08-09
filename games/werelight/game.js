@@ -193,12 +193,17 @@ World.loadResources = function () {
 };
 
 function btn_hover () {
-  this.opacity = 0.5;
-  this.scale = 1.2;
+  if (this.color !== "#999")
+  {
+    this.oldColor = this.color;
+    this.color = "#999";
+  }
 }
 function btn_unhover () {
-  this.opacity = 1;
-  this.scale = 1;
+  if (this.color !== this.oldColor && this.oldColor !== undefined) {
+    this.color = this.oldColor;
+    this.oldColor = undefined;
+  }
 }
 // fix me: add this to layer, replace 'on-button'
 function select (layers, e, family) {
