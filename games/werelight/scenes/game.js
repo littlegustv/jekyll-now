@@ -164,9 +164,9 @@ var onStart = function () {
   // game editor
   if (true) {
     this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
-    var bg = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, gameWorld.height / 2, 54, gameWorld.height));
-    bg.color = "white";
-    bg.z = 99;
+    //var bg = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, gameWorld.height / 2, 54, gameWorld.height));
+    //bg.color = "white";
+    //bg.z = 99;
     
     // button to toggle between editor and game
     // button to move object
