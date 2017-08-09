@@ -1,3 +1,5 @@
+/* global Layer, Entity, Sprite, Follow, Oscillate, OFFSET, TILESIZE, gameWorld, Resources, Circle, Delay, Knight, COLUMNS, ROWS, randint */
+
 var onStart = function () {
   var s = this;
   this.water_layer = this.addLayer(Object.create(Layer).init(320, 180));
@@ -12,18 +14,19 @@ var onStart = function () {
   this.light_layer = this.addLayer(Object.create(Layer).init(320,180));
   
   var water = this.water_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
-  water.color = "#2f4f4f";
+  water.color = "#cb3d44";
   water.z = 1;
   
   this.mobs = [];
   
-  this.player = this.fg.add(Object.create(Sprite).init(OFFSET.x + 2 * TILESIZE, OFFSET.y + 2 *TILESIZE,Resources.wisp));
+  this.player = this.fg.add(Object.create(Sprite).init(2 * TILESIZE, 2 *TILESIZE, Resources.wisp));
   this.player.family = "action";
   this.player.point_light = this.light_layer.add(Object.create(Circle).init(this.player.x, this.player.y, TILESIZE));
   this.player.point_light.blend = "destination-out";
   this.player.point_light.addBehavior(Follow, {target: this.player, offset: {x: 0, y: -8}});
+  this.player.point_light.addBehavior(Oscillate, {object: this.player.point_light, field: "radius", constant: 2, initial: TILESIZE, rate: 5});
   
-  this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: OFFSET.x + 7 * TILESIZE, y: OFFSET.y + 7 * TILESIZE}, tilesize: TILESIZE, callback: function () {
+  this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: OFFSET.x + TILESIZE * COLUMNS, y: OFFSET.y + TILESIZE * ROWS}, tilesize: TILESIZE, callback: function () {
     s.lit();
     for (var i = 0; i < s.mobs.length; i++) {
       var m = s.mobs[i].grid.toGrid(s.mobs[i]);
@@ -38,11 +41,13 @@ var onStart = function () {
   }, grid: this.grid});
   var p = this.player;
   
-  for (var i = 0; i < 8; i++) {
+  for (var i = 0; i < COLUMNS; i++) {
     this.grid.push([]);
-    for (var j = 0; j < 8; j++) {
+    for (var j = 0; j < ROWS; j++) {
       var g = {};
-      if (Resources.levels.layers[1].data[i + j * 8] === 0) {
+      if (i < 6 || j < 2 || i > COLUMNS - 7 || j > ROWS - 3) {
+        g.swamp = true;
+      } else if (Resources.levels.layers[1].data[i + j * 8] === 0) {
         g.swamp = true;
         /*var swamp = this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j,TILESIZE - 2, TILESIZE - 2));
         swamp.z = 200;
@@ -62,7 +67,7 @@ var onStart = function () {
             if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) this.entity.alive = false;
           }});
           m.hungry = m.addBehavior(Hungry, {target:p});
-          m.z = 201;
+          m.z = 200;
           m.family = "action";
           this.mobs.push(m);
         }
@@ -75,7 +80,7 @@ var onStart = function () {
         ripple.z = 2;
         ripple.addBehavior(Oscillate, {object: ripple, field: "w", constant: 2, initial: TILESIZE + 4, rate: 5});
         ripple.addBehavior(Oscillate, {object: ripple, field: "h", constant: 2, initial: TILESIZE + 4, rate: 5});
-        ripple.color = "#0f2f2f";
+        ripple.color = "#751217";
       } else if (this.grid[i][j-1] && !this.grid[i][j-1].swamp) {
         if (this.grid[i-1] && !this.grid[i-1][j].swamp) {
           g.x = 1, g.y = 1;
@@ -92,7 +97,7 @@ var onStart = function () {
       this.grid[i].push({solid: g.solid, swamp: g.swamp, x: g.x, y: g.y});
     }  
   }
-  this.map = this.bg.add(Object.create(TileMap).init(gameWorld.width / 2, gameWorld.height / 2, Resources.werelight, this.grid));
+  this.map = this.bg.add(Object.create(TileMap).init(COLUMNS * TILESIZE / 2 - 8, ROWS * TILESIZE / 2 - 8, Resources.werelight, this.grid));
   this.map.z = 2;
   //console.log(map);
 
@@ -102,10 +107,10 @@ var onStart = function () {
   
   // lights.. need to go out of 8x8 grid if 'floating island effect' is wanted... (FIX ME)
   this.lights = [];
-  for (var i = 0; i < 8; i++) {
+  for (var i = 0; i <= Math.ceil(gameWorld.width / TILESIZE); i++) {
     this.lights.push([]);
-    for (var j = 0; j < 8; j++) {
-      var l = this.light_layer.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j, TILESIZE, TILESIZE));
+    for (var j = 0; j <= Math.ceil(gameWorld.height / TILESIZE); j++) {
+      var l = this.light_layer.add(Object.create(Entity).init(TILESIZE * i, TILESIZE * j, TILESIZE, TILESIZE));
       l.color = "white";
       l.blend = "destination-out";
       l.z = 10;
@@ -120,7 +125,7 @@ var onStart = function () {
         this.lights[i][j].opacity = 0.5;
       }
     }
-    for (var i = p.x; i < 8; i++) {
+    for (var i = p.x; i < this.grid.length; i++) {
       if (this.grid[i][p.y].solid) {
         break;
       } else {
@@ -134,7 +139,7 @@ var onStart = function () {
         this.lights[i][p.y].opacity = 1;
       }
     }
-    for (var i = p.y; i < 8; i++) {
+    for (var i = p.y; i < this.grid[p.x].length; i++) {
       if (this.grid[p.x][i].solid) {
         break;
       } else {
@@ -164,7 +169,6 @@ var onStart = function () {
     bg.z = 99;
     
     // button to toggle between editor and game
-    
     // button to move object
     
     var move = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, 10, 46, 14));
@@ -411,13 +415,20 @@ var onStart = function () {
   
 }
 var onUpdate = function (dt) {
-  /* rain (needs work)
-  for (var i = 0; i < 5; i++) {
-    var rain = this.fg.add(Object.create(Entity).init(randint(0, OFFSET.x + 8 * TILESIZE), randint(0, OFFSET.y + 8 * TILESIZE), 2, 8));
-    rain.addBehavior(Velocity);
-    rain.velocity = {x: 0, y: 20};
-    rain.color = "darkslategray";
-    rain.opacity = 0.6;
-    rain.addBehavior(FadeOut, {duration: 0, delay: 1});
-  }*/
+  var s = this;
+  
+  // rain --> ugly, but functional for now
+  var rain = this.fg.add(Object.create(Entity).init(randint(-32, gameWorld.width + 32), randint(-gameWorld.width / 2, gameWorld.height), 8, 2));
+  rain.angle = 100 * PI / 180;
+  rain.addBehavior(Velocity);
+  rain.color = "#751217";
+  rain.z = 100;
+  rain.velocity = {x: Math.cos(rain.angle) * 40, y: Math.sin(rain.angle) * 40};
+  rain.addBehavior(Delay, {duration: 2, callback: function () {
+    this.entity.alive = false;
+    var splash = s.water_layer.add(Object.create(Entity).init(this.entity.x, this.entity.y, 8, 8));
+    splash.color = "#751217";
+    splash.addBehavior(FadeOut, {duration: 1});
+  }});
+  
 }

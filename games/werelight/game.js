@@ -62,7 +62,7 @@ Grid.toXY = function (coord) {
 	return {x: coord.x * this.tilesize + this.min.x, y: coord.y * this.tilesize + this.min.y};
 }
 Grid.toGrid = function (coord) {
-  console.log(coord.x, coord.y, this.tilesize);
+  //console.log(coord.x, coord.y, this.tilesize);
 	return {
   	x: Math.round((coord.x - this.min.x) / this.tilesize),
   	y: Math.round((coord.y - this.min.y) / this.tilesize)
@@ -86,7 +86,8 @@ Grid.select = function (coord) {
 }
 Grid.draw = function (ctx) {
 	if (this.show) {
-		ctx.strokeStyle = "red";
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = 4;
   	for (var i = this.min.x; i <= this.max.x; i += this.tilesize) {
     	for (var j = this.min.y; j <= this.max.y; j += this.tilesize) {
       	if (this.possible({x: i, y: j})) {
@@ -218,5 +219,5 @@ function select (layers, e, family) {
   }
 }
 
-var TILESIZE = 16, OFFSET = {x: 104, y: 34};
+var TILESIZE = 16, OFFSET = {x: 0, y: 0}, WIDTH = 320, HEIGHT = 180, COLUMNS = Math.ceil(WIDTH / TILESIZE), ROWS = Math.ceil(HEIGHT / TILESIZE);
 var gameWorld = Object.create(World).init(320, 180, "index.json");
