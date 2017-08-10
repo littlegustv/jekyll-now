@@ -45,21 +45,25 @@ var onStart = function () {
     this.grid.push([]);
     for (var j = 0; j < ROWS; j++) {
       var g = {};
-      if (i < 6 || j < 2 || i > COLUMNS - 7 || j > ROWS - 3) {
-        g.swamp = true;
-      } else if (Resources.levels.layers[1].data[i + j * 8] === 0) {
-        g.swamp = true;
-        /*var swamp = this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j,TILESIZE - 2, TILESIZE - 2));
-        swamp.z = 200;
-        swamp.color = "darkgreen";*/
-      } else if (randint(0, 10) <= 1) {
-        g.solid = true;
-        var solid = this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 4, Resources.box));//TILESIZE - 2, TILESIZE - 2));
-        solid.z = 200;
-        solid.family = "action";
-      } else {
-        // mobs; eventually load from data
-        if (randint(0,10) <= 1) {
+      switch(Resources.levels.levels[current_level][i][j]) {
+        case 0:
+          g.swamp = true;
+          g.solid = false;
+          break;
+        case 1:
+          g.swamp = false;
+          g.solid = true;
+          var solid = this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 4, Resources.box));//TILESIZE - 2, TILESIZE - 2));
+          solid.z = 200;
+          solid.family = "action";
+          break;
+        case 2:
+          g.swamp = false;
+          g.solid = false;
+          break;
+        case 3:
+          g.swamp = false;
+          g.solid = false;
           var m = this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 8, Resources.person));
           m.color = "tomato";
           m.grid = m.addBehavior(Pawn, {min: {x: OFFSET.x, y: OFFSET.y - 8}, max: {x: gameWorld.width - OFFSET.x - TILESIZE, y: gameWorld.height - OFFSET.y - 8}, rate: 5, tilesize: TILESIZE, grid: this.grid, callback: function () {
@@ -70,7 +74,7 @@ var onStart = function () {
           m.z = 200;
           m.family = "action";
           this.mobs.push(m);
-        }
+          break;
       }
       
       if (!g.swamp) {
@@ -99,7 +103,6 @@ var onStart = function () {
   }
   this.map = this.bg.add(Object.create(TileMap).init(COLUMNS * TILESIZE / 2 - 8, ROWS * TILESIZE / 2 - 8, Resources.werelight, this.grid));
   this.map.z = 2;
-  //console.log(map);
 
   var dark = this.light_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
   dark.z = 9;;
@@ -164,17 +167,12 @@ var onStart = function () {
   // game editor
   if (true) {
     this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
-    //var bg = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, gameWorld.height / 2, 54, gameWorld.height));
-    //bg.color = "white";
-    //bg.z = 99;
     
-    // button to toggle between editor and game
     // button to move object
     
     var move = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, 10, 46, 14));
     move.color = "green";
     move.family = "button";
-    //move.opacity = 0;
     move.shown = this.ui.add(Object.create(TileMap).init(move.x, move.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
     move.text = this.ui.add(Object.create(SpriteFont).init(move.x, move.y, Resources.expire_font, "Move", {align: "center", spacing: -3}));
     move.text.z = 102;
@@ -194,7 +192,6 @@ var onStart = function () {
     remove.family = "button";
     remove.hover = btn_hover;
     remove.unhover = btn_unhover;
-    //remove.opacity = 0;
     remove.shown = this.ui.add(Object.create(TileMap).init(remove.x, remove.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
     remove.text = this.ui.add(Object.create(SpriteFont).init(remove.x, remove.y, Resources.expire_font, "remove", {align: "center", spacing: -3}));
     remove.text.z = 102;
@@ -212,7 +209,6 @@ var onStart = function () {
     addsolid.family = "button";
     addsolid.hover = btn_hover;
     addsolid.unhover = btn_unhover;
-    //addsolid.opacity = 0;
     addsolid.shown = this.ui.add(Object.create(TileMap).init(addsolid.x, addsolid.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
     addsolid.text = this.ui.add(Object.create(SpriteFont).init(addsolid.x, addsolid.y, Resources.expire_font, "+solid", {align: "center", spacing: -3}));
     addsolid.text.z = 102;
@@ -232,7 +228,6 @@ var onStart = function () {
     addperson.hover = btn_hover;
     addperson.unhover = btn_unhover;
     addperson.z = 101;
-    //addperson.opacity = 0;
     addperson.shown = this.ui.add(Object.create(TileMap).init(addperson.x, addperson.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
     addperson.text = this.ui.add(Object.create(SpriteFont).init(addperson.x, addperson.y, Resources.expire_font, "+person", {align: "center", spacing: -3}));
     addperson.text.z = 102;
@@ -248,7 +243,6 @@ var onStart = function () {
     addswamp.hover = btn_hover;
     addswamp.unhover = btn_unhover;
     addswamp.z = 101;
-    //addswamp.opacity = 0;
     addswamp.shown = this.ui.add(Object.create(TileMap).init(addswamp.x, addswamp.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
     addswamp.text = this.ui.add(Object.create(SpriteFont).init(addswamp.x, addswamp.y, Resources.expire_font, "+swamp", {align: "center", spacing: -3}));
     addswamp.text.z = 102;
@@ -264,7 +258,6 @@ var onStart = function () {
     addfloor.hover = btn_hover;
     addfloor.unhover = btn_unhover;
     addfloor.z = 101;
-    //addswamp.opacity = 0;
     addfloor.shown = this.ui.add(Object.create(TileMap).init(addfloor.x, addfloor.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
     addfloor.text = this.ui.add(Object.create(SpriteFont).init(addfloor.x, addfloor.y, Resources.expire_font, "+floor", {align: "center", spacing: -3}));
     addfloor.text.z = 102;
@@ -274,13 +267,37 @@ var onStart = function () {
       s.action = "floor";
     };
     
+    var clear = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, 130, 46, 14));
+    clear.color = "orange";
+    clear.family = "button";
+    clear.hover = btn_hover;
+    clear.unhover = btn_unhover;
+    clear.z = 101;
+    clear.shown = this.ui.add(Object.create(TileMap).init(clear.x, clear.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
+    clear.text = this.ui.add(Object.create(SpriteFont).init(clear.x, clear.y, Resources.expire_font, "#clear", {align: "center", spacing: -3}));
+    clear.text.z = 102;
+    clear.shown.z = 100;
+    clear.trigger = function () {
+      for (var i = 0; i < s.grid.length; i++) {
+        for (var j = 0; j < s.grid[i].length; j++) {
+          s.grid[i][j] = {solid: false, swamp: true, x: 4, y: 0}; 
+        }
+      }
+      for (var i = 0; i < s.bg.entities.length; i++) {
+        s.bg.entities[i].alive = false;
+      }
+      s.mobs = [];
+      s.map.map = s.grid;
+    };
+    
+    
+    // button to toggle between editor and game
     var toggleui = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, gameWorld.height - 10, 46, 14));
     toggleui.color = "cyan";
     toggleui.family = "button";
     toggleui.hover = btn_hover;
     toggleui.unhover = btn_unhover;
     toggleui.z = 101;
-    //addswamp.opacity = 0;
     toggleui.shown = this.ui.add(Object.create(TileMap).init(toggleui.x, toggleui.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
     toggleui.text = this.ui.add(Object.create(SpriteFont).init(toggleui.x, toggleui.y, Resources.expire_font, "toggle", {align: "center", spacing: -3}));
     toggleui.text.z = 102;
@@ -295,13 +312,19 @@ var onStart = function () {
     save.hover = btn_hover;
     save.unhover = btn_unhover;
     save.z = 101;
-    //addswamp.opacity = 0;
     save.shown = this.ui.add(Object.create(TileMap).init(save.x, save.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
     save.text = this.ui.add(Object.create(SpriteFont).init(save.x, save.y, Resources.expire_font, "@save", {align: "center", spacing: -3}));
     save.text.z = 102;
     save.shown.z = 100;
     save.trigger = function () {
-      console.log('saving', JSON.stringify(s.grid));
+      var data = s.grid.map(function (col) { return col.map( function (cell) { return cell.swamp ? 0 : (cell.solid ? 1 : 2); }); });
+      for (var i = 0; i < s.mobs.length; i++) {
+        var coord = s.mobs[i].grid.toGrid(s.mobs[i]);
+        if (data[coord.x] && data[coord.x][coord.y]) {
+          data[coord.x][coord.y] = 3;
+        }
+      }
+      console.log('saving', JSON.stringify(data));
     };
   }
 
@@ -335,10 +358,16 @@ var onStart = function () {
         s.lit();
         // update grid
       } else if (s.action == "person") {
-        var person = s.bg.add(Object.create(Entity).init(x * TILESIZE + OFFSET.x, y * TILESIZE + OFFSET.y - 8, 8, 16));
-        person.color = "darksalmon";
-        person.z = 201;
-        person.family = "action";
+        var m = s.bg.add(Object.create(Sprite).init(x * TILESIZE + OFFSET.x, y * TILESIZE + OFFSET.y - 8, Resources.person));
+        m.color = "tomato";
+        m.grid = m.addBehavior(Pawn, {min: {x: OFFSET.x, y: OFFSET.y - 8}, max: {x: gameWorld.width - OFFSET.x - TILESIZE, y: gameWorld.height - OFFSET.y - 8}, rate: 5, tilesize: TILESIZE, grid: this.grid, callback: function () {
+          var g = this.toGrid(this.entity);
+          if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) this.entity.alive = false;
+        }});
+        m.hungry = m.addBehavior(Hungry, {target:p});
+        m.z = 200;
+        m.family = "action";
+        s.mobs.push(m);
         // add behaviors!
       } else if (s.action == "swamp") {
         // set water

@@ -1,5 +1,6 @@
 { 
 	"scenes": [
+		{"name": "menu", "reload": true},
 		{"name": "game", "reload": true}
 	],
 	"resources": [
