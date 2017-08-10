@@ -19,33 +19,36 @@ var onStart = function () {
   
   this.mobs = [];
   
-  this.player = this.fg.add(Object.create(Sprite).init(2 * TILESIZE, 2 *TILESIZE, Resources.wisp));
-  this.player.family = "action";
-  this.player.point_light = this.light_layer.add(Object.create(Circle).init(this.player.x, this.player.y, TILESIZE));
-  this.player.point_light.blend = "destination-out";
-  this.player.point_light.addBehavior(Follow, {target: this.player, offset: {x: 0, y: -8}});
-  this.player.point_light.addBehavior(Oscillate, {object: this.player.point_light, field: "radius", constant: 2, initial: TILESIZE, rate: 5});
-  
-  this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: OFFSET.x + TILESIZE * COLUMNS, y: OFFSET.y + TILESIZE * ROWS}, tilesize: TILESIZE, callback: function () {
-    s.lit();
-    for (var i = 0; i < s.mobs.length; i++) {
-      var m = s.mobs[i].grid.toGrid(s.mobs[i]);
-      if (s.lights[m.x][m.y].opacity >= 1) {
-        s.mobs[i].hungry.setTarget();
-      }
-    }
-    s.bg.paused = false;
-    this.entity.addBehavior(Delay, {duration: 0.8, callback: function () {
-      s.bg.paused = true;
-    }});
-  }, grid: this.grid});
-  var p = this.player;
-  
   for (var i = 0; i < COLUMNS; i++) {
     this.grid.push([]);
     for (var j = 0; j < ROWS; j++) {
       var g = {};
-      switch(Resources.levels.levels[current_level][i][j]) {
+      var r = Resources.levels.levels[current_level][i][j];
+      if (r >= 10) {
+        r -= 10;
+        this.player = this.fg.add(Object.create(Sprite).init(i * TILESIZE, j *TILESIZE, Resources.wisp));
+        this.player.family = "action";
+        this.player.point_light = this.light_layer.add(Object.create(Circle).init(this.player.x, this.player.y, TILESIZE));
+        this.player.point_light.blend = "destination-out";
+        this.player.point_light.addBehavior(Follow, {target: this.player, offset: {x: 0, y: -8}});
+        this.player.point_light.addBehavior(Oscillate, {object: this.player.point_light, field: "radius", constant: 2, initial: TILESIZE, rate: 5});
+        
+        this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: OFFSET.x + TILESIZE * COLUMNS, y: OFFSET.y + TILESIZE * ROWS}, tilesize: TILESIZE, callback: function () {
+          s.lit();
+          for (var i = 0; i < s.mobs.length; i++) {
+            var m = s.mobs[i].grid.toGrid(s.mobs[i]);
+            if (s.lights[m.x][m.y].opacity >= 1) {
+              s.mobs[i].hungry.setTarget();
+            }
+          }
+          s.bg.paused = false;
+          this.entity.addBehavior(Delay, {duration: 0.8, callback: function () {
+            s.bg.paused = true;
+          }});
+        }, grid: this.grid});
+        var p = this.player;
+      }
+      switch(r) {
         case 0:
           g.swamp = true;
           g.solid = false;
@@ -181,6 +184,7 @@ var onStart = function () {
     move.unhover = btn_unhover;
     move.z = 101;
     move.trigger = function () {
+      console.log('move');
       s.grabbing = true;
       s.action = "move";
     };
@@ -198,6 +202,7 @@ var onStart = function () {
     remove.shown.z = 100;
     remove.z = 101;
     remove.trigger = function () {
+      console.log('remove');
       s.grabbing = true;
       s.action = "remove";
     };
@@ -215,6 +220,7 @@ var onStart = function () {
     addsolid.shown.z = 100;
     addsolid.z = 101;
     addsolid.trigger = function () {
+      console.log('addsolid');
       s.adding = true;
       s.action = "solid";
     };
@@ -233,6 +239,7 @@ var onStart = function () {
     addperson.text.z = 102;
     addperson.shown.z = 100;
     addperson.trigger = function () {
+      console.log('addperson');
       s.adding = true;
       s.action = "person";
     };
@@ -248,7 +255,8 @@ var onStart = function () {
     addswamp.text.z = 102;
     addswamp.shown.z = 100;
     addswamp.trigger = function () {
-      s.adding = true;
+       console.log('addswamp');
+       s.adding = true;
       s.action = "swamp";
     };
     
@@ -263,33 +271,10 @@ var onStart = function () {
     addfloor.text.z = 102;
     addfloor.shown.z = 100;
     addfloor.trigger = function () {
+      console.log('addfloor');
       s.adding = true;
       s.action = "floor";
     };
-    
-    var clear = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, 130, 46, 14));
-    clear.color = "orange";
-    clear.family = "button";
-    clear.hover = btn_hover;
-    clear.unhover = btn_unhover;
-    clear.z = 101;
-    clear.shown = this.ui.add(Object.create(TileMap).init(clear.x, clear.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
-    clear.text = this.ui.add(Object.create(SpriteFont).init(clear.x, clear.y, Resources.expire_font, "#clear", {align: "center", spacing: -3}));
-    clear.text.z = 102;
-    clear.shown.z = 100;
-    clear.trigger = function () {
-      for (var i = 0; i < s.grid.length; i++) {
-        for (var j = 0; j < s.grid[i].length; j++) {
-          s.grid[i][j] = {solid: false, swamp: true, x: 4, y: 0}; 
-        }
-      }
-      for (var i = 0; i < s.bg.entities.length; i++) {
-        s.bg.entities[i].alive = false;
-      }
-      s.mobs = [];
-      s.map.map = s.grid;
-    };
-    
     
     // button to toggle between editor and game
     var toggleui = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, gameWorld.height - 10, 46, 14));
@@ -303,7 +288,9 @@ var onStart = function () {
     toggleui.text.z = 102;
     toggleui.shown.z = 100;
     toggleui.trigger = function () {
+      console.log('toggle');
       s.editor = !s.editor;
+      s.bg.paused = !s.editor;
     };
     
     var save = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, gameWorld.height - 30, 46, 14));
@@ -324,30 +311,52 @@ var onStart = function () {
           data[coord.x][coord.y] = 3;
         }
       }
+      var p = s.player.grid.toGrid(s.player);
+      data[p.x][p.y] += 10;
       console.log('saving', JSON.stringify(data));
     };
   }
+  s.ui.buttons = [save, toggleui, addfloor, addperson, addswamp, addsolid, move, remove];
+  s.ui.resetButtons = function () {
+    this.selected = undefined;
+    for (var i = 0; i < this.buttons.length; i++) {
+      this.buttons[i].unhover();
+    }
+    s.adding = false;
+    s.action = undefined;
+    s.grabbing = false;
+    s.grabbed = undefined;
+  };
 
   s.onClick = function (e) {
     var b = s.ui.onButton(e.x, e.y);
     if (b) {
+      console.log('triggering')
+      s.ui.resetButtons();
       b.trigger();
+      s.ui.selected = b;
+      return;
     }
     else if (!s.editor) {
+      console.log('wrong mode');
       return;
     } else if (s.grabbing) {
+      console.log('grabbing');
       var entity = select([s.fg, s.bg], e, "action");
       if (entity) {
-        s.grabbing = false;
         if (s.action == "move") {
+          s.grabbing = false;
           s.grabbed = entity;
         } else if (s.action == "remove") {
           // bg has to be unpaused for this to work...
           entity.alive = false;
         }
+      } else {
+        console.log('no entity');
       }
     } else if (s.grabbed) {
       s.grabbed = undefined;
+      s.grabbing = true;
     } else if (s.adding) {
       var x = Math.round((e.x - OFFSET.x) / TILESIZE), y = Math.round((e.y - OFFSET.y) / TILESIZE);
       if (s.action == "solid") {
@@ -355,7 +364,6 @@ var onStart = function () {
         box.z = 200;
         box.family = "action";
         s.grid[x][y].solid = true;
-        s.lit();
         // update grid
       } else if (s.action == "person") {
         var m = s.bg.add(Object.create(Sprite).init(x * TILESIZE + OFFSET.x, y * TILESIZE + OFFSET.y - 8, Resources.person));
@@ -376,7 +384,7 @@ var onStart = function () {
       } else if (s.action == "floor") {
         s.grid[x][y].swamp = false;
       }
-      s.adding = false;
+      //s.adding = false;
       // reconstruct tiledmap appearance
       for (var k = 0; k <= 1; k++) {
         for (var l = 0; l <= 1; l++) {
@@ -404,14 +412,17 @@ var onStart = function () {
           }
         }
       }
-      s.map.map = s.grid;
     }
+    s.map.map = s.grid;
+    s.lit();
+    //s.ui.selected = undefined;
   }
   
   s.onMouseMove = function (e) {
     if (s.grabbed) {
+      var offset = s.grabbed === s.player ? 0 : 8;
       s.grabbed.x = Math.round((e.x - OFFSET.x) / TILESIZE) * TILESIZE + OFFSET.x;
-      s.grabbed.y = Math.round((e.y - OFFSET.y) / TILESIZE) * TILESIZE + OFFSET.y;
+      s.grabbed.y = Math.round((e.y - OFFSET.y) / TILESIZE) * TILESIZE + OFFSET.y - offset;
     }
     var b = s.ui.onButton(e.x, e.y);
     if (b) {
@@ -419,7 +430,7 @@ var onStart = function () {
     }
     var buttons = s.ui.entities.filter(function (e) { return e.family === "button" });
     for (var i = 0; i < buttons.length; i++) {
-      if (buttons[i] !== b) {
+      if (buttons[i] !== b && buttons[i] !== s.ui.selected) {
         buttons[i].unhover();
       }
     }
