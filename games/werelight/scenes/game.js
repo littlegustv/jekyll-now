@@ -418,7 +418,7 @@ var onUpdate = function (dt) {
   var s = this;
   
   // rain --> ugly, but functional for now
-  var rain = this.fg.add(Object.create(Entity).init(randint(-32, gameWorld.width + 32), randint(-gameWorld.width / 2, gameWorld.height), 8, 2));
+  /*var rain = this.fg.add(Object.create(Entity).init(randint(-32, gameWorld.width + 32), randint(-gameWorld.width / 2, gameWorld.height), 8, 2));
   rain.angle = 100 * PI / 180;
   rain.addBehavior(Velocity);
   rain.color = "#751217";
@@ -429,6 +429,6 @@ var onUpdate = function (dt) {
     var splash = s.water_layer.add(Object.create(Entity).init(this.entity.x, this.entity.y, 8, 8));
     splash.color = "#751217";
     splash.addBehavior(FadeOut, {duration: 1});
-  }});
+  }});*/
   
 }
