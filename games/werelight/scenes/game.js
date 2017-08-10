@@ -73,7 +73,6 @@ var onStart = function () {
             var g = this.toGrid(this.entity);
             if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) this.entity.alive = false;
           }});
-          m.hungry = m.addBehavior(Hungry, {target:p});
           m.z = 200;
           m.family = "action";
           this.mobs.push(m);
@@ -104,6 +103,11 @@ var onStart = function () {
       this.grid[i].push({solid: g.solid, swamp: g.swamp, x: g.x, y: g.y});
     }  
   }
+
+  for (var i = 0; i < this.mobs.length; i++) {
+    this.mobs[i].hungry = this.mobs[i].addBehavior(Hungry, {target: this.player});
+  }
+  
   this.map = this.bg.add(Object.create(TileMap).init(COLUMNS * TILESIZE / 2 - 8, ROWS * TILESIZE / 2 - 8, Resources.werelight, this.grid));
   this.map.z = 2;
 
