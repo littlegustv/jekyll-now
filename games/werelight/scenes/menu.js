@@ -22,7 +22,7 @@ var onStart = function () {
         b.label.z = 2;
         b.trigger = function () {
             current_level = this.index;
-            gameWorld.setScene(1);
+            gameWorld.setScene(1, true);
         };
     }
     

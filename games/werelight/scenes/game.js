@@ -71,7 +71,9 @@ var onStart = function () {
           m.color = "tomato";
           m.grid = m.addBehavior(Pawn, {min: {x: OFFSET.x, y: OFFSET.y - 8}, max: {x: gameWorld.width - OFFSET.x - TILESIZE, y: gameWorld.height - OFFSET.y - 8}, rate: 5, tilesize: TILESIZE, grid: this.grid, callback: function () {
             var g = this.toGrid(this.entity);
-            if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) this.entity.alive = false;
+            if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) {
+              this.entity.alive = false;
+            }
           }});
           m.z = 200;
           m.family = "action";
@@ -176,6 +178,16 @@ var onStart = function () {
     this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
     
     // button to move object
+    
+    var menu = this.ui.add(Object.create(Entity).init(20, 10, 32, 14));
+    menu.opacity = 0;
+    menu.family = "button";
+    menu.hover = btn_hover;
+    menu.unhover = btn_unhover;
+    menu.text = this.ui.add(Object.create(SpriteFont).init(menu.x, menu.y, Resources.expire_font, "menu", {align: "center", spacing: -2}));
+    menu.trigger = function () {
+      gameWorld.setScene(0);
+    }
     
     var move = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, 10, 46, 14));
     move.color = "green";
@@ -374,7 +386,9 @@ var onStart = function () {
         m.color = "tomato";
         m.grid = m.addBehavior(Pawn, {min: {x: OFFSET.x, y: OFFSET.y - 8}, max: {x: gameWorld.width - OFFSET.x - TILESIZE, y: gameWorld.height - OFFSET.y - 8}, rate: 5, tilesize: TILESIZE, grid: this.grid, callback: function () {
           var g = this.toGrid(this.entity);
-          if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) this.entity.alive = false;
+          if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) {
+            this.entity.alive = false;
+          }
         }});
         m.hungry = m.addBehavior(Hungry, {target:p});
         m.z = 200;
