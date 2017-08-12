@@ -41,6 +41,7 @@ var onStart = function () {
               s.mobs[i].hungry.setTarget();
             }
           }
+          gameWorld.playSound(Resources.step);
           s.bg.paused = false;
           this.entity.addBehavior(Delay, {duration: 0.8, callback: function () {
             s.bg.paused = true;
@@ -465,6 +466,7 @@ var onStart = function () {
     else if (s.bg.paused) {
       s.player.grid.show = false;
       s.player.grid.select(e);
+      gameWorld.playSound(Resources.jump);
     }
   }
   s.onKeyDown = function (e) {

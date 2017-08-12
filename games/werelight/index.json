@@ -10,6 +10,8 @@
 		{"path": "expire_font.png", "frames": 95, "animations": 1},
 		{"path": "keys.png", "frames": 4, "animations": 2},
 		{"path": "box.png"},
+		{"path": "jump.wav"},
+		{"path": "step.wav"},
 		{"path": "wisp.png", "frames": 2, "animations": 1, "speed": 0.4}
 	]
 }
