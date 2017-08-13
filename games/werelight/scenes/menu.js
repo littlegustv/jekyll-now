@@ -7,29 +7,44 @@ var onStart = function () {
     water.z = -1;
     
     this.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, 10, Resources.expire_font, "wereLight", {align: "center", spacing: -2}));
+    this.buttons = [];
     
     for (var i = 0; i < Resources.levels.levels.length; i++) {
-        var b = this.bg.add(Object.create(Entity).init(10 + i * 20, 32, 14, 14));
+        var b = this.bg.add(Object.create(Sprite).init(10 + i * 20, 32, Resources.empty));
+        b.behaviors = [];
         b.family = "button";
         b.color = "#eeeeee";
+        b.hover = function () {
+            this.frame = 1;
+        };
+        b.unhover = function () {
+            this.frame = 0;
+        };
         b.index = i;
         b.z = 1;
-        b.label = this.bg.add(Object.create(SpriteFont).init(b.x, b.y, Resources.expire_font, "" + (i + 1), {align: "center", spacing: -4}));
-        b.border = this.bg.add(Object.create(Sprite).init(b.x, b.y, Resources.keys));
-        b.border.behaviors = [];
-        b.border.frame = 0;
-        b.border.animation = 1;
-        b.label.z = 2;
         b.trigger = function () {
             current_level = this.index;
             gameWorld.setScene(1, true);
         };
+        this.buttons.push(b);
     }
-    
+    var s = this;
     this.onClick = function (e) {
-        var b = this.bg.onButton(e.x, e.y);
+        var b = s.bg.onButton(e.x, e.y);
         if (b) {
             b.trigger();
+        }
+    }
+    
+    this.onMouseMove = function (e) {
+        var b = s.bg.onButton(e.x, e.y);
+        if (b) {
+            b.hover();
+        }
+        for (var i = 0; i < s.buttons.length; i++) {
+            if (s.buttons[i] != b) {
+                s.buttons[i].unhover();
+            }
         }
     }
 }

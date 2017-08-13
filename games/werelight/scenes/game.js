@@ -74,6 +74,15 @@ var onStart = function () {
             var g = this.toGrid(this.entity);
             if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) {
               this.entity.alive = false;
+              s.mobs.splice(s.mobs.indexOf(this.entity), 1);
+              if (s.mobs.length <= 0) {
+                // level over!
+                var done = s.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "complete...", {align: "center", spacing: -2}));
+                done.addBehavior(Delay, {duration: 0.6, callback: function () {
+                  current_level = (current_level + 1) % Resources.levels.levels.length;
+                  gameWorld.setScene(1, true);
+                }})
+              }
             }
           }});
           m.z = 200;
