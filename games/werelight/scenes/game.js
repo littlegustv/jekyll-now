@@ -35,10 +35,12 @@ var onStart = function () {
         
         this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: OFFSET.x + TILESIZE * COLUMNS, y: OFFSET.y + TILESIZE * ROWS}, tilesize: TILESIZE, callback: function () {
           s.lit();
+          var found = 0;
           for (var i = 0; i < s.mobs.length; i++) {
             var m = s.mobs[i].grid.toGrid(s.mobs[i]);
             if (s.lights[m.x][m.y].opacity >= 1) {
               s.mobs[i].hungry.setTarget();
+              found += 1;
             }
           }
           gameWorld.playSound(Resources.step);
@@ -46,6 +48,15 @@ var onStart = function () {
           this.entity.addBehavior(Delay, {duration: 0.8, callback: function () {
             s.bg.paused = true;
           }});
+          
+          // have to be visible to someone to not lose
+          if (found <= 0) {
+            var done = s.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "you lose...", {align: "center", spacing: -2}));
+            done.addBehavior(Delay, {duration: 0.6, callback: function () {
+              gameWorld.setScene(1, true);
+            }})
+          }
+          
         }, grid: this.grid});
         var p = this.player;
       }
@@ -72,7 +83,13 @@ var onStart = function () {
           m.color = "tomato";
           m.grid = m.addBehavior(Pawn, {min: {x: OFFSET.x, y: OFFSET.y - 8}, max: {x: gameWorld.width - OFFSET.x - TILESIZE, y: gameWorld.height - OFFSET.y - 8}, rate: 5, tilesize: TILESIZE, grid: this.grid, callback: function () {
             var g = this.toGrid(this.entity);
-            if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) {
+            var p_g = s.player.grid.toGrid(s.player);
+            if (g.x === p_g.x && g.y === p_g.y) {
+              var done = s.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "you lose...", {align: "center", spacing: -2}));
+              done.addBehavior(Delay, {duration: 0.6, callback: function () {
+                gameWorld.setScene(1, true);
+              }});
+            } else if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) {
               this.entity.alive = false;
               s.mobs.splice(s.mobs.indexOf(this.entity), 1);
               if (s.mobs.length <= 0) {
