@@ -117,6 +117,16 @@ Rook.available = function (coord) {
 };
 
 var Knight = Object.create(Grid);
+Knight.visited = function (coord) {
+	var g = this.toGrid(coord);
+  if (this.grid[g.x] && this.grid[g.x][g.y]) return this.grid[g.x][g.y].visited;
+  else return false;
+}
+Knight.possible = function (coord) {
+	if (this.solid(coord)) return false;
+	if (this.visited(coord)) return ALLOW_VISITED;
+  else return this.available(coord);
+}
 Knight.available = function (coord) {
 	var t = this.toGrid(this.entity), c = this.toGrid(coord);
   return ((Math.abs(c.x - t.x) + Math.abs(c.y - t.y)) === 3) && (Math.abs(c.x - t.x) < 3 && Math.abs(c.y - t.y) < 3);
@@ -219,7 +229,7 @@ function select (layers, e, family) {
   }
 }
 
-var ALLOW_SOLID = false, TILESIZE = 16, OFFSET = {x: 0, y: 0}, WIDTH = 320, HEIGHT = 180, COLUMNS = Math.ceil(WIDTH / TILESIZE), ROWS = Math.ceil(HEIGHT / TILESIZE);
+var ALLOW_SOLID = false, ALLOW_VISITED = false, TILESIZE = 16, OFFSET = {x: 0, y: 0}, WIDTH = 320, HEIGHT = 180, COLUMNS = Math.ceil(WIDTH / TILESIZE), ROWS = Math.ceil(HEIGHT / TILESIZE);
 
 var current_level = 0;
 

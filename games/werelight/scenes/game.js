@@ -29,6 +29,8 @@ var onStart = function () {
         var r = data[i][j];
         if (r >= 10) {
           r -= 10;
+          g.visited = true;
+          this.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j, TILESIZE, TILESIZE)).color = "yellow";
           if (this.player && this.player.point_light) {
             this.player.point_light.alive = false;
           }
@@ -56,6 +58,11 @@ var onStart = function () {
             this.entity.addBehavior(Delay, {duration: 0.8, callback: function () {
               s.bg.paused = true;
             }});
+            
+            var g = this.toGrid(this.entity);
+            this.grid[g.x][g.y].visited = true;
+            console.log(this.grid[g.x, g.y]);
+            s.bg.add(Object.create(Entity).init(OFFSET.x + TILESIZE * g.x, OFFSET.y + TILESIZE * g.y, TILESIZE, TILESIZE)).color = "yellow";
             
             // have to be visible to someone to not lose --. Or solid?
             if (found <= 0 && this.entity.solids <= 0) {
@@ -136,7 +143,7 @@ var onStart = function () {
             g.x = 4, g.y = 0;
           }
         }
-        this.grid[i].push({solid: g.solid, swamp: g.swamp, x: g.x, y: g.y});
+        this.grid[i].push({solid: g.solid, swamp: g.swamp, visited: g.visited, x: g.x, y: g.y});
       }  
     }
     for (var i = 0; i < this.mobs.length; i++) {
