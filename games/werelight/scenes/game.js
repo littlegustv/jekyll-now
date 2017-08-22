@@ -13,7 +13,7 @@ var onStart = function () {
   this.light_layer = this.addLayer(Object.create(Layer).init(320,180));
   
   var water = this.water_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
-  water.color = "#cb3d44";
+  water.color = "#999"; //"#cb3d44";
   water.z = 1;
   
   this.load = function (data) {
