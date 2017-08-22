@@ -57,14 +57,14 @@ var onStart = function () {
               s.bg.paused = true;
             }});
             
-            // have to be visible to someone to not lose
-            if (found <= 0) {
+            // have to be visible to someone to not lose --. Or solid?
+            if (found <= 0 && this.entity.solids <= 0) {
               var done = s.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "you lose...", {align: "center", spacing: -2}));
               done.addBehavior(Delay, {duration: 0.6, callback: function () {
                 gameWorld.setScene(1, true);
               }})
             }
-            
+            this.entity.solids = 0;
           }, grid: this.grid});
         }
         switch(r) {
@@ -169,6 +169,7 @@ var onStart = function () {
   }
   this.lit = function () {
     var p = this.player.grid.toGrid(this.player);
+    this.player.solids = 0;
     for (var i = 0; i < this.lights.length; i++) {
       for (var j = 0; j < this.lights[i].length; j++) {
         this.lights[i][j].opacity = 0.5;
@@ -176,6 +177,7 @@ var onStart = function () {
     }
     for (var i = p.x; i < this.grid.length; i++) {
       if (this.grid[i][p.y].solid) {
+        if (ALLOW_SOLID) this.player.solids += 1;
         break;
       } else {
         this.lights[i][p.y].opacity = 1;
@@ -183,6 +185,7 @@ var onStart = function () {
     }
     for (var i = p.x; i >= 0; i--) {
       if (this.grid[i][p.y].solid) {
+        if (ALLOW_SOLID) this.player.solids += 1;
         break;
       } else {
         this.lights[i][p.y].opacity = 1;
@@ -190,6 +193,7 @@ var onStart = function () {
     }
     for (var i = p.y; i < this.grid[p.x].length; i++) {
       if (this.grid[p.x][i].solid) {
+        if (ALLOW_SOLID) this.player.solids += 1;
         break;
       } else {
         this.lights[p.x][i].opacity = 1;
@@ -197,6 +201,7 @@ var onStart = function () {
     }
     for (var i = p.y; i >= 0; i--) {
       if (this.grid[p.x][i].solid) {
+        if (ALLOW_SOLID) this.player.solids += 1;
         break;
       } else {
         this.lights[p.x][i].opacity = 1;

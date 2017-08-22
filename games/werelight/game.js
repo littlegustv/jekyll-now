@@ -219,7 +219,7 @@ function select (layers, e, family) {
   }
 }
 
-var TILESIZE = 16, OFFSET = {x: 0, y: 0}, WIDTH = 320, HEIGHT = 180, COLUMNS = Math.ceil(WIDTH / TILESIZE), ROWS = Math.ceil(HEIGHT / TILESIZE);
+var ALLOW_SOLID = false, TILESIZE = 16, OFFSET = {x: 0, y: 0}, WIDTH = 320, HEIGHT = 180, COLUMNS = Math.ceil(WIDTH / TILESIZE), ROWS = Math.ceil(HEIGHT / TILESIZE);
 
 var current_level = 0;
 
