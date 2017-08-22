@@ -9,7 +9,6 @@ var onStart = function () {
   this.fg = this.addLayer(Object.create(Layer).init(320,180));
   this.fg.paused = false;
 
-  this.grid = [];
 
   this.light_layer = this.addLayer(Object.create(Layer).init(320,180));
   
@@ -17,128 +16,139 @@ var onStart = function () {
   water.color = "#cb3d44";
   water.z = 1;
   
-  this.mobs = [];
-  
-  for (var i = 0; i < COLUMNS; i++) {
-    this.grid.push([]);
-    for (var j = 0; j < ROWS; j++) {
-      var g = {};
-      var r = Resources.levels.levels[current_level][i][j];
-      if (r >= 10) {
-        r -= 10;
-        this.player = this.fg.add(Object.create(Sprite).init(i * TILESIZE, j *TILESIZE, Resources.wisp));
-        this.player.family = "action";
-        this.player.point_light = this.light_layer.add(Object.create(Circle).init(this.player.x, this.player.y, TILESIZE));
-        this.player.point_light.blend = "destination-out";
-        this.player.point_light.addBehavior(Follow, {target: this.player, offset: {x: 0, y: -8}});
-        this.player.point_light.addBehavior(Oscillate, {object: this.player.point_light, field: "radius", constant: 2, initial: TILESIZE, rate: 5});
-        
-        this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: OFFSET.x + TILESIZE * COLUMNS, y: OFFSET.y + TILESIZE * ROWS}, tilesize: TILESIZE, callback: function () {
-          s.lit();
-          var found = 0;
-          for (var i = 0; i < s.mobs.length; i++) {
-            var m = s.mobs[i].grid.toGrid(s.mobs[i]);
-            if (s.lights[m.x][m.y].opacity >= 1) {
-              s.mobs[i].hungry.setTarget();
-              found += 1;
+  this.load = function (data) {
+    this.grid = [];
+    this.mobs = [];
+    this.bg.entities = [];
+    this.fg.entities = [];
+
+    for (var i = 0; i < COLUMNS; i++) {
+      this.grid.push([]);
+      for (var j = 0; j < ROWS; j++) {
+        var g = {};
+        var r = data[i][j];
+        if (r >= 10) {
+          r -= 10;
+          if (this.player && this.player.point_light) {
+            this.player.point_light.alive = false;
+          }
+          this.player = this.fg.add(Object.create(Sprite).init(i * TILESIZE, j *TILESIZE, Resources.wisp));
+          this.player.offset = {x: 0, y: -6};
+          this.player.z = 10;
+          this.player.family = "action";
+          this.player.point_light = this.light_layer.add(Object.create(Circle).init(this.player.x, this.player.y, TILESIZE));
+          this.player.point_light.blend = "destination-out";
+          this.player.point_light.addBehavior(Follow, {target: this.player, offset: {x: 0, y: -8}});
+          this.player.point_light.addBehavior(Oscillate, {object: this.player.point_light, field: "radius", constant: 2, initial: TILESIZE, rate: 5});
+          
+          this.player.grid = this.player.addBehavior(Knight, {min: {x: OFFSET.x, y: OFFSET.y}, rate: 5, max: {x: OFFSET.x + TILESIZE * COLUMNS, y: OFFSET.y + TILESIZE * ROWS}, tilesize: TILESIZE, callback: function () {
+            s.lit();
+            var found = 0;
+            for (var i = 0; i < s.mobs.length; i++) {
+              var m = s.mobs[i].grid.toGrid(s.mobs[i]);
+              if (s.lights[m.x][m.y].opacity >= 1) {
+                s.mobs[i].hungry.setTarget();
+                found += 1;
+              }
             }
-          }
-          gameWorld.playSound(Resources.step);
-          s.bg.paused = false;
-          this.entity.addBehavior(Delay, {duration: 0.8, callback: function () {
-            s.bg.paused = true;
-          }});
-          
-          // have to be visible to someone to not lose
-          if (found <= 0) {
-            var done = s.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "you lose...", {align: "center", spacing: -2}));
-            done.addBehavior(Delay, {duration: 0.6, callback: function () {
-              gameWorld.setScene(1, true);
-            }})
-          }
-          
-        }, grid: this.grid});
-        var p = this.player;
-      }
-      switch(r) {
-        case 0:
-          g.swamp = true;
-          g.solid = false;
-          break;
-        case 1:
-          g.swamp = false;
-          g.solid = true;
-          var solid = this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 4, Resources.box));//TILESIZE - 2, TILESIZE - 2));
-          solid.z = 200;
-          solid.family = "action";
-          break;
-        case 2:
-          g.swamp = false;
-          g.solid = false;
-          break;
-        case 3:
-          g.swamp = false;
-          g.solid = false;
-          var m = this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 8, Resources.person));
-          m.color = "tomato";
-          m.grid = m.addBehavior(Pawn, {min: {x: OFFSET.x, y: OFFSET.y - 8}, max: {x: gameWorld.width - OFFSET.x - TILESIZE, y: gameWorld.height - OFFSET.y - 8}, rate: 5, tilesize: TILESIZE, grid: this.grid, callback: function () {
-            var g = this.toGrid(this.entity);
-            var p_g = s.player.grid.toGrid(s.player);
-            if (g.x === p_g.x && g.y === p_g.y) {
+            gameWorld.playSound(Resources.step);
+            s.bg.paused = false;
+            this.entity.addBehavior(Delay, {duration: 0.8, callback: function () {
+              s.bg.paused = true;
+            }});
+            
+            // have to be visible to someone to not lose
+            if (found <= 0) {
               var done = s.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "you lose...", {align: "center", spacing: -2}));
               done.addBehavior(Delay, {duration: 0.6, callback: function () {
                 gameWorld.setScene(1, true);
-              }});
-            } else if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) {
-              this.entity.alive = false;
-              s.mobs.splice(s.mobs.indexOf(this.entity), 1);
-              if (s.mobs.length <= 0) {
-                // level over!
-                var done = s.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "complete...", {align: "center", spacing: -2}));
-                done.addBehavior(Delay, {duration: 0.6, callback: function () {
-                  current_level = (current_level + 1) % Resources.levels.levels.length;
-                  gameWorld.setScene(1, true);
-                }})
-              }
+              }})
             }
-          }});
-          m.z = 200;
-          m.family = "action";
-          this.mobs.push(m);
-          break;
-      }
-      
-      if (!g.swamp) {
-        g.x = 0, g.y = 0;
-        // fix me: need to clear and refresh this on map edit... or maybe it's trivial, since that's only for editor
-        var ripple = this.water_layer.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j + 4, TILESIZE + 2, TILESIZE + 2));
-        ripple.z = 2;
-        ripple.addBehavior(Oscillate, {object: ripple, field: "w", constant: 2, initial: TILESIZE + 4, rate: 5});
-        ripple.addBehavior(Oscillate, {object: ripple, field: "h", constant: 2, initial: TILESIZE + 4, rate: 5});
-        ripple.color = "#751217";
-      } else if (this.grid[i][j-1] && !this.grid[i][j-1].swamp) {
-        if (this.grid[i-1] && !this.grid[i-1][j].swamp) {
-          g.x = 1, g.y = 1;
-        } else {
-          g.x = 0, g.y = 1;
+            
+          }, grid: this.grid});
         }
-      } else {
-        if (this.grid[i-1] && !this.grid[i-1][j].swamp) {
-          g.x = 1, g.y = 0;
-        } else {
-          g.x = 4, g.y = 0;
+        switch(r) {
+          case 0:
+            g.swamp = true;
+            g.solid = false;
+            break;
+          case 1:
+            g.swamp = false;
+            g.solid = true;
+            var solid = this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 4, Resources.box));//TILESIZE - 2, TILESIZE - 2));
+            solid.z = 200;
+            solid.family = "action";
+            break;
+          case 2:
+            g.swamp = false;
+            g.solid = false;
+            break;
+          case 3:
+            g.swamp = false;
+            g.solid = false;
+            var m = this.bg.add(Object.create(Sprite).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j - 8, Resources.person));
+            m.color = "tomato";
+            m.grid = m.addBehavior(Pawn, {min: {x: OFFSET.x, y: OFFSET.y - 8}, max: {x: gameWorld.width - OFFSET.x - TILESIZE, y: gameWorld.height - OFFSET.y - 8}, rate: 5, tilesize: TILESIZE, grid: this.grid, callback: function () {
+              var g = this.toGrid(this.entity);
+              var p_g = s.player.grid.toGrid(s.player);
+              if (g.x === p_g.x && g.y === p_g.y) {
+                var done = s.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "you lose...", {align: "center", spacing: -2}));
+                done.addBehavior(Delay, {duration: 0.6, callback: function () {
+                  gameWorld.setScene(1, true);
+                }});
+              } else if (this.grid[g.x] && this.grid[g.x][g.y] && this.grid[g.x][g.y].swamp) {
+                this.entity.alive = false;
+                s.mobs.splice(s.mobs.indexOf(this.entity), 1);
+                if (s.mobs.length <= 0) {
+                  // level over!
+                  var done = s.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "complete...", {align: "center", spacing: -2}));
+                  done.addBehavior(Delay, {duration: 0.6, callback: function () {
+                    current_level = (current_level + 1) % Resources.levels.levels.length;
+                    gameWorld.setScene(1, true);
+                  }})
+                }
+              }
+            }});
+            m.z = 200;
+            m.family = "action";
+            this.mobs.push(m);
+            break;
         }
-      }
-      this.grid[i].push({solid: g.solid, swamp: g.swamp, x: g.x, y: g.y});
-    }  
+        
+        if (!g.swamp) {
+          g.x = 0, g.y = 0;
+          // fix me: need to clear and refresh this on map edit... or maybe it's trivial, since that's only for editor
+          var ripple = this.water_layer.add(Object.create(Entity).init(OFFSET.x + TILESIZE * i, OFFSET.y + TILESIZE * j + 4, TILESIZE + 2, TILESIZE + 2));
+          ripple.z = 2;
+          ripple.addBehavior(Oscillate, {object: ripple, field: "w", constant: 2, initial: TILESIZE + 4, rate: 5});
+          ripple.addBehavior(Oscillate, {object: ripple, field: "h", constant: 2, initial: TILESIZE + 4, rate: 5});
+          ripple.color = "#751217";
+        } else if (this.grid[i][j-1] && !this.grid[i][j-1].swamp) {
+          if (this.grid[i-1] && !this.grid[i-1][j].swamp) {
+            g.x = 1, g.y = 1;
+          } else {
+            g.x = 0, g.y = 1;
+          }
+        } else {
+          if (this.grid[i-1] && !this.grid[i-1][j].swamp) {
+            g.x = 1, g.y = 0;
+          } else {
+            g.x = 4, g.y = 0;
+          }
+        }
+        this.grid[i].push({solid: g.solid, swamp: g.swamp, x: g.x, y: g.y});
+      }  
+    }
+    for (var i = 0; i < this.mobs.length; i++) {
+      this.mobs[i].hungry = this.mobs[i].addBehavior(Hungry, {target: this.player});
+    }
+    
+    this.map = this.bg.add(Object.create(TileMap).init(COLUMNS * TILESIZE / 2 - 8, ROWS * TILESIZE / 2 - 8, Resources.werelight, this.grid));
+    this.map.z = 2;
+    
+    this.lit();
   }
 
-  for (var i = 0; i < this.mobs.length; i++) {
-    this.mobs[i].hungry = this.mobs[i].addBehavior(Hungry, {target: this.player});
-  }
-  
-  this.map = this.bg.add(Object.create(TileMap).init(COLUMNS * TILESIZE / 2 - 8, ROWS * TILESIZE / 2 - 8, Resources.werelight, this.grid));
-  this.map.z = 2;
 
   var dark = this.light_layer.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
   dark.z = 9;;
@@ -194,11 +204,8 @@ var onStart = function () {
     }
   }
   
-  
+  this.load(Resources.levels.levels[current_level]);
   this.lit();
-  
-  this.player.offset = {x: 0, y: -6};
-  this.player.z = 10;
 
   // game editor
   if (true) {
@@ -358,6 +365,23 @@ var onStart = function () {
       data[p.x][p.y] += 10;
       console.log('saving', JSON.stringify(data));
     };
+    
+    var load = this.ui.add(Object.create(Entity).init(gameWorld.width - 30, gameWorld.height - 50, 46, 14));
+    load.color = "yellow";
+    load.family = "button";
+    load.hover = btn_hover;
+    load.unhover = btn_unhover;
+    load.z = 101;
+    load.shown = this.ui.add(Object.create(TileMap).init(load.x, load.y, Resources.keys, [[{x: 1, y: 1}], [{x: 2, y: 1}], [{x: 3, y: 1}]]));
+    load.text = this.ui.add(Object.create(SpriteFont).init(load.x, load.y, Resources.expire_font, "%load", {align: "center", spacing: -3}));
+    load.text.z = 102;
+    load.shown.z = 100;
+    load.trigger = function () {
+      var data = prompt("Enter level data");
+      if (data) {
+        s.load(JSON.parse(data));
+      }
+    };
   }
   s.ui.buttons = [save, toggleui, addfloor, addperson, addswamp, addsolid, move, remove];
   s.ui.resetButtons = function () {
@@ -417,7 +441,7 @@ var onStart = function () {
             this.entity.alive = false;
           }
         }});
-        m.hungry = m.addBehavior(Hungry, {target:p});
+        m.hungry = m.addBehavior(Hungry, {target: s.player});
         m.z = 200;
         m.family = "action";
         s.mobs.push(m);
