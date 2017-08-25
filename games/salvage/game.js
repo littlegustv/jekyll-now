@@ -409,6 +409,32 @@ Entity.onDraw = function (ctx) {
 	}	
 };
 
+var Trail = Object.create(Behavior);
+Trail.update = function (dt) {
+	if (this.time === undefined) {
+		this.record = [];
+		this.time = 0;
+	}
+	this.time += dt;
+	
+	if (this.time >= this.interval) {
+		this.time = 0;
+		this.record.push({x: this.entity.x, y: this.entity.y});
+		if (this.record.length > this.maxlength) {
+			this.record.shift();
+		}
+	}
+}
+Trail.draw = function (ctx) {
+	var shrink = this.entity.radius / this.record.length;
+	ctx.fillStyle = this.entity.strokeColor;
+	for (var i = 0; i < this.record.length; i++) {
+		ctx.beginPath();
+		ctx.arc(this.record[i].x, this.record[i].y, i * shrink, 0, PI2, true);
+		ctx.fill();
+	}
+}
+
 // push to raindrop
 function lerp_angle (a1, a2, rate) {
   var r = a1 + short_angle(a1, a2) * rate;
@@ -469,6 +495,7 @@ var Weapons = {
 		a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)	};
 		a.angle = theta;		
 		a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
+		a.addBehavior(Trail, {interval: 0.06, maxlength: 10})
 		return 1.6;
 	},
 	triple: function (layer) {
@@ -493,6 +520,8 @@ var Weapons = {
 		if (this.target) console.log('target');
 		a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)	};
 		a.angle = theta;
+		a.addBehavior(Trail, {interval: 0.06, maxlength: 10})
+
 		this.count += 1;
 		if (this.count % 3 === 0) {
 			return 3;
@@ -523,6 +552,8 @@ var Weapons = {
 		}
 		a.velocity = {x: 100 * Math.cos(this.theta), y: 100 * Math.sin(this.theta)	};
 		a.angle = this.theta;
+		a.addBehavior(Trail, {interval: 0.06, maxlength: 10})
+		
 		this.count += 1;
 		if (this.count % 15 === 0) {
 			return 4;
@@ -544,6 +575,7 @@ var Weapons = {
 			//gameWorld.playSound(Resources.mortar);
 			a.collision.onHandle = projectileHit;
 			a.addBehavior(Velocity);
+			a.radius = 4;
 			a.addBehavior(Target, {target: this.target, turn_rate: 0.2, speed: 30, offset: {x: 0, y: 0}, set_angle: true});
 			a.family = this.family;
 			a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
@@ -551,6 +583,8 @@ var Weapons = {
 			var theta = this.angle;
 			a.velocity = {x: 90 * Math.cos(theta), y: 90 * Math.sin(theta)};
 			a.angle = theta;
+			a.addBehavior(Trail, {interval: 0.12, maxlength: 10})
+			
 			return 1.6;			
 	},
 	proximity: function (layer) {

@@ -346,7 +346,7 @@ var onStart = function () {
     [6, 6, 6, 6, 4, 4, 5],
 		[6,6, 5]
 	];
-	//this.waves = [[0]];
+	//this.waves = [[5]];
 	//this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 	
 	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.boss));
