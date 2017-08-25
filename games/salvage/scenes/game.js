@@ -349,14 +349,14 @@ var onStart = function () {
 	//this.waves = [[0]];
 	//this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 	
-	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.modules));
-	boss.animation = 4;
+	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.boss));
+	boss.animation = 0;
 	boss.modules = [];
 	boss.z = 12;
 	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
 	boss.setCollision(Polygon);
 	gameWorld.boss = boss;
-	
+	/*
 	for (var i = 0; i < 4; i++) {
 		var theta = (i + 1) * PI2 / 5;
 		var b = this.bg.add(Object.create(Sprite).init(boss.x, boss.y, Resources.modules));
@@ -367,7 +367,7 @@ var onStart = function () {
 		b.setCollision(Polygon);
 		boss.modules.push(b);
 		b.addBehavior(Joined, {target: boss, color: COLORS.tertiary, width: 4});
-	}
+	}*/
 	
   // intro animation
   this.intro = true;
