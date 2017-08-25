@@ -1,5 +1,6 @@
 /* global Resources, Layer, gameWorld, MAXHEALTH, Entity, TiledBackground, Sprite, SpriteFont */
 var onStart = function () {
+	this.wave = [];
 	
 	Resources.music = Resources.salvage;
   //var super_bg = this.addLayer(Object.create(Layer).init(1000,1000));
@@ -258,13 +259,41 @@ var onStart = function () {
 			this.player_bot.velocity = {x: 0, y: 0};
 			this.player_bot.acceleration = {x: 0, y: 0};
 			this.player_bot.animation = 0;
+		  if (this.wave.length <= 0) {
+		  	console.log('mmm');
+				console.log('new wave');
+				this.current_wave += 1;
+				var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
+				cash.addBehavior(Velocity);
+				cash.velocity = {x: 0, y: 20};
+				cash.setCollision(Polygon);
+				cash.collision.onHandle = function (object, other) {
+					if (other == s.player_bot) {
+						object.alive = false;
+						other.salvage += 1;
+		        gameWorld.playSound(Resources.coins);
+						for (var i = 0; i < 20; i++) {
+							var p = object.layer.add(Object.create(SpriteFont).init(other.x, other.y, Resources.expire_font, "$", {align: "center"}));
+							p.addBehavior(Velocity);
+							p.addBehavior(FadeOut, {duration: 0, delay: Math.random()});
+							p.velocity = {x: randint(-20,20), y: randint(-20,20)};
+						}
+					}
+				}
+				var w = this.waves[gameWorld.wave % this.waves.length];
+				gameWorld.wave++;
+				gameWorld.playSound(Resources[choose(["spawn"])]);
+				for (var j = 0; j < w.length; j++) {
+					var enemy = spawn(this.bg, w[j], this.player_bot);
+					this.wave.push(enemy);
+				}
+		  }
 		}
   }
   this.unpause = function () {
     this.bg.paused = false;
     this.fg.paused = false;
   }
-  this.pause();
   var s = this;
 	var down = function (e) {
 		var layer = s.store_layer.active ? s.store_layer : s.ui;		
@@ -332,7 +361,6 @@ var onStart = function () {
 		move(e);
 	};
 	
-	this.wave = [];
 	this.current_wave = 0;
   this.waves = [
     [0,0,0,0,0,0], // learn to hit head-on
@@ -413,6 +441,7 @@ var onStart = function () {
 
     //console.log('what?');
   }});
+  this.pause();
 }
 var onUpdate = function (dt) {
   var s = this;
@@ -428,38 +457,4 @@ var onUpdate = function (dt) {
     gameWorld.filter.frequency.value = lerp(gameWorld.filter.frequency.value, 24000, dt);
   }
 		
-  if (!this.bg.paused && this.wave.length <= 0) {
-		console.log('new wave');
-		this.current_wave += 1;
-		if (this.current_wave % 2 === 1) {
-			// store is open for business?
-			// drop cash
-			// 'adding'
-			var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
-			cash.addBehavior(Velocity);
-			cash.velocity = {x: 0, y: 20};
-			cash.setCollision(Polygon);
-			cash.collision.onHandle = function (object, other) {
-				if (other == s.player_bot) {
-					object.alive = false;
-					other.salvage += 1;
-          gameWorld.playSound(Resources.coins);
-					for (var i = 0; i < 20; i++) {
-						var p = object.layer.add(Object.create(SpriteFont).init(other.x, other.y, Resources.expire_font, "$", {align: "center"}));
-						p.addBehavior(Velocity);
-						p.addBehavior(FadeOut, {duration: 0, delay: Math.random()});
-						p.velocity = {x: randint(-20,20), y: randint(-20,20)};
-					}
-				}
-			}
-		}
-		
-		var w = this.waves[gameWorld.wave % this.waves.length];
-    gameWorld.wave++;
-		gameWorld.playSound(Resources[choose(["spawn"])]);
-		for (var j = 0; j < w.length; j++) {
-			var enemy = spawn(this.bg, w[j], this.player_bot);
-			this.wave.push(enemy);
-		}
-	}
 }
