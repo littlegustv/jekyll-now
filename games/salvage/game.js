@@ -76,6 +76,17 @@ HyperDrive.update = function (dt) {
 	}
 }
 
+Scene.draw = function (ctx) {
+  ctx.clearRect(0, 0, gameWorld.width, gameWorld.height); // HERE!
+  for (var i = 0; i < this.layers.length; i++) {
+    if (this.layers[i].active)
+    {
+      this.layers[i].draw(ctx);
+      ctx.drawImage(this.layers[i].canvas, 0, 0);
+    }
+  }
+}
+
 // try this out...
 Layer.drawOrder = function () {
     var t = this;
@@ -628,15 +639,6 @@ function requestFullScreen () {
 }
 
 // push to raindrop 'active' flag for layer
-Scene.draw = function (ctx) {
-	for (var i = 0; i < this.layers.length; i++) {
-		if (this.layers[i].active)
-		{
-			this.layers[i].draw(ctx);
-			ctx.drawImage(this.layers[i].canvas, 0, 0);
-		}
-	}
-};
 Scene.update = function (dt) {
 	this.time += dt;
 	for (var i = 0; i < this.layers.length; i++) {

@@ -29,6 +29,7 @@
 		{"path": "shielded fighter.png", "frames": 6, "animations": 1, "speed": 0.2},
 		{"path": "expire_font.png", "frames": 95, "animations": 1},
 		{"path": "gem.png"},
+		{"path": "broken.png"},
 		{"path": "asteroid.png"},
 		{"path": "enemies.png", "frames": 2, "animations": 5, "speed": 0.4},
 		{"path": "blink.png", "frames": 7, "animations": 1, "speed": 0.1},

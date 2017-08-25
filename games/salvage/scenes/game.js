@@ -356,6 +356,18 @@ var onStart = function () {
 	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
 	boss.setCollision(Polygon);
 	gameWorld.boss = boss;
+	
+	//this.layers =[];
+	
+	/*var test = this.addLayer(Object.create(Layer).init(1000, 1000));
+	
+	var bossTop = test.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2, Resources.boss));
+	bossTop.addBehavior(Follow, {target: boss, offset: {x: 0, y: 0, z: 0}});
+	var cracks = test.add(Object.create(Sprite).init(boss.x, boss.y, Resources.broken));
+	cracks.z = 13;
+	cracks.addBehavior(Follow, {target: bossTop, offset: {x: 0, y: 0, z: 1}});
+	cracks.blend = "source-atop";
+	cracks.opacity = 1;*/
 	/*
 	for (var i = 0; i < 4; i++) {
 		var theta = (i + 1) * PI2 / 5;
