@@ -14,7 +14,7 @@ var onStart = function () {
 
   
 	var b = bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height));
-  b.color = "#ffffff";
+  b.color = COLORS.nullary;
   b.z = -10;
 	
 	bg.add(Object.create(TiledBackground).init(0, 0, 48 * gameWorld.width, 48 * gameWorld.height, Resources.grid)).z = -8;
@@ -202,6 +202,8 @@ var onStart = function () {
 	player_bot.die = function () {
 		s.unpause();
 		s.pause = function () {};
+		player_bot.removeBehavior(player_bot.lerpx);
+		player_bot.removeBehavior(player_bot.lerpy);
 		player_bot.death = player_bot.addBehavior(Delay, {duration: 1.5, callback: function () {
 			player_bot.alive = false;
 			player_bot.death = undefined;
@@ -215,7 +217,8 @@ var onStart = function () {
 		flash.z = 2;
 		flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
 		flash.color = COLORS.secondary;
-		gameWorld.playSound(Resources.hit);   
+		gameWorld.playSound(Resources.hit);
+		gameWorld.wave = 0;
 	}
 	
   this.store_layer = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
@@ -260,8 +263,16 @@ var onStart = function () {
 			this.player_bot.acceleration = {x: 0, y: 0};
 			this.player_bot.animation = 0;
 		  if (this.wave.length <= 0) {
-		  	console.log('mmm');
-				console.log('new wave');
+		  	for (var i = 0; i < projectiles.length; i++) {
+		  		if (projectiles[i].alive) {
+			  		projectiles[i].alive = false;
+			  		var f = projectiles[i].layer.add(Object.create(Circle).init(projectiles[i].x, projectiles[i].y, 5));
+			  		f.color = COLORS.primary;
+			  		f.addBehavior(FadeOut, {duration: 0.1, delay: 0.1});
+		  		}
+		  	}
+		  	projectiles = [];
+		  	
 				this.current_wave += 1;
 				var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
 				cash.addBehavior(Velocity);

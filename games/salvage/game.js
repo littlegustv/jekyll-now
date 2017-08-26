@@ -4,8 +4,10 @@
 var MAXHEALTH = 4, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(180, 320, "index.json");
 gameWorld.wave = 0;
+gameWorld.distance = 100;
 
 var COLORS = {
+	nullary: "#FFFFFF",
 	primary: "#32CD32", //#ff6347 -> used for enemy weapons, projectiles -> signifies 'energy'
 	secondary: "#FF953E", // -> used for explosions
 	tertiary: "#940455" // -> used for... everything else? emphasis, particles?
@@ -460,6 +462,8 @@ var projectile_vertices = [
 	{x: -2, y: 2}
 ];
 
+var projectiles = [];
+
 // add cooldown visuals (circle shrinks/brightens, then POW)
 var Weapons = {
 	hitscan: function (layer) {
@@ -502,11 +506,12 @@ var Weapons = {
 		a.family = this.family;//"player";
 		a.projectile = true;
 		var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
-		if (this.target) console.log('target');
+		//if (this.target) console.log('target');
 		a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)	};
 		a.angle = theta;		
 		a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
-		a.addBehavior(Trail, {interval: 0.06, maxlength: 10})
+		a.addBehavior(Trail, {interval: 0.06, maxlength: 10});
+		projectiles.push(a);
 		return 1.6;
 	},
 	triple: function (layer) {
@@ -531,7 +536,8 @@ var Weapons = {
 		if (this.target) console.log('target');
 		a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)	};
 		a.angle = theta;
-		a.addBehavior(Trail, {interval: 0.06, maxlength: 10})
+		a.addBehavior(Trail, {interval: 0.06, maxlength: 10});
+		projectiles.push(a);
 
 		this.count += 1;
 		if (this.count % 3 === 0) {
@@ -563,7 +569,9 @@ var Weapons = {
 		}
 		a.velocity = {x: 100 * Math.cos(this.theta), y: 100 * Math.sin(this.theta)	};
 		a.angle = this.theta;
-		a.addBehavior(Trail, {interval: 0.06, maxlength: 10})
+		a.addBehavior(Trail, {interval: 0.06, maxlength: 10});
+		
+		projectiles.push(a);
 		
 		this.count += 1;
 		if (this.count % 15 === 0) {
@@ -595,6 +603,8 @@ var Weapons = {
 			a.velocity = {x: 90 * Math.cos(theta), y: 90 * Math.sin(theta)};
 			a.angle = theta;
 			a.addBehavior(Trail, {interval: 0.12, maxlength: 10})
+			a.addBehavior(Follow, {target: this, offset: {x: false, y: false, z: false, alive: true, angle: false}});
+			projectiles.push(a);
 			
 			return 1.6;			
 	},
@@ -615,6 +625,8 @@ var Weapons = {
 			a.addBehavior(Velocity);
 			a.family = this.family;
 			a.projectile = true;
+			projectiles.push(a);
+			
 			a.velocity = {x: 0, y: 0};//, angle: PI / 6};
 			return 1.2;			
 	}
@@ -742,6 +754,7 @@ var CropDistance = Object.create(Behavior);
 CropDistance.update = function (dt) {
 	var d = distance(this.entity.x, this.entity.y, this.target.x, this.target.y);
 	if (d > this.max) {
+		console.log('cropdistance actually happening');
 		this.entity.alive = false;
 	}
 }
@@ -827,7 +840,7 @@ TractorBeam.update = function (dt) {
 		this.origin.x = lerp(this.origin.x, this.target.x, this.rate * dt);
 		this.origin.y = lerp(this.origin.y, this.target.y, this.rate * dt);
 		if (distance(this.origin.x, this.origin.y, this.target.x, this.target.y) <= 2) {
-			console.log('reached');
+			//console.log('reached');
 			this.reached = true;
 		}
 	} else {
