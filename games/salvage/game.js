@@ -510,7 +510,7 @@ var Weapons = {
 		a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)	};
 		a.angle = theta;		
 		a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
-		a.addBehavior(Trail, {interval: 0.06, maxlength: 10});
+		a.addBehavior(Trail, {interval: 0.06, maxlength: 10, record: []});
 		projectiles.push(a);
 		return 1.6;
 	},
@@ -1030,6 +1030,7 @@ var Movement = {
 	standard: function (s) {
 		s.unpause();
 		s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: Math.round(s.player_bot.x + this.distance * Math.cos(s.player_bot.angle)), rate: this.speed, object: s.player_bot, callback: function () {
+			console.log('lerpx callback');
 			this.entity.removeBehavior(this);
 			this.entity.lerpx = undefined;
 			s.pause();

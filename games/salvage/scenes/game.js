@@ -257,7 +257,7 @@ var onStart = function () {
 	
   this.keydown = false;
   this.pause = function () {
-		if (!this.player_bot.lerpx && !this.player_bot.lerpy) {			
+		if (!this.player_bot.lerpx && !this.player_bot.lerpy) {
 			this.bg.paused = true;
 			this.player_bot.velocity = {x: 0, y: 0};
 			this.player_bot.acceleration = {x: 0, y: 0};
@@ -385,6 +385,7 @@ var onStart = function () {
     [6, 6, 6, 6, 4, 4, 5],
 		[6,6, 5]
 	];
+	this.waves = [[0]];
 	//this.waves = [[5]];
 	//this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 	
@@ -392,8 +393,44 @@ var onStart = function () {
 	boss.animation = 0;
 	boss.modules = [];
 	boss.z = 12;
+	boss.maxhealth = 3;
+	boss.health = boss.maxhealth;
+	boss.respond = function (target) {
+		if (this.health >= this.maxhealth) {}
+		else if (this.health >= this.maxhealth - 1) {
+			this.shoot = Weapons.standard;
+			// fix me: should be based on NORMAL to angle(this, target), i.e. two shots to either side
+			this.target = {x: target.x, y: target.y - 12};
+			this.shoot(this.layer);
+			this.target = {x: target.x, y: target.y + 12};
+			this.shoot(this.layer);
+		} else if (this.health >= this.maxhealth - 2) {
+			this.target = target;
+			this.shoot(this.layer);
+		}
+	}
 	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
 	boss.setCollision(Polygon);
+	boss.collision.onHandle = function (object, other) {
+		if (other.family == "player" && !object.invulnerable) {
+			// blowback
+			object.health -= 1;
+			object.invulnerable = true;
+			object.respond(s.player_bot);
+			object.addBehavior(Delay, {duration: 1, callback: function () { this.entity.invulnerable = false}})
+			if (object.health <= 0) object.alive = false;
+			if (!other.projectile) {
+				var theta = angle(object.x, object.y, other.x, other.y);
+
+				s.player_bot.removeBehavior((s.player_bot.lerpx));
+				s.player_bot.removeBehavior((s.player_bot.lerpy));
+				s.player_bot.angle = theta;
+				s.player_bot.move(s);
+				s.player_bot.lerpx.goal = object.x + object.w * Math.cos(theta);
+				s.player_bot.lerpy.goal = object.y + object.w * Math.sin(theta);
+			}
+		}
+	}
 	gameWorld.boss = boss;
 	
 	//this.layers =[];
