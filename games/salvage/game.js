@@ -26,6 +26,16 @@ var buttonHover = function () {
 };
 var buttonUnHover = function () { this.opacity = 1;};
 
+// 
+var HealthBar = Object.create(Behavior);
+HealthBar.draw = function (ctx) {
+	var w = this.entity.w / this.entity.maxhealth;
+	for (var i = 0; i < this.entity.maxhealth; i++) {
+		ctx.fillStyle = (i <= this.entity.health) ? "black" : "gray";
+		ctx.fillRect(this.entity.x - this.entity.w / 2 + i * w + w / 2, this.entity.y - this.entity.h / 2, w, 8);
+	}
+}
+
 // very custom, so avoid passing parameters and just assume them...
 var Radar = Object.create(Behavior);
 Radar.draw = function(ctx) {
@@ -41,6 +51,15 @@ Radar.draw = function(ctx) {
 		ctx.lineTo(x - 16 * Math.cos(theta - PI / 6), y - 16 * Math.sin(theta - PI / 6));
 		ctx.closePath();
 		ctx.fill();
+	}
+}
+
+var Disable = Object.create(Behavior);
+Disable.update = function (dt) {
+	if (this.cooldown === undefined) this.cooldown = 0;
+	this.cooldown -= dt;
+	if (this.cooldown <= 0 && this.target.health > 1) {
+		this.cooldown = this.entity.shoot(this.entity.layer);
 	}
 }
 
@@ -1013,6 +1032,7 @@ function spawn(layer, key, player) {
 				p.addBehavior(Velocity);
 				p.velocity = {x: 0, y: -50};
 				p.addBehavior(FadeOut, {duration: 0.5, delay: 0.3});
+				other.health = Math.min(other.maxhealth, other.health + 1);
 			} else if (other == player && other.material !== undefined) {
 				object.alive =false;
 				other.material += 1;

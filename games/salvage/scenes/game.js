@@ -393,7 +393,7 @@ var onStart = function () {
 	boss.animation = 0;
 	boss.modules = [];
 	boss.z = 12;
-	boss.maxhealth = 3;
+	boss.maxhealth = 10;
 	boss.health = boss.maxhealth;
 	boss.respond = function (target) {
 		if (this.health >= this.maxhealth) {}
@@ -407,10 +407,18 @@ var onStart = function () {
 		} else if (this.health >= this.maxhealth - 2) {
 			this.target = target;
 			this.shoot(this.layer);
+		} else if (this.health >= this.maxhealth / 2 && this.disable === undefined) {
+			this.family = "enemy";
+			this.disable = this.addBehavior(Disable, {target: target});
+		} else if (this.disable !== undefined) {
+			this.removeBehavior(this.disable);
+			this.disable = undefined;
+			this.addBehavior(Enemy);
 		}
 	}
 	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
 	boss.setCollision(Polygon);
+	boss.addBehavior(HealthBar);
 	boss.collision.onHandle = function (object, other) {
 		if (other.family == "player" && !object.invulnerable) {
 			// blowback
