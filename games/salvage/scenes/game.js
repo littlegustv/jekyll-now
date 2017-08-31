@@ -417,29 +417,47 @@ var onStart = function () {
 		}
 	}
 	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
-	boss.setCollision(Polygon);
 	boss.addBehavior(HealthBar);
-	boss.collision.onHandle = function (object, other) {
-		if (other.family == "player" && !object.invulnerable) {
-			// blowback
-			object.health -= 1;
-			object.invulnerable = true;
-			object.respond(s.player_bot);
-			object.addBehavior(Delay, {duration: 1, callback: function () { this.entity.invulnerable = false}})
-			if (object.health <= 0) object.alive = false;
-			if (!other.projectile) {
-				var theta = angle(object.x, object.y, other.x, other.y);
-
-				s.player_bot.removeBehavior((s.player_bot.lerpx));
-				s.player_bot.removeBehavior((s.player_bot.lerpy));
-				s.player_bot.angle = theta;
-				s.player_bot.move(s);
-				s.player_bot.lerpx.goal = object.x + object.w * Math.cos(theta);
-				s.player_bot.lerpy.goal = object.y + object.w * Math.sin(theta);
+	gameWorld.boss = boss;
+	gameWorld.limbs = [];
+	
+	for (var i = 0; i < 5; i++) {
+		var theta = i * PI2 / 5;
+		var limb = this.bg.add(Object.create(Entity).init(boss.x + Math.cos(theta) * 32, boss.y + Math.sin(theta) * 32, 24, 24));
+		//limb.w = 12, limb.h = 12;
+		limb.setCollision(Polygon);
+		limb.addBehavior(Follow, {target: gameWorld.boss, offset: {x: Math.cos(theta) * 32, y: Math.sin(theta) * 32}});
+		limb.color = COLORS.tertiary;
+		limb.health = 2;
+		limb.opacity = 0.8;
+		limb.z = 13 + i;
+		gameWorld.limbs.push(limb);
+		limb.collision.onHandle = function (object, other) {
+			if (other.family == "player" && !gameWorld.boss.invulnerable) {
+				// blowback
+				object.health -= 1;
+				gameWorld.boss.invulnerable = true;
+				gameWorld.boss.respond(s.player_bot);
+				gameWorld.boss.addBehavior(Delay, {duration: 1, callback: function () { this.entity.invulnerable = false}})
+				if (object.health <= 0) object.alive = false;
+				if (!other.projectile) {
+					var theta = angle(gameWorld.boss.x, gameWorld.boss.y, other.x, other.y);
+					
+					var goal = {x: 48 * Math.round((object.x + 56 * Math.cos(theta)) / 48), y:  48 * Math.round((object.y + 56 * Math.sin(theta)) / 48)}
+	
+					// gridsize is 48, find nearest
+	
+					s.player_bot.removeBehavior((s.player_bot.lerpx));
+					s.player_bot.removeBehavior((s.player_bot.lerpy));
+					s.player_bot.angle = theta;
+					s.player_bot.move(s);
+					s.player_bot.lerpx.goal = goal.x;
+					s.player_bot.lerpy.goal = goal.y;
+				}
 			}
 		}
 	}
-	gameWorld.boss = boss;
+	//boss.setCollision(Polygon);
 	
 	//this.layers =[];
 	
