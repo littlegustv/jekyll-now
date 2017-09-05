@@ -108,6 +108,16 @@ Scene.draw = function (ctx) {
   }
 }
 
+// push to raindrop 'active' flag for layer
+Scene.update = function (dt) {
+	this.time += dt;
+	for (var i = 0; i < this.layers.length; i++) {
+		if (this.layers[i].active)
+			this.layers[i].update(dt);
+	}
+	this.onUpdate(dt);
+};
+
 // try this out...
 Layer.drawOrder = function () {
     var t = this;
@@ -121,17 +131,29 @@ Layer.drawOrder = function () {
     });
 };
 
-var DrawEnergy = Object.create(Behavior);
-DrawEnergy.draw = function (ctx) {
-	ctx.strokeStyle = this.color || "blue";
-	ctx.lineWidth = this.thickness || 1;
-	ctx.beginPath();
-	ctx.moveTo(this.entity.x, this.entity.y);
-	ctx.lineTo(this.entity.x - this.w / 2, this.entity.y + this.h);
-	ctx.moveTo(this.entity.x, this.entity.y);
-	ctx.lineTo(this.entity.x + this.w / 2, this.entity.y + this.h);
-	ctx.stroke();
+// push to raindrop -> collisions fix
+Layer.update = function (dt) {
+	this.camera.update(dt);
+	if (this.paused === true) {
+		return;
+	} else if (this.paused > 0) {
+	  this.paused -= dt;
+	  return;
+	}
+	for (var i = 0; i < this.entities.length; i++) {
+	  this.entities[i].update(dt);
+	}
+	for (var i = 0; i < this.entities.length; i++) {
+	  this.entities[i].checkCollisions(i + 1, this.entities); // i + 1 instead of i
+	}
+	for (var i = 0; i < this.entities.length; i++) {
+	  if (!this.entities[i].alive) {
+	    this.entities[i].end();
+	    this.entities.splice(i, 1);
+	  }
+	}
 }
+
 
 // push to raindrop -> making setScene(reload) work properly
 World.setScene = function (n, reload) {
@@ -150,48 +172,6 @@ World.draw = function () {
 		this.scene.draw(this.ctx);
 	}
 };
-
-var Charge = Object.create(Behavior);
-// speed, target, rate
-Charge.update = function (dt) {
-	if (!this.entity.lerpx &&  !this.entity.lerpy) {
-		var theta = (PI / 2) * Math.round(angle(this.entity.x, this.entity.y, this.target.x, this.target.y) / (PI / 2));
-		//var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
-		this.entity.angle = theta;
-		this.entity.lerpx = this.entity.addBehavior(Lerp, {rate: this.rate, goal: this.entity.x + Math.cos(theta) * this.distance, object: this.entity, field: "x", callback: function () {
-			console.log('removing lerpx');
-			this.entity.removeBehavior(this.entity.lerpx);
-			this.entity.lerpx = undefined;
-		}});		
-		this.entity.lerpy = this.entity.addBehavior(Lerp, {rate: this.rate, goal: this.entity.y + Math.sin(theta) * this.distance, object: this.entity, field: "y", callback: function () {
-			console.log('removing lerpy');
-			this.entity.removeBehavior(this.entity.lerpy);
-			this.entity.lerpy = undefined;
-		}});
-	}
-}
-Charge.draw = function (ctx) {
-	ctx.beginPath();
-	ctx.arc(this.entity.x, this.entity.y, 18, this.entity.angle - PI / 4, this.entity.angle + PI / 4, false);
-	ctx.stroke();
-}
-
-var AI = Object.create(Behavior);
-AI.update = function (dt) {
-	if (this.time === undefined) this.time = 0;
-	this.time += dt;
-  // move to player, pay
-  if (this.value / this.time < 1) {
-  	this.entity.y = lerp(this.entity.y, this.target.y, this.rate * dt);
-    this.entity.x = lerp(this.entity.x, this.target.x + (this.target.x > gameWorld.width / 2 ? -24 : 24), this.rate * dt);
-  	//this.entity.x = lerp(this.entity.x, this.target.x, this.rate * dt);
-  }
-  // stick around, store is 'open'
-  // use above?
-  // ...
-  // leave for a while
-  // ...
-}
 
 World.playSound = function(sound, volume) {
 	if (AudioContext) {
@@ -249,91 +229,16 @@ Delay.update = function (dt) {
   this.time += dt;
   if (this.time > this.duration) {
     this.callback();
-		this.time = undefined;
-		if (this.remove) {
-    	this.entity.removeBehavior(this);
-		}
+	this.time = undefined;
+	if (this.remove) {
+		this.entity.removeBehavior(this);
+	}
   }
-}
+};
 Delay.set = function (t) {
 	if (t !== undefined) this.duration = t;
 	this.time = 0;
-}
-
-var BeamShip = Object.create(Behavior);
-BeamShip.update = function (dt) {
-	// movement
-	if (this.time === undefined) this.time = 0;
-	if (this.cooldown === undefined) this.cooldown = 1;
-	// weapon
-	this.cooldown -= dt;
-	if (this.cooldown <= 0 && this.cooldown > -1) {
-		this.cooldown = -1;
-		this.direction = this.entity.velocity.y;
-		this.entity.velocity = {x: 0, y: 0};
-		
-		var theta = this.entity.angle;
-		var b = this.entity.layer.add(Object.create(Entity).init(this.entity.x + Math.cos(theta) * 240, this.entity.y + Math.sin(theta) * 240, 480, 2));
-		b.color = "#e91e63";
-		b.angle = theta;
-		b.setCollision(Polygon);
-		b.collision.onHandle = function (object, other) {
-			if (other.family != object.family && !other.projectile) {
-				var small = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.small));
-				small.addBehavior(FadeOut, {duration: 0.5});
-				gameWorld.playSound(Resources.hit, volume(small));
-			}
-		};
-		b.family = this.entity.family;
-		b.projectile = true;
-		b.addBehavior(FadeOut, {delay: 0.7, duration: 0.2, maxOpacity: 1});
-		b.addBehavior(FadeIn, {duration: 0.2, maxOpacity: 1});
-		b.opacity = 0;
-		b.z = Z.projectile;
-		gameWorld.playSound(Resources.beam, volume(b));
-		
-	} else if (this.cooldown < -2) {
-		this.cooldown = 1
-		// shooting
-	} else if (this.cooldown > 0) {
-		this.time += dt;
-		this.entity.velocity.x = Math.sin(this.time) * 60;
-		if (this.entity.velocity.y === 0) this.entity.velocity.y = this.direction;
-		this.entity.angle = Math.atan2(this.entity.velocity.y, this.entity.velocity.x);
-
-		if (this.entity.y > this.max.y) {
-			this.entity.velocity.y *= -1;
-			this.entity.y = this.max.y;
-		}
-		if (this.entity.y < this.min.y) {
-			this.entity.velocity.y *= -1;
-			this.entity.y = this.min.y;
-		}
-	}
-}
-
-// push to raindrop -> collisions fix
-Layer.update = function (dt) {
-	this.camera.update(dt);
-	if (this.paused === true) {
-		return;
-	} else if (this.paused > 0) {
-	  this.paused -= dt;
-	  return;
-	}
-	for (var i = 0; i < this.entities.length; i++) {
-	  this.entities[i].update(dt);
-	}
-	for (var i = 0; i < this.entities.length; i++) {
-	  this.entities[i].checkCollisions(i + 1, this.entities); // i + 1 instead of i
-	}
-	for (var i = 0; i < this.entities.length; i++) {
-	  if (!this.entities[i].alive) {
-	    this.entities[i].end();
-	    this.entities.splice(i, 1);
-	  }
-	}
-}
+};
 
 Lerp.update = function (dt) {
   if (this.field == "angle")
@@ -350,33 +255,6 @@ function lerp (current, goal, rate, threshold) {
   } else {
     return (1-rate)*current + rate*goal
   }  
-}
-
-// radius, cooldown, rate, target, damage
-var Space = Object.create(Behavior);
-Space.update = function (dt) {
-	if (this.cooldown === undefined) this.cooldown = 0;
-	else if (this.cooldown > 0) this.cooldown -= dt;
-	else if (distance(this.entity.x, this.entity.y, this.target.x, this.target.y) > this.radius) {
-		this.entity.health -= this.damage;
-		this.cooldown = this.rate;
-		// create particle effect
-		for (var i = 0; i < 6; i++) {
-			var e = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y, 3));
-			e.addBehavior(Velocity);
-			e.color = "black";
-			var theta = Math.random() * PI2;
-			e.velocity = {x: 30 * Math.cos(theta), y: 30 * Math.sin(theta) };
-			e.addBehavior(FadeOut, {duration: 1, remove: true});
-		}
-	}
-}
-
-var Grow = Object.create(Behavior);
-Grow.update = function (dt) {
-	if (this.time === undefined) this.time = 0;
-	this.time += dt;
-	this.entity.scale = 1 + this.max * this.time / this.duration;
 }
 
 function projectileHit (object, other) {
@@ -669,16 +547,6 @@ function requestFullScreen () {
   }
 }
 
-// push to raindrop 'active' flag for layer
-Scene.update = function (dt) {
-	this.time += dt;
-	for (var i = 0; i < this.layers.length; i++) {
-		if (this.layers[i].active)
-			this.layers[i].update(dt);
-	}
-	this.onUpdate(dt);
-};
-
 // cooldown, shoot
 var Enemy = Object.create(Behavior);
 Enemy.update = function (dt) {
@@ -698,6 +566,7 @@ Enemy.draw = function (ctx) {
 	}
 }
 
+// fix me: not used, but maybe useful? keeping for now
 // target, radius, rate, angle
 var Drone = Object.create(Behavior);
 Drone.update = function (dt) {
@@ -712,24 +581,6 @@ Drone.update = function (dt) {
   this.entity.angle = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
 }
 
-var Bounce = Object.create(Behavior);
-Bounce.update = function (dt) {
-  if (this.entity.x > this.max.x) {
-    this.entity.x = this.max.x;
-    this.entity.velocity.x *= -1;
-  } else if (this.entity.x < this.min.x) {
-    this.entity.x = this.min.x;
-    this.entity.velocity.x *= -1;
-  }
-  if (this.entity.y > this.max.y) {
-    this.entity.y = this.max.y;
-    this.entity.velocity.y *= -1;
-  } else if (this.entity.y < this.min.y) {
-    this.entity.y = this.min.y;
-    this.entity.velocity.y *= -1;
-  }
-}
-
 // push to raindrop
 Velocity.update = function (dt) {
 	this.entity.x += dt * this.entity.velocity.x;
@@ -742,38 +593,11 @@ FadeIn.start = function () {
   this.time = 0;
 };
 
-// push to raindrop, maybe with certain modifications??
-var BoundDistance = Object.create(Behavior);
-BoundDistance.update = function (dt) {
-  	var d = distance(this.entity.x, this.entity.y, this.target.x, this.target.y);
-  	if (d > this.max) {
-  		var speed = Math.sqrt(Math.pow(this.entity.velocity.x, 2) + Math.pow(this.entity.velocity.y, 2));
-	  	this.entity.out_of_bounds = true;
-	  	var theta = angle(this.entity.x, this.entity.y, this.target.x, this.target.y);
-	    this.entity.angle = lerp_angle(this.entity.angle, theta, this.rate * dt);
-	    this.entity.velocity = {x: Math.cos(this.entity.angle) * speed, y: Math.sin(this.entity.angle) * speed};
-	} else if (d < this.min) {
-  		var speed = Math.sqrt(Math.pow(this.entity.velocity.x, 2) + Math.pow(this.entity.velocity.y, 2));
-	  	this.entity.out_of_bounds = true;
-	  	var theta = angle(this.target.x, this.target.y, this.entity.x, this.entity.y);
-	    this.entity.angle = lerp_angle(this.entity.angle, theta, this.rate * dt);
-	    this.entity.velocity = {x: Math.cos(this.entity.angle) * speed, y: Math.sin(this.entity.angle) * speed};
-	} else {
-	  	this.entity.out_of_bounds = false;
-	  }
-	if (this.visible && this.entity.out_of_bounds) {
-		var c = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y, randint(4,8)));
-		c.addBehavior(FadeIn, {duration: 0.1, delay: 0.1, maxOpacity: 1});
-		c.addBehavior(FadeOut, {duration: 1.1, delay: 0.1, maxOpacity: 1});
-		c.color = this.color || "white";
-	}
-};
-
 var CropDistance = Object.create(Behavior);
 CropDistance.update = function (dt) {
 	var d = distance(this.entity.x, this.entity.y, this.target.x, this.target.y);
 	if (d > this.max) {
-		console.log('cropdistance actually happening');
+		//console.log('cropdistance actually happening');
 		this.entity.alive = false;
 	}
 }
@@ -816,41 +640,6 @@ NewTarget.update = function (dt) {
 		this.entity.y = lerp(this.entity.y, this.goal.y, this.speed * dt);
 	}
 };
-
-var Wheel = Object.create(Entity);
-Wheel.init = function (x, y, radius, border, slice, step, percentage, colors) {
-	this.x = x, this.y = y, this.radius = radius, this.border = border, this.slice = slice, this.step = step, this.percentage = percentage, this.colors = colors;
-	this.behaviors = [], this.offset = {x: 0, y: 0};
-	return this;
-} 
-Wheel.onDraw = function (ctx) {
-	ctx.fillStyle = this.colors[0];
-  ctx.beginPath();
-  ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
-  ctx.fill();
-
-	for (var i = 0; i < 100 / this.step; i += 1) {
-  	if (i < this.percentage / this.step)
-      ctx.fillStyle = this.colors[2];
-    else
-    	ctx.fillStyle = this.colors[1];
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y);
-    ctx.arc(this.x, this.y, this.radius - this.border, i * 2 * Math.PI / (100 / this.step) + this.slice, (i + 1) * 2 * Math.PI / (100 / this.step) - this.slice, false);
-    ctx.fill();
-	}
-  
-  ctx.fillStyle = this.colors[0];
-  ctx.beginPath();
-  ctx.arc(this.x, this.y, this.radius / 4 + this.border, 0, Math.PI * 2, false);
-  ctx.fill();
-  
-  ctx.fillStyle = this.colors[3];
-  ctx.beginPath();
-  ctx.arc(this.x, this.y, this.radius / 4, 0, Math.PI * 2, false);
-  ctx.fill();
-}
-
 
 // target object, origin object, destination object (default = entity), rate, color, width
 var TractorBeam = Object.create(Behavior);
@@ -913,11 +702,7 @@ function spawn(layer, key, player) {
 	var theta = Math.random() * PI2;
 	var x = player.x + randint(- gameWorld.width / 2,  gameWorld.width / 2), y = player.y + randint(-gameWorld.height / 2, gameWorld.height / 2);
 	var enemy = Object.create(Sprite).init(Math.round(x / 48) * 48, Math.round(y / 48) * 48, Resources[sprites[key % sprites.length]]);
-
-	//enemy.animation = animations[key];
-	//enemy.addBehavior(Crop, {min: {x: -16, y: -1000}, max: {x: gameWorld.width + 16, y: 1000}});
 	enemy.z = Z.entity;
-	//enemy.angle = enemy.x > gameWorld.width / 2 ? - PI : 0;
 	enemy.addBehavior(Velocity);
 	enemy.velocity = {x: 0, y: 0};
 	enemy.setCollision(Polygon);
@@ -948,18 +733,13 @@ function spawn(layer, key, player) {
 			]);			
 			break;
 		case 3:
-		// fix me: collisions still a bit bad; need feedback/bounceback for failed hit especially
-			//enemy.x = Math.round(enemy.x / 48) * 48, enemy.y = Math.round(enemy.y / 48) * 48;
-			//enemy.addBehavior(Charge, {target: player, distance: 48, rate: 3});
+			// fix me: currently does NOTHING
 			enemy.velocity = {x: 0, y: 0};
-			enemy.shielded = true;
 			enemy.setVertices([
 				{x: -5, y: -3}, {x: -5, y: 3}, {x: 5, y: 3}, {x: 5, y: -3}
 			]);
 			break;
 		case 4:
-		// needs a bit of tweaking for balance/difficulty - maybe only useful in combination? - 
-		// - perhaps more explicit movement (tried to make box around you, e.g) would be better
 			enemy.addBehavior(Target, {target: player, speed: 35, turn_rate: 1, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
 			enemy.shoot = Weapons.proximity;
 			enemy.setVertices([
@@ -967,7 +747,6 @@ function spawn(layer, key, player) {
 			]);
 			break;
 		case 5:
-		// homing should A: start in the right direction, B: be faster?
 			enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 5, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
 			enemy.target = player;
 			enemy.shoot = Weapons.homing;
@@ -976,7 +755,6 @@ function spawn(layer, key, player) {
 			]);
 			break;
 		case 6:
-			//enemy.addBehavior(Target, {target: player, speed: 60, turn_rate: 1, min: 80});
 			enemy.shoot = Weapons.hitscan;
 			enemy.animation = 0;
 			enemy.target = player;
@@ -989,9 +767,7 @@ function spawn(layer, key, player) {
 	var flash = layer.add(Object.create(Sprite).init(enemy.x, enemy.y, Resources.blink));
 	flash.addBehavior(FadeOut, {duration: 0, delay: 0.7});
 	enemy.collision.onHandle = function (object, other) {
-		if (object.shielded && short_angle(angle(object.x, object.y, other.x, other.y), object.angle) < PI / 4) {
-			console.log('shielded!');
-		} else if (other.family == "player") {
+		if (other.family == "player") {
 			enemy.alive = false;
 			enemy.die();
 		}
@@ -1003,7 +779,6 @@ function spawn(layer, key, player) {
 	enemy.die = function () {
 		enemy.alive = false;
 		var expl = enemy.layer.add(Object.create(Circle).init(enemy.x, enemy.y, 24));
-		//var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
 		expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
 		expl.z = 1;
 		var flash = enemy.layer.add(Object.create(Circle).init(enemy.x, enemy.y, 32));
@@ -1011,15 +786,7 @@ function spawn(layer, key, player) {
 		flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
 		flash.color = COLORS.secondary;
 		gameWorld.playSound(Resources.hit);        
-		/*for (var i = 0; i < 3; i++) {
-			expl.addBehavior(Delay, {duration: Math.random() * 0.6 + 0.2, callback: function () {
-				var e = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
-				e.addBehavior(FadeOut, {duration: 0, delay: 0.8});
-				e.z = 1;
-				gameWorld.playSound(Resources.hit);        
-				this.entity.removeBehavior(this);
-			}})
-		}*/
+		
 		var scrap = enemy.layer.add(Object.create(Entity).init(enemy.x, enemy.y, 4, 4));
 		gameWorld.boss.addBehavior(TractorBeam, {target: scrap, turn_rate: 5, speed: 50, color: COLORS.tertiary, thickness: 2, width: 3.5, rate: 6, origin: {x: gameWorld.boss.x, y: gameWorld.boss.y}});
 		scrap.addBehavior(Velocity);
@@ -1044,7 +811,7 @@ function spawn(layer, key, player) {
 }
 
 var current_movement_key = 0;
-var movement_keys = ["standard", "blink", "double", "chaos"];
+var movement_keys = ["standard"];
 // fix me: can remove
 var Movement = {
 	standard: function (s) {
@@ -1061,133 +828,19 @@ var Movement = {
 			s.pause();
 		}});
 		
-		// create contrail sprite
 		gameWorld.playSound(Resources.move);  
 		var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
 		d.addBehavior(Velocity);
 		d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
 		d.addBehavior(FadeOut, {duration: 0.8});
-		//s.player_bot.stopped = false;
-		//s.player_bot.delay.set();
-	},
-	blink: function (s) {
-		s.unpause();
-		gameWorld.playSound(Resources.blink1);
-		gameWorld.playSound(Resources.move);
-		s.player_bot.delay.set(0.5);
-		s.player_bot.opacity = 0.1;
-		s.player_bot.lerpx = true;
-		//s.player_bot.stopped = false;
-		s.player_bot.delay.old_callback = s.player_bot.delay.callback;
-		s.player_bot.delay.callback = function () {
-			s.pause();
-			s.player_bot.opacity = 1;
-			s.player_bot.lerpx = false;
-			//s.player_bot.stopped = true;
-			gameWorld.playSound(Resources.blink2);
-			s.player_bot.x = s.player_bot.x + 50 * Math.cos(s.player_bot.angle), s.player_bot.y = s.player_bot.y + 50 * Math.sin(s.player_bot.angle);
-			s.player_bot.delay.callback = s.player_bot.delay.old_callback;
-		}
-	},
-	// just 'double' movement now, a commitment, slower (?)
-	double: function (s) {
-		s.unpause();
-		s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: Math.round(s.player_bot.x + 100 * Math.cos(s.player_bot.angle)), rate: 2.5, object: s.player_bot, callback: function () {
-			this.entity.removeBehavior(this);
-			this.entity.lerpx = undefined;
-		}});
-		s.player_bot.lerpy = s.player_bot.addBehavior(Lerp, {field: "y", goal: Math.round(s.player_bot.y + 100 * Math.sin(s.player_bot.angle)), rate: 2.5, object: s.player_bot, callback: function () {
-			this.entity.removeBehavior(this);
-			this.entity.lerpy = undefined;
-		}});
-		
-		// create contrail sprite
-		gameWorld.playSound(Resources.move);  
-		var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
-		d.addBehavior(Velocity);
-		d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
-		d.addBehavior(FadeOut, {duration: 0.8});
-		//s.player_bot.stopped = false;
-		s.player_bot.delay.set(2);
-	},
-	// triple movement in random direction
-	chaos: function (s) {
-		s.unpause();
-		s.player_bot.angle = randint(0,4) * PI / 2;
-		s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: Math.round(s.player_bot.x + 150 * Math.cos(s.player_bot.angle)), rate: 4.5, object: s.player_bot, callback: function () {
-			this.entity.removeBehavior(this);
-			this.entity.lerpx = undefined;
-		}});
-		s.player_bot.lerpy = s.player_bot.addBehavior(Lerp, {field: "y", goal: Math.round(s.player_bot.y + 150 * Math.sin(s.player_bot.angle)), rate: 4.5, object: s.player_bot, callback: function () {
-			this.entity.removeBehavior(this);
-			this.entity.lerpy = undefined;
-		}});
-		
-		// create contrail sprite
-		gameWorld.playSound(Resources.move);  
-		var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
-		d.addBehavior(Velocity);
-		d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
-		d.addBehavior(FadeOut, {duration: 0.8});
-		//s.player_bot.stopped = false;
-		s.player_bot.delay.set(2);
-	},
-	boom: function (s) {
-		s.unpause();
-		s.player_bot.velocity = {x: 0, y: 0};
-		gameWorld.playSound(Resources.boom);
-		s.player_bot.delay.set(1);
-		//s.player_bot.stopped = false;
-		s.player_bot.addBehavior(Delay, {duration: 0.3, callback: function () {
-			//s.player_bot.angle = s.player_top.angle;
-			var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.explosion));
-			d.addBehavior(Velocity);
-			d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
-			d.addBehavior(FadeOut, {duration: 0.8});
-			for (var i = 0; i < 3; i++) {
-				var theta = s.player_bot.angle + PI - PI / 5 + i * PI / 5;
-				var a = s.bg.add(Object.create(Sprite).init(s.player_bot.x + Math.cos(theta) * 8, s.player_bot.y + Math.sin(theta) * 8, Resources.projectile));
-				a.angle = theta;
-				a.animation = 4;
-				a.addBehavior(Velocity);
-				a.velocity = {x: 40 * Math.cos(theta), y: 40 * Math.sin(theta) };
-				//a.addBehavior(FadeOut, {duration: 0, delay: 1});
-				a.setCollision(Polygon);
-				a.setVertices(projectile_vertices);
-				a.collision.onHandle = projectileHit;
-				a.family = "player";
-				a.projectile = true;
-				//gameWorld.playSound(Resources.spark_sound);
-			}
-			s.player_bot.animation = 1;
-			s.player_bot.velocity = {
-				x: Math.cos( s.player_bot.angle) * 100,
-				y: Math.sin( s.player_bot.angle) * 100
-			}
-			s.player_bot.acceleration = {
-				x: -s.player_bot.velocity.x,
-				y: -s.player_bot.velocity.y
-			}
-			s.player_bot.removeBehavior(this);
-		}})
 	}
 }
 
 var Store = {
 	init: function (layer, player) {
 		this.layer = layer, this.player = player, this.spent = 0, this.repair_cost = 1;
-		// create UI
 		this.createUI();
 		return this;
-	},
-	// is this used?
-	spend: function (amount) {
-		if (this.player.salvage - this.spent < amount) return false; // can't afford
-		else if (amount < 0 && this.spent + amount < 0) return false; // can't unspend more than you've spent
-		else {
-			this.spent += amount;
-			this.salvage.text = "$ " + (this.player.salvage - this.spent);
-		}
 	},
 	buttons: [
 		{ name: "Health", price: 1, icon: 0, trigger: function (t) {
@@ -1360,8 +1013,6 @@ var Store = {
 		gameWorld.scene.bg.camera.addBehavior(Lerp, {object: gameWorld.scene.bg.camera.behaviors[0].offset, field: "y", goal: -7 * gameWorld.height / 8, rate: 10, callback: function () {
 			this.entity.removeBehavior(this);
 		}});
-		gameWorld.boss.energy = gameWorld.boss.addBehavior(DrawEnergy, {h: 32, w: gameWorld.width / 2, color: COLORS.tertiary, thickness: 2});
-		gameWorld.scene.player_bot.energy = gameWorld.scene.player_bot.addBehavior(DrawEnergy, {h: -32, w: gameWorld.width / 2, color: "#000", thickness: 2});
 		gameWorld.boss.old_x = gameWorld.boss.x;
 		gameWorld.boss.old_y = gameWorld.boss.y;
 		gameWorld.boss.x = this.player.x;

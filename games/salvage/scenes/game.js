@@ -242,10 +242,6 @@ var onStart = function () {
     store_text.scale = 1;
   };
 
-	gameWorld.shop = bg.add(Object.create(Sprite).init(gameWorld.width - 48, gameWorld.height / 2 + 60,  Resources.shop));
-	gameWorld.shop.opacity = 0;
-	gameWorld.shop.addBehavior(AI, {target: player_bot, rate: 5, value: 0});
-
 	this.player_bot = player_bot;
   var t = this;
 
