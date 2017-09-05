@@ -11,7 +11,7 @@ var onStart = function () {
   var fg = this.addLayer(Object.create(Layer).init(1000,1000));
 	fg.active = true;
 	//parallax.active = true;
-
+//
   
 	var b = bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height));
   b.color = COLORS.nullary;
@@ -381,7 +381,7 @@ var onStart = function () {
     [6, 6, 6, 6, 4, 4, 5],
 		[6,6, 5]
 	];
-	this.waves = [[0]];
+//this.waves = [[0]];
 	//this.waves = [[5]];
 	//this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 	
