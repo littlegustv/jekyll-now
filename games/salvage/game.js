@@ -7,6 +7,7 @@ gameWorld.wave = 0;
 gameWorld.distance = 100;
 
 var COLORS = {
+	negative: "#000000",
 	nullary: "#FFFFFF",
 	primary: "#32CD32", //#ff6347 -> used for enemy weapons, projectiles -> signifies 'energy'
 	secondary: "#FF953E", // -> used for explosions
@@ -706,6 +707,7 @@ function spawn(layer, key, player) {
 	enemy.addBehavior(Velocity);
 	enemy.velocity = {x: 0, y: 0};
 	enemy.setCollision(Polygon);
+	enemy.blend = "destination-out";
 	switch (key) {
 		case 0:
 			enemy.addBehavior(NewTarget, {target: player, speed: 2, tilesize: 48, goal: {x: enemy.x, y: enemy.y}});

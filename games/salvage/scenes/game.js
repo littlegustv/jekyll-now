@@ -4,12 +4,16 @@ var onStart = function () {
 	
 	Resources.music = Resources.salvage;
   //var super_bg = this.addLayer(Object.create(Layer).init(1000,1000));
-  //super_bg.active = true;
+  //super_bggit.active = true;
   //var parallax = this.addLayer(Object.create(Layer).init(1000,1000));
+  var colorize = this.addLayer(Object.create(Layer).init(1000, 1000));
+  colorize.add(Object.create(Entity).init(0, 0, 1000, 1000)).color = COLORS.negative;
+  //colorize.color = COLORS.negative;
+  
   var bg = this.addLayer(Object.create(Layer).init(1000,1000));
 	bg.active = true;
-  var fg = this.addLayer(Object.create(Layer).init(1000,1000));
-	fg.active = true;
+  //var fg = this.addLayer(Object.create(Layer).init(1000,1000));
+	//fg.active = true;
 	//parallax.active = true;
 //
   
@@ -17,7 +21,9 @@ var onStart = function () {
   b.color = COLORS.nullary;
   b.z = -10;
 	
-	bg.add(Object.create(TiledBackground).init(0, 0, 48 * gameWorld.width, 48 * gameWorld.height, Resources.grid)).z = -8;
+	var grid = bg.add(Object.create(TiledBackground).init(0, 0, 48 * gameWorld.width, 48 * gameWorld.height, Resources.grid));
+	grid.z = -8;
+	grid.blend = "destination-out";
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	this.ui.active = true;
@@ -74,56 +80,9 @@ var onStart = function () {
 	mute_button.unhover = function () {
 		mute_text.scale = 1;
 	};
-/*
-  this.ui.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height - 8, gameWorld.width, 16)).color = "#6DC72E";
-  var name = this.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height - 8, Resources.expire_font, "Standard", {align: "center", spacing: -2}));
-  var l = this.ui.add(Object.create(Entity).init(8, gameWorld.height - 8, 16, 16));
-  var l_text = this.ui.add(Object.create(SpriteFont).init(4, gameWorld.height - 8, Resources.expire_font, "<", {align: "left"}));
-  l.color = "#6DC72E";
-  l.family = "button";
-  l.trigger = function () {
-    s.unpause();
-    s.player_bot.delay.set(0.5);
-		s.player_bot.thrust = modulo(s.player_bot.thrust - 1, s.player_bot.thrusts.length);
-		s.player_bot.speed = s.player_bot.thrusts[s.player_bot.thrust].speed;
-		s.player_bot.distance = s.player_bot.thrusts[s.player_bot.thrust].distance;
-    //current_movement_key = modulo(current_movement_key - 1, movement_keys.length);
-    //player_bot.move = Movement[movement_keys[current_movement_key]];
-    name.text = s.player_bot.speed + ", " + s.player_bot.distance;
-    name.text = movement_keys[current_movement_key];
-  };
-  l.hover = function () {
-    l.opactity = 0.5;
-  };
-  l.unhover = function () {
-    this.opactity = 1;
-  };
-  var r = this.ui.add(Object.create(Entity).init(gameWorld.width - 8, gameWorld.height - 8, 16, 16));
-  var r_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width, gameWorld.height - 8, Resources.expire_font, ">", {align: "right"}));
-  r.family = "button";
-  r.color = "#6DC72E";
-  r.trigger = function () {
-		s.player_bot.thrust = modulo(s.player_bot.thrust + 1, s.player_bot.thrusts.length);
-		s.player_bot.speed = s.player_bot.thrusts[s.player_bot.thrust].speed;
-		s.player_bot.distance = s.player_bot.thrusts[s.player_bot.thrust].distance;
-    //current_movement_key = modulo(current_movement_key + 1, movement_keys.length);
-    //player_bot.move = Movement[movement_keys[current_movement_key]];
-    name.text = s.player_bot.speed + ", " + s.player_bot.distance;
-    s.unpause();
-    s.player_bot.delay.set(0.5);
-  };
-  r.hover = function () {
-    l.opactity = 0.5;
-  };
-  r.unhover = function () {
-    this.opactity = 1;
-  };*/
-
-	//bg.add(Object.create(TiledBackground).init(-8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
-	//bg.add(Object.create(TiledBackground).init(gameWorld.width + 8, gameWorld.height / 2, 32, gameWorld.height * 10, Resources.building2)).z = -7;
 	
   var player_bot = bg.add(Object.create(Sprite).init(48, 48, Resources.viper));
-  player_bot.color = "red";
+  player_bot.blend = "destination-out";
   player_bot.setCollision(Polygon);
 	player_bot.move = Movement.standard;
 	player_bot.addBehavior(Accelerate);
@@ -246,10 +205,10 @@ var onStart = function () {
   var t = this;
 
 	bg.camera.addBehavior(Follow, {target: player_bot, offset: {x: -gameWorld.width / 2, y: -gameWorld.height / 2}, rate: 5});
-  fg.camera.addBehavior(Follow, {target: bg.camera, offset: {x: 0, y: 0}});
+  //fg.camera.addBehavior(Follow, {target: bg.camera, offset: {x: 0, y: 0}});
 	
   this.bg = bg;
-  this.fg = fg;
+  //this.fg = fg;
 	
   this.keydown = false;
   this.pause = function () {
@@ -272,6 +231,7 @@ var onStart = function () {
 				this.current_wave += 1;
 				var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
 				cash.addBehavior(Velocity);
+				cash.blend = "destination-out";
 				cash.velocity = {x: 0, y: 20};
 				cash.setCollision(Polygon);
 				cash.collision.onHandle = function (object, other) {
@@ -299,7 +259,7 @@ var onStart = function () {
   }
   this.unpause = function () {
     this.bg.paused = false;
-    this.fg.paused = false;
+    //this.fg.paused = false;
   }
   var s = this;
 	var down = function (e) {
@@ -386,6 +346,7 @@ var onStart = function () {
 	//this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 	
 	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.boss));
+	boss.blend = "destination-out";
 	boss.animation = 0;
 	boss.modules = [];
 	boss.z = 12;
@@ -422,6 +383,7 @@ var onStart = function () {
 		var limb = this.bg.add(Object.create(Entity).init(boss.x + Math.cos(theta) * 32, boss.y + Math.sin(theta) * 32, 24, 24));
 		//limb.w = 12, limb.h = 12;
 		limb.setCollision(Polygon);
+		limb.blend = "destination-out";
 		limb.addBehavior(Follow, {target: gameWorld.boss, offset: {x: Math.cos(theta) * 32, y: Math.sin(theta) * 32}});
 		limb.color = COLORS.tertiary;
 		limb.health = 2;
@@ -453,36 +415,11 @@ var onStart = function () {
 			}
 		}
 	}
-	//boss.setCollision(Polygon);
-	
-	//this.layers =[];
-	
-	/*var test = this.addLayer(Object.create(Layer).init(1000, 1000));
-	
-	var bossTop = test.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2, Resources.boss));
-	bossTop.addBehavior(Follow, {target: boss, offset: {x: 0, y: 0, z: 0}});
-	var cracks = test.add(Object.create(Sprite).init(boss.x, boss.y, Resources.broken));
-	cracks.z = 13;
-	cracks.addBehavior(Follow, {target: bossTop, offset: {x: 0, y: 0, z: 1}});
-	cracks.blend = "source-atop";
-	cracks.opacity = 1;*/
-	/*
-	for (var i = 0; i < 4; i++) {
-		var theta = (i + 1) * PI2 / 5;
-		var b = this.bg.add(Object.create(Sprite).init(boss.x, boss.y, Resources.modules));
-		b.animation = i;
-		b.z = 9 - 0.1 * i;
-		b.addBehavior(Follow, {target: boss, offset: {x: (i + 1) * 32, y: 0, angle: false, z: false}, rate: 1.5})
-		//b.addBehavior(LerpFollow, {target: boss, offset: {x: 20 * Math.cos(theta), y: 20 * Math.sin(theta), angle: false, z: false}, rate: 1.5});
-		b.setCollision(Polygon);
-		boss.modules.push(b);
-		b.addBehavior(Joined, {target: boss, color: COLORS.tertiary, width: 4});
-	}*/
 	
   // intro animation
   this.intro = true;
   this.bg.paused = false;
-  this.fg.paused = false;
+  //this.fg.paused = false;
 
   this.bg.camera.scale = 0.5;
   //this.fg.camera.scale = 0.5;
@@ -496,20 +433,12 @@ var onStart = function () {
     s.player_bot.delay = player_bot.addBehavior(Delay, {duration: 1, remove: false, callback: function () {
       this.entity.velocity = {x: 0, y: 0};
       this.entity.acceleration = {x: 0, y: 0};
-      //this.entity.stopped = true;
       s.pause();
     }});
     this.entity.removeBehavior(this.entity.lerp);
     this.entity.removeBehavior(this.entity.lerpx);
     this.entity.removeBehavior(this.entity.lerpy);
 		
-	  //s.bg.camera.addBehavior(LerpFollow, {target: s.player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}, rate: 2});  
-  	//s.fg.camera.addBehavior(Follow, {target: s.bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
-    //super_bg.camera.addBehavior(Follow, {target: s.bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
-    //parallax.camera.addBehavior(Follow, {target: s.bg.camera, offset: {angle: false, x: 0, y: 0, z: 0}});
-    //s.fg.camera.addBehavior(LerpFollow, {target: s.player_bot, offset: {angle: false, x: -gameWorld.width / 2, y: -gameWorld.height / 2, z: 0}, rate: 2});
-
-    //console.log('what?');
   }});
   this.pause();
 }
