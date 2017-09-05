@@ -403,6 +403,7 @@ var Weapons = {
 		a.addBehavior(Velocity);
 		a.family = this.family;//"player";
 		a.projectile = true;
+		a.blend = "destination-out";
 		var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
 		//if (this.target) console.log('target');
 		a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)	};
@@ -420,6 +421,7 @@ var Weapons = {
 		a.stroke = true;
 		a.strokeColor = COLORS.primary;
 		a.width = 2;
+		a.blend = "destination-out";
 //var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 		//a.animation = 5;
 		a.setCollision(Polygon);
@@ -451,6 +453,7 @@ var Weapons = {
 		a.stroke = true;
 		a.strokeColor = COLORS.primary;
 		a.width = 2;
+		a.blend = "destination-out";
 		//var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
 //var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 		//a.animation = 5;
@@ -484,6 +487,7 @@ var Weapons = {
 			a.stroke = true;
 			a.strokeColor = COLORS.primary;
 			a.width = 2;
+			a.blend = "destination-out";
 			//var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
 //			var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
 			a.setCollision(Polygon);
@@ -514,6 +518,7 @@ var Weapons = {
 			a.stroke = true;
 			a.strokeColor = COLORS.primary;
 			a.width = 2;
+			a.blend = "destination-out";
 			//a.animation = 5;
 			a.setCollision(Polygon);
 			//gameWorld.playSound(Resources.mortar);
