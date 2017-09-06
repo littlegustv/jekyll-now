@@ -6,13 +6,30 @@ var gameWorld = Object.create(World).init(180, 320, "index.json");
 gameWorld.wave = 0;
 gameWorld.distance = 100;
 
-var COLORS = {
+var SCHEMES = [{
 	negative: "#000000",
 	nullary: "#FFFFFF",
 	primary: "#32CD32", //#ff6347 -> used for enemy weapons, projectiles -> signifies 'energy'
 	secondary: "#FF953E", // -> used for explosions
 	tertiary: "#940455" // -> used for... everything else? emphasis, particles?
+},
+{
+	negative: "#FFFFFF",
+	nullary: "#000000",
+	primary: "orange",
+	secondary: "red", 
+	tertiary: "tomato" 
+},
+{
+	negative: "#FFFFFF",
+	nullary: "#999999",
+	primary: "#DDDDDD",
+	secondary: "#333333", 
+	tertiary: "#BBBBBB" 
 }
+]
+
+var COLORS = SCHEMES[0];
 
 var Z = {
 	particle: 1,

@@ -15,6 +15,7 @@
 		{"path": "projectile.png"},
 		{"path": "bullet.png", "frames": 3, "speed": 0.15},
 		{"path": "grid.png"},
+		{"path": "ground.png"},
 		{"path": "bomb.png", "frames": 3, "speed": 0.2},
 		{"path": "shop.png", "frames": 7, "speed": 0.08},
 		{"path": "tank.png", "frames": 2, "animations": 1, "speed": 0.5},

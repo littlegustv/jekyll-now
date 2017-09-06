@@ -353,6 +353,7 @@ var onStart = function () {
 	boss.maxhealth = 10;
 	boss.health = boss.maxhealth;
 	boss.respond = function (target) {
+		this.health = this.limbs.reduce(function (sum, l) { return sum + l.health; }, 0);
 		if (this.health >= this.maxhealth) {}
 		else if (this.health >= this.maxhealth - 1) {
 			this.shoot = Weapons.standard;
@@ -376,20 +377,21 @@ var onStart = function () {
 	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
 	boss.addBehavior(HealthBar);
 	gameWorld.boss = boss;
-	gameWorld.limbs = [];
+	boss.limbs = [];
 	
 	for (var i = 0; i < 5; i++) {
 		var theta = i * PI2 / 5;
 		var limb = this.bg.add(Object.create(Entity).init(boss.x + Math.cos(theta) * 32, boss.y + Math.sin(theta) * 32, 24, 24));
 		//limb.w = 12, limb.h = 12;
+		limb.angle = angle(limb.x, limb.y, boss.x, boss.y);
 		limb.setCollision(Polygon);
-		limb.blend = "destination-out";
-		limb.addBehavior(Follow, {target: gameWorld.boss, offset: {x: Math.cos(theta) * 32, y: Math.sin(theta) * 32}});
+		//limb.blend = "destination-out";
+		limb.addBehavior(Follow, {target: gameWorld.boss, offset: {x: Math.cos(theta) * 32, y: Math.sin(theta) * 32, angle: false}});
 		limb.color = COLORS.tertiary;
 		limb.health = 2;
 		limb.opacity = 0.8;
 		limb.z = 13 + i;
-		gameWorld.limbs.push(limb);
+		boss.limbs.push(limb);
 		limb.collision.onHandle = function (object, other) {
 			if (other.family == "player" && !gameWorld.boss.invulnerable) {
 				// blowback
