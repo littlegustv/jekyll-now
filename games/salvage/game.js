@@ -20,12 +20,12 @@ var SCHEMES = [{
 	secondary: "red", 
 	tertiary: "tomato" 
 },
-{
-	negative: "#FFFFFF",
-	nullary: "#999999",
-	primary: "#DDDDDD",
-	secondary: "#333333", 
-	tertiary: "#BBBBBB" 
+{ // gameboy
+	negative: "#000000",
+	nullary: "#b7b7b7",
+	primary: "#ffffff",
+	secondary: "#686868", 
+	tertiary: "#000000" 
 }
 ]
 
@@ -689,10 +689,12 @@ TractorBeam.draw = function (ctx) {
 	ctx.beginPath();
 	ctx.strokeStyle = this.color || "black";
 	ctx.lineWidth = this.thickness || 2;
-	ctx.moveTo(this.entity.x, this.entity.y);
-	ctx.lineTo(this.origin.x - this.target.w / 2, this.origin.y);
-	ctx.moveTo(this.entity.x, this.entity.y);
-	ctx.lineTo(this.origin.x + this.target.w / 2, this.origin.y);
+	if (this.entity.limbs) {
+		for (var i = 0; i < this.entity.limbs.length; i++) {
+			ctx.moveTo(this.entity.limbs[i].x, this.entity.limbs[i].y);
+			ctx.lineTo(this.origin.x, this.origin.y);
+		}
+	}
 	ctx.stroke();
 };
 

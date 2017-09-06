@@ -399,7 +399,9 @@ var onStart = function () {
 				gameWorld.boss.invulnerable = true;
 				gameWorld.boss.respond(s.player_bot);
 				gameWorld.boss.addBehavior(Delay, {duration: 1, callback: function () { this.entity.invulnerable = false}})
-				if (object.health <= 0) object.alive = false;
+				if (object.health <= 0) {
+					object.alive = false;
+				}
 				if (!other.projectile) {
 					var theta = angle(gameWorld.boss.x, gameWorld.boss.y, other.x, other.y);
 					
