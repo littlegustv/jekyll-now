@@ -6,7 +6,7 @@ var onStart =  function () {
 	this.secondaries = [];
 	this.tertiaries = [];
 
-	Resources.music = Resources.soundtrack;
+//	Resources.music = Resources.soundtrack;
 	if (!gameWorld.soundtrack) {
 		if (AudioContext) {
 		  gameWorld.filter = gameWorld.audioContext.createBiquadFilter();
@@ -20,7 +20,7 @@ var onStart =  function () {
 		  //gameWorld.soundtrack.connect(gameWorld.filter);
 		  gameWorld.soundtrack.onended = gameWorld.musicLoop;
 		}
-		gameWorld.musicLoop();
+		//gameWorld.musicLoop();
 	}
 
 	var colorize = this.addLayer(Object.create(Layer).init(1000, 1000));

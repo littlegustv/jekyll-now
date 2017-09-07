@@ -24,7 +24,7 @@ var SCHEMES = [{
 	negative: "#000000",
 	nullary: "#b7b7b7",
 	primary: "#ffffff",
-	secondary: "#686868", 
+	secondary: "#686868",
 	tertiary: "#000000" 
 }
 ]
