@@ -841,24 +841,26 @@ var movement_keys = ["standard"];
 // fix me: can remove
 var Movement = {
 	standard: function (s) {
-		s.unpause();
-		s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: Math.round(s.player_bot.x + this.distance * Math.cos(s.player_bot.angle)), rate: this.speed, object: s.player_bot, callback: function () {
-			console.log('lerpx callback');
-			this.entity.removeBehavior(this);
-			this.entity.lerpx = undefined;
-			s.pause();
-		}});
-		s.player_bot.lerpy = s.player_bot.addBehavior(Lerp, {field: "y", goal: Math.round(s.player_bot.y + this.distance * Math.sin(s.player_bot.angle)), rate: this.speed, object: s.player_bot, callback: function () {
-			this.entity.removeBehavior(this);
-			this.entity.lerpy = undefined;
-			s.pause();
-		}});
-		
-		gameWorld.playSound(Resources.move);  
-		var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
-		d.addBehavior(Velocity);
-		d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
-		d.addBehavior(FadeOut, {duration: 0.8});
+		var goal = {x: Math.round(s.player_bot.x + this.distance * Math.cos(s.player_bot.angle)), y: Math.round(s.player_bot.y + this.distance * Math.sin(s.player_bot.angle))};
+		if (between(goal.x, s.player_bot.min.x, s.player_bot.max.x) && between(goal.y, s.player_bot.min.y, s.player_bot.max.y)) {				
+			s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: goal.x, rate: this.speed, object: s.player_bot, callback: function () {
+				console.log('lerpx callback');
+				this.entity.removeBehavior(this);
+				this.entity.lerpx = undefined;
+				s.pause();
+			}});
+			s.player_bot.lerpy = s.player_bot.addBehavior(Lerp, {field: "y", goal: goal.y, rate: this.speed, object: s.player_bot, callback: function () {
+				this.entity.removeBehavior(this);
+				this.entity.lerpy = undefined;
+				s.pause();
+			}});
+			s.unpause();	
+			gameWorld.playSound(Resources.move);  
+			var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
+			d.addBehavior(Velocity);
+			d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
+			d.addBehavior(FadeOut, {duration: 0.8});
+		}
 	}
 }
 

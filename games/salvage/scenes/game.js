@@ -1,3 +1,11 @@
+/*
+
+- enemy respecting boundaries
+- boss...
+
+ */
+
+
 /* global Resources, Layer, gameWorld, MAXHEALTH, Entity, TiledBackground, Sprite, SpriteFont */
 var onStart = function () {
 	this.wave = [];
@@ -21,9 +29,24 @@ var onStart = function () {
   b.color = COLORS.nullary;
   b.z = -10;
 	
-	var grid = bg.add(Object.create(TiledBackground).init(0, 0, 48 * gameWorld.width, 48 * gameWorld.height, Resources.grid));
+	var grid = bg.add(Object.create(TiledBackground).init(0, 144, 48 * gameWorld.width, 3 * gameWorld.height, Resources.grid));
 	grid.z = -8;
 	grid.blend = "destination-out";
+
+  var ground = bg.add(Object.create(TiledBackground).init(0, 2 * gameWorld.height - 6, 48 * gameWorld.width, 12, Resources.ground));
+  ground.z = -7;
+  ground.blend = "destination-out";
+  ground.setCollision(Polygon);
+
+  var right = bg.add(Object.create(TiledBackground).init(2 * gameWorld.width, gameWorld.height, 32, 2 * gameWorld.height, Resources.building2));
+  right.z = -6;
+  right.blend = "destination-out";
+  right.setCollision(Polygon);
+
+  var left = bg.add(Object.create(TiledBackground).init(-2 * gameWorld.width, gameWorld.height, 32, 2 * gameWorld.height, Resources.building2));
+  left.z = -6;
+  left.blend = "destination-out";
+  left.setCollision(Polygon);
 	
 	this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	this.ui.active = true;
@@ -42,12 +65,12 @@ var onStart = function () {
 				s.health_bar[i].opacity = 1;
 			} else if (i < MAXHEALTH) {
 				s.health_bar[i].opacity = 0.3;
-			} 
+			}
 		}
 		this.shield.opacity = object.shield;
-	}
-	
-	var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 12, Resources.expire_font, "menu", {align: "center", spacing: -2}));
+	};
+
+  var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 12, Resources.expire_font, "menu", {align: "center", spacing: -2}));
 	var menu_button = this.ui.add(Object.create(Entity).init(24, 12, 48, 24));
 	menu_button.family = "button";
 	menu_button.opacity = 0;
@@ -57,7 +80,7 @@ var onStart = function () {
       gameWorld.playSound(Resources.select);
 		}
 	};
-	menu_button.hover = function () {		
+	menu_button.hover = function () {
     if (menu_text.scale != 2) gameWorld.playSound(Resources.hover);
     menu_text.scale = 2;
 	};
@@ -85,6 +108,8 @@ var onStart = function () {
   player_bot.blend = "destination-out";
   player_bot.setCollision(Polygon);
 	player_bot.move = Movement.standard;
+  player_bot.min = {x: -2 * gameWorld.width, y: 0};
+  player_bot.max = {x: 2 * gameWorld.width, y: 2 * gameWorld.height - 48};
 	player_bot.addBehavior(Accelerate);
 	player_bot.addBehavior(Velocity);
   player_bot.velocity = {x: 0, y: 0};
@@ -205,6 +230,7 @@ var onStart = function () {
   var t = this;
 
 	bg.camera.addBehavior(Follow, {target: player_bot, offset: {x: -gameWorld.width / 2, y: -gameWorld.height / 2}, rate: 5});
+  bg.camera.addBehavior(Bound, {min: {x: -2 * gameWorld.width, y:  0}, max: {x: gameWorld.width, y: gameWorld.height}})
   //fg.camera.addBehavior(Follow, {target: bg.camera, offset: {x: 0, y: 0}});
 	
   this.bg = bg;
@@ -217,17 +243,16 @@ var onStart = function () {
 			this.player_bot.velocity = {x: 0, y: 0};
 			this.player_bot.acceleration = {x: 0, y: 0};
 			this.player_bot.animation = 0;
-		  if (this.wave.length <= 0) {
-		  	for (var i = 0; i < projectiles.length; i++) {
-		  		if (projectiles[i].alive) {
-			  		projectiles[i].alive = false;
-			  		var f = projectiles[i].layer.add(Object.create(Circle).init(projectiles[i].x, projectiles[i].y, 5));
-			  		f.color = COLORS.primary;
-			  		f.addBehavior(FadeOut, {duration: 0.1, delay: 0.1});
-		  		}
-		  	}
-		  	projectiles = [];
-		  	
+      if (this.wave.length <= 0) {
+        for (var i = 0; i < projectiles.length; i++) {
+          if (projectiles[i].alive) {
+            projectiles[i].alive = false;
+            var f = projectiles[i].layer.add(Object.create(Circle).init(projectiles[i].x, projectiles[i].y, 5));
+            f.color = COLORS.primary;
+            f.addBehavior(FadeOut, {duration: 0.1, delay: 0.1});
+          }
+        }
+        projectiles = [];
 				this.current_wave += 1;
 				var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
 				cash.addBehavior(Velocity);
