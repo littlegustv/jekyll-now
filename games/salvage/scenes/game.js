@@ -374,7 +374,7 @@ var onStart = function () {
 	boss.blend = "destination-out";
 	boss.animation = 0;
 	boss.modules = [];
-	boss.z = 12;
+	boss.z = 24;
 	boss.maxhealth = 10;
 	boss.health = boss.maxhealth;
 	boss.respond = function (target) {
@@ -400,18 +400,18 @@ var onStart = function () {
 		}
 	}
 	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
-	boss.addBehavior(HealthBar);
+	//boss.addBehavior(HealthBar);
 	gameWorld.boss = boss;
 	boss.limbs = [];
 	
-	for (var i = 0; i < 5; i++) {
-		var theta = i * PI2 / 5;
-		var limb = this.bg.add(Object.create(Entity).init(boss.x + Math.cos(theta) * 32, boss.y + Math.sin(theta) * 32, 24, 24));
+	for (var i = 0; i < 6; i++) {
+		var theta = PI / 2 + i * PI2 / 6;
+		var limb = this.bg.add(Object.create(Circle).init(boss.x + Math.cos(theta) * 32, boss.y + Math.sin(theta) * 32, 15));
 		//limb.w = 12, limb.h = 12;
 		limb.angle = angle(limb.x, limb.y, boss.x, boss.y);
 		limb.setCollision(Polygon);
 		//limb.blend = "destination-out";
-		limb.addBehavior(Follow, {target: gameWorld.boss, offset: {x: Math.cos(theta) * 32, y: Math.sin(theta) * 32, angle: false}});
+		limb.addBehavior(Follow, {target: gameWorld.boss, offset: {x: Math.cos(theta) * 32, y: Math.sin(theta) * 32, angle: false, z: -( i + 1)}});
 		limb.color = COLORS.tertiary;
 		limb.health = 2;
 		limb.opacity = 0.8;
