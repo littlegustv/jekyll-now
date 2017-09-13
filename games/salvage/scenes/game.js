@@ -25,25 +25,25 @@ var onStart = function () {
 	//parallax.active = true;
 //
   
-	var b = bg.add(Object.create(Entity).init(0, 0, 10 * gameWorld.width, 10 * gameWorld.height));
+	var b = bg.add(Object.create(Entity).init(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT));
   b.color = COLORS.nullary;
   b.z = -10;
 	
-	var grid = bg.add(Object.create(TiledBackground).init(0, 144, 48 * gameWorld.width, 3 * gameWorld.height, Resources.grid));
+	var grid = bg.add(Object.create(TiledBackground).init(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT, Resources.grid));
 	grid.z = -8;
 	grid.blend = "destination-out";
 
-  var ground = bg.add(Object.create(TiledBackground).init(0, 2 * gameWorld.height - 6, 48 * gameWorld.width, 12, Resources.ground));
+  var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, HEIGHT - 6, WIDTH, 12, Resources.ground));
   ground.z = -7;
   ground.blend = "destination-out";
   ground.setCollision(Polygon);
 
-  var right = bg.add(Object.create(TiledBackground).init(2 * gameWorld.width, gameWorld.height, 32, 2 * gameWorld.height, Resources.building2));
+  var right = bg.add(Object.create(TiledBackground).init(WIDTH, HEIGHT / 2, 32, HEIGHT, Resources.building2));
   right.z = -6;
   right.blend = "destination-out";
   right.setCollision(Polygon);
 
-  var left = bg.add(Object.create(TiledBackground).init(-2 * gameWorld.width, gameWorld.height, 32, 2 * gameWorld.height, Resources.building2));
+  var left = bg.add(Object.create(TiledBackground).init(0, HEIGHT / 2, 32, HEIGHT, Resources.building2));
   left.z = -6;
   left.blend = "destination-out";
   left.setCollision(Polygon);
@@ -108,8 +108,8 @@ var onStart = function () {
   player_bot.blend = "destination-out";
   player_bot.setCollision(Polygon);
 	player_bot.move = Movement.standard;
-  player_bot.min = {x: -2 * gameWorld.width, y: 0};
-  player_bot.max = {x: 2 * gameWorld.width, y: 2 * gameWorld.height - 48};
+  player_bot.min = {x: 24, y: 24};
+  player_bot.max = {x: WIDTH - 24, y: HEIGHT - 24};
 	player_bot.addBehavior(Accelerate);
 	player_bot.addBehavior(Velocity);
   player_bot.velocity = {x: 0, y: 0};
@@ -230,7 +230,7 @@ var onStart = function () {
   var t = this;
 
 	bg.camera.addBehavior(Follow, {target: player_bot, offset: {x: -gameWorld.width / 2, y: -gameWorld.height / 2}, rate: 5});
-  bg.camera.addBehavior(Bound, {min: {x: -2 * gameWorld.width, y:  0}, max: {x: gameWorld.width, y: gameWorld.height}})
+  bg.camera.addBehavior(Bound, {min: {x: 0, y:  0}, max: {x: WIDTH - gameWorld.width, y: HEIGHT - gameWorld.height}})
   //fg.camera.addBehavior(Follow, {target: bg.camera, offset: {x: 0, y: 0}});
 	
   this.bg = bg;
@@ -366,7 +366,7 @@ var onStart = function () {
     [6, 6, 6, 6, 4, 4, 5],
 		[6,6, 5]
 	];
-//this.waves = [[0]];
+//  this.waves = [[0]];
 	//this.waves = [[5]];
 	//this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 	

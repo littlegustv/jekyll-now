@@ -6,6 +6,9 @@ var gameWorld = Object.create(World).init(180, 320, "index.json");
 gameWorld.wave = 0;
 gameWorld.distance = 100;
 
+var WIDTH = 1280;
+var HEIGHT = 320;
+
 var SCHEMES = [{
 	negative: "#000000",
 	nullary: "#FFFFFF",
@@ -29,7 +32,7 @@ var SCHEMES = [{
 }
 ]
 
-var COLORS = SCHEMES[0];
+var COLORS = SCHEMES[2];
 
 var Z = {
 	particle: 1,
@@ -725,12 +728,14 @@ Repair.update = function (dt) {
 var sprites = ["drone", "saucer", "modules", "bomber", "saucer", "drone", "modules"];
 function spawn(layer, key, player) {
 	var theta = Math.random() * PI2;
-	var x = player.x + randint(- gameWorld.width / 2,  gameWorld.width / 2), y = player.y + randint(-gameWorld.height / 2, gameWorld.height / 2);
+	var x = randint(1, WIDTH / 48 - 1) * 48 - WIDTH / 2, y = randint(1, HEIGHT / 48 - 1) * 48;
+//	var x = player.x + randint(- gameWorld.width / 2,  gameWorld.width / 2), y = player.y + randint(-gameWorld.height / 2, gameWorld.height / 2);
 	var enemy = Object.create(Sprite).init(Math.round(x / 48) * 48, Math.round(y / 48) * 48, Resources[sprites[key % sprites.length]]);
 	enemy.z = Z.entity;
 	enemy.addBehavior(Velocity);
 	enemy.velocity = {x: 0, y: 0};
 	enemy.setCollision(Polygon);
+	enemy.addBehavior(Bound, {min: {x: 16, y: 16}, max: {x: WIDTH - 16, y: HEIGHT - 16}});
 	enemy.blend = "destination-out";
 	switch (key) {
 		case 0:
