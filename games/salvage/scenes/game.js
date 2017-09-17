@@ -29,6 +29,11 @@ var onStart = function () {
   b.color = COLORS.nullary;
   b.z = -10;
 	
+	for (var i = 1; i < WIDTH / 32; i++) {
+		var h = randint(1,5) * 32; var b = bg.add(Object.create(TiledBackground).init(i * 32, HEIGHT - h / 2, 32, h, Resources.building));
+		b.blend = "destination-out"; b.z = -9; b.opacity = Math.random()  / 3;
+	}
+	
 	var grid = bg.add(Object.create(TiledBackground).init(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT, Resources.grid));
 	grid.z = -8;
 	grid.blend = "destination-out";
@@ -38,12 +43,12 @@ var onStart = function () {
   ground.blend = "destination-out";
   ground.setCollision(Polygon);
 
-  var right = bg.add(Object.create(TiledBackground).init(WIDTH, HEIGHT / 2, 32, HEIGHT, Resources.building2));
+  var right = bg.add(Object.create(TiledBackground).init(WIDTH, HEIGHT / 2, 32, HEIGHT, Resources.building));
   right.z = -6;
   right.blend = "destination-out";
   right.setCollision(Polygon);
 
-  var left = bg.add(Object.create(TiledBackground).init(0, HEIGHT / 2, 32, HEIGHT, Resources.building2));
+  var left = bg.add(Object.create(TiledBackground).init(0, HEIGHT / 2, 32, HEIGHT, Resources.building));
   left.z = -6;
   left.blend = "destination-out";
   left.setCollision(Polygon);
@@ -370,7 +375,7 @@ var onStart = function () {
 	//this.waves = [[5]];
 	//this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 	
-	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x, player_bot.y - gameWorld.height / 3, Resources.boss));
+	var boss = this.bg.add(Object.create(Sprite).init(player_bot.x + gameWorld.width, player_bot.y, Resources.boss));
 	boss.blend = "destination-out";
 	boss.animation = 0;
 	boss.modules = [];

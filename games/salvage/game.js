@@ -33,7 +33,7 @@ var SCHEMES = [{
 }
 ]
 
-var COLORS = SCHEMES[2];
+var COLORS = SCHEMES[0];
 
 var Z = {
 	particle: 1,
@@ -971,7 +971,7 @@ var Store = {
 	],
 	createUI: function () {
 
-		var border = this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 128, gameWorld.height / 2, Resources.building2));
+		var border = this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 128, gameWorld.height / 2, Resources.building));
 		border.z = -10;
 		var b1 = this.layer.add(Object.create(Entity).init(border.x, border.y + 1, border.w - 8, border.h - 16));
 		b1.color = "#000";
