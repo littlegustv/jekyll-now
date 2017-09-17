@@ -366,7 +366,7 @@ var onStart = function () {
     [6, 6, 6, 6, 4, 4, 5],
 		[6,6, 5]
 	];
-//  this.waves = [[0]];
+  this.waves = [[0]];
 	//this.waves = [[5]];
 	//this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 	
@@ -399,11 +399,11 @@ var onStart = function () {
 			this.addBehavior(Enemy);
 		}
 	}
-	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
+//	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
 	//boss.addBehavior(HealthBar);
 	gameWorld.boss = boss;
 	boss.limbs = [];
-	
+	/*
 	for (var i = 0; i < 6; i++) {
 		var theta = PI / 2 + i * PI2 / 6;
 		var limb = this.bg.add(Object.create(Circle).init(boss.x + Math.cos(theta) * 32, boss.y + Math.sin(theta) * 32, 15));
@@ -443,7 +443,7 @@ var onStart = function () {
 				}
 			}
 		}
-	}
+	}*/
 	
   // intro animation
   this.intro = true;

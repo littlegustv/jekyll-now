@@ -8,6 +8,7 @@ gameWorld.distance = 100;
 
 var WIDTH = 1280;
 var HEIGHT = 320;
+var TILESIZE = 48;
 
 var SCHEMES = [{
 	negative: "#000000",
@@ -116,6 +117,31 @@ HyperDrive.update = function (dt) {
 		this.entity.acceleration = {x: 100, y: 0};
 		this.done = true;
 	}
+}
+
+// goal {x, y}, speed
+var Move = Object.create(Behavior);
+Move.update = function (dt) {
+	if (this.goal) {
+		this.entity.x = lerp(this.entity.x, this.goal.x, this.speed * dt);
+		this.entity.y = lerp(this.entity.y, this.goal.y, this.speed * dt);
+		if (this.entity.x === this.goal.x && this.entity.y === this.goal.y) {
+			this.goal = undefined;
+			this.delay = this.duration;
+		}
+	} else if (this.delay > 0) {
+		this.delay -= dt;
+	} else {
+		this.goal = this.pick();
+	}
+};
+Move.pick = function () {
+	return {x: randint(0, WIDTH), y: randint(0, HEIGHT)};
+}
+
+var Approach = Object.create(Move);
+Approach.pick = function () {
+	return {x: this.entity.x + sign(this.target.x - this.entity.x) * TILESIZE, y: this.entity.y + sign(this.target.y - this.entity.y) * TILESIZE}
 }
 
 Scene.draw = function (ctx) {
@@ -728,7 +754,7 @@ Repair.update = function (dt) {
 var sprites = ["drone", "saucer", "modules", "bomber", "saucer", "drone", "modules"];
 function spawn(layer, key, player) {
 	var theta = Math.random() * PI2;
-	var x = randint(1, WIDTH / 48 - 1) * 48 - WIDTH / 2, y = randint(1, HEIGHT / 48 - 1) * 48;
+	var x = player.x + 2 * TILESIZE, y = player.y;
 //	var x = player.x + randint(- gameWorld.width / 2,  gameWorld.width / 2), y = player.y + randint(-gameWorld.height / 2, gameWorld.height / 2);
 	var enemy = Object.create(Sprite).init(Math.round(x / 48) * 48, Math.round(y / 48) * 48, Resources[sprites[key % sprites.length]]);
 	enemy.z = Z.entity;
@@ -739,7 +765,8 @@ function spawn(layer, key, player) {
 	enemy.blend = "destination-out";
 	switch (key) {
 		case 0:
-			enemy.addBehavior(NewTarget, {target: player, speed: 2, tilesize: 48, goal: {x: enemy.x, y: enemy.y}});
+			//enemy.addBehavior(NewTarget, {target: player, speed: 2, tilesize: 48, goal: {x: enemy.x, y: enemy.y}});
+			enemy.addBehavior(Approach, {duration: 1, speed: 5, target: player});
 			enemy.shoot = Weapons.standard;
 			enemy.target = player;
 			enemy.setVertices([
