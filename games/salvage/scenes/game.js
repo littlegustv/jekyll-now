@@ -34,21 +34,21 @@ var onStart = function () {
 		b.blend = "destination-out"; b.z = -9; b.opacity = Math.random()  / 3;
 	}
 	
-	var grid = bg.add(Object.create(TiledBackground).init(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT, Resources.grid));
+	var grid = bg.add(Object.create(TiledBackground).init(16, 16, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
 	grid.z = -8;
 	grid.blend = "destination-out";
 
-  var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, HEIGHT - 6, WIDTH, 12, Resources.ground));
+  var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, HEIGHT - 3, WIDTH, 12, Resources.ground));
   ground.z = -7;
   ground.blend = "destination-out";
   ground.setCollision(Polygon);
 
-  var right = bg.add(Object.create(TiledBackground).init(WIDTH, HEIGHT / 2, 32, HEIGHT, Resources.building));
+  var right = bg.add(Object.create(TiledBackground).init(WIDTH + 8, HEIGHT / 2, 32, HEIGHT, Resources.building));
   right.z = -6;
   right.blend = "destination-out";
   right.setCollision(Polygon);
 
-  var left = bg.add(Object.create(TiledBackground).init(0, HEIGHT / 2, 32, HEIGHT, Resources.building));
+  var left = bg.add(Object.create(TiledBackground).init(-8, HEIGHT / 2, 32, HEIGHT, Resources.building));
   left.z = -6;
   left.blend = "destination-out";
   left.setCollision(Polygon);
@@ -109,12 +109,12 @@ var onStart = function () {
 		mute_text.scale = 1;
 	};
 	
-  var player_bot = bg.add(Object.create(Sprite).init(48, 48, Resources.viper));
+  var player_bot = bg.add(Object.create(Sprite).init(64, 64, Resources.viper));
   player_bot.blend = "destination-out";
   player_bot.setCollision(Polygon);
 	player_bot.move = Movement.standard;
-  player_bot.min = {x: 24, y: 24};
-  player_bot.max = {x: WIDTH - 24, y: HEIGHT - 24};
+  player_bot.min = {x: 16, y: 16};
+  player_bot.max = {x: WIDTH - 16, y: HEIGHT - 16};
 	player_bot.addBehavior(Accelerate);
 	player_bot.addBehavior(Velocity);
   player_bot.velocity = {x: 0, y: 0};
@@ -411,7 +411,9 @@ var onStart = function () {
 			this.addBehavior(Enemy);
 		}
 	}
-	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
+	boss.addBehavior(Hover, {duration: 0.5, speed: 24, target: player_bot});
+
+	//boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
 	//boss.addBehavior(HealthBar);
 	gameWorld.boss = boss;
 	boss.limbs = [];

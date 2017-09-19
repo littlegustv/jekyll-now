@@ -6,8 +6,10 @@ var gameWorld = Object.create(World).init(180, 320, "index.json");
 gameWorld.wave = 0;
 gameWorld.distance = 100;
 
-var WIDTH = 1280;
+var WIDTH = 320;
 var HEIGHT = 320;
+var MIN = {x: 16, y: 16};
+var MAX = {x: WIDTH - 16, y: HEIGHT - 16}; 
 var TILESIZE = 48;
 
 var SCHEMES = [{
@@ -40,6 +42,13 @@ var Z = {
 	projectile: 2,
 	entity: 3,
 	obstacle: 4
+}
+
+function toGrid(x, y) {
+	return {
+		x: clamp(Math.round((x - MIN.x) / TILESIZE) * TILESIZE + MIN.x, MIN.x, MAX.x),
+		y: clamp(Math.round((y - MIN.y) / TILESIZE) * TILESIZE + MIN.y, MIN.y, MAX.y)
+	}
 }
 
 var buttonHover = function () { 
@@ -121,11 +130,18 @@ HyperDrive.update = function (dt) {
 
 // goal {x, y}, speed
 var Move = Object.create(Behavior);
+Move.move = function (dt) {
+	this.entity.x = lerp(this.entity.x, this.goal.x, this.speed * dt);
+	this.entity.y = lerp(this.entity.y, this.goal.y, this.speed * dt);
+}
+Move.check = function () {
+	return this.entity.x === this.goal.x && this.entity.y === this.goal.y;
+}
 Move.update = function (dt) {
 	if (this.goal) {
-		this.entity.x = lerp(this.entity.x, this.goal.x, this.speed * dt);
-		this.entity.y = lerp(this.entity.y, this.goal.y, this.speed * dt);
-		if (this.entity.x === this.goal.x && this.entity.y === this.goal.y) {
+		this.move(dt);
+		if (this.check()) {
+			console.log('done');
 			this.goal = undefined;
 			this.delay = this.duration;
 		}
@@ -136,13 +152,34 @@ Move.update = function (dt) {
 	}
 };
 Move.pick = function () {
-	return {x: randint(0, WIDTH), y: randint(0, HEIGHT)};
+	return toGrid(randint(MIN.x, MAX.x), randint(MIN.y, MAX.y));
 }
 
+// moves at right angle in approaching "spiral" - ish
 var Approach = Object.create(Move);
 Approach.pick = function () {
-	return {x: this.entity.x + sign(this.target.x - this.entity.x) * TILESIZE, y: this.entity.y + sign(this.target.y - this.entity.y) * TILESIZE}
+	if (Math.abs(this.target.x - this.entity.x) > Math.abs(this.target.y - this.entity.y)) {
+		return toGrid(this.entity.x + sign(this.target.x - this.entity.x) * TILESIZE, this.entity.y);
+	} else {
+		return toGrid(this.entity.x, this.entity.y + sign(this.target.y - this.entity.y) * TILESIZE);
+	}
 }
+
+// hover - tries to stay above or below, staying vertically aligned
+var Hover = Object.create(Move);
+Hover.move = function (dt) {
+	this.entity.x += sign(this.goal.x - this.entity.x) * this.speed * dt;
+	this.entity.y += sign(this.goal.y - this.entity.y) * this.speed * dt;
+}
+Hover.check = function () {
+	return Math.abs(this.entity.x - this.goal.x) <= 2 && Math.abs(this.entity.y - this.goal.y) <= 2;
+}
+
+// stationary - ... mmm
+
+// single-level (does not move vertically, just turns around when reaches the end - for GROUND movement, but also others maybe)
+
+// boss -> tries to keep some space
 
 Scene.draw = function (ctx) {
   ctx.clearRect(0, 0, gameWorld.width, gameWorld.height); // HERE!
@@ -754,9 +791,9 @@ Repair.update = function (dt) {
 var sprites = ["drone", "saucer", "modules", "bomber", "saucer", "drone", "modules"];
 function spawn(layer, key, player) {
 	var theta = Math.random() * PI2;
-	var x = player.x + 2 * TILESIZE, y = player.y;
-//	var x = player.x + randint(- gameWorld.width / 2,  gameWorld.width / 2), y = player.y + randint(-gameWorld.height / 2, gameWorld.height / 2);
-	var enemy = Object.create(Sprite).init(Math.round(x / 48) * 48, Math.round(y / 48) * 48, Resources[sprites[key % sprites.length]]);
+	var x = randint(MIN.x, MAX.x), y = randint(MIN.y, MAX.y);
+	var c = toGrid(x, y);
+	var enemy = Object.create(Sprite).init(c.x, c.y, Resources[sprites[key % sprites.length]]);
 	enemy.z = Z.entity;
 	enemy.addBehavior(Velocity);
 	enemy.velocity = {x: 0, y: 0};
@@ -766,7 +803,7 @@ function spawn(layer, key, player) {
 	switch (key) {
 		case 0:
 			//enemy.addBehavior(NewTarget, {target: player, speed: 2, tilesize: 48, goal: {x: enemy.x, y: enemy.y}});
-			enemy.addBehavior(Approach, {duration: 1, speed: 5, target: player});
+			enemy.addBehavior(Hover, {duration: 0.5, speed: 24, target: player});
 			enemy.shoot = Weapons.standard;
 			enemy.target = player;
 			enemy.setVertices([
@@ -774,7 +811,7 @@ function spawn(layer, key, player) {
 			]);
 			break;
 		case 1:
-			enemy.addBehavior(Target, {target: player, speed: 25, turn_rate: 2.5, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
+			//enemy.addBehavior(Target, {target: player, speed: 25, turn_rate: 2.5, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
 			enemy.shoot = Weapons.triple;
 			enemy.target = player;
 			enemy.setVertices([
@@ -782,7 +819,7 @@ function spawn(layer, key, player) {
 			]);			
 			break;
 		case 2:
-			enemy.addBehavior(Target, {target: player, speed: 0, turn_rate: 0, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
+			//enemy.addBehavior(Target, {target: player, speed: 0, turn_rate: 0, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
 			enemy.shoot = Weapons.burst;
 			enemy.target = player;
 			enemy.animation = 2;
@@ -873,8 +910,8 @@ var movement_keys = ["standard"];
 // fix me: can remove
 var Movement = {
 	standard: function (s) {
-		var goal = {x: Math.round(s.player_bot.x + this.distance * Math.cos(s.player_bot.angle)), y: Math.round(s.player_bot.y + this.distance * Math.sin(s.player_bot.angle))};
-		if (between(goal.x, s.player_bot.min.x, s.player_bot.max.x) && between(goal.y, s.player_bot.min.y, s.player_bot.max.y)) {				
+		var goal = toGrid(Math.round(s.player_bot.x + this.distance * Math.cos(s.player_bot.angle)), Math.round(s.player_bot.y + this.distance * Math.sin(s.player_bot.angle)))
+		if (goal.x !== s.player_bot.x || goal.y !== s.player_bot.y) {				
 			s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: goal.x, rate: this.speed, object: s.player_bot, callback: function () {
 				console.log('lerpx callback');
 				this.entity.removeBehavior(this);
