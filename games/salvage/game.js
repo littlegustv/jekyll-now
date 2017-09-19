@@ -174,10 +174,28 @@ Hover.move = function (dt) {
 Hover.check = function () {
 	return Math.abs(this.entity.x - this.goal.x) <= 2 && Math.abs(this.entity.y - this.goal.y) <= 2;
 }
+Hover.pick = function () {
+	var e = toGrid(this.entity.x, this.entity.y);
+	var t = toGrid(this.target.x, this.target.y);
+	if (e.y === t.y) {
+		return toGrid(this.entity.x, this.entity.y - TILESIZE > MIN.y ? this.entity.y - TILESIZE : this.entity.y + TILESIZE);
+	} else {
+		return toGrid(this.target.x, this.entity.y);
+	}
+}
 
 // stationary - ... mmm
 
 // single-level (does not move vertically, just turns around when reaches the end - for GROUND movement, but also others maybe)
+var Horizontal = Object.create(Hover);
+Horizontal.pick = function () {
+	if (this.entity.x > WIDTH / 2) return toGrid(0, this.entity.y);
+	else return toGrid(WIDTH, this.entity.y);
+}
+
+// ground - could either be horizontal, or 'hover' with no vertical component...
+
+// something more aggressive? long delay, charges towards you?
 
 // boss -> tries to keep some space
 
@@ -803,7 +821,7 @@ function spawn(layer, key, player) {
 	switch (key) {
 		case 0:
 			//enemy.addBehavior(NewTarget, {target: player, speed: 2, tilesize: 48, goal: {x: enemy.x, y: enemy.y}});
-			enemy.addBehavior(Hover, {duration: 0.5, speed: 24, target: player});
+			enemy.addBehavior(Approach, {duration: 1, speed: 5, target: player}); // hmmm!
 			enemy.shoot = Weapons.standard;
 			enemy.target = player;
 			enemy.setVertices([
@@ -813,6 +831,7 @@ function spawn(layer, key, player) {
 		case 1:
 			//enemy.addBehavior(Target, {target: player, speed: 25, turn_rate: 2.5, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
 			enemy.shoot = Weapons.triple;
+			enemy.addBehavior(Hover, {duration: 0.5, speed: 24, target: player}); // hmmm!
 			enemy.target = player;
 			enemy.setVertices([
 				{x: -3, y: -3}, {x: -3, y: 3}, {x: 3, y: 3}, {x: 3, y: -3}
@@ -828,8 +847,9 @@ function spawn(layer, key, player) {
 			]);			
 			break;
 		case 3:
-			// fix me: currently does NOTHING
+			// fix me: currently does NOTHING ...
 			enemy.velocity = {x: 0, y: 0};
+			enemy.addBehavior(Horizontal, {duration: 0.2, speed: 64, target: player});
 			enemy.setVertices([
 				{x: -5, y: -3}, {x: -5, y: 3}, {x: 5, y: 3}, {x: 5, y: -3}
 			]);
