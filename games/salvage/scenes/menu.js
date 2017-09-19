@@ -5,6 +5,7 @@ var onStart =  function () {
 	this.primaries = [];
 	this.secondaries = [];
 	this.tertiaries = [];
+	var s = this;
 
 //	Resources.music = Resources.soundtrack;
 	if (!gameWorld.soundtrack) {
@@ -24,11 +25,11 @@ var onStart =  function () {
 	}
 
 	var colorize = this.addLayer(Object.create(Layer).init(1000, 1000));
+	
 	var c = colorize.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
 	c.color = COLORS.negative;
 	this.negatives.push(c);
 	
-
 	this.bg = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
 	this.bg.active = true;
 	
@@ -37,10 +38,19 @@ var onStart =  function () {
 	back.z = 0;
 	this.nullaries.push(back);
 
-	var title = this.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "salvage", {spacing: 2, align: "center"}));
+	var title = this.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height - 12, Resources.expire_font, "the field of mars", {spacing: -4, align: "center"}));
 	//title.addBehavior(Oscillate, {field: "y", object: title, initial: gameWorld.height / 2, rate: 1, constant: 24});
 	title.blend = "destination-out";
+	title.scale = 2;
 	title.z = 10;
+	
+	for (var i = 16; i < gameWorld.width; i += 32) {
+		var h = randint(1,4) * 32;
+		var b = this.bg.add(Object.create(TiledBackground).init(i, gameWorld.height - h / 2, 32, h, Resources.building));
+		b.opacity = Math.random() / 2;
+		b.blend = "destination-out";
+		b.z = 9.5;
+	}
 	
 	var ground = this.bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4, gameWorld.width, 8, Resources.ground));
 	ground.blend = "destination-out";
@@ -71,6 +81,20 @@ var onStart =  function () {
 		line.addBehavior(Wrap, {min: {x: -line.w / 2, y: 0}, max: {x: gameWorld.width + line.w / 2, y: gameWorld.height}});
 		this.tertiaries.push(line);
 	}
+	var buttons = ["play", "mute", "credits", "achievements"];
+	for (var i = 0; i < buttons.length; i++) {
+		var b = this.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 4 + i * 16, Resources.expire_font, buttons[i], {spacing: -2, align: "center"}));
+		var button = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 4 + i * 16, gameWorld.width, 16));
+		button.family = "button";
+		b.blend = "destination-out";
+		button.opacity = 0;
+		button.text = b;
+		button.hover = function () { this.text.scale = 2;};
+		button.unhover = function () { this.text.scale = 1; };
+		button.trigger = function () {
+			gameWorld.setScene(1, true);
+		}
+	}
 	
 	var ship = this.bg.add(Object.create(Sprite).init(0, 3 * gameWorld.height / 4, Resources.viper));
 	ship.addBehavior(Velocity);
@@ -88,15 +112,30 @@ var onStart =  function () {
 		this.tertiaries.forEach(function (e) { e.color = COLORS.tertiary; });
 	}
 
-	this.onClick = function () {
-		gameWorld.setScene(1, true);
+	this.onClick = function (e) {
+		var b = s.bg.onButton(e.x, e.y);
+		console.log('mm', b);
+		if (b) {
+			b.trigger();
+		}
+	}
+	this.onMouseMove = function (e) {
+		var buttons = s.bg.entities.filter(function (e) { return e.family === "button"; });
+		var b = s.bg.onButton(e.x, e.y);
+		for (var i = 0; i < buttons.length; i++) {
+			if (b == buttons[i]) b.hover();
+			else buttons[i].unhover();
+		}
 	}
 	this.onTouchEnd = function (e) {
 		if (!fullscreen) {
 			requestFullScreen();
 			return;
 		} else {
-			gameWorld.setScene(1, true);
+			var b = s.bg.onButton(e.x, e.y);
+			if (b) {
+				b.trigger();
+			}
 		}
 	}
 }

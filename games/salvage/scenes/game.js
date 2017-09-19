@@ -156,9 +156,9 @@ var onStart = function () {
 				var expl = other.layer.add(Object.create(Circle).init(other.x, other.y, 8));
 				//var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
 				expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
-				expl.z = 1;
+				expl.z = 3;
 				var flash = other.layer.add(Object.create(Circle).init(other.x, other.y, 12));
-				flash.z = 2;
+				flash.z = 4;
 				flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
 				flash.color = COLORS.secondary;
 				gameWorld.playSound(Resources.hit);        
@@ -264,6 +264,12 @@ var onStart = function () {
 				cash.blend = "destination-out";
 				cash.velocity = {x: 0, y: 20};
 				cash.setCollision(Polygon);
+				cash.setVertices([
+					{x: -20, y: -5},
+					{x: -20, y: 5},
+					{x: 20, y: 5},
+					{x: 20, y: -5}
+				]);
 				cash.collision.onHandle = function (object, other) {
 					if (other == s.player_bot) {
 						object.alive = false;
@@ -272,6 +278,7 @@ var onStart = function () {
 						for (var i = 0; i < 20; i++) {
 							var p = object.layer.add(Object.create(SpriteFont).init(other.x, other.y, Resources.expire_font, "$", {align: "center"}));
 							p.addBehavior(Velocity);
+							p.blend = "destination-out";
 							p.addBehavior(FadeOut, {duration: 0, delay: Math.random()});
 							p.velocity = {x: randint(-20,20), y: randint(-20,20)};
 						}
@@ -404,7 +411,7 @@ var onStart = function () {
 			this.addBehavior(Enemy);
 		}
 	}
-//	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
+	boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
 	//boss.addBehavior(HealthBar);
 	gameWorld.boss = boss;
 	boss.limbs = [];
