@@ -39,7 +39,7 @@ var onStart = function () {
           this.player.z = 10;
           this.player.family = "action";
           this.player.point_light = this.light_layer.add(Object.create(Circle).init(this.player.x, this.player.y, TILESIZE));
-          this.player.point_light.blend = "destination-out";
+          //this.player.point_light.blend = "destination-out";
           this.player.point_light.addBehavior(Follow, {target: this.player, offset: {x: 0, y: -8}});
           this.player.point_light.addBehavior(Oscillate, {object: this.player.point_light, field: "radius", constant: 2, initial: TILESIZE, rate: 5});
           
@@ -168,7 +168,7 @@ var onStart = function () {
     for (var j = 0; j <= Math.ceil(gameWorld.height / TILESIZE); j++) {
       var l = this.light_layer.add(Object.create(Entity).init(TILESIZE * i, TILESIZE * j, TILESIZE, TILESIZE));
       l.color = "white";
-      l.blend = "destination-out";
+      //l.blend = "destination-out";
       l.z = 10;
       l.opacity = 0.5;
       this.lights[i].push(l);
