@@ -10,10 +10,10 @@ var onStart =  function () {
 //  Resources.music = Resources.soundtrack;
   if (!gameWorld.soundtrack) {
     if (AudioContext) {
-      gameWorld.filter = gameWorld.audioContext.createBiquadFilter();
-      gameWorld.filter.connect(gameWorld.audioContext.destination);
-      gameWorld.filter.type = 'lowpass'; // Low-pass filter. See BiquadFilterNode docs
-      gameWorld.filter.frequency.value = 24000; // Set cutoff to 440 HZ
+      //gameWorld.filter = gameWorld.audioContext.createBiquadFilter();
+      //gameWorld.filter.connect(gameWorld.audioContext.destination);
+      //gameWorld.filter.type = 'lowpass'; // Low-pass filter. See BiquadFilterNode docs
+      //gameWorld.filter.frequency.value = 24000; // Set cutoff to 440 HZ
     }
 
     gameWorld.musicLoop = function () {
@@ -117,11 +117,10 @@ var onStart =  function () {
 
   this.onClick = function (e) {
     var b = s.bg.onButton(e.x, e.y);
-    console.log('mm', b);
     if (b) {
       b.trigger();
     }
-  }
+  };
   this.onMouseMove = function (e) {
     var buttons = s.bg.entities.filter(function (e) { return e.family === "button"; });
     var b = s.bg.onButton(e.x, e.y);
@@ -130,12 +129,20 @@ var onStart =  function () {
       else buttons[i].unhover();
     }
   }
+  this.onTouchMove = function (e) {
+    if (fullscreen) {
+      e.x = e.touch.x; e.y = e.touch.y;
+      this.onMouseMove(e);      
+    }
+  }
   this.onTouchEnd = function (e) {
     if (!fullscreen) {
       requestFullScreen();
       return;
     } else {
+      e.x = e.touch.x; e.y = e.touch.y;
       var b = s.bg.onButton(e.x, e.y);
+      console.log(e, b);
       if (b) {
         b.trigger();
       }

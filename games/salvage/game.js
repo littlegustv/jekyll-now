@@ -42,7 +42,15 @@ var COLORS = {
   primary: "#CC0000",
   secondary: "#ff4500",
   tertiary: "#994411"
-}
+};
+
+var COLORS = {
+  negative: "#000000",
+  nullary: "#FFFFFF",
+  primary: "#000000",
+  secondary: "#000000",
+  tertiary: "#000000"
+};
 
 var Z = {
   particle: 1,
@@ -165,11 +173,11 @@ Move.pick = function () {
 // moves at right angle in approaching "spiral" - ish
 var Approach = Object.create(Move);
 Approach.pick = function () {
-  if (Math.abs(this.target.x - this.entity.x) > Math.abs(this.target.y - this.entity.y)) {
-    return toGrid(this.entity.x + sign(this.target.x - this.entity.x) * TILESIZE, this.entity.y);
-  } else {
-    return toGrid(this.entity.x, this.entity.y + sign(this.target.y - this.entity.y) * TILESIZE);
-  }
+
+  var g = toGrid(this.entity.x + sign(this.target.x - this.entity.x) * TILESIZE, this.entity.y); // horiztonal
+  var p = toGrid(this.target.x, this.target.y);
+  if (g.x !== p.x || g.y !== p.y) return g;
+  else return toGrid(this.entity.x, this.entity.y + sign(this.target.y - this.entity.y) * TILESIZE);
 }
 
 // hover - tries to stay above or below, staying vertically aligned
@@ -895,7 +903,7 @@ function spawn(layer, key, player) {
     }
   };
   enemy.family = "enemy";
-  enemy.addBehavior(Enemy);
+  enemy.addBehavior(Enemy, {cooldown: 0.5});
 
   layer.add(enemy);
   enemy.die = function () {
@@ -909,10 +917,12 @@ function spawn(layer, key, player) {
     flash.color = COLORS.secondary;
     gameWorld.playSound(Resources.hit);        
     
-    var scrap = enemy.layer.add(Object.create(Entity).init(enemy.x, enemy.y, 4, 4));
-    gameWorld.boss.addBehavior(TractorBeam, {target: scrap, turn_rate: 5, speed: 50, color: COLORS.tertiary, thickness: 2, width: 3.5, rate: 6, origin: {x: gameWorld.boss.x, y: gameWorld.boss.y}});
+    var scrap = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, this.sprite));
+    scrap.behaviors = [];
+    gameWorld.boss.addBehavior(TractorBeam, {target: scrap, turn_rate: 5, speed: 20, color: COLORS.tertiary, thickness: 2, width: 3.5, rate: 6, origin: {x: gameWorld.boss.x, y: gameWorld.boss.y}});
     scrap.addBehavior(Velocity);
-    scrap.velocity = {x: 0, y: 0};
+    scrap.velocity = {x: 0, y: 0};//angle: PI / 3};
+    scrap.opacity = 0.8;
     scrap.setCollision(Polygon);
     scrap.collision.onHandle = function (object, other) {
       if (other == gameWorld.boss) {

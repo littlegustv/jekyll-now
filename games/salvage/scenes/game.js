@@ -30,7 +30,7 @@ var onStart = function () {
   b.z = -10;
   
   for (var i = 1; i < WIDTH / 32; i++) {
-    var h = randint(1,5) * 32; var b = bg.add(Object.create(TiledBackground).init(i * 32, HEIGHT - h / 2, 32, h, Resources.building));
+    var h = randint(1,5) * 32; var b = bg.add(Object.create(TiledBackground).init(i * 32 - 8, HEIGHT - h / 2, 32, h, Resources.building));
     //b.blend = "destination-out"; 
     b.z = -9; 
     b.opacity = Math.random()  / 3;
@@ -286,13 +286,17 @@ var onStart = function () {
             }
           }
         }
-        var w = this.waves[gameWorld.wave % this.waves.length];
-        gameWorld.wave++;
+
         gameWorld.playSound(Resources[choose(["spawn"])]);
-        for (var j = 0; j < w.length; j++) {
-          var enemy = spawn(this.bg, w[j], this.player_bot);
-          this.wave.push(enemy);
+
+        for (var i = 0; i < gameWorld.wave; i++) {
+          var k = i % this.waves.length;
+          for (var j = 0; j < this.waves[k].length; j++) {
+            var enemy = spawn(this.bg, this.waves[k][j], this.player_bot);
+            this.wave.push(enemy);            
+          }
         }
+        gameWorld.wave++;
       }
     }
   }
@@ -381,6 +385,16 @@ var onStart = function () {
     [6,6, 5]
   ];
   this.waves = [[0,1,2,3]];
+
+  this.waves = [
+    [0,0,0],
+    [1],
+    [2,2],
+    [3],
+    [4,4],
+    [5],
+    [6,6]
+  ]
   //this.waves = [[5]];
   //this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
   
@@ -414,6 +428,7 @@ var onStart = function () {
     }
   }
   boss.addBehavior(Hover, {duration: 0.5, speed: 24, target: player_bot});
+  boss.setCollision(Polygon);
 
   //boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
   //boss.addBehavior(HealthBar);
@@ -486,7 +501,7 @@ var onStart = function () {
     
   }});
   this.pause();
-}
+};
 var onUpdate = function (dt) {
   var s = this;
   if (this.intro) return; // for now...
@@ -495,10 +510,10 @@ var onUpdate = function (dt) {
     if (!this.wave[i].alive) this.wave.splice(i, 1);
   }
 
-  if (this.bg.paused) {
+  /*if (this.bg.paused) {
     gameWorld.filter.frequency.value = lerp(gameWorld.filter.frequency.value, 220, dt);
   } else {
     gameWorld.filter.frequency.value = lerp(gameWorld.filter.frequency.value, 24000, dt);
-  }
+  }*/
     
-}
+};
