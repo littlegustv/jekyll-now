@@ -1,7 +1,8 @@
 { 
   "scenes": [
     {"name": "menu", "reload": true},
-    {"name": "game", "reload": true}
+    {"name": "game", "reload": true},
+    {"name": "end", "reload": true}
   ],
   "resources": [
     {"path": "viper.png", "frames": 4, "animations": 1, "speed": 0.5},

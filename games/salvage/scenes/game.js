@@ -83,7 +83,8 @@ var onStart = function () {
   menu_button.opacity = 0;
   menu_button.trigger = function () {
     if (s.bg.paused) {
-      gameWorld.setScene(0);
+      gameWorld.setScene(0, true);
+      gameWorld.saved = true;
       gameWorld.playSound(Resources.select);
     }
   };
@@ -155,16 +156,7 @@ var onStart = function () {
         object.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
         s.updateHealthBar(object);
         
-        var expl = other.layer.add(Object.create(Circle).init(other.x, other.y, 8));
-        //var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
-        expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
-        expl.z = 3;
-        var flash = other.layer.add(Object.create(Circle).init(other.x, other.y, 12));
-        flash.z = 4;
-        flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
-        flash.color = COLORS.secondary;
-        gameWorld.playSound(Resources.hit);        
-        
+        projectileDie(other);        
         //var expl = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.explosion));
         //expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
         
@@ -192,13 +184,14 @@ var onStart = function () {
   }
   player_bot.die = function () {
     s.unpause();
+    gameWorld.saved = false;
     s.pause = function () {};
     player_bot.removeBehavior(player_bot.lerpx);
     player_bot.removeBehavior(player_bot.lerpy);
     player_bot.death = player_bot.addBehavior(Delay, {duration: 1.5, callback: function () {
       player_bot.alive = false;
       player_bot.death = undefined;
-      gameWorld.setScene(0, true);
+      gameWorld.setScene(2, true);
     }});
     var expl = this.layer.add(Object.create(Circle).init(this.x, this.y, 32));
     //var expl = enemy.layer.add(Object.create(Sprite).init(thi));
@@ -387,6 +380,7 @@ var onStart = function () {
   this.waves = [[0,1,2,3]];
 
   this.waves = [
+    [4, 4],
     [0,0,0],
     [1],
     [2,2],
@@ -406,7 +400,6 @@ var onStart = function () {
   boss.maxhealth = 10;
   boss.health = boss.maxhealth;
   boss.respond = function (target) {
-    this.health = this.limbs.reduce(function (sum, l) { return sum + l.health; }, 0);
     if (this.health >= this.maxhealth) {}
     else if (this.health >= this.maxhealth - 1) {
       this.shoot = Weapons.standard;
@@ -426,9 +419,29 @@ var onStart = function () {
       this.disable = undefined;
       this.addBehavior(Enemy);
     }
-  }
+  };
   boss.addBehavior(Hover, {duration: 0.5, speed: 24, target: player_bot});
   boss.setCollision(Polygon);
+  boss.collision.onHandle = function (object, other) {
+    if (other.family == "player" && !gameWorld.boss.invulnerable) {
+      object.health -= 1;
+      gameWorld.boss.invulnerable = true;
+      gameWorld.boss.respond(s.player_bot);
+      gameWorld.boss.addBehavior(Delay, {duration: 1, callback: function () { this.entity.invulnerable = false}});
+      if (object.health <= 0) {
+        object.alive = false;
+      } else if (!other.projectile) {
+        var theta = angle(object.x, object.y, other.x, other.y);
+        var p = toGrid(object.x + 64 * Math.cos(theta), object.y + 64 * Math.sin(theta));
+        s.player_bot.removeBehavior((s.player_bot.lerpx));
+        s.player_bot.removeBehavior((s.player_bot.lerpy));
+        s.player_bot.angle = theta;
+        s.player_bot.move(s);
+        s.player_bot.lerpx.goal = p.x;
+        s.player_bot.lerpy.goal = p.y;
+      }
+    }
+  };
 
   //boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
   //boss.addBehavior(HealthBar);
@@ -481,7 +494,7 @@ var onStart = function () {
   this.bg.paused = false;
   //this.fg.paused = false;
 
-  this.bg.camera.scale = 0.5;
+  /*this.bg.camera.scale = 0.5;
   //this.fg.camera.scale = 0.5;
   this.bg.camera.x = -gameWorld.width / 4;
   this.bg.camera.y = -gameWorld.height / 4;
@@ -499,7 +512,7 @@ var onStart = function () {
     this.entity.removeBehavior(this.entity.lerpx);
     this.entity.removeBehavior(this.entity.lerpy);
     
-  }});
+  }});*/
   this.pause();
 };
 var onUpdate = function (dt) {

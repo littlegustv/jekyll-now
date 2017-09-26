@@ -47,7 +47,7 @@ var COLORS = {
 var COLORS = {
   negative: "#000000",
   nullary: "#FFFFFF",
-  primary: "#000000",
+  primary: "#AA0000",
   secondary: "#000000",
   tertiary: "#000000"
 };
@@ -80,7 +80,7 @@ HealthBar.draw = function (ctx) {
     ctx.fillStyle = (i <= this.entity.health) ? "black" : "gray";
     ctx.fillRect(this.entity.x - this.entity.w / 2 + i * w + w / 2, this.entity.y - this.entity.h / 2, w, 8);
   }
-}
+};
 
 // very custom, so avoid passing parameters and just assume them...
 var Radar = Object.create(Behavior);
@@ -98,7 +98,7 @@ Radar.draw = function(ctx) {
     ctx.closePath();
     ctx.fill();
   }
-}
+};
 
 var Disable = Object.create(Behavior);
 Disable.update = function (dt) {
@@ -107,14 +107,14 @@ Disable.update = function (dt) {
   if (this.cooldown <= 0 && this.target.health > 1) {
     this.cooldown = this.entity.shoot(this.entity.layer);
   }
-}
+};
 
 var Shielded = Object.create(Behavior);
 Shielded.update = function (dt) {
   if (this.entity.shield < 1) this.entity.shield += dt * this.rate;
   else this.entity.shield = 1;
   this.entity.shield_sprite.opacity = this.entity.shield;
-}
+};
 
 var Shake = Object.create(Behavior);
 Shake.update = function (dt) {
@@ -125,7 +125,7 @@ Shake.update = function (dt) {
     this.entity.x += randint(this.min, this.max) * dt;
     this.entity.y += randint(this.min, this.max) * dt;
   }
-}
+};
 
 var HyperDrive = Object.create(Behavior);
 HyperDrive.update = function (dt) {
@@ -141,17 +141,17 @@ HyperDrive.update = function (dt) {
     this.entity.acceleration = {x: 100, y: 0};
     this.done = true;
   }
-}
+};
 
 // goal {x, y}, speed
 var Move = Object.create(Behavior);
 Move.move = function (dt) {
   this.entity.x = lerp(this.entity.x, this.goal.x, this.speed * dt);
   this.entity.y = lerp(this.entity.y, this.goal.y, this.speed * dt);
-}
+};
 Move.check = function () {
   return this.entity.x === this.goal.x && this.entity.y === this.goal.y;
-}
+};
 Move.update = function (dt) {
   if (this.goal) {
     this.move(dt);
@@ -168,7 +168,7 @@ Move.update = function (dt) {
 };
 Move.pick = function () {
   return toGrid(randint(MIN.x, MAX.x), randint(MIN.y, MAX.y));
-}
+};
 
 // moves at right angle in approaching "spiral" - ish
 var Approach = Object.create(Move);
@@ -178,17 +178,17 @@ Approach.pick = function () {
   var p = toGrid(this.target.x, this.target.y);
   if (g.x !== p.x || g.y !== p.y) return g;
   else return toGrid(this.entity.x, this.entity.y + sign(this.target.y - this.entity.y) * TILESIZE);
-}
+};
 
 // hover - tries to stay above or below, staying vertically aligned
 var Hover = Object.create(Move);
 Hover.move = function (dt) {
   this.entity.x += sign(this.goal.x - this.entity.x) * this.speed * dt;
   this.entity.y += sign(this.goal.y - this.entity.y) * this.speed * dt;
-}
+};
 Hover.check = function () {
   return Math.abs(this.entity.x - this.goal.x) <= 2 && Math.abs(this.entity.y - this.goal.y) <= 2;
-}
+};
 Hover.pick = function () {
   var e = toGrid(this.entity.x, this.entity.y);
   var t = toGrid(this.target.x, this.target.y);
@@ -197,7 +197,7 @@ Hover.pick = function () {
   } else {
     return toGrid(this.target.x, this.entity.y);
   }
-}
+};
 
 // stationary - ... mmm
 
@@ -206,7 +206,7 @@ var Horizontal = Object.create(Hover);
 Horizontal.pick = function () {
   if (this.entity.x > WIDTH / 2) return toGrid(0, this.entity.y);
   else return toGrid(WIDTH, this.entity.y);
-}
+};
 
 // ground - could either be horizontal, or 'hover' with no vertical component...
 
@@ -223,7 +223,7 @@ Scene.draw = function (ctx) {
       ctx.drawImage(this.layers[i].canvas, 0, 0);
     }
   }
-}
+};
 
 // push to raindrop 'active' flag for layer
 Scene.update = function (dt) {
@@ -269,7 +269,7 @@ Layer.update = function (dt) {
       this.entities.splice(i, 1);
     }
   }
-}
+};
 
 
 // push to raindrop -> making setScene(reload) work properly
@@ -314,17 +314,17 @@ World.playSound = function(sound, volume) {
       return sound;
     }
   }
-}
+};
 
 function volume (object) {
   //var v = Math.max(0,1 - distance(object.x, object.y, gameWorld.scene.layers[0].camera.x, gameWorld.scene.layers[0].camera.y) / (1.4 * gameWorld.height));
   //console.log(v);
   return 0.8;
-}
+};
 
 function inverse(family) {
   return family == "enemy" ? "player" : "enemy";
-}
+};
 
 var LerpFollow = Object.create(Behavior);
 LerpFollow.update = function (dt) { 
@@ -425,7 +425,7 @@ Circle.onDraw = function (ctx) {
     ctx.strokeStyle = this.strokeColor;
     ctx.stroke();
   }
-}
+};
 Entity.oldDraw = Entity.onDraw;
 Entity.onDraw = function (ctx) {
   this.oldDraw(ctx);
@@ -451,7 +451,7 @@ Trail.update = function (dt) {
       this.record.shift();
     }
   }
-}
+};
 Trail.draw = function (ctx) {
   var shrink = this.entity.radius / this.record.length;
   ctx.fillStyle = this.entity.strokeColor;
@@ -460,13 +460,25 @@ Trail.draw = function (ctx) {
     ctx.arc(this.record[i].x, this.record[i].y, i * shrink, 0, PI2, true);
     ctx.fill();
   }
-}
+};
 
 // push to raindrop
 function lerp_angle (a1, a2, rate) {
   var r = a1 + short_angle(a1, a2) * rate;
   if (Math.abs(r - a2) < 0.01) return a2;
   else return r;
+}
+
+function projectileDie(p) {
+  var expl = p.layer.add(Object.create(Circle).init(p.x, p.y, 8));
+  //var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
+  expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
+  expl.z = 3;
+  var flash = p.layer.add(Object.create(Circle).init(p.x, p.y, 12));
+  flash.z = 4;
+  flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
+  flash.color = COLORS.secondary;
+  gameWorld.playSound(Resources.hit);
 }
 
 var projectile_vertices = [
@@ -640,6 +652,10 @@ var Weapons = {
       //gameWorld.playSound(Resources.mortar);
       a.collision.onHandle = projectileHit;
       a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
+      a.addBehavior(Delay, {duration: 4, callback: function () {
+        projectileDie(this.entity);
+        this.entity.alive = false;
+      }});
       //a.addBehavior(Oscillate, {field: "scale", object: a, rate: 1, initial: 1, constant: 0.2, offset: 0});
       a.addBehavior(Velocity);
       a.family = this.family;
@@ -962,8 +978,8 @@ var Movement = {
         this.entity.lerpy = undefined;
         s.pause();
       }});
-      s.unpause();  
-      gameWorld.playSound(Resources.move);  
+      s.unpause();
+      gameWorld.playSound(Resources.move);
       var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
       d.addBehavior(Velocity);
       d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};

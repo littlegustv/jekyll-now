@@ -61,21 +61,8 @@ var onStart =  function () {
   circle.color = COLORS.primary;
   this.primaries.push(circle);
   */
-  for (var i = 0; i < 8; i++) {
-    var w = randint(1, 4) * 4 + 4;
-    var square = this.bg.add(Object.create(Sprite).init(randint(0, gameWorld.width), randint(0, gameWorld.height), Resources.asteroid));
-    square.radius = square.w / 2;
-    square.strokeColor = COLORS.secondary;
-    //square.color = COLORS.secondary;
-    square.z = 8;
-    square.addBehavior(Trail, {interval: 0.2, maxlength: 10, record: []});
-    square.velocity = {x: choose([10, -10]), y: 30};
-    square.addBehavior(Wrap, {min: {x: 0, y: 0}, max: {x: gameWorld.width, y: gameWorld.height}});
-    square.addBehavior(Velocity);
-    this.secondaries.push(square);
-  }
   
-  for (var i = 0; i < 20; i++) {
+/*  for (var i = 0; i < 20; i++) {
     var line = this.bg.add(Object.create(Entity).init(randint(0, gameWorld.width), randint(0, 2 * gameWorld.height / 3), randint(gameWorld.width / 2, gameWorld.width * 2), 2));
     line.color = COLORS.tertiary;
     line.z = 7;
@@ -83,10 +70,10 @@ var onStart =  function () {
     line.velocity = {x: 10, y: 00};
     line.addBehavior(Wrap, {min: {x: -line.w / 2, y: 0}, max: {x: gameWorld.width + line.w / 2, y: gameWorld.height}});
     this.tertiaries.push(line);
-  }
+  }*/
   var buttons = ["play", "mute", "credits", "achievements"];
   for (var i = 0; i < buttons.length; i++) {
-    var b = this.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 4 + i * 16, Resources.expire_font, buttons[i], {spacing: -2, align: "center"}));
+    var b = this.bg.add(Object.create(SpriteFont).init(8, gameWorld.height / 4 + i * 16, Resources.expire_font, buttons[i], {spacing: -2, align: "left"}));
     var button = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 4 + i * 16, gameWorld.width, 16));
     button.family = "button";
     //b.blend = "destination-out";
@@ -96,7 +83,20 @@ var onStart =  function () {
     button.unhover = function () { this.text.scale = 1; };
     button.trigger = function () {
       gameWorld.setScene(1, true);
-    }
+    };
+  }
+  if (gameWorld.saved) {
+    var b = this.bg.add(Object.create(SpriteFont).init(8, gameWorld.height / 4 - 16, Resources.expire_font, "resume", {spacing: -2, align: "left"}));
+    var button = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 4 - 16, gameWorld.width, 16));
+    button.family = "button";
+    //b.blend = "destination-out";
+    button.opacity = 0;
+    button.text = b;
+    button.hover = function () { this.text.scale = 2;};
+    button.unhover = function () { this.text.scale = 1; };
+    button.trigger = function () {
+      gameWorld.setScene(1, false);
+    };
   }
   
   var ship = this.bg.add(Object.create(Sprite).init(0, 3 * gameWorld.height / 4, Resources.viper));
@@ -151,4 +151,17 @@ var onStart =  function () {
 }
 
 var onUpdate = function () {
+  /*if (Math.random() * 100 < 2) {
+    var w = randint(1, 4) * 4 + 4;
+    var square = this.bg.add(Object.create(Sprite).init(randint(0, gameWorld.width), -8, Resources.asteroid));
+    square.radius = square.w / 3;
+    square.strokeColor = COLORS.primary;
+    //square.color = COLORS.secondary;
+    square.z = 8;
+    square.addBehavior(Trail, {interval: 0.1, maxlength: 16, record: []});
+    square.velocity = {x: choose([10, -10]), y: 30};
+    square.addBehavior(Crop, {min: {x: -8, y: -10}, max: {x: gameWorld.width + 8, y: gameWorld.height - 6}});
+    square.addBehavior(Velocity);
+    this.secondaries.push(square);
+  }*/
 }
