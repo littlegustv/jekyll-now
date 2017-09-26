@@ -666,6 +666,8 @@ function requestFullScreen () {
     body.mozRequestFullscreen();
   } else if (body.msRequestFullscreen) {
     body.msRequestFullscreen();
+  } else if (window.requestFullscreen) {
+    window.requestFullscreen();
   }
 }
 
