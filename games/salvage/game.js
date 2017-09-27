@@ -100,6 +100,16 @@ Radar.draw = function(ctx) {
   }
 };
 
+var Fanfare = Object.create(Behavior);
+Fanfare.update = function (dt) {
+  if (Math.random() * 100 < this.frequency) {
+    console.log('fanfare!');
+    var c = this.entity.layer.add(Object.create(Circle).init(this.entity.x + randint(-this.entity.radius, this.entity.radius), this.entity.y + randint(-this.entity.radius, this.entity.radius), randint(this.radius.min, this.radius.max)));
+    c.color = choose(this.colors);
+    c.addBehavior(FadeOut, {duration: 0.1, delay: Math.random() / 2 + 0.5});
+  }
+};
+
 var Disable = Object.create(Behavior);
 Disable.update = function (dt) {
   if (this.cooldown === undefined) this.cooldown = 0;
@@ -1186,7 +1196,10 @@ var Store = {
       t.layer.active = false;
       t.player.locked = false;
     }
-    gameWorld.current_wave += 1;
+    for (var i = 0; i < gameWorld.scene.layers.length; i++) {
+      gameWorld.scene.layers[i].paused = false;
+    }
+    //gameWorld.current_wave += 1;
     
     /*gameWorld.scene.bg.camera.addBehavior(Lerp, {object: gameWorld.scene.bg.camera.behaviors[0].offset, field: "y", goal: -gameWorld.height / 2, rate: 10, callback: function () {
       this.entity.removeBehavior(this);

@@ -77,7 +77,7 @@ var onStart = function () {
     this.shield.opacity = object.shield;
   };
 
-  var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 12, Resources.expire_font, "menu", {align: "center", spacing: -2}));
+  var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 12, Resources.expire_font, "pause", {align: "center", spacing: -2}));
   var menu_button = this.ui.add(Object.create(Entity).init(24, 12, 48, 24));
   menu_button.family = "button";
   menu_button.opacity = 0;
@@ -96,7 +96,7 @@ var onStart = function () {
     menu_text.scale = 1;
   };
   
-  var mute_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width - 24, 12, Resources.expire_font, "mute", {align: "center", spacing: -2}));
+  /*var mute_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width - 24, 12, Resources.expire_font, "mute", {align: "center", spacing: -2}));
   var mute_button = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, 12, 48, 24));
   mute_button.family = "button";
   mute_button.opacity = 0;
@@ -110,7 +110,7 @@ var onStart = function () {
   };
   mute_button.unhover = function () {
     mute_text.scale = 1;
-  };
+  };*/
   
   var player_bot = bg.add(Object.create(Sprite).init(64, 64, Resources.viper));
   //player_bot.blend = "destination-out";
@@ -203,13 +203,13 @@ var onStart = function () {
     flash.color = COLORS.secondary;
     gameWorld.playSound(Resources.hit);
     gameWorld.wave = 0;
-  }
+  };
   
   this.store_layer = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
   this.store_layer.active = false;
   var store = Object.create(Store).init(this.store_layer, player_bot);
   this.store = store;
-
+/*
   var e = this.ui.add(Object.create(Entity).init(gameWorld.width / 2, 12, 48, 24));
   var store_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, 12, Resources.expire_font, "store", {align: "center", spacing: -2}));
   e.family = "button";
@@ -224,7 +224,7 @@ var onStart = function () {
   };
   e.unhover = function () {
     store_text.scale = 1;
-  };
+  };*/
 
   this.player_bot = player_bot;
   var t = this;
@@ -253,6 +253,28 @@ var onStart = function () {
           }
         }
         projectiles = [];
+        if (this.current_wave % 2 === 0) {
+          var theta = Math.random() * PI2;
+          var g = toGrid(boss.x + 64 * Math.cos(theta), boss.y + 64 * Math.sin(theta));
+          var shopkeeper = s.bg.add(Object.create(Circle).init(g.x, g.y, 16));
+          shopkeeper.opacity = 0.6;
+          shopkeeper.color = COLORS.secondary;
+          shopkeeper.w = 32; shopkeeper.h = 32;
+          shopkeeper.setCollision(Polygon);
+          shopkeeper.addBehavior(Fanfare, {colors: [COLORS.secondary, COLORS.primary], radius: {min: 2, max: 8}, frequency: 10});
+          var text = s.bg.add(Object.create(SpriteFont).init(g.x, g.y, Resources.expire_font, "store", {spacing: -2, align: "center"}));
+          text.addBehavior(Follow, {target: shopkeeper, offset: {x: 0, y: -8}});
+          var text2 = s.bg.add(Object.create(SpriteFont).init(g.x, g.y, Resources.expire_font, "open!", {spacing: -2, align: "center"}));
+          text2.addBehavior(Follow, {target: shopkeeper, offset: {x: 0, y: 8}});
+          shopkeeper.addBehavior(Follow, {target: gameWorld.boss, offset: {x: shopkeeper.x - gameWorld.boss.x, y: shopkeeper.y - gameWorld.boss.y}});
+          shopkeeper.collision.onHandle = function (object, other) {
+            if (other === s.player_bot) {
+              object.collision.onHandle = function (a, b) {};
+              object.alive = false;
+              s.store.open();             
+            }
+          };
+        }
         this.current_wave += 1;
         var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
         cash.addBehavior(Velocity);
@@ -278,7 +300,7 @@ var onStart = function () {
               p.velocity = {x: randint(-20,20), y: randint(-20,20)};
             }
           }
-        }
+        };
 
         gameWorld.playSound(Resources[choose(["spawn"])]);
 
@@ -490,7 +512,7 @@ var onStart = function () {
   }*/
   
   // intro animation
-  this.intro = true;
+  //this.intro = true;
   this.bg.paused = false;
   //this.fg.paused = false;
 
@@ -517,7 +539,7 @@ var onStart = function () {
 };
 var onUpdate = function (dt) {
   var s = this;
-  if (this.intro) return; // for now...
+  //if (this.intro) return; // for now...
 
   for (var i = 0; i < this.wave.length; i++) {
     if (!this.wave[i].alive) this.wave.splice(i, 1);

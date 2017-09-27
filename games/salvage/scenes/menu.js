@@ -71,7 +71,7 @@ var onStart =  function () {
     line.addBehavior(Wrap, {min: {x: -line.w / 2, y: 0}, max: {x: gameWorld.width + line.w / 2, y: gameWorld.height}});
     this.tertiaries.push(line);
   }*/
-  var buttons = ["play", "mute", "credits", "achievements"];
+  var buttons = ["new game", "mute", "credits", "achievements"];
   for (var i = 0; i < buttons.length; i++) {
     var b = this.bg.add(Object.create(SpriteFont).init(8, gameWorld.height / 4 + i * 16, Resources.expire_font, buttons[i], {spacing: -2, align: "left"}));
     var button = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 4 + i * 16, gameWorld.width, 16));
