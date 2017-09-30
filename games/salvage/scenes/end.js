@@ -1,6 +1,7 @@
 var onStart =  function () {
   var fg = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
-  fg.add(Object.create(SpriteFont).init(8, gameWorld.height / 2, Resources.expire_font, "the END", {spacing: -2, align: "left"}));
+  fg.add(Object.create(SpriteFont).init(8, gameWorld.height / 2 - 16, Resources.expire_font, ENDINGS[gameWorld.ending], {spacing: -2, align: "left"}));
+  fg.add(Object.create(SpriteFont).init(8, gameWorld.height / 2, Resources.expire_font, "Ending " + (gameWorld.ending + 1) + " of " + ENDINGS.length, {spacing: -2, align: "left"})).opacity = 0.8;
 
   fg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 6, gameWorld.width, 12, Resources.ground));
 

@@ -5,6 +5,15 @@ var MAXHEALTH = 4, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(180, 320, "index.json");
 gameWorld.wave = 0;
 gameWorld.distance = 100;
+gameWorld.ending = 0;
+
+var ENDINGS = [
+	"Workplace Accident",
+	"Don't Forget Where You Came From",
+	"Social Mobility",
+	"Terror is the order of the day",
+	"Insurrection"
+]
 
 var WIDTH = 320;
 var HEIGHT = 320;
@@ -138,9 +147,8 @@ Shake.update = function (dt) {
 };
 
 var HyperDrive = Object.create(Behavior);
-HyperDrive.update = function (dt) {
+HyperDrive.go = function () {
   if (this.done === undefined) {
-    console.log('heyt');
     this.entity.layer.paused = false;
     this.entity.behaviors = [this.entity.behaviors[0], this]; // :O ... keep animate and this, remove all other behaviors
     this.entity.addBehavior(Velocity);
@@ -150,6 +158,14 @@ HyperDrive.update = function (dt) {
     this.entity.angle = 0;
     this.entity.acceleration = {x: 100, y: 0};
     this.done = true;
+    this.entity.addBehavior(Delay, {duration: 1.2, callback: function () {
+    	if (gameWorld.boss.alive) {
+    		gameWorld.ending = 2;
+    	} else {
+    		gameWorld.ending = 3;
+    	}
+    	gameWorld.setScene(2, true);
+    }});
   }
 };
 
@@ -1064,6 +1080,13 @@ var Store = {
       name: "FTL", price: 15, icon: 5, trigger: function (t) {
         if (!t.player.hasFTL) {
           t.player.hasFTL = t.player.addBehavior(HyperDrive); // maybe do this HERE instead of in random behavior...
+          var ftl_button = gameWorld.scene.ui.add(Object.create(Entity).init(gameWorld.width - 12, gameWorld.height - 8, 24, 16));
+          ftl_button.family = "button";
+          ftl_button.text = gameWorld.scene.ui.add(Object.create(SpriteFont).init(gameWorld.width - 12, gameWorld.height - 8, Resources.expire_font, "FTL", {spacing: 2, align: "center"}));
+          ftl_button.trigger = function () {
+          	t.player.hasFTL.go();
+          	ftl_button.alive = false;
+          };
           return true;
         } else {
           return false;

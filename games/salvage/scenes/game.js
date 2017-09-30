@@ -40,7 +40,7 @@ var onStart = function () {
   grid.z = -8;
   //grid.blend = "destination-out";
 
-  var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, HEIGHT - 3, WIDTH, 12, Resources.ground));
+  var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, HEIGHT, WIDTH, 12, Resources.ground));
   ground.z = -7;
   //ground.blend = "destination-out";
   ground.setCollision(Polygon);
@@ -60,25 +60,25 @@ var onStart = function () {
 
   this.health_bar = []; 
   for (var i = 0.5; i < MAXHEALTH + 0.5; i++) {
-    this.health_bar.push(this.ui.add(Object.create(Sprite).init(i * 16, gameWorld.height - 12, Resources.icons)));
+    this.health_bar.push(this.ui.add(Object.create(Sprite).init(i * 16, gameWorld.height - 8, Resources.icons)));
   }
-  this.shield = this.ui.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 12, Resources.icons));
+  this.shield = this.ui.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 8, Resources.icons));
   this.shield.animation = 1;
   
   var s = this;
   this.updateHealthBar = function (object) {
     for (var i = 0; i < s.health_bar.length; i++) {
       if (i < object.health) {
-        s.health_bar[i].opacity = 1;
+        s.health_bar[i].opacity = 0.8;
       } else if (i < MAXHEALTH) {
-        s.health_bar[i].opacity = 0.3;
+        s.health_bar[i].opacity = 0.2;
       }
     }
     this.shield.opacity = object.shield;
   };
 
-  var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 12, Resources.expire_font, "pause", {align: "center", spacing: -2}));
-  var menu_button = this.ui.add(Object.create(Entity).init(24, 12, 48, 24));
+  var menu_text = this.ui.add(Object.create(SpriteFont).init(4, 8, Resources.expire_font, "pause", {align: "left", spacing: -2}));
+  var menu_button = this.ui.add(Object.create(Entity).init(24, 8, 48, 16));
   menu_button.family = "button";
   menu_button.opacity = 0;
   menu_button.trigger = function () {
@@ -191,6 +191,13 @@ var onStart = function () {
     player_bot.death = player_bot.addBehavior(Delay, {duration: 1.5, callback: function () {
       player_bot.alive = false;
       player_bot.death = undefined;
+      if (gameWorld.boss.alive && gameWorld.boss.health >= boss.maxhealth) {
+        console.log('first', gameWorld.boss.health, boss.maxhealth)
+        gameWorld.ending = 0;
+      } else if (gameWorld.boss.alive) {
+        console.log('second');
+        gameWorld.ending = 1;
+      }
       gameWorld.setScene(2, true);
     }});
     var expl = this.layer.add(Object.create(Circle).init(this.x, this.y, 32));
@@ -451,7 +458,7 @@ var onStart = function () {
       gameWorld.boss.respond(s.player_bot);
       gameWorld.boss.addBehavior(Delay, {duration: 1, callback: function () { this.entity.invulnerable = false}});
       if (object.health <= 0) {
-        object.alive = false;
+        object.die();
       } else if (!other.projectile) {
         var theta = angle(object.x, object.y, other.x, other.y);
         var p = toGrid(object.x + 64 * Math.cos(theta), object.y + 64 * Math.sin(theta));
@@ -464,6 +471,33 @@ var onStart = function () {
       }
     }
   };
+  boss.die = function (e) {
+    var expl = this.layer.add(Object.create(Circle).init(this.x, this.y, 24));
+    expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
+    expl.z = 1;
+    var flash = this.layer.add(Object.create(Circle).init(this.x, this.y, 32));
+    flash.z = 2;
+    flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
+    flash.color = COLORS.secondary;
+    gameWorld.playSound(Resources.hit);
+
+    s.unpause();
+    gameWorld.saved = false;
+    s.pause = function () {};
+    this.behaviors = [];
+    this.death = this.addBehavior(Delay, {duration: 1.5, callback: function () {
+      this.entity.alive = false;
+      this.entity.death = undefined;
+      if (s.player_bot.hasFTL) {
+        gameWorld.ending = 3;
+      } else {
+        gameWorld.ending = 4;
+      }
+      gameWorld.setScene(2, true);
+    }});
+    gameWorld.wave = 0;
+
+  }
 
   //boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
   //boss.addBehavior(HealthBar);
