@@ -112,7 +112,7 @@ Radar.draw = function(ctx) {
 var Fanfare = Object.create(Behavior);
 Fanfare.update = function (dt) {
   if (Math.random() * 100 < this.frequency) {
-    console.log('fanfare!');
+    //console.log('fanfare!');
     var c = this.entity.layer.add(Object.create(Circle).init(this.entity.x + randint(-this.entity.radius, this.entity.radius), this.entity.y + randint(-this.entity.radius, this.entity.radius), randint(this.radius.min, this.radius.max)));
     c.color = choose(this.colors);
     c.addBehavior(FadeOut, {duration: 0.1, delay: Math.random() / 2 + 0.5});
@@ -994,7 +994,7 @@ var Movement = {
     var goal = toGrid(Math.round(s.player_bot.x + this.distance * Math.cos(s.player_bot.angle)), Math.round(s.player_bot.y + this.distance * Math.sin(s.player_bot.angle)))
     if (goal.x !== s.player_bot.x || goal.y !== s.player_bot.y) {       
       s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: goal.x, rate: this.speed, object: s.player_bot, callback: function () {
-        console.log('lerpx callback');
+        //console.log('lerpx callback');
         this.entity.removeBehavior(this);
         this.entity.lerpx = undefined;
         s.pause();
