@@ -152,25 +152,36 @@ var onStart = function () {
           //object.addBehavior(Delay, {duration: 1.5, callback: function () { this.entity.noCollide = false; }})
         } else {
           object.health -= 1;
+          if (object.retaliate >= 1) {
+            var theta = angle(object.x, object.y, other.x, other.y);
+            var p =object.layer.add(Object.create(Circle).init(object.x, object.y, 4));
+            p.color = "black";
+            p.stroke = true;
+            p.strokeColor = COLORS.primary;
+            p.width = 2;
+            //      var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
+            //p.animation = 5;
+            p.setCollision(Polygon);
+            p.setVertices(projectile_vertices);
+            gameWorld.playSound(Resources.laser, volume(p));
+            p.collision.onHandle = projectileHit;
+            p.addBehavior(Velocity);
+            p.family = "player";
+            p.projectile = true;
+            //;
+            //if (this.target) console.log('target');
+            p.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)  };
+            p.angle = theta;
+            p.addBehavior(Trail, {interval: 0.06, maxlength: 10, record: []});
+            projectiles.push(p);
+          }
         }
         object.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
         s.updateHealthBar(object);
         
-        projectileDie(other);        
         //var expl = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.explosion));
         //expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
         
-        if (object.retaliate >= 1) {
-          for (var i = 0; i < 3; i++) {
-            var theta = i * PI2 / 3;
-            var p =object.layer.add(Object.create(Entity).init(object.x, object.y, 4, 4));
-            p.addBehavior(Velocity);
-            p.velocity = {x: 40 * Math.cos(theta), y: 40 * Math.sin(theta)};
-            p.projectile = true;
-            p.family = object.family;
-            p.setCollision(Polygon);
-          }
-        }
         
         //object.damage.timer = DAMAGE_COOLDOWN;
       }
@@ -268,7 +279,8 @@ var onStart = function () {
           shopkeeper.color = COLORS.secondary;
           shopkeeper.w = 32; shopkeeper.h = 32;
           shopkeeper.setCollision(Polygon);
-          shopkeeper.addBehavior(Fanfare, {colors: [COLORS.secondary, COLORS.primary], radius: {min: 2, max: 8}, frequency: 10});
+          shopkeeper.family = "neutral";
+          //shopkeeper.addBehavior(Fanfare, {colors: [COLORS.secondary, COLORS.primary], radius: {min: 2, max: 8}, frequency: 10});
           var text = s.bg.add(Object.create(SpriteFont).init(g.x, g.y, Resources.expire_font, "store", {spacing: -2, align: "center"}));
           text.addBehavior(Follow, {target: shopkeeper, offset: {x: 0, y: -8}});
           var text2 = s.bg.add(Object.create(SpriteFont).init(g.x, g.y, Resources.expire_font, "open!", {spacing: -2, align: "center"}));
@@ -285,6 +297,7 @@ var onStart = function () {
         this.current_wave += 1;
         var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
         cash.addBehavior(Velocity);
+        cash.family = "neutral";
         //cash.blend = "destination-out";
         cash.velocity = {x: 0, y: 20};
         cash.setCollision(Polygon);
@@ -394,38 +407,28 @@ var onStart = function () {
   };
   
   this.current_wave = 0;
-  this.waves = [
-    [0,0,0,0,0,0], // learn to hit head-on
-    [1,1,1,0,0,0,0], // learn to hit where you need to
-    [2,2,1,1,0,0], // learn to close the distance
-    [2,2,2,0,0,0,0,0], // learn to prioritize
-    [5,5,0,0,0,0,1,1], // learn to anticipate
-    [3,3,3,0,0],
-    [4,4,2,1,1,1],
-    [5,5,5,0,0,0,0],
-    [6, 6, 6, 6, 4, 4, 5],
-    [6,6, 5]
-  ];
-  this.waves = [[0,1,2,3]];
 
   this.waves = [
-    [4, 4],
-    [0,0,0],
+    [0],
+    [0],
     [1],
-    [2,2],
+    [2],
     [3],
-    [4,4],
+    [4],
     [5],
-    [6,6]
-  ]
-  //this.waves = [[5]];
-  //this.waves = [[0], [0,0,0], [0,0,0,0,0], [0,0,0,0,0,0,0,0]];
+    [6],
+    [7],
+    [8],
+    [9],
+    [10]
+  ];
   
   var boss = this.bg.add(Object.create(Sprite).init(player_bot.x + gameWorld.width, player_bot.y, Resources.boss));
   //boss.blend = "destination-out";
   boss.animation = 0;
   boss.modules = [];
   boss.z = 24;
+  boss.family = "neutral";
   boss.maxhealth = 10;
   boss.health = boss.maxhealth;
   boss.respond = function (target) {

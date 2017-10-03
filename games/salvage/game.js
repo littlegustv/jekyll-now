@@ -98,7 +98,7 @@ Radar.draw = function(ctx) {
   var concerning = this.entity.layer.entities.filter(function (e) { return e.family == "enemy" && !e.projectile && (!between(e.x, t.entity.x - gameWorld.width / 2, t.entity.x + gameWorld.width / 2) || !between(e.y, t.entity.y - gameWorld.height / 2, t.entity.y + gameWorld.height / 2)); });
   ctx.fillStyle = COLORS.tertiary;
   for (var i = 0; i < concerning.length; i++) {
-    var x = clamp(concerning[i].x, this.entity.x - gameWorld.width / 2, this.entity.x + gameWorld.width / 2) - 2;
+    var x = clamp(concerning[i].x, Math.min(WIDTH - gameWorld.width, this.entity.x - gameWorld.width / 2), Math.max(this.entity.x + gameWorld.width / 2, gameWorld.width)) - 2;
     var y = clamp(concerning[i].y, this.entity.y - gameWorld.height / 2, this.entity.y + gameWorld.height / 2) - 2;
     var theta = angle(this.entity.x, this.entity.y, x, y);
     ctx.moveTo(x, y);
@@ -182,7 +182,7 @@ Move.update = function (dt) {
   if (this.goal) {
     this.move(dt);
     if (this.check()) {
-      console.log('done');
+      //console.log('done');
       this.goal = undefined;
       this.delay = this.duration;
     }
@@ -209,8 +209,7 @@ Approach.pick = function () {
 // hover - tries to stay above or below, staying vertically aligned
 var Hover = Object.create(Move);
 Hover.move = function (dt) {
-  this.entity.x += sign(this.goal.x - this.entity.x) * this.speed * dt;
-  this.entity.y += sign(this.goal.y - this.entity.y) * this.speed * dt;
+  this.entity.velocity = {x: sign(this.goal.x - this.entity.x) * this.speed , y: sign(this.goal.y - this.entity.y) * this.speed };
 };
 Hover.check = function () {
   return Math.abs(this.entity.x - this.goal.x) <= 2 && Math.abs(this.entity.y - this.goal.y) <= 2;
@@ -401,8 +400,9 @@ function lerp (current, goal, rate, threshold) {
 }
 
 function projectileHit (object, other) {
-  if (other.family != object.family && !other.projectile) {
-    object.alive = false;   
+  if (other.family === "neutral") return false;
+  else if (other.family != object.family && !other.projectile) {
+    projectileDie(object);
     gameWorld.playSound(Resources.hit);
   }
 }
@@ -496,6 +496,7 @@ function lerp_angle (a1, a2, rate) {
 }
 
 function projectileDie(p) {
+  p.alive = false;
   var expl = p.layer.add(Object.create(Circle).init(p.x, p.y, 8));
   //var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
   expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
@@ -516,8 +517,142 @@ var projectile_vertices = [
 
 var projectiles = [];
 
-// add cooldown visuals (circle shrinks/brightens, then POW)
 var Weapons = {
+  boomerang: function (layer) {
+    var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
+    a.color = "black";
+    a.stroke = true;
+    a.strokeColor = COLORS.primary;
+    a.width = 2;
+    a.setCollision(Polygon);
+    a.setVertices(projectile_vertices);
+    gameWorld.playSound(Resources.laser, volume(a));
+    a.parent = this;
+    a.collision.onHandle = function (object, other) {
+      if (other == object.parent) {
+        this.alive = false;
+      } else {
+        projectileHit (object, other);        
+      }
+    }
+    a.addBehavior(Velocity);
+    a.family = this.family;
+    a.addBehavior(Accelerate);
+    a.projectile = true;
+
+    var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
+    a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)  };
+    a.acceleration = {x: -a.velocity.x, y: -a.velocity.y};
+    a.angle = theta;    
+    a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
+    a.addBehavior(Trail, {interval: 0.06, maxlength: 10, record: []});
+    projectiles.push(a);
+    return 1.6;
+  },
+  firework: function (layer) {
+    var f = layer.add(Object.create(Circle).init(this.x, this.y, 8));
+    f.color = COLORS.negative;
+    f.stroke = true;
+    f.strokeColor = COLORS.primary;
+    f.width = 3;
+    gameWorld.playSound(Resources.laser, volume(f));
+    f.addBehavior(Velocity);
+    f.family = this.family;//"player";
+    f.angle = this.shoot_angle;
+    f.velocity = {x: 40 * Math.cos(f.angle), y: 40 * Math.sin(f.angle)  };    
+    f.addBehavior(Delay, {duration: 1.5, callback: function () {
+      this.entity.alive = false;
+      for (var i = 0; i < 10; i++) {
+        var theta = i * PI2 / 10;
+        var a = this.entity.layer.add(Object.create(Circle).init(this.entity.x + this.entity.radius * Math.cos(theta), this.entity.y + this.entity.radius * Math.sin(theta), 4));
+        a.color = "black";
+        a.stroke = true;
+        a.strokeColor = COLORS.primary;
+        a.width = 2;
+        a.setCollision(Polygon);
+        a.setVertices(projectile_vertices);
+        gameWorld.playSound(Resources.laser, volume(a));
+        a.collision.onHandle = projectileHit;
+        a.addBehavior(Velocity);
+        a.family = this.entity.family;//"player";
+        a.projectile = true;
+        a.angle = theta;
+        console.log(a.family);
+        a.velocity = {x: 30 * Math.cos(a.angle), y: 30 * Math.sin(a.angle)  };
+        a.addBehavior(Trail, {interval: 0.06, maxlength: 4, record: []});
+        projectiles.push(a);
+      }
+    }});
+    f.addBehavior(Trail, {interval: 0.06, maxlength: 10, record: []});
+    return 4.6;
+  },
+  triangle: function (layer) {
+    for (var i = -1; i <= 1; i += 2) {
+      //var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.bullet));
+      var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
+      a.color = "black";
+      a.stroke = true;
+      a.strokeColor = COLORS.primary;
+      a.width = 2;
+  //      var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
+      //a.animation = 5;
+      a.setCollision(Polygon);
+      a.setVertices(projectile_vertices);
+      gameWorld.playSound(Resources.laser, volume(a));
+      a.collision.onHandle = projectileHit;
+      a.addBehavior(Velocity);
+      a.family = this.family;//"player";
+      a.projectile = true;
+      //;
+      var theta = this.shoot_angle + i * PI / 6;
+      //if (this.target) console.log('target');
+      a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)  };
+      a.angle = theta;    
+      a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
+      a.addBehavior(Trail, {interval: 0.06, maxlength: 10, record: []});
+      projectiles.push(a);
+    }
+    return 2;
+  },
+  // fix me: sync up with movement properly
+  spin: function (layer) {
+    if (this.weapon_index === undefined) {
+      this.weapon_index = 0;
+      debug = this;
+    }
+
+    this.weapon_index += 1;
+    this.angle = this.weapon_index * PI / 2;
+    var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
+    a.color = "black";
+    a.stroke = true;
+    a.strokeColor = COLORS.primary;
+    a.width = 2;
+//      var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
+    //a.animation = 5;
+    a.setCollision(Polygon);
+    a.setVertices(projectile_vertices);
+    gameWorld.playSound(Resources.laser, volume(a));
+    a.collision.onHandle = projectileHit;
+    a.addBehavior(Velocity);
+    a.family = this.family;//"player";
+    a.projectile = true;
+    //;
+    var theta = this.angle;
+    //if (this.target) console.log('target');
+    a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)};
+    a.angle = theta;    
+    a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
+    a.addBehavior(Trail, {interval: 0.06, maxlength: 10, record: []});
+    projectiles.push(a);
+
+    if (this.weapon_index >= 4) {
+      this.weapon_index = 0;
+      return 2;
+    } else {
+      return 1;      
+    }
+  },
   hitscan: function (layer) {
     var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
     var warn = layer.add(Object.create(Entity).init(this.x + Math.cos(theta) * gameWorld.height, this.y + Math.sin(theta) * gameWorld.height, gameWorld.height * 2, 8));
@@ -704,12 +839,14 @@ function requestFullScreen () {
     body.requestFullscreen();
   } else if (body.webkitRequestFullscreen) {
     body.webkitRequestFullscreen();
-  } else if (body.mozRequestFullscreen) {
-    body.mozRequestFullscreen();
+  } else if (body.mozRequestFullScreen) {
+      body.mozRequestFullScreen();
   } else if (body.msRequestFullscreen) {
-    body.msRequestFullscreen();
+      body.msRequestFullscreen();
   } else if (window.requestFullscreen) {
-    window.requestFullscreen();
+      window.requestFullscreen();
+  } else {
+    console.log('could not request fullscreen');
   }
 }
 
@@ -865,7 +1002,7 @@ Repair.update = function (dt) {
 }
 
 //var animations = [0, 1, 2, 2, 4, 4, 3, 3, 2];
-var sprites = ["drone", "saucer", "modules", "bomber", "saucer", "drone", "modules"];
+var sprites = ["drone", "saucer", "modules", "bomber", "saucer", "drone", "modules", "beamship", "walker", "walker", "beamship"];
 function spawn(layer, key, player) {
   var theta = Math.random() * PI2;
   var x = randint(MIN.x, MAX.x), y = randint(MIN.y, MAX.y);
@@ -906,22 +1043,23 @@ function spawn(layer, key, player) {
       ]);     
       break;
     case 3:
-      // fix me: currently does NOTHING ...
-      enemy.velocity = {x: 0, y: 0};
+      // fix me: make have a 'bombing' weapon, drops agains 'below', 'climbing' behavior as well?
       enemy.addBehavior(Horizontal, {duration: 0.2, speed: 64, target: player});
       enemy.setVertices([
         {x: -5, y: -3}, {x: -5, y: 3}, {x: 5, y: 3}, {x: 5, y: -3}
       ]);
+      enemy.addBehavior(Flip);
+      enemy.shoot = Weapons.standard;
       break;
     case 4:
-      enemy.addBehavior(Target, {target: player, speed: 35, turn_rate: 1, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
+      enemy.addBehavior(Hover, {duration: 1, speed: 48, target: player}); // hmmm!
       enemy.shoot = Weapons.proximity;
       enemy.setVertices([
         {x: -4, y: 0}, {x: 0, y: 4}, {x: 4, y: 0}, {x: 0, y: -4}
       ]);
       break;
     case 5:
-      enemy.addBehavior(Target, {target: player, speed: 20, turn_rate: 5, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
+      enemy.addBehavior(Approach, {duration: 1, speed: 10, target: player}); // hmmm!
       enemy.target = player;
       enemy.shoot = Weapons.homing;
       enemy.setVertices([
@@ -929,9 +1067,46 @@ function spawn(layer, key, player) {
       ]);
       break;
     case 6:
-      enemy.shoot = Weapons.hitscan;
+      enemy.addBehavior(Approach, {duration: 4, speed: 32, target: player}); // hmmm!
       enemy.animation = 0;
       enemy.target = player;
+      enemy.shoot = Weapons.hitscane;
+      enemy.setVertices([
+        {x: -6, y: -3}, {x: -6, y: 3}, {x: 6, y: 3}, {x: 6, y: -3}
+      ]);
+      break;
+    case 7:
+      enemy.addBehavior(Approach, {duration: 3, speed: 16, target: player}); // hmmm!
+      enemy.animation = 0;
+      enemy.shoot = Weapons.spin;
+      enemy.setVertices([
+        {x: -6, y: -3}, {x: -6, y: 3}, {x: 6, y: 3}, {x: 6, y: -3}
+      ]);
+      break;
+    case 8:
+      enemy.addBehavior(Horizontal, {duration: 0.5, speed: 16, target: player}); // hmmm!
+      enemy.animation = 0;
+      enemy.shoot = Weapons.triangle;
+      enemy.shoot_angle = -PI / 2;
+      enemy.y = toGrid(enemy.x, HEIGHT).y;
+      enemy.setVertices([
+        {x: -6, y: -3}, {x: -6, y: 3}, {x: 6, y: 3}, {x: 6, y: -3}
+      ]);
+      break;
+    case 9:
+      enemy.addBehavior(Horizontal, {duration: 0.5, speed: 4, target: player}); // hmmm!
+      enemy.animation = 0;
+      enemy.shoot = Weapons.firework;
+      enemy.shoot_angle = -PI / 2;
+      enemy.y = toGrid(enemy.x, HEIGHT).y;
+      enemy.setVertices([
+        {x: -6, y: -3}, {x: -6, y: 3}, {x: 6, y: 3}, {x: 6, y: -3}
+      ]);
+      break;
+    case 10:
+      enemy.addBehavior(Hover, {duration: 2, speed: 16, target: player}); // hmmm!
+      enemy.animation = 0;
+      enemy.shoot = Weapons.boomerang;
       enemy.setVertices([
         {x: -6, y: -3}, {x: -6, y: 3}, {x: 6, y: 3}, {x: 6, y: -3}
       ]);
