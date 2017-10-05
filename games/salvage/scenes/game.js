@@ -428,6 +428,13 @@ var onStart = function () {
   boss.animation = 0;
   boss.modules = [];
   boss.z = 24;
+/*
+  var glow = this.bg.add(Object.create(Entity).init(boss.x, boss.y, boss.w, 8));
+  glow.z = 23;
+  glow.offset = glow.addBehavior(Follow, {target: boss, offset: {x: 0, y: 0, z: -1}});
+  boss.glow = glow;
+  glow.color = COLORS.nullary;*/
+
   boss.family = "neutral";
   boss.maxhealth = 10;
   boss.health = boss.maxhealth;
@@ -441,6 +448,8 @@ var onStart = function () {
       this.target = {x: target.x, y: target.y + 12};
       this.shoot(this.layer);
     } else if (this.health >= this.maxhealth - 2) {
+      this.shoot = Weapons.triangle;
+      this.shoot_angle = angle(this.x, this.y, target.x, target.y);
       this.target = target;
       this.shoot(this.layer);
     } else if (this.health >= this.maxhealth / 2 && this.disable === undefined) {
@@ -453,6 +462,8 @@ var onStart = function () {
     }
   };
   boss.addBehavior(Hover, {duration: 0.5, speed: 24, target: player_bot});
+  boss.velocity = {x: 0, y: 0};
+  boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
   boss.collision.onHandle = function (object, other) {
     if (other.family == "player" && !gameWorld.boss.invulnerable) {
