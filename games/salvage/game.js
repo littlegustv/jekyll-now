@@ -9,7 +9,7 @@ gameWorld.ending = 0;
 
 var ENDINGS = [
 	"Workplace Accident",
-	"Don't Forget Where You Came From",
+	"Forgot Your Place?",
 	"Social Mobility",
 	"Terror is the order of the day",
 	"Insurrection"
@@ -1146,11 +1146,13 @@ function spawn(layer, key, player) {
     scrap.collision.onHandle = function (object, other) {
       if (other == gameWorld.boss) {
         object.alive = false;
-        var p = other.layer.add(Object.create(Entity).init(object.x, other.y, 6, 6));
-        p.addBehavior(Velocity);
-        p.velocity = {x: 0, y: -50};
-        p.addBehavior(FadeOut, {duration: 0.5, delay: 0.3});
-        other.health = Math.min(other.maxhealth, other.health + 1);
+        for (var i = 0; i < 2; i++) {
+          var p = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.dust));
+          p.addBehavior(Velocity);
+          p.velocity = {x: 0, y: -40 + randint(-10,10)};
+          p.addBehavior(FadeOut, {duration: 0.2, delay: 2});
+        }
+        other.health = Math.min(other.maxhealth, other.health + 1); // repair!
       } else if (other == player && other.material !== undefined) {
         object.alive =false;
         other.material += 1;
