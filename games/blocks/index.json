@@ -6,6 +6,7 @@
     {"path": "blocks.wav"},
     {"path": "explode.wav"},
     {"path": "block.png", "frames": 3, "animations": 2, "speed": 0.2},
-    {"path": "hammer.png", "frames": 2, "animations": 2, "speed": 0.5}
+    {"path": "eyes.png", "frames": 1, "animations": 2, "speed": false},
+    {"path": "bomb.png", "frames": 2, "animations": 1, "speed": 0.33}
   ]
 }
