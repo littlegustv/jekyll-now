@@ -461,7 +461,7 @@ var onStart = function () {
       this.addBehavior(Enemy);
     }
   };
-  boss.addBehavior(Hover, {duration: 0.5, speed: 24, target: player_bot});
+  boss.addBehavior(Approach, {duration: 1.5, speed: 9, target: player_bot});
   boss.velocity = {x: 0, y: 0};
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
