@@ -1399,6 +1399,7 @@ var Store = {
     for (var i = 0; i < gameWorld.scene.layers.length; i++) {
       gameWorld.scene.layers[i].paused = false;
     }
+    gameWorld.boss.animation = 0;
     //gameWorld.current_wave += 1;
     
     /*gameWorld.scene.bg.camera.addBehavior(Lerp, {object: gameWorld.scene.bg.camera.behaviors[0].offset, field: "y", goal: -gameWorld.height / 2, rate: 10, callback: function () {

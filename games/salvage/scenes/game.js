@@ -274,25 +274,15 @@ var onStart = function () {
         if (this.current_wave % 2 === 0) {
           var theta = Math.random() * PI2;
           var g = toGrid(boss.x + 64 * Math.cos(theta), boss.y + 64 * Math.sin(theta));
-          var shopkeeper = s.bg.add(Object.create(Circle).init(g.x, g.y, 16));
-          shopkeeper.opacity = 0.6;
-          shopkeeper.color = COLORS.secondary;
-          shopkeeper.w = 32; shopkeeper.h = 32;
-          shopkeeper.setCollision(Polygon);
-          shopkeeper.family = "neutral";
-          //shopkeeper.addBehavior(Fanfare, {colors: [COLORS.secondary, COLORS.primary], radius: {min: 2, max: 8}, frequency: 10});
-          var text = s.bg.add(Object.create(SpriteFont).init(g.x, g.y, Resources.expire_font, "store", {spacing: -2, align: "center"}));
-          text.addBehavior(Follow, {target: shopkeeper, offset: {x: 0, y: -8}});
-          var text2 = s.bg.add(Object.create(SpriteFont).init(g.x, g.y, Resources.expire_font, "open!", {spacing: -2, align: "center"}));
-          text2.addBehavior(Follow, {target: shopkeeper, offset: {x: 0, y: 8}});
-          shopkeeper.addBehavior(Follow, {target: gameWorld.boss, offset: {x: shopkeeper.x - gameWorld.boss.x, y: shopkeeper.y - gameWorld.boss.y}});
-          shopkeeper.collision.onHandle = function (object, other) {
-            if (other === s.player_bot) {
-              object.collision.onHandle = function (a, b) {};
-              object.alive = false;
-              s.store.open();             
+          if (gameWorld.boss.health >= gameWorld.boss.maxhealth) {
+            if (!gameWorld.boss.billboard || !gameWorld.boss.billboard.alive) {              
+              gameWorld.boss.billboard = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
+              gameWorld.boss.billboard.opacity = 0;
+              gameWorld.boss.billboard.addBehavior(FadeIn, {duration: 0.5, maxOpacity: 1, delay: 0});
+              gameWorld.boss.billboard.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 0, y: 4, z: -1}});
+              gameWorld.boss.animation = 1;
             }
-          };
+          }
         }
         this.current_wave += 1;
         var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
@@ -423,6 +413,24 @@ var onStart = function () {
     [10]
   ];
   
+  var gate = this.bg.add(Object.create(Sprite).init(32, gameWorld.height / 2, Resources.gate));
+  gate.setCollision(Polygon);
+  gate.collision.onHandle = function (object, other) {
+      if (other === s.player_bot) {
+        if (other.hasFTL) {
+          if (gameWorld.boss.alive) {
+            gameWorld.ending = 2;
+          } else {
+            gameWorld.ending = 3;
+          }
+          gameWorld.setScene(2);
+        } else {
+
+        }
+      }
+  }
+
+
   var boss = this.bg.add(Object.create(Sprite).init(player_bot.x + gameWorld.width, player_bot.y, Resources.boss));
   //boss.blend = "destination-out";
   boss.animation = 0;
@@ -466,7 +474,13 @@ var onStart = function () {
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
   boss.collision.onHandle = function (object, other) {
-    if (other.family == "player" && !gameWorld.boss.invulnerable) {
+    if (other.family == "player" && object.billboard && object.billboard.alive) {
+      if (!other.lerpx && !other.lerpy) {
+        object.billboard.alive = false;
+        s.store.open();                     
+      }
+    }
+    else if (other.family == "player" && !gameWorld.boss.invulnerable) {
       object.health -= 1;
       gameWorld.boss.invulnerable = true;
       gameWorld.boss.respond(s.player_bot);
