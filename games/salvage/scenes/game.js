@@ -274,7 +274,7 @@ var onStart = function () {
         if (this.current_wave % 2 === 0) {
           var theta = Math.random() * PI2;
           var g = toGrid(boss.x + 64 * Math.cos(theta), boss.y + 64 * Math.sin(theta));
-          if (gameWorld.boss.health >= gameWorld.boss.maxhealth) {
+          /*if (gameWorld.boss.health >= gameWorld.boss.maxhealth) {
             if (!gameWorld.boss.billboard || !gameWorld.boss.billboard.alive) {              
               gameWorld.boss.billboard = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
               gameWorld.boss.billboard.opacity = 0;
@@ -282,7 +282,7 @@ var onStart = function () {
               gameWorld.boss.billboard.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 0, y: 4, z: -1}});
               gameWorld.boss.animation = 1;
             }
-          }
+          }*/
         }
         this.current_wave += 1;
         var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
