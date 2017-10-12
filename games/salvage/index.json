@@ -18,6 +18,7 @@
     {"path": "gate.png", "frames": 6, "animations": 1, "speed": 0.3},
     {"path": "grid.png"},
     {"path": "ground.png"},
+    {"path": "heart.png"},
     {"path": "building.png"},
     {"path": "tank.png", "frames": 2, "animations": 1, "speed": 0.5},
     {"path": "walker.png", "frames": 4, "animations": 1, "speed": 0.5},

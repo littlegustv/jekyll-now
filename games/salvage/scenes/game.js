@@ -24,6 +24,8 @@ var onStart = function () {
   //fg.active = true;
   //parallax.active = true;
 //
+
+  var player_bot = bg.add(Object.create(Sprite).init(64, 64, Resources.viper));
   
   var b = bg.add(Object.create(Entity).init(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT));
   b.color = COLORS.nullary;
@@ -36,11 +38,11 @@ var onStart = function () {
     b.opacity = Math.random()  / 3;
   }
   
-  var grid = bg.add(Object.create(TiledBackground).init(16, 16, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
+  var grid = bg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
   grid.z = -8;
   //grid.blend = "destination-out";
 
-  var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, HEIGHT, WIDTH, 12, Resources.ground));
+  var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, HEIGHT + 2, WIDTH, 12, Resources.ground));
   ground.z = -7;
   //ground.blend = "destination-out";
   ground.setCollision(Polygon);
@@ -60,7 +62,14 @@ var onStart = function () {
 
   this.health_bar = []; 
   for (var i = 0.5; i < MAXHEALTH + 0.5; i++) {
-    this.health_bar.push(this.ui.add(Object.create(Sprite).init(i * 16, gameWorld.height - 8, Resources.icons)));
+    var h = bg.add(Object.create(Sprite).init(i * 16, gameWorld.height - 8, Resources.heart));
+    h.follow = h.addBehavior(Follow, {target: player_bot, offset: {x: 0, y: 0, z: 1, angle: false}});
+    //h.addBehavior(Trail, {interval: 0.06, maxlength: 4, record: []});
+    h.radius = 2;
+    h.addBehavior(Oscillate, {field: "x", object: h.follow.offset, initial: 0, constant: 16, time: i * PI / 5, func: "cos"});
+    h.addBehavior(Oscillate, {field: "y", object: h.follow.offset, initial: 0, constant: 16, time: PI + i * PI / 5});
+    h.strokeColor = "#DD0000";
+    this.health_bar.push(h);
   }
   this.shield = this.ui.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 8, Resources.icons));
   this.shield.animation = 1;
@@ -112,7 +121,6 @@ var onStart = function () {
     mute_text.scale = 1;
   };*/
   
-  var player_bot = bg.add(Object.create(Sprite).init(64, 64, Resources.viper));
   //player_bot.blend = "destination-out";
   player_bot.setCollision(Polygon);
   player_bot.move = Movement.standard;

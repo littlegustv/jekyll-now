@@ -17,8 +17,8 @@ var ENDINGS = [
 
 var WIDTH = 320;
 var HEIGHT = 320;
-var MIN = {x: 16, y: 16};
-var MAX = {x: WIDTH - 16, y: HEIGHT - 16}; 
+var MIN = {x: 16, y: 24};
+var MAX = {x: WIDTH - 16, y: HEIGHT - 8}; 
 var TILESIZE = 48;
 
 /*var SCHEMES = [{
@@ -455,6 +455,15 @@ Circle.onDraw = function (ctx) {
     ctx.lineWidth = this.width;
     ctx.strokeStyle = this.strokeColor;
     ctx.stroke();
+  }
+};
+Oscillate.update = function (dt) {
+  if (!this.started) this.start();
+  this.time += this.rate * dt;
+  if (this.func === "cos") {
+    this.object[this.field] = this.constant * Math.cos(this.time) + this.initial;    
+  } else {
+    this.object[this.field] = this.constant * Math.sin(this.time) + this.initial;    
   }
 };
 Entity.oldDraw = Entity.onDraw;
