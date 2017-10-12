@@ -15,11 +15,11 @@ var ENDINGS = [
 	"Insurrection"
 ]
 
-var WIDTH = 320;
+var WIDTH = 180;
 var HEIGHT = 320;
-var MIN = {x: 16, y: 24};
-var MAX = {x: WIDTH - 16, y: HEIGHT - 8}; 
-var TILESIZE = 48;
+var MIN = {x: 8, y: 22};
+var MAX = {x: WIDTH - 8, y: HEIGHT - 10}; 
+var TILESIZE = 32;
 
 /*var SCHEMES = [{
   negative: "#000000",
@@ -48,7 +48,7 @@ var TILESIZE = 48;
 var COLORS = {
   negative: "#000000",
   nullary: "#FFFFFF",
-  primary: "#CC0000",
+  primary: "darkcyan",//"#CC0000",
   secondary: "#ff4500",
   tertiary: "#994411"
 };
@@ -56,7 +56,7 @@ var COLORS = {
 var COLORS = {
   negative: "#000000",
   nullary: "#FFFFFF",
-  primary: "#AA0000",
+  primary: "deepskyblue",//"#AA0000",
   secondary: "#000000",
   tertiary: "#000000"
 };
@@ -1224,7 +1224,7 @@ var Store = {
     {
       name: "Shield", price: 2, icon: 1, trigger: function (t) {
         if (!t.player.has_shield) {
-          t.player.has_shield = t.player.addBehavior(Shielded, {rate: 1});
+          t.player.has_shield = t.player.addBehavior(Shielded, {rate: 0.5});
           gameWorld.scene.updateHealthBar(t.player);
           return true;
         } else {

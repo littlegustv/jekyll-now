@@ -25,7 +25,8 @@ var onStart = function () {
   //parallax.active = true;
 //
 
-  var player_bot = bg.add(Object.create(Sprite).init(64, 64, Resources.viper));
+  var player_coordinates = toGrid(64, 64);
+  var player_bot = bg.add(Object.create(Sprite).init(player_coordinates.x, player_coordinates.y, Resources.viper));
   
   var b = bg.add(Object.create(Entity).init(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT));
   b.color = COLORS.nullary;
@@ -40,19 +41,24 @@ var onStart = function () {
   
   var grid = bg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
   grid.z = -8;
+
   //grid.blend = "destination-out";
 
-  var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, HEIGHT + 2, WIDTH, 12, Resources.ground));
+  var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MAX.y + 10, WIDTH, 12, Resources.ground));
   ground.z = -7;
   //ground.blend = "destination-out";
   ground.setCollision(Polygon);
 
-  var right = bg.add(Object.create(TiledBackground).init(WIDTH + 8, HEIGHT / 2, 32, HEIGHT, Resources.building));
+  var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, 8, WIDTH - 16, 16, Resources.building2));
+  ceiling.z = -7;
+  ceiling.setCollision(Polygon);
+
+  var right = bg.add(Object.create(TiledBackground).init(WIDTH + 12, HEIGHT / 2, 32, HEIGHT, Resources.building));
   right.z = -6;
   //right.blend = "destination-out";
   right.setCollision(Polygon);
 
-  var left = bg.add(Object.create(TiledBackground).init(-8, HEIGHT / 2, 32, HEIGHT, Resources.building));
+  var left = bg.add(Object.create(TiledBackground).init(-12, HEIGHT / 2, 32, HEIGHT, Resources.building));
   left.z = -6;
   //left.blend = "destination-out";
   left.setCollision(Polygon);
@@ -71,8 +77,9 @@ var onStart = function () {
     h.strokeColor = "#DD0000";
     this.health_bar.push(h);
   }
-  this.shield = this.ui.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 8, Resources.icons));
+  this.shield = bg.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 8, Resources.icons));
   this.shield.animation = 1;
+  this.shield.addBehavior(Follow, {target: player_bot, offset: {x: 0, y: 0, z: -1, angle: -PI / 2, opacity: false}})
   
   var s = this;
   this.updateHealthBar = function (object) {
@@ -83,11 +90,11 @@ var onStart = function () {
         s.health_bar[i].opacity = 0.2;
       }
     }
-    this.shield.opacity = object.shield;
+    this.shield.opacity = Math.pow(object.shield, 2);
   };
 
-  var menu_text = this.ui.add(Object.create(SpriteFont).init(4, 8, Resources.expire_font, "pause", {align: "left", spacing: -2}));
-  var menu_button = this.ui.add(Object.create(Entity).init(24, 8, 48, 16));
+  var menu_text = this.ui.add(Object.create(SpriteFont).init(28, 8, Resources.expire_font, "pause", {align: "center", spacing: -3}));
+  var menu_button = this.ui.add(Object.create(Entity).init(28, 8, 41, 16));
   menu_button.family = "button";
   menu_button.opacity = 0;
   menu_button.trigger = function () {
@@ -98,15 +105,15 @@ var onStart = function () {
     }
   };
   menu_button.hover = function () {
-    if (menu_text.scale != 2) gameWorld.playSound(Resources.hover);
-    menu_text.scale = 2;
+    if (menu_text.scale != 1.2) gameWorld.playSound(Resources.hover);
+    menu_text.scale = 1.2;
   };
   menu_button.unhover = function () {
     menu_text.scale = 1;
   };
   
-  /*var mute_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width - 24, 12, Resources.expire_font, "mute", {align: "center", spacing: -2}));
-  var mute_button = this.ui.add(Object.create(Entity).init(gameWorld.width - 24, 12, 48, 24));
+  var mute_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width - 28, 8, Resources.expire_font, "mute", {align: "center", spacing: -3}));
+  var mute_button = this.ui.add(Object.create(Entity).init(gameWorld.width - 28, 12, 41, 24));
   mute_button.family = "button";
   mute_button.opacity = 0;
   mute_button.trigger = function () {
@@ -114,12 +121,12 @@ var onStart = function () {
     // mute!
   };
   mute_button.hover = function () {
-    if (mute_text.scale != 2) gameWorld.playSound(Resources.hover);
-    mute_text.scale = 2;
+    if (mute_text.scale != 1.2) gameWorld.playSound(Resources.hover);
+    mute_text.scale = 1.2;
   };
   mute_button.unhover = function () {
     mute_text.scale = 1;
-  };*/
+  };
   
   //player_bot.blend = "destination-out";
   player_bot.setCollision(Polygon);
@@ -138,8 +145,8 @@ var onStart = function () {
   //player_bot.addBehavior(Bound, {min: {x: 6, y: -gameWorld.height * 5}, max: {x: gameWorld.width - 6, y: 5 * gameWorld.height}});
   player_bot.salvage = 0;
   // new movement settings
-  player_bot.speed = 5.5;
-  player_bot.distance = 48;
+  player_bot.speed = 6.5;
+  player_bot.distance = TILESIZE;
   player_bot.noCollide = false;
   
   player_bot.family = "player";
@@ -421,7 +428,7 @@ var onStart = function () {
   ];
 
   //this.waves = [[5, 6]]
-  
+  /*
   var gate = this.bg.add(Object.create(Sprite).init(32, gameWorld.height / 2, Resources.gate));
   gate.setCollision(Polygon);
   gate.collision.onHandle = function (object, other) {
@@ -437,7 +444,7 @@ var onStart = function () {
 
         }
       }
-  }
+  }*/
 
 
   var boss = this.bg.add(Object.create(Sprite).init(player_bot.x + gameWorld.width, player_bot.y, Resources.boss));
