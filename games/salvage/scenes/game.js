@@ -399,19 +399,20 @@ var onStart = function () {
   this.current_wave = 0;
 
   this.waves = [
-    [0],
-    [0],
+    [0, 0], // drones --> done!
     [1],
     [2],
     [3],
     [4],
     [5],
     [6],
-    [7],
-    [8],
-    [9],
-    [10]
+    //[7],
+    //[8],
+    //[9],
+    //[10]
   ];
+
+  //this.waves = [[5, 6]]
   
   var gate = this.bg.add(Object.create(Sprite).init(32, gameWorld.height / 2, Resources.gate));
   gate.setCollision(Polygon);
@@ -456,7 +457,7 @@ var onStart = function () {
       this.target = {x: target.x, y: target.y + 12};
       this.shoot(this.layer);
     } else if (this.health >= this.maxhealth - 2) {
-      this.shoot = Weapons.triangle;
+      this.shoot = Weapons.firework;
       this.shoot_angle = angle(this.x, this.y, target.x, target.y);
       this.target = target;
       this.shoot(this.layer);
