@@ -17,8 +17,8 @@ var ENDINGS = [
 
 var WIDTH = 180;
 var HEIGHT = 320;
-var MIN = {x: 8, y: 22};
-var MAX = {x: WIDTH - 8, y: HEIGHT - 10}; 
+var MIN = {x: 6, y: 22};
+var MAX = {x: WIDTH - 6, y: HEIGHT - 10}; 
 var TILESIZE = 32;
 
 /*var SCHEMES = [{
@@ -199,6 +199,17 @@ Move.pick = function () {
   var x = randint(-1, 2);
   return toGrid(this.entity.x + x * TILESIZE, x === 0 ? this.entity.y + choose([-1, 1]) * TILESIZE : this.entity.y);
   //return toGrid(randint(MIN.x, MAX.x), randint(MIN.y, MAX.y));
+};
+
+var Boss = Object.create(Move);
+Boss.pick = function () {
+  if (this.entity.y + TILESIZE > MAX.y) {
+    return toGrid(this.entity.x, this.entity.y - TILESIZE);
+  } else if (this.entity.y - TILESIZE < MIN.y) {
+    return toGrid(this.entity.x, this.entity.y + TILESIZE);
+  } else {
+    return toGrid(this.entity.x, this.entity.y + choose([-1, 1]) * TILESIZE);
+  }
 };
 
 // moves at right angle in approaching "spiral" - ish
@@ -1031,7 +1042,7 @@ function spawn(layer, key, player) {
   enemy.addBehavior(Velocity);
   enemy.velocity = {x: 0, y: 0};
   enemy.setCollision(Polygon);
-  enemy.addBehavior(Bound, {min: {x: 16, y: 16}, max: {x: WIDTH - 16, y: HEIGHT - 16}});
+  enemy.addBehavior(Bound, {min: {x: MIN.x, y: MIN.y}, max: {x: MAX.x, y: MAX.y}});
   //enemy.blend = "destination-out";
   switch (key) {
     case 0: // drone

@@ -447,7 +447,7 @@ var onStart = function () {
   }*/
 
 
-  var boss = this.bg.add(Object.create(Sprite).init(player_bot.x + gameWorld.width, player_bot.y, Resources.boss));
+  var boss = this.bg.add(Object.create(Sprite).init(0, toGrid(0, 100).y, Resources.boss));
   //boss.blend = "destination-out";
   boss.animation = 0;
   boss.modules = [];
@@ -485,7 +485,7 @@ var onStart = function () {
       this.addBehavior(Enemy);
     }
   };
-  boss.addBehavior(Approach, {duration: 1.5, speed: 9, target: player_bot});
+  boss.addBehavior(Boss, {duration: 1.5, speed: 9, target: player_bot});
   boss.velocity = {x: 0, y: 0};
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
