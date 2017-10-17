@@ -432,7 +432,7 @@ var onStart = function () {
     //[10]
   ];
 
-  //this.waves = [[5, 6]]
+  //this.waves = [[2, 2, 2]]
   /*
   var gate = this.bg.add(Object.create(Sprite).init(32, gameWorld.height / 2, Resources.gate));
   gate.setCollision(Polygon);

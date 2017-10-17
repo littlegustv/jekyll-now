@@ -313,6 +313,7 @@ Layer.update = function (dt) {
   for (var i = 0; i < this.entities.length; i++) {
     if (!this.entities[i].alive) {
       this.entities[i].end();
+      delete this.entities[i];
       this.entities.splice(i, 1);
     }
   }
