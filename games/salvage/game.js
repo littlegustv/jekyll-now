@@ -935,6 +935,7 @@ var CropDistance = Object.create(Behavior);
 CropDistance.update = function (dt) {
   var d = distance(this.entity.x, this.entity.y, this.target.x, this.target.y);
   if (d > this.max) {
+    console.log('too far');
     //console.log('cropdistance actually happening');
     this.entity.alive = false;
   }
@@ -1146,7 +1147,7 @@ function spawn(layer, key, player) {
   flash.addBehavior(FadeOut, {duration: 0, delay: 0.7});
   enemy.collision.onHandle = function (object, other) {
     if (other.family == "player") {
-      enemy.alive = false;
+      //enemy.alive = false;
       enemy.die();
     }
   };

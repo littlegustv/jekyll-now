@@ -1,3 +1,5 @@
+'use strict';
+
 var Behavior = {
 	init: function (entity, config) {
 		this.entity = entity;
@@ -316,7 +318,7 @@ var Collision = {
 	},
 	onStart: function (object) {},
 	onCheck: function (object, other) {},
-	onHandle: function (object, object) { },
+	onHandle: function (object, other) {},
 	onEnd: function (object) {},
 	onDraw: function (object, ctx) {}
 };
@@ -1433,6 +1435,8 @@ var Layer = {
     for (var i = 0; i < this.entities.length; i++) {
       if (!this.entities[i].alive) {
         this.entities[i].end();
+        // push to raindrop - garbage collection
+        delete this.entities[i];
         this.entities.splice(i, 1);
       }
     }
@@ -1651,10 +1655,10 @@ var World = {
     if (window.innerWidth / window.innerHeight > ratio)
     {
       this.canvas.style.height = window.innerHeight + "px";
-      scale = window.innerHeight / this.canvas.height;
+      var scale = window.innerHeight / this.canvas.height;
     } else {
       this.canvas.style.width = window.innerWidth + "px";
-      scale = window.innerWidth / this.canvas.width;
+      var scale = window.innerWidth / this.canvas.width;
     }
     this.scale = scale;
   },
