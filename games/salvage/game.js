@@ -17,8 +17,8 @@ var ENDINGS = [
 
 var WIDTH = 180;
 var HEIGHT = 320;
-var MIN = {x: 6, y: 22};
-var MAX = {x: WIDTH - 6, y: HEIGHT - 10}; 
+var MIN = {x: 10, y: 22};
+var MAX = {x: WIDTH - 10, y: HEIGHT - 10}; 
 var TILESIZE = 32;
 
 /*var SCHEMES = [{
@@ -1423,6 +1423,8 @@ var Store = {
       gameWorld.scene.layers[i].paused = false;
     }
     gameWorld.boss.animation = 0;
+    gameWorld.boss.store_open.alive = false;
+    gameWorld.boss.store_open = undefined;
     //gameWorld.current_wave += 1;
     
     /*gameWorld.scene.bg.camera.addBehavior(Lerp, {object: gameWorld.scene.bg.camera.behaviors[0].offset, field: "y", goal: -gameWorld.height / 2, rate: 10, callback: function () {

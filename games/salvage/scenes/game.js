@@ -289,15 +289,19 @@ var onStart = function () {
         if (this.current_wave % 2 === 0) {
           var theta = Math.random() * PI2;
           var g = toGrid(boss.x + 64 * Math.cos(theta), boss.y + 64 * Math.sin(theta));
-          /*if (gameWorld.boss.health >= gameWorld.boss.maxhealth) {
-            if (!gameWorld.boss.billboard || !gameWorld.boss.billboard.alive) {              
+          if (gameWorld.boss.health >= gameWorld.boss.maxhealth) {
+            gameWorld.boss.store_open = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
+            gameWorld.boss.store_open.angle = PI / 2;
+            gameWorld.boss.store_open.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 6, y: 0, angle: false, z: 1}});
+            gameWorld.boss.animation = 1;
+          /*  if (!gameWorld.boss.billboard || !gameWorld.boss.billboard.alive) {              
               gameWorld.boss.billboard = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
               gameWorld.boss.billboard.opacity = 0;
               gameWorld.boss.billboard.addBehavior(FadeIn, {duration: 0.5, maxOpacity: 1, delay: 0});
               gameWorld.boss.billboard.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 0, y: 4, z: -1}});
               gameWorld.boss.animation = 1;
-            }
-          }*/
+            }*/
+          }
         }
         this.current_wave += 1;
         var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
@@ -490,10 +494,9 @@ var onStart = function () {
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
   boss.collision.onHandle = function (object, other) {
-    if (other.family == "player" && object.billboard && object.billboard.alive) {
+    if (other.family == "player" && object.store_open) {
       if (!other.lerpx && !other.lerpy) {
-        object.billboard.alive = false;
-        s.store.open();                     
+        s.store.open();
       }
     }
     else if (other.family == "player" && !gameWorld.boss.invulnerable) {
