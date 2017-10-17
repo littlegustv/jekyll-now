@@ -69,10 +69,16 @@ var Z = {
 }
 
 function toGrid(x, y) {
-  return {
+  var g = {
     x: clamp(Math.round((x - MIN.x) / TILESIZE) * TILESIZE + MIN.x, MIN.x, MAX.x),
     y: clamp(Math.round((y - MIN.y) / TILESIZE) * TILESIZE + MIN.y, MIN.y, MAX.y)
   }
+  if (gameWorld.player && gameWorld.player.hasFTL) {
+    if (g.x == MIN.x + TILESIZE * 2 || g.x == MIN.x + TILESIZE * 3) { // halfway point?
+      g.y = clamp(Math.round((y - MIN.y) / TILESIZE) * TILESIZE + MIN.y, MIN.y - 32, MAX.y)
+    }
+  }
+  return g;
 }
 
 var buttonHover = function () { 
@@ -1279,14 +1285,15 @@ var Store = {
     {
       name: "FTL", price: 15, icon: 5, trigger: function (t) {
         if (!t.player.hasFTL) {
-          t.player.hasFTL = t.player.addBehavior(HyperDrive); // maybe do this HERE instead of in random behavior...
+/*          t.player.hasFTL = t.player.addBehavior(HyperDrive); // maybe do this HERE instead of in random behavior...
           var ftl_button = gameWorld.scene.ui.add(Object.create(Entity).init(gameWorld.width - 12, gameWorld.height - 8, 24, 16));
           ftl_button.family = "button";
           ftl_button.text = gameWorld.scene.ui.add(Object.create(SpriteFont).init(gameWorld.width - 12, gameWorld.height - 8, Resources.expire_font, "FTL", {spacing: 2, align: "center"}));
           ftl_button.trigger = function () {
           	t.player.hasFTL.go();
           	ftl_button.alive = false;
-          };
+          };*/
+          t.player.hasFTL = true;
           return true;
         } else {
           return false;

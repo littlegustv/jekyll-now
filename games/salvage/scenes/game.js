@@ -155,6 +155,7 @@ var onStart = function () {
   }
   
   this.updateHealthBar(player_bot);
+  gameWorld.player = player_bot;
   player_bot.collision.onHandle = function (object, other) {
     if (object.noCollide) return;
     
