@@ -1038,7 +1038,7 @@ Repair.update = function (dt) {
 
 //var animations = [0, 1, 2, 2, 4, 4, 3, 3, 2];
 //var sprites = ["drone", "saucer", "modules", "bomber", "saucer", "drone", "modules", "beamship", "walker", "walker", "beamship"];
-var sprites = ["drone", "train", "radar", "round", "thopter", "fighter", "walker"]
+var sprites = ["drone", "train", "radar", "saucer", "thopter", "fighter", "walker"]
 function spawn(layer, key, player) {
   var theta = Math.random() * PI2;
   var x = randint(MIN.x, MAX.x), y = randint(MIN.y, MAX.y);
