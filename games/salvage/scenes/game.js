@@ -516,6 +516,7 @@ var onStart = function () {
     }
   };
   boss.die = function (e) {
+    // fix me: maybe here? (need to made non-collide)
     var expl = this.layer.add(Object.create(Circle).init(this.x, this.y, 24));
     expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
     expl.z = 1;
