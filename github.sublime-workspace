@@ -1,0 +1,2069 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"proven",
+				"provenance"
+			],
+			[
+				"prove",
+				"provenance"
+			],
+			[
+				"date_n",
+				"date_normalized_start"
+			],
+			[
+				"foli",
+				"folios_search"
+			],
+			[
+				"man",
+				"manuscript_date_search"
+			],
+			[
+				"mode",
+				"model_class_str"
+			],
+			[
+				"entry",
+				"entry_place"
+			],
+			[
+				"save",
+				"savesource"
+			],
+			[
+				"displ",
+				"display_value"
+			],
+			[
+				"disp",
+				"display_value"
+			],
+			[
+				"displa",
+				"display_value"
+			],
+			[
+				"attr",
+				"attributes"
+			],
+			[
+				"results",
+				"resultsTable"
+			],
+			[
+				"person",
+				"person_id"
+			],
+			[
+				"source",
+				"source_catalog_or_lot_number"
+			],
+			[
+				"normali",
+				"normalized_date_range_str"
+			],
+			[
+				"a",
+				"active"
+			],
+			[
+				"unre",
+				"unreviewed_only"
+			],
+			[
+				"ap",
+				"appliedFilter"
+			],
+			[
+				"facet_l",
+				"facet_limit-active"
+			],
+			[
+				"decre",
+				"decrement_counter"
+			],
+			[
+				"date_norm",
+				"date_normalized_end"
+			],
+			[
+				"sale",
+				"sale_entries"
+			],
+			[
+				"agent",
+				"agent_sources"
+			],
+			[
+				"check",
+				"checkCatOrLotNumbers"
+			],
+			[
+				"cat_",
+				"cat_or_lot_numbers"
+			],
+			[
+				"end",
+				"end_date_range"
+			],
+			[
+				"start_",
+				"start_date_range"
+			],
+			[
+				"created",
+				"created_by_id"
+			],
+			[
+				"prod",
+				"productivity"
+			],
+			[
+				"alt",
+				"alt_size"
+			],
+			[
+				"AL",
+				"ALT_SIZE_TYPES"
+			],
+			[
+				"deric",
+				"dericci_records_path"
+			],
+			[
+				"Dericci",
+				"DericciRecord"
+			],
+			[
+				"dericci_",
+				"dericci_record_flags"
+			],
+			[
+				"search",
+				"search_string"
+			],
+			[
+				"dericc",
+				"dericci_record_flags"
+			],
+			[
+				"dericci_reco",
+				"dericci_record_flags"
+			],
+			[
+				"dericci_rec",
+				"dericci_record_flags_attributes"
+			],
+			[
+				"der",
+				"dericci_record_params"
+			],
+			[
+				"comment",
+				"comments_attributes"
+			],
+			[
+				"comm",
+				"comments_attributes"
+			],
+			[
+				"data",
+				"dataConfirmModal"
+			],
+			[
+				"dericci",
+				"dericci_links"
+			],
+			[
+				"record",
+				"record_id"
+			],
+			[
+				"prep",
+				"prepopulatedURL"
+			],
+			[
+				"requ",
+				"request-advancement"
+			],
+			[
+				"temp",
+				"temporarily_disabled"
+			],
+			[
+				"curre",
+				"current_user"
+			],
+			[
+				"user",
+				"username_with_profile_link"
+			],
+			[
+				"html",
+				"html_safe"
+			],
+			[
+				"edit",
+				"editing_group_users"
+			],
+			[
+				"sdbm",
+				"sdbmTable"
+			],
+			[
+				"locati",
+				"location_institution"
+			],
+			[
+				"works",
+				"workspaceTable"
+			],
+			[
+				"workspace",
+				"workspaceTable"
+			],
+			[
+				"highl",
+				"highlightRows"
+			],
+			[
+				"manuscri",
+				"manuscript_id"
+			],
+			[
+				"compl",
+				"complete_entry"
+			],
+			[
+				"rela",
+				"relation_type"
+			],
+			[
+				"manu",
+				"manuscript_link"
+			],
+			[
+				"ass",
+				"associated_date"
+			],
+			[
+				"entry_lan",
+				"entry_languages"
+			],
+			[
+				"publi",
+				"public_view"
+			],
+			[
+				"get_bu",
+				"get_buyers"
+			],
+			[
+				"entryman",
+				"entrymanuscripts"
+			],
+			[
+				"some",
+				"somethingunguessable"
+			],
+			[
+				"getCol",
+				"getColumnIndex"
+			],
+			[
+				"do_s",
+				"do_csv_search"
+			],
+			[
+				"sale_sell",
+				"sale_selling_agent_search"
+			],
+			[
+				"bu",
+				"sale_buyer_search"
+			],
+			[
+				"sell",
+				"sale_seller_search"
+			],
+			[
+				"cat",
+				"catalog_or_lot_number_search"
+			],
+			[
+				"place",
+				"place_search"
+			],
+			[
+				"language",
+				"language_search"
+			],
+			[
+				"extra",
+				"extra_controller_params"
+			],
+			[
+				"find",
+				"find_by_id"
+			],
+			[
+				"auc",
+				"auction_catalog"
+			],
+			[
+				"Manuscr",
+				"Manuscripts"
+			],
+			[
+				"dash",
+				"dashboard_activity_path"
+			],
+			[
+				"dericci_links",
+				"dericci_links_attributes"
+			],
+			[
+				"gam",
+				"gameID"
+			],
+			[
+				"watches",
+				"watches_params"
+			],
+			[
+				"set",
+				"setProgress"
+			],
+			[
+				"gly",
+				"glyphicon-blank"
+			],
+			[
+				"trust",
+				"trustAsResourceUrl"
+			],
+			[
+				"current",
+				"current_record"
+			],
+			[
+				"orig",
+				"originalEntryViewModel"
+			],
+			[
+				"sor",
+				"sortable-history"
+			],
+			[
+				"acti",
+				"activity_tabs"
+			],
+			[
+				"modal",
+				"modalInstance"
+			],
+			[
+				"new",
+				"new_params"
+			],
+			[
+				"quer",
+				"query_params"
+			],
+			[
+				"found",
+				"found_lc_name"
+			],
+			[
+				"num",
+				"number_of_records"
+			],
+			[
+				"notifica",
+				"notification"
+			],
+			[
+				"not",
+				"notifications"
+			],
+			[
+				"create",
+				"createSearchParams"
+			],
+			[
+				"text",
+				"textStatus"
+			],
+			[
+				"to",
+				"to_formatted_s"
+			],
+			[
+				"allow",
+				"allow_destroy"
+			],
+			[
+				"devise",
+				"devise_mapping"
+			],
+			[
+				"sd",
+				"sdbm_hide_panel"
+			],
+			[
+				"book",
+				"bookmarks-collapse"
+			],
+			[
+				"num_m",
+				"num_manuscripts_to_show"
+			],
+			[
+				"num_",
+				"num_sources_to_show"
+			],
+			[
+				"setFor",
+				"setFormStateFromParams"
+			],
+			[
+				"remove-",
+				"remove-link-container"
+			],
+			[
+				"but",
+				"button_html"
+			],
+			[
+				"notifi",
+				"notification"
+			],
+			[
+				"watc",
+				"watched_type"
+			],
+			[
+				"nu",
+				"num_entries"
+			],
+			[
+				"notif",
+				"notification_f"
+			],
+			[
+				"transac",
+				"transaction_id"
+			],
+			[
+				"manage",
+				"manageEntries"
+			],
+			[
+				"mana",
+				"manageEntries"
+			],
+			[
+				"priate",
+				"private_messages"
+			],
+			[
+				"origina",
+				"original_entry"
+			],
+			[
+				"TYP",
+				"TYPE_RELATION_IS"
+			],
+			[
+				"Entry",
+				"EntryManuscript"
+			],
+			[
+				"priva",
+				"private_message"
+			],
+			[
+				"sent",
+				"sent_messages"
+			],
+			[
+				"user_mess",
+				"user_messages_to"
+			],
+			[
+				"prive",
+				"private_message"
+			],
+			[
+				"date_ac",
+				"date_accessed_str"
+			],
+			[
+				"s",
+				"syllables"
+			],
+			[
+				"grou",
+				"group_params"
+			],
+			[
+				"ini",
+				"initial_replies_count"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "games/salvage/game.js",
+			"settings":
+			{
+				"buffer_size": 51925,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "games/salvage/scenes/game.js",
+			"settings":
+			{
+				"buffer_size": 23697,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 252.0,
+		"selected_items":
+		[
+			[
+				"indent",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"bea",
+				"BeautifyRuby"
+			],
+			[
+				"",
+				"BeautifyRuby"
+			],
+			[
+				"beaut",
+				"BeautifyRuby"
+			],
+			[
+				"ruby",
+				"Format: Ruby"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"lint",
+				"SublimeLinter: Lint Current File"
+			],
+			[
+				"git log",
+				"Git: Log Current File"
+			],
+			[
+				"pack",
+				"Package Control: Install Package"
+			],
+			[
+				"plac",
+				"Package Control: List Packages"
+			],
+			[
+				"previ",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"preview",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"git ",
+				"Git: Status"
+			],
+			[
+				"git hist",
+				"Git: Commit history"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"beu",
+				"BeautifyRuby"
+			],
+			[
+				"markdown",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"git diff",
+				"Git: Diff Current File"
+			],
+			[
+				"log",
+				"Git: Log Current File"
+			],
+			[
+				"git log cu",
+				"Git: Log Current File"
+			],
+			[
+				"git log cur",
+				"Git: Log Current File"
+			],
+			[
+				"git log c",
+				"Git: Log Current File"
+			],
+			[
+				"git curr",
+				"Git: Diff Tool Current File"
+			],
+			[
+				"prev",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"markdow",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"git",
+				"Git: Log Current File"
+			],
+			[
+				"pack inst",
+				"Package Control: Install Package"
+			],
+			[
+				"package disa",
+				"Package Control: Disable Package"
+			],
+			[
+				"markdo",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"Package inst",
+				"Package Control: Install Package"
+			],
+			[
+				"git commi",
+				"Git: Commit history"
+			],
+			[
+				"Package Control: I",
+				"Package Control: Install Package"
+			],
+			[
+				"Pack",
+				"Package Control: Install Package"
+			],
+			[
+				"Packa",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 530.0
+	},
+	"console":
+	{
+		"height": 125.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/hellerb/Projects/github/littlegustv.github.io/index.html",
+		"/home/hellerb/sdbmss/app/models/name.rb",
+		"/home/hellerb/sdbmss/app/controllers/names_controller.rb",
+		"/home/hellerb/sdbmss/app/controllers/places_controller.rb",
+		"/home/hellerb/sdbmss/app/controllers/languages_controller.rb",
+		"/home/hellerb/sdbmss/app/models/source.rb",
+		"/home/hellerb/sdbmss/app/controllers/manage_models_controller.rb",
+		"/home/hellerb/sdbmss/app/views/sources/_source.json.jbuilder",
+		"/home/hellerb/sdbmss/app/models/entry.rb",
+		"/home/hellerb/sdbmss/app/models/place.rb",
+		"/home/hellerb/sdbmss/app/controllers/entries_controller.rb",
+		"/home/hellerb/sdbmss/app/views/activities/_show_all.html.erb",
+		"/home/hellerb/sdbmss/app/models/entry_place.rb",
+		"/home/hellerb/Projects/bodleian/medieval-mss/script.rb",
+		"/home/hellerb/Downloads/test2.xml",
+		"/home/hellerb/sdbmss/app/assets/stylesheets/sdbmss.css.erb",
+		"/home/hellerb/sdbmss/app/models/entry_author.rb",
+		"/home/hellerb/sdbmss/app/views/profiles/_tiles.html.erb",
+		"/home/hellerb/sdbmss/app/views/activities/_nav.html.erb",
+		"/home/hellerb/sdbmss/app/views/dashboard/contributions.html.erb",
+		"/home/hellerb/sdbmss/app/views/bookmarks/index.html.erb.bk3",
+		"/home/hellerb/sdbmss/app/views/dashboard/show.html.erb",
+		"/home/hellerb/sdbmss/app/views/dashboard/_my_entries.html.erb",
+		"/home/hellerb/sdbmss/app/assets/javascripts/sdbm.js",
+		"/home/hellerb/sdbmss/app/views/dashboard/activity.html.erb",
+		"/home/hellerb/sdbmss/app/views/shared/_control_panel.html.erb",
+		"/home/hellerb/Documents/suggestions.rake",
+		"/home/hellerb/sdbmss/app/views/dashboard/_header.html.erb",
+		"/home/hellerb/sdbmss/config/initializers/thredded.rb",
+		"/home/hellerb/sdbmss/app/views/dashboard/_drafts.html.erb",
+		"/home/hellerb/sdbmss/app/views/dashboard/_my_sources.html.erb",
+		"/home/hellerb/sdbmss/app/views/dashboard/_my_manuscripts.html.erb",
+		"/home/hellerb/sdbmss/app/models/source_agent.rb",
+		"/home/hellerb/sdbmss/app/views/names/_main.html.erb",
+		"/home/hellerb/sdbmss/app/views/sources/_source_details.html.erb",
+		"/home/hellerb/sdbmss/app/views/sources/show.html.erb",
+		"/home/hellerb/sdbmss/app/controllers/catalog_controller.rb",
+		"/home/hellerb/Documents/alt_size.csv",
+		"/home/hellerb/test_suggestions.rb",
+		"/home/hellerb/sdbmss/solr/conf/schema.xml",
+		"/home/hellerb/sdbmss/app/views/catalog/show.xml.builder",
+		"/home/hellerb/sdbmss/lib/sdbmss/index_job.rb",
+		"/home/hellerb/sdbmss/bin/delayed_job",
+		"/home/hellerb/sdbmss/app/models/concerns/index_after_update.rb",
+		"/home/hellerb/sdbmss/app/controllers/sources_controller.rb",
+		"/home/hellerb/sdbmss/app/views/shared/_select_model_authority.html.erb",
+		"/home/hellerb/sdbmss/app/assets/javascripts/sdbmApp.js",
+		"/home/hellerb/sdbmss/app/views/entries/_edit_buttons.html.erb",
+		"/home/hellerb/sdbmss/config/routes.rb",
+		"/home/hellerb/sdbmss/app/controllers/community_controller.rb",
+		"/home/hellerb/sdbmss/app/models/ability.rb",
+		"/home/hellerb/sdbmss/app/models/group_record.rb",
+		"/home/hellerb/Downloads/237741.xml",
+		"/home/hellerb/sdbmss/app/views/entries/show.json.jbuilder",
+		"/home/hellerb/sdbmss/app/views/catalog/show.html.erb",
+		"/home/hellerb/sdbmss/Gemfile",
+		"/home/hellerb/sdbmss/app/views/sources/_tools.html.erb",
+		"/home/hellerb/sdbmss/app/views/entries/edit.html.erb",
+		"/home/hellerb/sdbmss/app/views/manage_models/_tools.html.erb",
+		"/home/hellerb/sdbmss/app/views/manage_models/show.html.erb",
+		"/home/hellerb/sdbmss/app/views/shared/_select_source.html.erb",
+		"/home/hellerb/sdbmss/app/views/names/problems.html.erb",
+		"/home/hellerb/sdbmss/app/views/layouts/application.html.erb",
+		"/home/hellerb/sdbmss/spec/features/data_entry_spec.rb",
+		"/home/hellerb/sdbmss/spec/lib/data_entry_helpers.rb",
+		"/home/hellerb/sdbmss/spec/features/entries_to_index_on_update_spec.rb",
+		"/home/hellerb/sdbmss/app/views/shared/_modal.html.erb",
+		"/home/hellerb/sdbmss/app/views/sources/edit.html.erb",
+		"/home/hellerb/sdbmss/app/views/shared/_create_source.html.erb",
+		"/home/hellerb/sdbmss/spec/features/manage_private_messages_spec.rb",
+		"/home/hellerb/sdbmss/spec/features/search_spec.rb",
+		"/home/hellerb/sdbmss/app/views/shared/_footer.html.erb",
+		"/home/hellerb/sdbmss/app/controllers/searchable_authority_controller.rb",
+		"/home/hellerb/sdbmss/app/views/entries/_source_selection_form.html.erb",
+		"/home/hellerb/sdbmss/app/views/shared/_select_name_authority.html.erb",
+		"/home/hellerb/sdbmss/app/assets/javascripts/sdbmManageRecords.js",
+		"/home/hellerb/sdbmss/app/views/sources/_index_js.html.erb",
+		"/home/hellerb/sdbmss/app/models/language.rb",
+		"/home/hellerb/sdbmss/app/views/names/show.html.erb",
+		"/home/hellerb/sdbmss/app/views/names/_tools.html.erb",
+		"/home/hellerb/sdbmss/db/migrate/20170807171227_add_problem_flag_to_names.rb",
+		"/home/hellerb/sdbmss/db/migrate/20170929181813_add_problem_to_places_languages_sources.rb",
+		"/home/hellerb/sdbmss/app/views/entries/_show.html.erb",
+		"/home/hellerb/sdbmss/app/views/entries/import.html.erb",
+		"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/sunspot-2.2.0/lib/sunspot.rb",
+		"/home/hellerb/sdbmss/lib/sdbmss/util.rb",
+		"/home/hellerb/sdbmss/app/models/entry_material.rb",
+		"/home/hellerb/Downloads/export_test.csv",
+		"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4/config/locales/blacklight_advanced_search.en.yml",
+		"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4/app/helpers/advanced_helper.rb",
+		"/home/hellerb/sdbmss/app/views/advanced/_advanced_search_form.html.erb",
+		"/home/hellerb/sdbmss/config/initializers/blacklight_advanced.rb",
+		"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4/app/controllers/blacklight_advanced_search/advanced_controller.rb",
+		"/home/hellerb/sdbmss/app/controllers/concerns/catalog_controller_configuration.rb",
+		"/home/hellerb/sdbmss/app/assets/javascripts/sdbmTable.js",
+		"/home/hellerb/sdbmss/app/views/linking_tool/show.html.erb",
+		"/home/hellerb/sdbmss/solr/conf/solrconfig.xml",
+		"/home/hellerb/sdbmss/app/views/catalog/_home_text.html.erb",
+		"/home/hellerb/sdbmss/app/views/catalog/_document.html.erb",
+		"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/sunspot-2.2.0/History.txt",
+		"/home/hellerb/sdbmss/lib/sdbmss/similar_entries.rb",
+		"/home/hellerb/sdbmss/app/views/entries/_index_js.html.erb",
+		"/home/hellerb/sdbmss/app/models/concerns/solr_searchable.rb",
+		"/home/hellerb/Documents/digging into data meeting.md",
+		"/home/hellerb/sdbmss/app/controllers/linking_tool_controller.rb",
+		"/home/hellerb/sdbmss/app/models/entry_artist.rb",
+		"/home/hellerb/sdbmss/app/models/entry_date.rb",
+		"/home/hellerb/sdbmss/app/models/entry_title.rb",
+		"/home/hellerb/sdbmss/app/models/entry_use.rb",
+		"/home/hellerb/sdbmss/app/models/entry_language.rb",
+		"/home/hellerb/sdbmss/app/models/entry_scribe.rb",
+		"/home/hellerb/sdbmss/app/models/provenance.rb",
+		"/home/hellerb/Projects/bodleian/medieval-mss/schema.rb",
+		"/home/hellerb/sdbmss/find.rb",
+		"/home/hellerb/Projects/bodleian/medieval-mss/schema.txt",
+		"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/sunspot-2.2.0/lib/sunspot/search/more_like_this_search.rb",
+		"/home/hellerb/sdbmss/Gemfile.lock",
+		"/home/hellerb/Documents/questions",
+		"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/sunspot-2.2.0/lib/sunspot/session.rb",
+		"/home/hellerb/sdbmss/app/views/entries/feed.rss.builder",
+		"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/sunspot-2.2.0/lib/sunspot/search.rb",
+		"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/sunspot-2.2.0/lib/sunspot/field.rb",
+		"/home/hellerb/sdbmss/app/views/manuscripts/show.html.erb",
+		"/home/hellerb/sdbmss/app/controllers/manuscripts_controller.rb",
+		"/home/hellerb/sdbmss/public/404.html",
+		"/home/hellerb/sdbmss/app/controllers/errors_controller.rb",
+		"/home/hellerb/sdbmss/app/views/comments/_show_all.html.erb",
+		"/home/hellerb/linked data/d2rq-0.8.1/mapping.ttl"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			"",
+			"~/sdbmss/spec",
+			"~/spec",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/sunspot-2.2.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/sunspot-2.2.0",
+			"",
+			"/home/hellerb/sdbmss/app/assets/javascripts",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/sunspot-2.2.0",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"~/sdbmss/spec",
+			"./spec",
+			"spec",
+			"./spec",
+			"spec",
+			"authors_count",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/thredded-0.9.4",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"./spec",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"~/sdbmss/spec",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/thredded-0.9.4",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"~/sdbmss/spec",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/devise-3.4.1",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/devise-3.4.1",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/devise-3.4.1",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"~/sdbmss/spec",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/sunspot-2.2.0/lib/sunspot",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/sunspot-2.2.0/lib/sunspot",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/devise-3.5.4,/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/devise-3.5.4",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"~/sdbmss/spec",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight_advanced_search-5.1.4",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"~/sdbmss/spec",
+			"",
+			"~/sdbmss/spec",
+			"@user = User.find_or_create_by",
+			"",
+			"~/sdbmss/spec",
+			"spec",
+			"",
+			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
+			"",
+			"~/sdbmss/spec",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"persName",
+			"deletable",
+			"flat",
+			"scribe",
+			"format.xml",
+			"xml",
+			".active",
+			"masonry",
+			"grid",
+			"masonry",
+			"tile",
+			".tile",
+			"br",
+			"dashboard-tabs",
+			"source",
+			"source_agents_count",
+			",\\s",
+			"    ",
+			",\\n",
+			",\\s",
+			"]",
+			"[",
+			"'",
+			"alt_size",
+			"artist_search",
+			"artists_search",
+			":define_field",
+			"more_like_",
+			"index_entries",
+			"ids",
+			"perform_later",
+			"indexjob",
+			"perform_later",
+			"group",
+			"can :edit",
+			"(xmlns\\:.+)=",
+			"def show",
+			"builder",
+			"october",
+			"currentlySaving = true",
+			"currentlySaving = false",
+			"currentlySav",
+			"save",
+			".problem",
+			"problem",
+			".problem",
+			"set_so",
+			"problem",
+			"def show",
+			"problem",
+			"as problematic",
+			"click_button",
+			"savesource",
+			"click_button('#savesource')",
+			"#save",
+			"#saveb",
+			"click_button('#savebutton')",
+			"'Save'",
+			"save",
+			"selling agent",
+			"find_source_agent_name_authority",
+			"find_source_agent_name_authority_0",
+			"find_source",
+			"create a new personal",
+			".count",
+			"selectsourcectrl",
+			"create a new source",
+			"btn",
+			"select",
+			"selectnameauthorityctrl\"",
+			"selectnameauth",
+			"selectmodelauthority",
+			"selectmodel",
+			"reviewed",
+			"searchable",
+			"reviewed",
+			"@model",
+			"approve",
+			"flag problem",
+			"problem",
+			"btn",
+			"col-sm-5",
+			"observation",
+			"use this type when",
+			"Use this",
+			"use this",
+			"legend",
+			"create new personal observation",
+			"create new",
+			"personal observa",
+			"personal obser",
+			"boost",
+			"def more_like_this",
+			"more_like_this",
+			"import",
+			">>>",
+			"benj",
+			"more_like_this",
+			"\\[.+\\*\\s\\s",
+			"\\[.+\\*\\s",
+			"\\[.+\\*",
+			"manuscript_date_search",
+			"control-panel {",
+			"display_value",
+			"more_like_this",
+			"advancedhelper",
+			"select_menu_for_field_operator",
+			"query_criteria_heading_html",
+			"find items that match",
+			"institution",
+			"num_lines",
+			"provenance_search",
+			"provenance",
+			"dropdown-meny",
+			"Price",
+			"_price",
+			":price",
+			"import",
+			"attr",
+			"def remove!",
+			"remove",
+			"console.log",
+			"suggestions",
+			"workspacetable",
+			".entries",
+			"search[regex]",
+			"/entries.json",
+			"reload"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			",",
+			"",
+			"\\n",
+			"",
+			",",
+			"",
+			"\"$1\"=>",
+			"find('#savesource').click",
+			"find('#savebutton').click",
+			"source",
+			"  ",
+			" ",
+			"",
+			"\\n\\n",
+			"\\n}",
+			"}\\n",
+			",\\n",
+			"\\n}",
+			"{\\n\\t",
+			"\\n\\t",
+			"=>\\n\\t",
+			",\\n",
+			"{\\n",
+			"map { |s| format(s) }",
+			"",
+			".",
+			"",
+			"\\n",
+			"sdbm",
+			"--ignore-table=sdbm_test.$1 ",
+			"$1,",
+			"$1",
+			"",
+			"--ignore-table=sdbm_test.$1 ",
+			"hello",
+			"",
+			"--ignore-table=$1 ",
+			"--ignore-table sdbm.",
+			" sdbm.",
+			"",
+			".select(&:facet_value).map(&:facet_value)",
+			"place",
+			"Place",
+			"place",
+			"btn btn-default btn-xs",
+			"",
+			"problem.name",
+			"language",
+			"place",
+			"provenance",
+			"scribe",
+			"map:EntryManuscript",
+			"map:Sale",
+			"map:Place",
+			"map:ManuscriptRecord",
+			"map:Language",
+			"map:DericciSale",
+			"map:DericciRecord",
+			"map:DericciNote",
+			"map:Source",
+			"map:Comment",
+			"language",
+			"Language",
+			"language",
+			"place",
+			"Place",
+			"Scribe",
+			"scribe",
+			"",
+			"map:Entry;",
+			"map:Entry ",
+			"",
+			" map:Name",
+			"entry.entry_$1_attributes",
+			"entry_$1_attributes",
+			"list-unstyled",
+			";",
+			"</td></tr>",
+			"<td>",
+			"</td>",
+			"<tr><td>",
+			"</td>",
+			"<td>",
+			"</td>",
+			"<tr><td>",
+			"</td></tr>",
+			"<td>",
+			"</td>",
+			"<tr><td>",
+			"<td>",
+			"</td>",
+			"</td></tr>",
+			"<tr><td>",
+			"",
+			"username",
+			"artist",
+			"null",
+			":",
+			"td",
+			"",
+			"@user = User.find_or_create_by",
+			"Place",
+			"place",
+			"main_app.$1",
+			"\"SDBM_SOURCE\"",
+			"setUnsavedChanges($1);",
+			"Manuscript Record",
+			"main_app.$1",
+			"{{ current_record",
+			"// $scope.currentlySaving = false",
+			"",
+			"['finally']",
+			"well-name-authority",
+			"located with the <b><span class=\"glyphicon glyphicon-question-sign\"></span> Help</b>",
+			"",
+			"\"$1\", ",
+			"$1",
+			"$1\\n",
+			"visit root_path",
+			"",
+			"link_to($2) do %>\\n<span class=\"glyphicon glyphicon-th\"></span> $1<% end %>\\n",
+			".order.to_i <=> b.order.to_i",
+			"{ |a, b| a.order <=> b.order }",
+			"sort(&",
+			"",
+			" ",
+			"ng-if",
+			"alert alert-danger name"
+		],
+		"reverse": false,
+		"show_context": false,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "games/salvage/game.js",
+					"settings":
+					{
+						"buffer_size": 51925,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								503,
+								503
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"devel": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": "load-save",
+							"sublimelinter_delay": 2,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": true,
+							"sublimelinter_gutter_marks_theme": "simple",
+							"sublimelinter_mark_style": "none",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 42.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "games/salvage/scenes/game.js",
+					"settings":
+					{
+						"buffer_size": 23697,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"devel": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": "load-save",
+							"sublimelinter_delay": 2,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": true,
+							"sublimelinter_gutter_marks_theme": "simple",
+							"sublimelinter_mark_style": "none",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 112.0
+	},
+	"output.git":
+	{
+		"height": 112.0
+	},
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"salvgame",
+				"games/salvage/scenes/game.js"
+			],
+			[
+				"salvaggame",
+				"games/salvage/game.js"
+			],
+			[
+				"source",
+				"app/models/source.rb"
+			],
+			[
+				"languages",
+				"app/controllers/languages_controller.rb"
+			],
+			[
+				"name",
+				"app/models/name.rb"
+			],
+			[
+				"namesc",
+				"app/controllers/names_controller.rb"
+			],
+			[
+				"places",
+				"app/controllers/places_controller.rb"
+			],
+			[
+				"entries",
+				"app/controllers/entries_controller.rb"
+			],
+			[
+				"entr",
+				"app/models/entry.rb"
+			],
+			[
+				"entryplace",
+				"app/models/entry_place.rb"
+			],
+			[
+				"managm",
+				"app/controllers/manage_models_controller.rb"
+			],
+			[
+				"place",
+				"app/models/place.rb"
+			],
+			[
+				"jbuilder",
+				"app/views/sources/_source.json.jbuilder"
+			],
+			[
+				"xml.b",
+				"app/views/catalog/show.xml.builder"
+			],
+			[
+				"activshowal",
+				"app/views/activities/_show_all.html.erb"
+			],
+			[
+				"dashshow",
+				"app/views/dashboard/show.html.erb"
+			],
+			[
+				"myentri",
+				"app/views/dashboard/_my_entries.html.erb"
+			],
+			[
+				"dashcontri",
+				"app/views/dashboard/contributions.html.erb"
+			],
+			[
+				"activshowall",
+				"app/views/activities/_show_all.html.erb"
+			],
+			[
+				"sdbmjs",
+				"app/assets/javascripts/sdbm.js"
+			],
+			[
+				"showall",
+				"app/views/activities/_show_all.html.erb"
+			],
+			[
+				"dashactiv",
+				"app/views/dashboard/activity.html.erb"
+			],
+			[
+				"sdbmss",
+				"app/assets/stylesheets/sdbmss.css.erb"
+			],
+			[
+				"activnav",
+				"app/views/activities/_nav.html.erb"
+			],
+			[
+				"mymanuscr",
+				"app/views/dashboard/_my_manuscripts.html.erb"
+			],
+			[
+				"mysources",
+				"app/views/dashboard/_my_sources.html.erb"
+			],
+			[
+				"myentries",
+				"app/views/dashboard/_my_entries.html.erb"
+			],
+			[
+				"drafts",
+				"app/views/dashboard/_drafts.html.erb"
+			],
+			[
+				"dashcontrib",
+				"app/views/dashboard/contributions.html.erb"
+			],
+			[
+				"controlpan",
+				"app/views/shared/_control_panel.html.erb"
+			],
+			[
+				"dashboheader",
+				"app/views/dashboard/_header.html.erb"
+			],
+			[
+				"thredded",
+				"config/initializers/thredded.rb"
+			],
+			[
+				"namemain",
+				"app/views/names/_main.html.erb"
+			],
+			[
+				"sourcedeta",
+				"app/views/sources/_source_details.html.erb"
+			],
+			[
+				"sourceshow",
+				"app/views/sources/show.html.erb"
+			],
+			[
+				"entryauth",
+				"app/models/entry_author.rb"
+			],
+			[
+				"sourcea",
+				"app/models/source_agent.rb"
+			],
+			[
+				"schema",
+				"solr/conf/schema.xml"
+			],
+			[
+				"entry",
+				"app/models/entry.rb"
+			],
+			[
+				"delayed",
+				"bin/delayed_job"
+			],
+			[
+				"names",
+				"app/controllers/names_controller.rb"
+			],
+			[
+				"schem",
+				"solr/conf/schema.xml"
+			],
+			[
+				"author",
+				"app/models/entry_author.rb"
+			],
+			[
+				"grouprec",
+				"app/models/group_record.rb"
+			],
+			[
+				"abili",
+				"app/models/ability.rb"
+			],
+			[
+				"entrjson",
+				"app/views/entries/show.json.jbuilder"
+			],
+			[
+				"catalshow",
+				"app/views/catalog/show.html.erb"
+			],
+			[
+				"catalo",
+				"app/controllers/catalog_controller.rb"
+			],
+			[
+				"gemf",
+				"Gemfile"
+			],
+			[
+				"communit",
+				"app/controllers/community_controller.rb"
+			],
+			[
+				"rout",
+				"config/routes.rb"
+			],
+			[
+				"sourcshow",
+				"app/views/sources/show.html.erb"
+			],
+			[
+				"sdbmap",
+				"app/assets/javascripts/sdbmApp.js"
+			],
+			[
+				"editbut",
+				"app/views/entries/_edit_buttons.html.erb"
+			],
+			[
+				"entredit",
+				"app/views/entries/edit.html.erb"
+			],
+			[
+				"managmode",
+				"app/controllers/manage_models_controller.rb"
+			],
+			[
+				"sourcesc",
+				"app/controllers/sources_controller.rb"
+			],
+			[
+				"sourcetool",
+				"app/views/sources/_tools.html.erb"
+			],
+			[
+				"dataentryhel",
+				"spec/lib/data_entry_helpers.rb"
+			],
+			[
+				"entriestoin",
+				"spec/features/entries_to_index_on_update_spec.rb"
+			],
+			[
+				"sourceedit",
+				"app/views/sources/edit.html.erb"
+			],
+			[
+				"priva",
+				"spec/features/manage_private_messages_spec.rb"
+			],
+			[
+				"dataentrysp",
+				"spec/features/data_entry_spec.rb"
+			],
+			[
+				"createsource",
+				"app/views/shared/_create_source.html.erb"
+			],
+			[
+				"selectsource",
+				"app/views/shared/_select_source.html.erb"
+			],
+			[
+				"privames",
+				"spec/features/manage_private_messages_spec.rb"
+			],
+			[
+				"catal",
+				"app/controllers/catalog_controller.rb"
+			],
+			[
+				"searchspec",
+				"spec/features/search_spec.rb"
+			],
+			[
+				"contropane",
+				"app/views/shared/_control_panel.html.erb"
+			],
+			[
+				"sharedmodal",
+				"app/views/shared/_modal.html.erb"
+			],
+			[
+				"applicahtm",
+				"app/views/layouts/application.html.erb"
+			],
+			[
+				"nameprobl",
+				"app/views/names/problems.html.erb"
+			],
+			[
+				"sourceform",
+				"app/views/entries/_source_selection_form.html.erb"
+			],
+			[
+				"selectname",
+				"app/views/shared/_select_name_authority.html.erb"
+			],
+			[
+				"search",
+				"app/controllers/searchable_authority_controller.rb"
+			],
+			[
+				"selectmodel",
+				"app/views/shared/_select_model_authority.html.erb"
+			],
+			[
+				"mangshow",
+				"app/views/manage_models/show.html.erb"
+			],
+			[
+				"sourcind",
+				"app/views/sources/_index_js.html.erb"
+			],
+			[
+				"sdbmman",
+				"app/assets/javascripts/sdbmManageRecords.js"
+			],
+			[
+				"place.r",
+				"app/models/place.rb"
+			],
+			[
+				"langu",
+				"app/models/language.rb"
+			],
+			[
+				"sourceindex",
+				"app/views/sources/_index_js.html.erb"
+			],
+			[
+				"nameshow",
+				"app/views/names/show.html.erb"
+			],
+			[
+				"managemode",
+				"app/controllers/manage_models_controller.rb"
+			],
+			[
+				"placesc",
+				"app/controllers/places_controller.rb"
+			],
+			[
+				"managtools",
+				"app/views/manage_models/_tools.html.erb"
+			],
+			[
+				"addproble",
+				"db/migrate/20170929181813_add_problem_to_places_languages_sources.rb"
+			],
+			[
+				"addproblem",
+				"db/migrate/20170807171227_add_problem_flag_to_names.rb"
+			],
+			[
+				"sdbma",
+				"app/assets/javascripts/sdbmApp.js"
+			],
+			[
+				"sourceedi",
+				"app/views/sources/edit.html.erb"
+			],
+			[
+				"problem",
+				"app/views/names/problems.html.erb"
+			],
+			[
+				"abilit",
+				"app/models/ability.rb"
+			],
+			[
+				"entrmater",
+				"app/models/entry_material.rb"
+			],
+			[
+				"util",
+				"lib/sdbmss/util.rb"
+			],
+			[
+				"entrshow",
+				"app/views/entries/_show.html.erb"
+			],
+			[
+				"blacklight",
+				"config/initializers/blacklight_advanced.rb"
+			],
+			[
+				"entredi",
+				"app/views/entries/edit.html.erb"
+			],
+			[
+				"solrc",
+				"solr/conf/solrconfig.xml"
+			],
+			[
+				"controlpane",
+				"app/views/shared/_control_panel.html.erb"
+			],
+			[
+				"homete",
+				"app/views/catalog/_home_text.html.erb"
+			],
+			[
+				"abil",
+				"app/models/ability.rb"
+			],
+			[
+				"hometext",
+				"app/views/catalog/_home_text.html.erb"
+			],
+			[
+				"docume",
+				"app/views/catalog/_document.html.erb"
+			],
+			[
+				"route",
+				"config/routes.rb"
+			],
+			[
+				"similarentr",
+				"lib/sdbmss/similar_entries.rb"
+			],
+			[
+				"linkshow",
+				"app/views/linking_tool/show.html.erb"
+			],
+			[
+				"sdbmta",
+				"app/assets/javascripts/sdbmTable.js"
+			],
+			[
+				"sdbmmana",
+				"app/assets/javascripts/sdbmManageRecords.js"
+			],
+			[
+				"sdbmtab",
+				"app/assets/javascripts/sdbmTable.js"
+			],
+			[
+				"solrsearch",
+				"app/models/concerns/solr_searchable.rb"
+			],
+			[
+				"searchab",
+				"app/controllers/searchable_authority_controller.rb"
+			],
+			[
+				"entri",
+				"app/controllers/entries_controller.rb"
+			],
+			[
+				"searchabl",
+				"app/controllers/searchable_authority_controller.rb"
+			],
+			[
+				"linktoshow",
+				"app/views/linking_tool/show.html.erb"
+			],
+			[
+				"link",
+				"app/controllers/linking_tool_controller.rb"
+			],
+			[
+				"entrcon",
+				"app/controllers/entries_controller.rb"
+			],
+			[
+				"imp",
+				"app/views/entries/import.html.erb"
+			],
+			[
+				"entriesc",
+				"app/controllers/entries_controller.rb"
+			],
+			[
+				"nametool",
+				"app/views/names/_tools.html.erb"
+			],
+			[
+				"importh",
+				"app/views/entries/import.html.erb"
+			],
+			[
+				"entryda",
+				"app/models/entry_date.rb"
+			],
+			[
+				"entrytit",
+				"app/models/entry_title.rb"
+			],
+			[
+				"entryus",
+				"app/models/entry_use.rb"
+			],
+			[
+				"entrymat",
+				"app/models/entry_material.rb"
+			],
+			[
+				"entrlan",
+				"app/models/entry_language.rb"
+			],
+			[
+				"entryscrib",
+				"app/models/entry_scribe.rb"
+			],
+			[
+				"entryart",
+				"app/models/entry_artist.rb"
+			],
+			[
+				"import",
+				"app/views/entries/import.html.erb"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 291.0,
+	"status_bar_visible": true
+}

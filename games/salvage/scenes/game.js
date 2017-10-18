@@ -49,7 +49,7 @@ var onStart = function () {
   //ground.blend = "destination-out";
   ground.setCollision(Polygon);
 
-  var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, 8, WIDTH - 16, 16, Resources.building2));
+  var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, 8, WIDTH - 8, 16, Resources.building));
   ceiling.z = -7;
   ceiling.setCollision(Polygon);
 
@@ -294,7 +294,7 @@ var onStart = function () {
             gameWorld.boss.store_open = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
             gameWorld.boss.store_open.angle = PI / 2;
             gameWorld.boss.store_open.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 6, y: 0, angle: false, z: 1}});
-            gameWorld.boss.animation = 1;
+            //gameWorld.boss.animation = 1;
           /*  if (!gameWorld.boss.billboard || !gameWorld.boss.billboard.alive) {              
               gameWorld.boss.billboard = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
               gameWorld.boss.billboard.opacity = 0;

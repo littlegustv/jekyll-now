@@ -13,7 +13,7 @@ var ENDINGS = [
 	"Social Mobility",
 	"Terror is the order of the day",
 	"Insurrection"
-]
+];
 
 var WIDTH = 180;
 var HEIGHT = 320;
@@ -1431,7 +1431,7 @@ var Store = {
     for (var i = 0; i < gameWorld.scene.layers.length; i++) {
       gameWorld.scene.layers[i].paused = false;
     }
-    gameWorld.boss.animation = 0;
+    //gameWorld.boss.animation = 0;
     gameWorld.boss.store_open.alive = false;
     gameWorld.boss.store_open = undefined;
     //gameWorld.current_wave += 1;
