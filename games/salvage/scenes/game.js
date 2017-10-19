@@ -49,20 +49,27 @@ var onStart = function () {
   //ground.blend = "destination-out";
   ground.setCollision(Polygon);
 
-  var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, 8, WIDTH - 8, 16, Resources.building));
+  var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, 2, WIDTH - 8, 16, Resources.ground));
   ceiling.z = -7;
+  ceiling.angle = PI;
   ceiling.setCollision(Polygon);
 
-  var right = bg.add(Object.create(TiledBackground).init(WIDTH + 12, HEIGHT / 2, 32, HEIGHT, Resources.building));
+  var right = bg.add(Object.create(TiledBackground).init(WIDTH - 2, HEIGHT / 2, HEIGHT, 8, Resources.ground));
+  right.angle = -PI / 2;
   right.z = -6;
   //right.blend = "destination-out";
   right.setCollision(Polygon);
 
-  var left = bg.add(Object.create(TiledBackground).init(-12, HEIGHT / 2, 32, HEIGHT, Resources.building));
+  var left = bg.add(Object.create(TiledBackground).init(2, HEIGHT / 2, HEIGHT, 8, Resources.ground));
   left.z = -6;
+  left.angle = PI / 2;
   //left.blend = "destination-out";
   left.setCollision(Polygon);
   
+  var gate = bg.add(Object.create(Sprite).init(gameWorld.width / 2, 8, Resources.gate));
+  gate.setCollision(Polygon);
+  gate.z = -5;
+
   this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
   this.ui.active = true;
 
@@ -93,8 +100,8 @@ var onStart = function () {
     this.shield.opacity = Math.pow(object.shield, 2);
   };
 
-  var menu_text = this.ui.add(Object.create(SpriteFont).init(28, 8, Resources.expire_font, "pause", {align: "center", spacing: -3}));
-  var menu_button = this.ui.add(Object.create(Entity).init(28, 8, 41, 16));
+  var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 4, Resources.expire_font, "pause", {align: "center", spacing: -3}));
+  var menu_button = this.ui.add(Object.create(Entity).init(24, 8, 48, 16));
   menu_button.family = "button";
   menu_button.opacity = 0;
   menu_button.trigger = function () {
@@ -112,8 +119,8 @@ var onStart = function () {
     menu_text.scale = 1;
   };
   
-  var mute_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width - 28, 8, Resources.expire_font, "mute", {align: "center", spacing: -3}));
-  var mute_button = this.ui.add(Object.create(Entity).init(gameWorld.width - 28, 12, 41, 24));
+  var mute_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width - 16, 4, Resources.expire_font, "mute", {align: "center", spacing: -3}));
+  var mute_button = this.ui.add(Object.create(Entity).init(gameWorld.width - 16, 8, 32, 16));
   mute_button.family = "button";
   mute_button.opacity = 0;
   mute_button.trigger = function () {
