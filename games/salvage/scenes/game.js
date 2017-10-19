@@ -31,13 +31,13 @@ var onStart = function () {
   var b = bg.add(Object.create(Entity).init(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT));
   b.color = COLORS.nullary;
   b.z = -10;
-  
+  /*
   for (var i = 1; i < WIDTH / 32; i++) {
     var h = randint(1,5) * 32; var b = bg.add(Object.create(TiledBackground).init(i * 32 - 8, HEIGHT - h / 2, 32, h, Resources.building));
     //b.blend = "destination-out"; 
     b.z = -9; 
-    b.opacity = Math.random()  / 3;
-  }
+    //b.opacity = Math.random()  / 3;
+  }*/
   
   var grid = bg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
   grid.z = -8;
