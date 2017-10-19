@@ -17,7 +17,6 @@
     {"path": "heart.png"},
     {"path": "building.png"},
     {"path": "walker.png", "frames": 4, "animations": 1, "speed": 0.5},
-    {"path": "bomber.png", "frames": 2, "animations": 1, "speed": 0.5},
     {"path": "saucer.png", "frames": 5, "animations": 1, "speed": 0.5},
     {"path": "fighter.png", "frames": 2, "animations": 1, "speed": 0.2},
     {"path": "expire_font.png", "frames": 95, "animations": 1},

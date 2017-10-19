@@ -14,8 +14,8 @@ var onStart = function () {
   //var super_bg = this.addLayer(Object.create(Layer).init(1000,1000));
   //super_bggit.active = true;
   //var parallax = this.addLayer(Object.create(Layer).init(1000,1000));
-  var colorize = this.addLayer(Object.create(Layer).init(1000, 1000));
-  colorize.add(Object.create(Entity).init(0, 0, 1000, 1000)).color = COLORS.negative;
+  //var colorize = this.addLayer(Object.create(Layer).init(1000, 1000));
+  //colorize.add(Object.create(Entity).init(0, 0, 1000, 1000)).color = "#000000";//COLORS.negative;
   //colorize.color = COLORS.negative;
   
   var bg = this.addLayer(Object.create(Layer).init(1000,1000));
@@ -28,16 +28,14 @@ var onStart = function () {
   var player_coordinates = toGrid(64, 64);
   var player_bot = bg.add(Object.create(Sprite).init(player_coordinates.x, player_coordinates.y, Resources.viper));
   
-  var b = bg.add(Object.create(Entity).init(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT));
-  b.color = COLORS.nullary;
-  b.z = -10;
-  /*
-  for (var i = 1; i < WIDTH / 32; i++) {
-    var h = randint(1,5) * 32; var b = bg.add(Object.create(TiledBackground).init(i * 32 - 8, HEIGHT - h / 2, 32, h, Resources.building));
-    //b.blend = "destination-out"; 
-    b.z = -9; 
-    //b.opacity = Math.random()  / 3;
-  }*/
+  // is it worth doing this kind of grid??
+  for (var i = MIN.x - 16; i <= MAX.x + 16; i+= 32) {
+    for (var j = MIN.y - 16; j <= MAX.y + 16; j += 32) {
+      var b = bg.add(Object.create(Entity).init(i, j, 32, 32));
+      b.color = (i - (MIN.x - 16) % 64 + j - (MIN.y - 16)) % 64 == 0 ? "black" : "#111";
+      b.z = -10;
+    }
+  }
   
   var grid = bg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
   grid.z = -8;
@@ -69,6 +67,12 @@ var onStart = function () {
   var gate = bg.add(Object.create(Sprite).init(gameWorld.width / 2, 8, Resources.gate));
   gate.setCollision(Polygon);
   gate.z = -5;
+
+  for (var i = 0; i < 100; i++) {
+    var star = bg.add(Object.create(Entity).init(randint(0, gameWorld.width), randint(0, gameWorld.height), 2, 2));
+    star.z = -1;
+    star.color = "white";
+  }
 
   this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
   this.ui.active = true;
