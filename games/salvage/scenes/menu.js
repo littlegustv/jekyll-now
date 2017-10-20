@@ -21,7 +21,7 @@ var onStart =  function () {
       //gameWorld.soundtrack.connect(gameWorld.filter);
       gameWorld.soundtrack.onended = gameWorld.musicLoop;
     }
-    //gameWorld.musicLoop();
+    gameWorld.musicLoop();
   }
 
   var colorize = this.addLayer(Object.create(Layer).init(1000, 1000));
@@ -34,23 +34,15 @@ var onStart =  function () {
   this.bg.active = true;
   
   var back = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
-  back.color = COLORS.nullary;
+  back.color = "black";
   back.z = 0;
   this.nullaries.push(back);
 
-  var title = this.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height - 12, Resources.expire_font, "the field of mars", {spacing: -4, align: "center"}));
+  var title = this.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 6, gameWorld.height - 16, Resources.expire_font, "salvage", {spacing: -2, align: "center"}));
   //title.addBehavior(Oscillate, {field: "y", object: title, initial: gameWorld.height / 2, rate: 1, constant: 24});
   //title.blend = "destination-out";
-  title.scale = 2;
+  title.scale = 3;
   title.z = 10;
-  
-  for (var i = 16; i < gameWorld.width; i += 32) {
-    var h = randint(1,4) * 32;
-    var b = this.bg.add(Object.create(TiledBackground).init(i, gameWorld.height - h / 2, 32, h, Resources.building));
-    b.opacity = Math.random() / 2;
-    //b.blend = "destination-out";
-    b.z = 9.5;
-  }
   
   var ground = this.bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4, gameWorld.width, 8, Resources.ground));
   //ground.blend = "destination-out";
@@ -154,7 +146,7 @@ var onUpdate = function () {
   /*if (Math.random() * 100 < 2) {
     var w = randint(1, 4) * 4 + 4;
     var square = this.bg.add(Object.create(Sprite).init(randint(0, gameWorld.width), -8, Resources.asteroid));
-    square.radius = square.w / 3;
+    square.radius = square.w / 2;
     square.strokeColor = COLORS.primary;
     //square.color = COLORS.secondary;
     square.z = 8;
@@ -162,6 +154,6 @@ var onUpdate = function () {
     square.velocity = {x: choose([10, -10]), y: 30};
     square.addBehavior(Crop, {min: {x: -8, y: -10}, max: {x: gameWorld.width + 8, y: gameWorld.height - 6}});
     square.addBehavior(Velocity);
-    this.secondaries.push(square);
+    //this.secondaries.push(square);
   }*/
 }

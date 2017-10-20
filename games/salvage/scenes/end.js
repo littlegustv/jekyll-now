@@ -1,5 +1,8 @@
 var onStart =  function () {
   var fg = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
+  var bg = fg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
+  bg.color = "black";
+  bg.z = -10;
   fg.add(Object.create(SpriteFont).init(8, gameWorld.height / 2 - 16, Resources.expire_font, ENDINGS[gameWorld.ending], {spacing: -2, align: "left"}));
   fg.add(Object.create(SpriteFont).init(8, gameWorld.height / 2, Resources.expire_font, "Ending " + (gameWorld.ending + 1) + " of " + ENDINGS.length, {spacing: -2, align: "left"})).opacity = 0.8;
 

@@ -1757,9 +1757,10 @@ var World = {
     var sceneData = this.gameInfo.scenes;
     for (var i = 0; i < sceneData.length; i++) {
       var sceneName = sceneData[i].name;
-      var s = Object.create(Scene).init(sceneName, true);
-      s.reload = sceneData[i].reload || false;
-      this.scenes.push(s);
+      //var s = Object.create(Scene).init(sceneName, true);
+      //s.reload = sceneData[i].reload || false;
+      //this.scenes.push(s);
+      this.scenes.push(sceneData[i]);
     }
   },
   setScene: function (n, reload) {

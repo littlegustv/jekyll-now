@@ -701,8 +701,9 @@ var Weapons = {
       warn.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.5 });
       var a = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y, this.entity.w, 2));
       a.setCollision(Polygon);
+      //a.color = "white";
       gameWorld.playSound(Resources.laser, volume(a));
-      a.collision.onHandle = projectileHit;
+      //a.collision.onHandle = projectileHit;
       a.family = "enemy";//"player";
       a.projectile = true;
       a.z = 100;
@@ -1171,8 +1172,9 @@ function spawn(layer, key, player) {
     scrap.behaviors = [];
     gameWorld.boss.addBehavior(TractorBeam, {target: scrap, turn_rate: 5, speed: 20, color: COLORS.tertiary, thickness: 2, width: 3.5, rate: 6, origin: {x: gameWorld.boss.x, y: gameWorld.boss.y}});
     scrap.addBehavior(Velocity);
-    scrap.velocity = {x: 0, y: 0};//angle: PI / 3};
+    scrap.velocity = {x: 0, y: 0, angle: PI};//angle: PI / 3};
     scrap.opacity = 0.8;
+    scrap.z = 3;
     scrap.setCollision(Polygon);
     scrap.collision.onHandle = function (object, other) {
       if (other == gameWorld.boss) {
