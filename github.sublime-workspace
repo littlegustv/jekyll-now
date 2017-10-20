@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"set",
+				"setCollision"
+			],
+			[
 				"proven",
 				"provenance"
 			],
@@ -336,10 +340,6 @@
 				"watches_params"
 			],
 			[
-				"set",
-				"setProgress"
-			],
-			[
 				"gly",
 				"glyphicon-blank"
 			],
@@ -531,7 +531,7 @@
 			"file": "games/salvage/scenes/game.js",
 			"settings":
 			{
-				"buffer_size": 23697,
+				"buffer_size": 24039,
 				"line_ending": "Unix"
 			}
 		},
@@ -539,7 +539,7 @@
 			"file": "games/salvage/index.json",
 			"settings":
 			{
-				"buffer_size": 2597,
+				"buffer_size": 1512,
 				"line_ending": "Unix"
 			}
 		}
@@ -708,6 +708,8 @@
 	},
 	"file_history":
 	[
+		"/home/hellerb/Projects/github/littlegustv.github.io/games/salvage/index.html",
+		"/home/hellerb/Projects/github/littlegustv.github.io/games/salvage/js/raindrop.js",
 		"/home/hellerb/Projects/github/littlegustv.github.io/index.html",
 		"/home/hellerb/sdbmss/app/models/name.rb",
 		"/home/hellerb/sdbmss/app/controllers/names_controller.rb",
@@ -833,9 +835,7 @@
 		"/home/hellerb/sdbmss/app/views/manuscripts/show.html.erb",
 		"/home/hellerb/sdbmss/app/controllers/manuscripts_controller.rb",
 		"/home/hellerb/sdbmss/public/404.html",
-		"/home/hellerb/sdbmss/app/controllers/errors_controller.rb",
-		"/home/hellerb/sdbmss/app/views/comments/_show_all.html.erb",
-		"/home/hellerb/linked data/d2rq-0.8.1/mapping.ttl"
+		"/home/hellerb/sdbmss/app/controllers/errors_controller.rb"
 	],
 	"find":
 	{
@@ -843,9 +843,10 @@
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 90.0,
 		"where_history":
 		[
+			"/home/hellerb/Projects/github/littlegustv.github.io/games/salvage",
 			"",
 			"~/sdbmss/spec",
 			"~/spec",
@@ -972,8 +973,7 @@
 			"",
 			"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/blacklight-5.14.0",
 			"",
-			"~/sdbmss/spec",
-			""
+			"~/sdbmss/spec"
 		]
 	},
 	"find_state":
@@ -981,6 +981,9 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"loading",
+			"store",
+			"gameWorld.playSound",
 			"building2",
 			"gate = ",
 			".animation = 0",
@@ -1105,10 +1108,7 @@
 			"import",
 			"attr",
 			"def remove!",
-			"remove",
-			"console.log",
-			"suggestions",
-			"workspacetable"
+			"remove"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1254,7 +1254,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -1269,8 +1269,8 @@
 						"selection":
 						[
 							[
-								50968,
-								50968
+								51121,
+								51121
 							]
 						],
 						"settings":
@@ -1370,7 +1370,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 19594.0,
+						"translation.y": 19184.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1380,15 +1380,15 @@
 					"file": "games/salvage/scenes/game.js",
 					"settings":
 					{
-						"buffer_size": 23697,
+						"buffer_size": 24039,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1889,
-								1889
+								21393,
+								21393
 							]
 						],
 						"settings":
@@ -1488,7 +1488,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 14.0,
+						"translation.y": 7077.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1498,15 +1498,15 @@
 					"file": "games/salvage/index.json",
 					"settings":
 					{
-						"buffer_size": 2597,
+						"buffer_size": 1512,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1762,
-								1762
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1663,6 +1663,14 @@
 		"height": 0.0,
 		"selected_items":
 		[
+			[
+				"raindr",
+				"games/salvage/js/raindrop.js"
+			],
+			[
+				"salvinde",
+				"games/salvage/index.html"
+			],
 			[
 				"salvindexjs",
 				"games/salvage/index.json"
@@ -2166,14 +2174,6 @@
 			[
 				"entrlan",
 				"app/models/entry_language.rb"
-			],
-			[
-				"entryscrib",
-				"app/models/entry_scribe.rb"
-			],
-			[
-				"entryart",
-				"app/models/entry_artist.rb"
 			]
 		],
 		"width": 0.0
