@@ -29,13 +29,16 @@ var onStart = function () {
   var player_bot = bg.add(Object.create(Sprite).init(player_coordinates.x, player_coordinates.y, Resources.viper));
   
   // is it worth doing this kind of grid??
-  for (var i = MIN.x - 16; i <= MAX.x + 16; i+= 32) {
+  /*for (var i = MIN.x - 16; i <= MAX.x + 16; i+= 32) {
     for (var j = MIN.y - 16; j <= MAX.y + 16; j += 32) {
       var b = bg.add(Object.create(Entity).init(i, j, 32, 32));
       b.color = (i - (MIN.x - 16) % 64 + j - (MIN.y - 16)) % 64 == 0 ? "black" : "#111";
       b.z = -10;
     }
-  }
+  }*/
+  var b = bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
+  b.color = "black";
+  b.z = -10;
   
   var grid = bg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
   grid.z = -8;
@@ -67,12 +70,12 @@ var onStart = function () {
   var gate = bg.add(Object.create(Sprite).init(gameWorld.width / 2, 8, Resources.gate));
   gate.setCollision(Polygon);
   gate.z = -5;
-
+/*
   for (var i = 0; i < 100; i++) {
     var star = bg.add(Object.create(Entity).init(randint(0, gameWorld.width), randint(0, gameWorld.height), 2, 2));
     star.z = -1;
     star.color = "white";
-  }
+  }*/
 
   this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
   this.ui.active = true;
@@ -343,7 +346,7 @@ var onStart = function () {
           }
         };
 
-        gameWorld.playSound(Resources[choose(["spawn"])]);
+        gameWorld.playSound(Resources.spawn, 0.5);
 
         for (var i = 0; i < gameWorld.wave; i++) {
           var k = i % this.waves.length;

@@ -1757,9 +1757,10 @@ var World = {
     var sceneData = this.gameInfo.scenes;
     for (var i = 0; i < sceneData.length; i++) {
       var sceneName = sceneData[i].name;
-      var s = Object.create(Scene).init(sceneName, true);
-      s.reload = sceneData[i].reload || false;
-      this.scenes.push(s);
+      //var s = Object.create(Scene).init(sceneName, true);
+      //s.reload = sceneData[i].reload || false;
+      //this.scenes.push(s);
+      this.scenes.push(sceneData[i]);
     }
   },
   setScene: function (n, reload) {
@@ -1894,9 +1895,10 @@ var World = {
   loadOGG: function (res, name) {
     var w = this;
     // cant play ogg, load mp3
-    if (name == "soundtrack" || name == "soundtrackFast") {
+    // push to raindrop
+    /*if (name == "soundtrack" || name == "soundtrackFast") {
       this.progressBar();
-    }
+    }*/
     if (this.audioType.length <= 0) {
       res = res.replace("ogg", "mp3");
       //console.log("replaced?");
@@ -1916,7 +1918,8 @@ var World = {
     request.onload = function() {
       w.audioContext.decodeAudioData(request.response, function(b) {
         Resources[name] = {buffer: b, play: false};
-        if (name == "soundtrack" || name == "soundtrackFast") {
+        // push to raindrop (no 'special' i.e. broken loading for a file called 'soundtrack')
+        if (false) { //(name == "soundtrack" || name == "soundtrackFast") {
 //          if (AudioContext && Resources.soundtrack && name == "soundtrack") w.musicLoop();
         } else {
           w.progressBar();
