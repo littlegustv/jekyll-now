@@ -96,6 +96,15 @@ var onStart =  function () {
   ship.velocity = {x: 40, y: 0};
   ship.addBehavior(Wrap, {min: {x: 0, y: 0}, max: {x: gameWorld.width, y: gameWorld.height}});
   ship.z = 12;
+  ship.addBehavior(Periodic, {period: 0.8, callback: function () {
+    var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
+    d.z = this.entity.z - 1;
+    d.behaviors[0].onEnd = function () {
+      this.entity.alive = false;
+    };
+    d.addBehavior(Velocity);
+    d.velocity = {x: - this.entity.velocity.x, y: 0};
+  }});
   //ship.blend = "destination-out";
 
   this.colorize = function (i) {
@@ -105,7 +114,7 @@ var onStart =  function () {
     this.primaries.forEach(function (e) { e.color = COLORS.primary; });
     this.secondaries.forEach(function (e) { e.color = COLORS.secondary; });
     this.tertiaries.forEach(function (e) { e.color = COLORS.tertiary; });
-  }
+  };
 
   this.onClick = function (e) {
     var b = s.bg.onButton(e.x, e.y);
@@ -156,4 +165,4 @@ var onUpdate = function () {
     square.addBehavior(Velocity);
     //this.secondaries.push(square);
   }*/
-}
+};

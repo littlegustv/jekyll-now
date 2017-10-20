@@ -152,29 +152,6 @@ Shake.update = function (dt) {
   }
 };
 
-var HyperDrive = Object.create(Behavior);
-HyperDrive.go = function () {
-  if (this.done === undefined) {
-    this.entity.layer.paused = false;
-    this.entity.behaviors = [this.entity.behaviors[0], this]; // :O ... keep animate and this, remove all other behaviors
-    this.entity.addBehavior(Velocity);
-    this.entity.health = 100;
-    this.entity.addBehavior(Accelerate);
-    this.entity.velocity = {x: 0, y: 0};
-    this.entity.angle = 0;
-    this.entity.acceleration = {x: 100, y: 0};
-    this.done = true;
-    this.entity.addBehavior(Delay, {duration: 1.2, callback: function () {
-    	if (gameWorld.boss.alive) {
-    		gameWorld.ending = 2;
-    	} else {
-    		gameWorld.ending = 3;
-    	}
-    	gameWorld.setScene(2, true);
-    }});
-  }
-};
-
 // goal {x, y}, speed
 var Move = Object.create(Behavior);
 Move.move = function (dt) {
@@ -530,13 +507,14 @@ function lerp_angle (a1, a2, rate) {
 function projectileDie(p) {
   p.alive = false;
   var expl = p.layer.add(Object.create(Circle).init(p.x, p.y, 8));
+  expl.color = "white";
   //var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
   expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
   expl.z = 3;
   var flash = p.layer.add(Object.create(Circle).init(p.x, p.y, 12));
   flash.z = 4;
   flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
-  flash.color = COLORS.secondary;
+  flash.color = "white"; COLORS.secondary;
   gameWorld.playSound(Resources.hit);
 }
 
@@ -1039,6 +1017,17 @@ Repair.update = function (dt) {
   }
 }
 
+var Periodic = Object.create(Behavior);
+Periodic.update = function (dt) {
+  if (this.time === undefined) this.time = 0;
+  this.time += dt;
+
+  if (this.time >= this.period) {
+    this.callback();
+    this.time = 0;
+  }
+}
+
 //var animations = [0, 1, 2, 2, 4, 4, 3, 3, 2];
 //var sprites = ["drone", "saucer", "modules", "bomber", "saucer", "drone", "modules", "beamship", "walker", "walker", "beamship"];
 var sprites = ["drone", "train", "radar", "saucer", "thopter", "fighter", "walker"]
@@ -1161,11 +1150,12 @@ function spawn(layer, key, player) {
     enemy.alive = false;
     var expl = enemy.layer.add(Object.create(Circle).init(enemy.x, enemy.y, 24));
     expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
+    expl.color = "white";
     expl.z = 1;
     var flash = enemy.layer.add(Object.create(Circle).init(enemy.x, enemy.y, 32));
     flash.z = 2;
     flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
-    flash.color = COLORS.secondary;
+    flash.color = "white"; //COLORS.secondary;
     gameWorld.playSound(Resources.hit);        
     
     var scrap = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, this.sprite));
@@ -1289,14 +1279,6 @@ var Store = {
     {
       name: "FTL", price: 15, icon: 5, trigger: function (t) {
         if (!t.player.hasFTL) {
-/*          t.player.hasFTL = t.player.addBehavior(HyperDrive); // maybe do this HERE instead of in random behavior...
-          var ftl_button = gameWorld.scene.ui.add(Object.create(Entity).init(gameWorld.width - 12, gameWorld.height - 8, 24, 16));
-          ftl_button.family = "button";
-          ftl_button.text = gameWorld.scene.ui.add(Object.create(SpriteFont).init(gameWorld.width - 12, gameWorld.height - 8, Resources.expire_font, "FTL", {spacing: 2, align: "center"}));
-          ftl_button.trigger = function () {
-          	t.player.hasFTL.go();
-          	ftl_button.alive = false;
-          };*/
           t.player.hasFTL = true;
           return true;
         } else {
@@ -1405,20 +1387,6 @@ var Store = {
       gameWorld.scene.layers[i].paused = true;
     }
     this.layer.paused = false;
-
-    /*gameWorld.scene.bg.camera.addBehavior(Lerp, {object: gameWorld.scene.bg.camera.behaviors[0].offset, field: "y", goal: -7 * gameWorld.height / 8, rate: 10, callback: function () {
-      this.entity.removeBehavior(this);
-    }});*/
-    //gameWorld.boss.old_x = gameWorld.boss.x;
-    //gameWorld.boss.old_y = gameWorld.boss.y;
-    //gameWorld.boss.x = this.player.x;
-    //gameWorld.boss.y = this.player.y - 3 * gameWorld.height / 4;
-    //gameWorld.boss.lerpFollow.old_rate = gameWorld.boss.lerpFollow.rate;
-    //gameWorld.boss.lerpFollow.rate = 0;
-/*    gameWorld.boss.addBehavior(Lerp, {object: gameWorld.boss.behaviors[1].offset, field: "y", goal: -3 * gameWorld.height / 4, rate: 10, callback: function () {
-      this.entity.removeBehavior(this);
-    }});*/
-    //gameWorld.boss.behaviors[1].rate = 10;
   },
   close: function () {
     var t = this;
@@ -1433,21 +1401,7 @@ var Store = {
     for (var i = 0; i < gameWorld.scene.layers.length; i++) {
       gameWorld.scene.layers[i].paused = false;
     }
-    //gameWorld.boss.animation = 0;
-    gameWorld.boss.store_open.alive = false;
-    gameWorld.boss.store_open = undefined;
-    //gameWorld.current_wave += 1;
-    
-    /*gameWorld.scene.bg.camera.addBehavior(Lerp, {object: gameWorld.scene.bg.camera.behaviors[0].offset, field: "y", goal: -gameWorld.height / 2, rate: 10, callback: function () {
-      this.entity.removeBehavior(this);
-    }});*/
-    //gameWorld.boss.removeBehavior(gameWorld.boss.energy);
-    //gameWorld.scene.player_bot.removeBehavior(gameWorld.scene.player_bot.energy);
-    //gameWorld.boss.energy = undefined;
-    //gameWorld.scene.player_bot.energy = undefined;
-    /*gameWorld.boss.addBehavior(Lerp, {object: gameWorld.boss.behaviors[1].offset, field: "y", goal: - gameWorld.height / 3, rate: 10, callback: function () {
-      this.entity.removeBehavior(this);
-      if (gameWorld.boss.lerpFollow.old_rate) gameWorld.boss.lerpFollow.rate = gameWorld.boss.lerpFollow.old_rate;
-    }});*/
+    //gameWorld.boss.store_open.alive = false;
+    gameWorld.boss.store_open = undefined;    
   }
 }

@@ -7,6 +7,24 @@ var onStart =  function () {
   fg.add(Object.create(SpriteFont).init(8, gameWorld.height / 2, Resources.expire_font, "Ending " + (gameWorld.ending + 1) + " of " + ENDINGS.length, {spacing: -2, align: "left"})).opacity = 0.8;
 
   fg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 6, gameWorld.width, 12, Resources.ground));
+  
+  if (gameWorld.ending === 2 || gameWorld.ending === 3) {
+    var player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 32, Resources.viper));
+    player.angle = -PI / 2;
+    player.addBehavior(Velocity);
+    player.velocity = {x: 0, y: -20};
+    player.addBehavior(Periodic, {period: 0.8, callback: function () {
+      var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
+      d.z = this.entity.z - 1;
+      d.behaviors[0].onEnd = function () {
+        this.entity.alive = false;
+      };
+      d.addBehavior(Velocity);
+      d.velocity = {x: 0, y: - this.entity.velocity.y};
+    }})
+  } else {
+    // add tombstone    
+  }
 
   var b = fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height - 24, Resources.expire_font, "menu", {spacing: -2, align: "center"}));
   var button = fg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height - 24, gameWorld.width, 16));

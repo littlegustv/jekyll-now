@@ -55,13 +55,13 @@ var onStart = function () {
   ceiling.angle = PI;
   ceiling.setCollision(Polygon);
 
-  var right = bg.add(Object.create(TiledBackground).init(WIDTH - 2, HEIGHT / 2, HEIGHT, 8, Resources.ground));
+  var right = bg.add(Object.create(TiledBackground).init(WIDTH - 2, HEIGHT / 2, HEIGHT - 8, 8, Resources.ground));
   right.angle = -PI / 2;
   right.z = -6;
   //right.blend = "destination-out";
   right.setCollision(Polygon);
 
-  var left = bg.add(Object.create(TiledBackground).init(2, HEIGHT / 2, HEIGHT, 8, Resources.ground));
+  var left = bg.add(Object.create(TiledBackground).init(2, HEIGHT / 2, HEIGHT - 8, 8, Resources.ground));
   left.z = -6;
   left.angle = PI / 2;
   //left.blend = "destination-out";
@@ -185,7 +185,7 @@ var onStart = function () {
           if (object.retaliate >= 1) {
             var theta = angle(object.x, object.y, other.x, other.y);
             var p =object.layer.add(Object.create(Circle).init(object.x, object.y, 4));
-            p.color = "black";
+            p.color = "white";
             p.stroke = true;
             p.strokeColor = COLORS.primary;
             p.width = 2;
@@ -205,8 +205,8 @@ var onStart = function () {
             p.addBehavior(Trail, {interval: 0.06, maxlength: 10, record: []});
             projectiles.push(p);
           }
+          object.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
         }
-        object.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
         s.updateHealthBar(object);
         
         //var expl = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.explosion));
@@ -215,6 +215,7 @@ var onStart = function () {
         
         //object.damage.timer = DAMAGE_COOLDOWN;
       }
+      // should this be JUST on projectile hit? probably, right! (invulnerability)
       object.noCollide = true;
       object.addBehavior(Delay, {duration: 0.5, callback: function () { this.entity.noCollide = false; }});
     }
@@ -287,6 +288,32 @@ var onStart = function () {
   this.keydown = false;
   this.pause = function () {
     if (!this.player_bot.lerpx && !this.player_bot.lerpy) {
+      // 'denied' for gate
+      
+      var coords = toGrid(this.player_bot.x, this.player_bot.y);
+      if (coords.y === MIN.y && (coords.x == MIN.x + TILESIZE * 2 || coords.x == MIN.x + TILESIZE * 3)) {
+        if (!player_bot.hasFTL) {
+          var warning = this.bg.add(Object.create(SpriteFont).init(gate.x, gate.y - 4, Resources.expire_font, "denied.", {spacing: -2, align: "center"}));
+          //gameWorld.playSound(Resources.denied);
+          warning.addBehavior(FadeOut, {duration: 0, delay: 1});          
+        } else {
+          gate.frame = 0;
+          gate.frameDelay = 0;
+          gate.animation = 1;
+          gate.behaviors[0].onEnd = function () {
+            this.entity.animation = 2;
+            this.entity.behaviors[0].onEnd = undefined;
+          };
+        }
+      } else if (coords.y < MIN.y) {
+        if (gameWorld.boss.alive) {
+          gameWorld.ending = 2;
+        } else {
+          gameWorld.ending = 3;
+        }
+        gameWorld.setScene(2, true);
+      }
+
       this.bg.paused = true;
       this.player_bot.velocity = {x: 0, y: 0};
       this.player_bot.acceleration = {x: 0, y: 0};
@@ -319,7 +346,7 @@ var onStart = function () {
           }
         }
         this.current_wave += 1;
-        var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
+        var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 32, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
         cash.addBehavior(Velocity);
         cash.family = "neutral";
         //cash.blend = "destination-out";
