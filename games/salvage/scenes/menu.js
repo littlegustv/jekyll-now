@@ -7,8 +7,9 @@ var onStart =  function () {
   this.tertiaries = [];
   var s = this;
 
-//  Resources.music = Resources.soundtrack;
-  if (!gameWorld.soundtrack) {
+  Resources.music = Resources.menu;
+  if (gameWorld.soundtrack) gameWorld.soundtrack.stop()
+  else if (!gameWorld.soundtrack) {
     if (AudioContext) {
       //gameWorld.filter = gameWorld.audioContext.createBiquadFilter();
       //gameWorld.filter.connect(gameWorld.audioContext.destination);
@@ -17,7 +18,7 @@ var onStart =  function () {
     }
 
     gameWorld.musicLoop = function () {
-      gameWorld.soundtrack = gameWorld.playSound(Resources.soundtrack, 1);
+      gameWorld.soundtrack = gameWorld.playSound(Resources.music, 1);
       //gameWorld.soundtrack.connect(gameWorld.filter);
       gameWorld.soundtrack.onended = gameWorld.musicLoop;
     }

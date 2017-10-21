@@ -10,7 +10,7 @@
 var onStart = function () {
   this.wave = [];
   
-  Resources.music = Resources.salvage;
+  Resources.music = Resources.soundtrack;
   //var super_bg = this.addLayer(Object.create(Layer).init(1000,1000));
   //super_bggit.active = true;
   //var parallax = this.addLayer(Object.create(Layer).init(1000,1000));
@@ -496,7 +496,9 @@ var onStart = function () {
   var boss = this.bg.add(Object.create(Sprite).init(0, toGrid(0, 100).y, Resources.boss));
   //boss.blend = "destination-out";
   boss.animation = 0;
+  boss.offset = {x: 12, y: 0};
   boss.modules = [];
+  boss.angle = PI / 2;
   boss.z = 24;
 /*
   var glow = this.bg.add(Object.create(Entity).init(boss.x, boss.y, boss.w, 8));

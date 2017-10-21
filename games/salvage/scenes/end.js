@@ -1,4 +1,6 @@
 var onStart =  function () {
+  Resources.music = Resources.menu;
+
   var fg = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
   var bg = fg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
   bg.color = "black";
