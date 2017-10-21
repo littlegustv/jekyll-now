@@ -165,6 +165,7 @@ Move.update = function (dt) {
   if (this.goal) {
     this.move(dt);
     if (this.check()) {
+      if (this.callback) this.callback();
       //console.log('done');
       this.goal = undefined;
       this.delay = this.duration;
@@ -185,13 +186,44 @@ Move.pick = function () {
 };
 
 var Boss = Object.create(Move);
+Boss.move = function (dt) {
+  if (Math.abs(this.goal.y - this.entity.y) > TILESIZE) {
+    this.entity.velocity = {x: 0, y: sign(this.goal.y - this.entity.y) * 5 * this.speed };        
+  } else {
+    this.entity.y = lerp(this.entity.y, this.goal.y, this.speed * dt);
+    this.entity.velocity = {x: 0, y: 0};
+  }
+  this.entity.x = lerp(this.entity.x, this.goal.x, this.speed * dt); 
+}
+Boss.beam = function () {
+  var beam = this.entity.layer.add(Object.create(Entity).init(gameWorld.width / 2, this.entity.y, gameWorld.width, 12));
+  beam.opacity = 0;
+  beam.color = "white";
+  beam.addBehavior(FadeIn, {duration: 0.2, maxOpacity: 1});
+  beam.addBehavior(FadeOut, {delay: 1.8, duration: 0.2});
+  beam.z = this.entity.z - 1;
+  beam.setCollision(Polygon);
+  beam.collision.onHandle = function (a, b) {
+    if (b.scrap) {
+      b.scrap = false;
+      b.z = a.z + 1;
+      b.addBehavior(Lerp, {field: "x", goal: 0, rate: 5, object: b});
+    }
+  }
+  this.delay = 2;
+  this.callback = undefined;
+}
+// create 'queue' of points to go to
 Boss.pick = function () {
-  if (this.entity.y + TILESIZE > MAX.y) {
+  if (this.entity.queue.length > 0) {
+    this.callback = this.beam;
+    return this.entity.queue.pop();
+  } else if (this.entity.y + TILESIZE > MAX.y) {
     return toGrid(this.entity.x, this.entity.y - TILESIZE);
   } else if (this.entity.y - TILESIZE < MIN.y) {
     return toGrid(this.entity.x, this.entity.y + TILESIZE);
   } else {
-    return toGrid(this.entity.x, this.entity.y + choose([-1, 1]) * TILESIZE);
+    return toGrid(this.entity.x, randint(0, HEIGHT));
   }
 };
 
@@ -1080,7 +1112,7 @@ function spawn(layer, key, player) {
       enemy.shoot = Weapons.bomb;
       break;
     case 4: // minelayer
-      enemy.addBehavior(Move, {duration: 1, speed: 8, turn: true }); // hmmm!
+      enemy.addBehavior(Move, {duration: 1, speed: 8 }); // hmmm!
       enemy.shoot = Weapons.proximity;
       enemy.setVertices([
         {x: -4, y: 0}, {x: 0, y: 4}, {x: 4, y: 0}, {x: 0, y: -4}
@@ -1160,12 +1192,14 @@ function spawn(layer, key, player) {
     
     var scrap = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, this.sprite));
     scrap.behaviors = [];
-    gameWorld.boss.addBehavior(TractorBeam, {target: scrap, turn_rate: 5, speed: 20, color: COLORS.tertiary, thickness: 2, width: 3.5, rate: 6, origin: {x: gameWorld.boss.x, y: gameWorld.boss.y}});
+    //gameWorld.boss.addBehavior(TractorBeam, {target: scrap, turn_rate: 5, speed: 20, color: COLORS.tertiary, thickness: 2, width: 3.5, rate: 6, origin: {x: gameWorld.boss.x, y: gameWorld.boss.y}});
     scrap.addBehavior(Velocity);
     scrap.velocity = {x: 0, y: 0, angle: PI};//angle: PI / 3};
     scrap.opacity = 0.8;
     scrap.z = 3;
+    scrap.scrap = true;
     scrap.setCollision(Polygon);
+    gameWorld.boss.queue.push(toGrid(0, scrap.y));
     scrap.collision.onHandle = function (object, other) {
       if (other == gameWorld.boss) {
         object.alive = false;
@@ -1376,6 +1410,8 @@ var Store = {
       this.layer.entities[i].lerp.goal = this.layer.entities[i].goal;
     }
     var t = this;
+    gameWorld.boss.store_open.alive = false;
+    gameWorld.boss.store_open = undefined;    
     this.layer.entities[0].lerp.callback = function () {
       /*for (var i = 0; i < gameWorld.scene.layers.length; i++) {
         gameWorld.scene.layers[i].paused = true;
@@ -1401,7 +1437,6 @@ var Store = {
     for (var i = 0; i < gameWorld.scene.layers.length; i++) {
       gameWorld.scene.layers[i].paused = false;
     }
-    //gameWorld.boss.store_open.alive = false;
-    gameWorld.boss.store_open = undefined;    
+    gameWorld.boss.animation = 0;  
   }
 }

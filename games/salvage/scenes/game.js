@@ -331,10 +331,25 @@ var onStart = function () {
         if (this.current_wave % 2 === 0) {
           var theta = Math.random() * PI2;
           var g = toGrid(boss.x + 64 * Math.cos(theta), boss.y + 64 * Math.sin(theta));
-          if (gameWorld.boss.health >= gameWorld.boss.maxhealth) {
-            gameWorld.boss.store_open = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
-            gameWorld.boss.store_open.angle = PI / 2;
-            gameWorld.boss.store_open.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 6, y: 0, angle: false, z: 1}});
+          if (gameWorld.boss.health >= gameWorld.boss.maxhealth && !gameWorld.boss.store_open) {
+            gameWorld.boss.store_open = t.bg.add(Object.create(Entity).init(gameWorld.boss.x + 32, gameWorld.boss.y, 16, 16));
+            
+
+            //gameWorld.boss.store_open.angle = PI / 2;
+            gameWorld.boss.store_open.opacity = 0;
+            gameWorld.boss.store_open.setCollision(Polygon);
+            gameWorld.boss.store_open.collision.onHandle = function (a, b) {
+              if (b == player_bot) {
+                s.store.open();
+              }
+            }
+            gameWorld.boss.animation = 2;
+            gameWorld.boss.store_open.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 32, y: 0, angle: false, z: 1}});
+
+            var t1 = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 32, gameWorld.boss.y, Resources.expire_font, "store", {spacing: -3, align: "center"}));
+            var t2 = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 32, gameWorld.boss.y, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
+            t1.addBehavior(Follow, {target: gameWorld.boss.store_open, offset: {x: -8, y: -6, alive: true, z: 1 }});
+            t2.addBehavior(Follow, {target: gameWorld.boss.store_open, offset: {x: -8, y: 6, alive: true, z: 1 }});
             //gameWorld.boss.animation = 1;
           /*  if (!gameWorld.boss.billboard || !gameWorld.boss.billboard.alive) {              
               gameWorld.boss.billboard = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
@@ -496,7 +511,7 @@ var onStart = function () {
   var boss = this.bg.add(Object.create(Sprite).init(0, toGrid(0, 100).y, Resources.boss));
   //boss.blend = "destination-out";
   boss.animation = 0;
-  boss.offset = {x: 12, y: 0};
+  boss.offset = {x: 6, y: 0};
   boss.modules = [];
   boss.angle = PI / 2;
   boss.z = 24;
@@ -510,6 +525,7 @@ var onStart = function () {
   boss.family = "neutral";
   boss.maxhealth = 10;
   boss.health = boss.maxhealth;
+  boss.queue = [];
   boss.respond = function (target) {
     if (this.health >= this.maxhealth) {}
     else if (this.health >= this.maxhealth - 1) {
@@ -538,16 +554,16 @@ var onStart = function () {
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
   boss.collision.onHandle = function (object, other) {
-    if (other.family == "player" && object.store_open) {
-      if (!other.lerpx && !other.lerpy) {
-        s.store.open();
-      }
-    }
-    else if (other.family == "player" && !gameWorld.boss.invulnerable) {
+    if (other.family == "player" && !gameWorld.boss.invulnerable) {
       object.health -= 1;
       gameWorld.boss.invulnerable = true;
       gameWorld.boss.respond(s.player_bot);
-      gameWorld.boss.addBehavior(Delay, {duration: 1, callback: function () { this.entity.invulnerable = false}});
+      gameWorld.boss.old_animation = gameWorld.boss.animation;
+      gameWorld.boss.animation = 1;
+      gameWorld.boss.addBehavior(Delay, {duration: 0.4, callback: function () { 
+        this.entity.invulnerable = false;
+        gameWorld.boss.animation = gameWorld.boss.old_animation;
+      }});
       if (object.health <= 0) {
         object.die();
       } else if (!other.projectile) {

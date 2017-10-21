@@ -7,9 +7,9 @@ var onStart =  function () {
   this.tertiaries = [];
   var s = this;
 
-  Resources.music = Resources.menu;
-  if (gameWorld.soundtrack) gameWorld.soundtrack.stop()
-  else if (!gameWorld.soundtrack) {
+  Resources.music = Resources.soundtrack;
+  //if (gameWorld.soundtrack) gameWorld.soundtrack.stop()
+  if (!gameWorld.soundtrack) {
     if (AudioContext) {
       //gameWorld.filter = gameWorld.audioContext.createBiquadFilter();
       //gameWorld.filter.connect(gameWorld.audioContext.destination);
