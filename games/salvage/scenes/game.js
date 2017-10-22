@@ -47,28 +47,33 @@ var onStart = function () {
 
   var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MAX.y + 10, WIDTH, 12, Resources.ground));
   ground.z = -7;
+  ground.solid = true;
   //ground.blend = "destination-out";
   ground.setCollision(Polygon);
 
   var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, 2, WIDTH - 8, 16, Resources.ground));
   ceiling.z = -7;
   ceiling.angle = PI;
+  ceiling.solid = true;
   ceiling.setCollision(Polygon);
 
   var right = bg.add(Object.create(TiledBackground).init(WIDTH - 2, HEIGHT / 2, HEIGHT - 8, 8, Resources.ground));
   right.angle = -PI / 2;
   right.z = -6;
+  right.solid = true;
   //right.blend = "destination-out";
   right.setCollision(Polygon);
 
   var left = bg.add(Object.create(TiledBackground).init(2, HEIGHT / 2, HEIGHT - 8, 8, Resources.ground));
   left.z = -6;
+  left.solid = true;
   left.angle = PI / 2;
   //left.blend = "destination-out";
   left.setCollision(Polygon);
   
   var gate = bg.add(Object.create(Sprite).init(gameWorld.width / 2, 8, Resources.gate));
   gate.setCollision(Polygon);
+  gate.solid = true;
   gate.z = -5;
 /*
   for (var i = 0; i < 100; i++) {
@@ -176,9 +181,9 @@ var onStart = function () {
     if (other.family == "enemy") {
       if (!other.projectile) {
       } else {
-        gameWorld.playSound(Resources.hit);
         if (object.shield >= 1) {
           object.shield = 0;
+          gameWorld.playSound(Resources.shield_down);
           //object.addBehavior(Delay, {duration: 1.5, callback: function () { this.entity.noCollide = false; }})
         } else {
           object.health -= 1;
@@ -193,7 +198,7 @@ var onStart = function () {
             //p.animation = 5;
             p.setCollision(Polygon);
             p.setVertices(projectile_vertices);
-            gameWorld.playSound(Resources.laser, volume(p));
+            gameWorld.playSound(Resources.laser);
             p.collision.onHandle = projectileHit;
             p.addBehavior(Velocity);
             p.family = "player";
@@ -295,8 +300,10 @@ var onStart = function () {
         if (!player_bot.hasFTL) {
           var warning = this.bg.add(Object.create(SpriteFont).init(gate.x, gate.y - 4, Resources.expire_font, "denied.", {spacing: -2, align: "center"}));
           //gameWorld.playSound(Resources.denied);
-          warning.addBehavior(FadeOut, {duration: 0, delay: 1});          
+          warning.addBehavior(FadeOut, {duration: 0, delay: 1});
+          gameWorld.playSound(Resources.denied);
         } else {
+          gameWorld.playSound(Resources.approved);
           gate.frame = 0;
           gate.frameDelay = 0;
           gate.animation = 1;
@@ -343,7 +350,7 @@ var onStart = function () {
                 s.store.open();
               }
             }
-            gameWorld.boss.animation = 2;
+            //gameWorld.boss.animation = 2;
             gameWorld.boss.store_open.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 32, y: 0, angle: false, z: 1}});
 
             var t1 = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 32, gameWorld.boss.y, Resources.expire_font, "store", {spacing: -3, align: "center"}));
@@ -388,7 +395,7 @@ var onStart = function () {
           }
         };
 
-        gameWorld.playSound(Resources.spawn, 0.5);
+        //gameWorld.playSound(Resources.spawn, 0.5);
 
         for (var i = 0; i < gameWorld.wave; i++) {
           var k = i % this.waves.length;
@@ -549,7 +556,7 @@ var onStart = function () {
       this.addBehavior(Enemy);
     }
   };
-  boss.addBehavior(Boss, {duration: 1.5, speed: 9, target: player_bot});
+  boss.addBehavior(Boss, {duration: 1.5, speed: 45, rate: 4, target: player_bot});
   boss.velocity = {x: 0, y: 0};
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
@@ -558,11 +565,11 @@ var onStart = function () {
       object.health -= 1;
       gameWorld.boss.invulnerable = true;
       gameWorld.boss.respond(s.player_bot);
-      gameWorld.boss.old_animation = gameWorld.boss.animation;
+      //gameWorld.boss.old_animation = gameWorld.boss.animation;
       gameWorld.boss.animation = 1;
       gameWorld.boss.addBehavior(Delay, {duration: 0.4, callback: function () { 
         this.entity.invulnerable = false;
-        gameWorld.boss.animation = gameWorld.boss.old_animation;
+        gameWorld.boss.animation = 0;
       }});
       if (object.health <= 0) {
         object.die();

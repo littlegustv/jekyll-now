@@ -136,7 +136,12 @@ Disable.update = function (dt) {
 
 var Shielded = Object.create(Behavior);
 Shielded.update = function (dt) {
-  if (this.entity.shield < 1) this.entity.shield += dt * this.rate;
+  if (this.entity.shield < 1) {
+    this.entity.shield += dt * this.rate;
+    if (this.entity.shield >= 1) {
+      gameWorld.playSound(Resources.shield_up);
+    }
+  }
   else this.entity.shield = 1;
   this.entity.shield_sprite.opacity = this.entity.shield;
 };
@@ -159,7 +164,7 @@ Move.move = function (dt) {
   this.entity.y = lerp(this.entity.y, this.goal.y, this.speed * dt);
 };
 Move.check = function () {
-  return this.entity.x === this.goal.x && this.entity.y === this.goal.y;
+  return Math.round(this.entity.x - this.goal.x) === 0 && Math.round(this.entity.y -  this.goal.y) === 0;
 };
 Move.update = function (dt) {
   if (this.goal) {
@@ -188,10 +193,10 @@ Move.pick = function () {
 var Boss = Object.create(Move);
 Boss.move = function (dt) {
   if (Math.abs(this.goal.y - this.entity.y) > TILESIZE) {
-    this.entity.velocity = {x: 0, y: sign(this.goal.y - this.entity.y) * 5 * this.speed };        
+    this.entity.velocity = {x: 0, y: sign(this.goal.y - this.entity.y) * this.speed };        
   } else {
-    this.entity.y = lerp(this.entity.y, this.goal.y, this.speed * dt);
-    this.entity.velocity = {x: 0, y: 0};
+    //this.entity.y = lerp(this.entity.y, this.goal.y, this.speed * dt);
+    this.entity.velocity = {x: 0, y: clamp(this.rate * (this.goal.y - this.entity.y), -this.speed, this.speed)};
   }
   this.entity.x = lerp(this.entity.x, this.goal.x, this.speed * dt); 
 }
@@ -199,18 +204,19 @@ Boss.beam = function () {
   var beam = this.entity.layer.add(Object.create(Entity).init(gameWorld.width / 2, this.entity.y, gameWorld.width, 12));
   beam.opacity = 0;
   beam.color = "white";
-  beam.addBehavior(FadeIn, {duration: 0.2, maxOpacity: 1});
-  beam.addBehavior(FadeOut, {delay: 1.8, duration: 0.2});
+  beam.addBehavior(FadeIn, {duration: 0.1, maxOpacity: 1});
+  beam.addBehavior(FadeOut, {delay: 0.8, duration: 0.1});
   beam.z = this.entity.z - 1;
   beam.setCollision(Polygon);
+  gameWorld.playSound(Resources.process);
   beam.collision.onHandle = function (a, b) {
     if (b.scrap) {
       b.scrap = false;
       b.z = a.z + 1;
-      b.addBehavior(Lerp, {field: "x", goal: 0, rate: 5, object: b});
+      b.addBehavior(Lerp, {field: "x", goal: 0, rate: 1, object: b});
     }
   }
-  this.delay = 2;
+  this.delay = 1.5;
   this.callback = undefined;
 }
 // create 'queue' of points to go to
@@ -218,12 +224,8 @@ Boss.pick = function () {
   if (this.entity.queue.length > 0) {
     this.callback = this.beam;
     return this.entity.queue.pop();
-  } else if (this.entity.y + TILESIZE > MAX.y) {
-    return toGrid(this.entity.x, this.entity.y - TILESIZE);
-  } else if (this.entity.y - TILESIZE < MIN.y) {
-    return toGrid(this.entity.x, this.entity.y + TILESIZE);
   } else {
-    return toGrid(this.entity.x, randint(0, HEIGHT));
+    return toGrid(this.entity.x, this.entity.y);
   }
 };
 
@@ -432,10 +434,12 @@ function lerp (current, goal, rate, threshold) {
 }
 
 function projectileHit (object, other) {
-  if (other.family === "neutral") return false;
-  else if (other.family != object.family && !other.projectile) {
-    projectileDie(object);
+  if (other.family == "player") {
     gameWorld.playSound(Resources.hit);
+    projectileDie(object);
+  } else if (other.family != object.family && other.solid) {
+    gameWorld.playSound(Resources.hit_small);
+    projectileDie(object);
   }
 }
 
@@ -547,7 +551,7 @@ function projectileDie(p) {
   flash.z = 4;
   flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
   flash.color = "white"; COLORS.secondary;
-  gameWorld.playSound(Resources.hit);
+  //gameWorld.playSound(Resources.hit);
 }
 
 var projectile_vertices = [
@@ -571,7 +575,7 @@ var Weapons = {
     //a.animation = 5;
     a.setCollision(Polygon);
     a.setVertices(projectile_vertices);
-    gameWorld.playSound(Resources.laser, volume(a));
+    gameWorld.playSound(Resources.laser);
     a.collision.onHandle = projectileHit;
     a.addBehavior(Velocity);
     a.family = this.family;//"player";
@@ -594,7 +598,7 @@ var Weapons = {
     f.stroke = true;
     f.strokeColor = COLORS.primary;
     f.width = 3;
-    gameWorld.playSound(Resources.laser, volume(f));
+    gameWorld.playSound(Resources.laser);
     f.addBehavior(Velocity);
     f.family = this.family;//"player";
     f.angle = this.shoot_angle;
@@ -610,7 +614,7 @@ var Weapons = {
         a.width = 2;
         a.setCollision(Polygon);
         a.setVertices(projectile_vertices);
-        gameWorld.playSound(Resources.laser, volume(a));
+        gameWorld.playSound(Resources.laser);
         a.collision.onHandle = projectileHit;
         a.addBehavior(Velocity);
         a.family = this.entity.family;//"player";
@@ -637,7 +641,7 @@ var Weapons = {
       //a.animation = 5;
       a.setCollision(Polygon);
       a.setVertices(projectile_vertices);
-      gameWorld.playSound(Resources.laser, volume(a));
+      gameWorld.playSound(Resources.laser);
       a.collision.onHandle = projectileHit;
       a.addBehavior(Velocity);
       a.family = this.family;//"player";
@@ -671,7 +675,7 @@ var Weapons = {
     //a.animation = 5;
     a.setCollision(Polygon);
     a.setVertices(projectile_vertices);
-    gameWorld.playSound(Resources.laser, volume(a));
+    gameWorld.playSound(Resources.laser);
     a.collision.onHandle = projectileHit;
     a.addBehavior(Velocity);
     a.family = this.family;//"player";
@@ -712,7 +716,7 @@ var Weapons = {
       var a = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y, this.entity.w, 2));
       a.setCollision(Polygon);
       //a.color = "white";
-      gameWorld.playSound(Resources.laser, volume(a));
+      gameWorld.playSound(Resources.laser);
       //a.collision.onHandle = projectileHit;
       a.family = "enemy";//"player";
       a.projectile = true;
@@ -734,7 +738,7 @@ var Weapons = {
     //a.animation = 5;
     a.setCollision(Polygon);
     a.setVertices(projectile_vertices);
-    gameWorld.playSound(Resources.laser, volume(a));
+    gameWorld.playSound(Resources.laser);
     a.collision.onHandle = projectileHit;
     a.addBehavior(Velocity);
     a.family = this.family;//"player";
@@ -762,7 +766,7 @@ var Weapons = {
     //a.animation = 5;
     a.setCollision(Polygon);
     a.setVertices(projectile_vertices);
-    gameWorld.playSound(Resources.laser, volume(a));
+    gameWorld.playSound(Resources.laser);
     a.collision.onHandle = projectileHit;
     a.addBehavior(Velocity);
     a.family = this.family;//"player";
@@ -795,7 +799,7 @@ var Weapons = {
     //a.animation = 5;
     a.setCollision(Polygon);
     a.setVertices(projectile_vertices);
-    gameWorld.playSound(Resources.laser, volume(a));
+    gameWorld.playSound(Resources.laser);
     a.collision.onHandle = projectileHit;
     a.addBehavior(Velocity);
     a.family = this.family;//"player";
@@ -1437,6 +1441,6 @@ var Store = {
     for (var i = 0; i < gameWorld.scene.layers.length; i++) {
       gameWorld.scene.layers[i].paused = false;
     }
-    gameWorld.boss.animation = 0;  
+    //gameWorld.boss.animation = 0;  
   }
 }
