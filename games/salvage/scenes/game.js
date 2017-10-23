@@ -533,27 +533,24 @@ var onStart = function () {
   boss.maxhealth = 10;
   boss.health = boss.maxhealth;
   boss.queue = [];
+  boss.weapons = ["standard", "triple", "burst", "homing", "hitscan", "firework"];
   boss.respond = function (target) {
     if (this.health >= this.maxhealth) {}
-    else if (this.health >= this.maxhealth - 1) {
+    else if (this.health >= this.maxhealth - 1) { // warning shot
       this.shoot = Weapons.standard;
       // fix me: should be based on NORMAL to angle(this, target), i.e. two shots to either side
       this.target = {x: target.x, y: target.y - 12};
       this.shoot(this.layer);
       this.target = {x: target.x, y: target.y + 12};
       this.shoot(this.layer);
-    } else if (this.health >= this.maxhealth - 2) {
-      this.shoot = Weapons.firework;
-      this.shoot_angle = angle(this.x, this.y, target.x, target.y);
-      this.target = target;
-      this.shoot(this.layer);
-    } else if (this.health >= this.maxhealth / 2 && this.disable === undefined) {
+    } else if (!this.enemy) {
+      this.enemy = this.addBehavior(BossEnemy);
       this.family = "enemy";
-      this.disable = this.addBehavior(Disable, {target: target});
-    } else if (this.disable !== undefined) {
-      this.removeBehavior(this.disable);
-      this.disable = undefined;
-      this.addBehavior(Enemy);
+      this.target = target;
+    }
+
+    if (this.health <= 3) {
+      this.unforgiving = true;
     }
   };
   boss.addBehavior(Boss, {duration: 1.5, speed: 45, rate: 4, target: player_bot});

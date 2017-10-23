@@ -224,6 +224,8 @@ Boss.pick = function () {
   if (this.entity.queue.length > 0) {
     this.callback = this.beam;
     return this.entity.queue.pop();
+  } else if (this.entity.enemy) {
+    return toGrid(this.entity.x, choose([-1, 1]) * TILESIZE + this.entity.y);
   } else {
     return toGrid(this.entity.x, this.entity.y);
   }
@@ -920,6 +922,17 @@ Enemy.draw = function (ctx) {
   }
 }
 
+var BossEnemy = Object.create(Enemy);
+BossEnemy.update = function (dt) {
+  if (this.cooldown > 0) this.cooldown -= dt;
+  else {
+    var weapon = choose(this.entity.weapons.slice(0, this.entity.maxhealth - this.entity.health));
+    console.log('blah', weapon)
+    this.entity.shoot = Weapons[weapon];
+    this.cooldown = this.entity.shoot(this.entity.layer);
+  }
+}
+
 // fix me: not used, but maybe useful? keeping for now
 // target, radius, rate, angle
 var Drone = Object.create(Behavior);
@@ -1214,6 +1227,9 @@ function spawn(layer, key, player) {
           p.addBehavior(FadeOut, {duration: 0.2, delay: 2});
         }
         other.health = Math.min(other.maxhealth, other.health + 1); // repair!
+        if (other.health >= other.maxhealth && !other.unforgiving && other.enemy) {
+          other.removeBehavior(other.enemy);
+        }
       } else if (other == player && other.material !== undefined) {
         object.alive =false;
         other.material += 1;
