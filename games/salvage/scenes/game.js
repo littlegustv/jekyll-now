@@ -497,7 +497,7 @@ var onStart = function () {
   }*/
 
 
-  var boss = this.bg.add(Object.create(Sprite).init(0, toGrid(0, 100).y, Resources.boss));
+  var boss = this.bg.add(Object.create(Sprite).init(toGrid(0, 100).x, toGrid(0, 100).y, Resources.boss));
   //boss.blend = "destination-out";
   boss.animation = 0;
   boss.offset = {x: 6, y: 0};

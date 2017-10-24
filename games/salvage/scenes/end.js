@@ -31,7 +31,22 @@ var onStart =  function () {
       };
       d.addBehavior(Velocity);
       d.velocity = {x: 0, y: - this.entity.velocity.y};
-    }})
+    }});
+  } else if (gameWorld.ending === 4) {
+    // insurrection
+    var wreck = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 12, Resources.boss));
+    wreck.angle = -PI / 3;
+    wreck.addBehavior(Periodic, {period: 0.1, callback: function () {
+      if (Math.random() > 0.5) {        
+        var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
+        d.z = this.entity.z - 1;
+        d.behaviors[0].onEnd = function () {
+          this.entity.alive = false;
+        };
+        d.addBehavior(Velocity);
+        d.velocity = {x: 0, y: - 40};
+      }
+    }});
   } else {
     var wreck = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 12, Resources.viper));
     wreck.angle = -PI / 3;
