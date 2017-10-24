@@ -11,11 +11,18 @@ var onStart =  function () {
   fg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 6, gameWorld.width, 12, Resources.ground));
   
   if (gameWorld.ending === 2 || gameWorld.ending === 3) {
+
+    var gate = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 8, Resources.gate));
+    gate.z = 10;
+    gate.angle = PI;
+
     var player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 32, Resources.viper));
     player.angle = -PI / 2;
     player.addBehavior(Velocity);
-    player.velocity = {x: 0, y: -20};
-    player.addBehavior(Periodic, {period: 0.8, callback: function () {
+    player.addBehavior(Accelerate);
+    player.velocity = {x: 0, y: -10};
+    player.acceleration = {x: 0, y: -80};
+    player.addBehavior(Periodic, {period: 0.2, callback: function () {
       var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
       d.z = this.entity.z - 1;
       d.behaviors[0].onEnd = function () {
@@ -25,11 +32,24 @@ var onStart =  function () {
       d.velocity = {x: 0, y: - this.entity.velocity.y};
     }})
   } else {
+    var wreck = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 12, Resources.viper));
+    wreck.angle = -PI / 3;
+    wreck.addBehavior(Periodic, {period: 0.1, callback: function () {
+      if (Math.random() > 0.5) {        
+        var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
+        d.z = this.entity.z - 1;
+        d.behaviors[0].onEnd = function () {
+          this.entity.alive = false;
+        };
+        d.addBehavior(Velocity);
+        d.velocity = {x: 0, y: - 40};
+      }
+    }});
     // add tombstone    
   }
 
-  var b = fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height - 24, Resources.expire_font, "menu", {spacing: -2, align: "center"}));
-  var button = fg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height - 24, gameWorld.width, 16));
+  var b = fg.add(Object.create(SpriteFont).init(48, gameWorld.height - 24, Resources.expire_font, "menu", {spacing: -2, align: "center"}));
+  var button = fg.add(Object.create(Entity).init(48, gameWorld.height - 24, gameWorld.width, 16));
   button.family = "button";
   button.opacity = 0;
   button.text = b;

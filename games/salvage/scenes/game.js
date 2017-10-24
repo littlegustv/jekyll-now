@@ -353,8 +353,8 @@ var onStart = function () {
             //gameWorld.boss.animation = 2;
             gameWorld.boss.store_open.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 32, y: 0, angle: false, z: 1}});
 
-            var t1 = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 32, gameWorld.boss.y, Resources.expire_font, "store", {spacing: -3, align: "center"}));
-            var t2 = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 32, gameWorld.boss.y, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
+            var t1 = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 24, gameWorld.boss.y - 6, Resources.expire_font, "store", {spacing: -3, align: "center"}));
+            var t2 = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 24, gameWorld.boss.y + 6, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
             t1.addBehavior(Follow, {target: gameWorld.boss.store_open, offset: {x: -8, y: -6, alive: true, z: 1 }});
             t2.addBehavior(Follow, {target: gameWorld.boss.store_open, offset: {x: -8, y: 6, alive: true, z: 1 }});
             //gameWorld.boss.animation = 1;
@@ -368,32 +368,9 @@ var onStart = function () {
           }
         }
         this.current_wave += 1;
-        var cash = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 32, gameWorld.boss.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
-        cash.addBehavior(Velocity);
-        cash.family = "neutral";
-        //cash.blend = "destination-out";
-        cash.velocity = {x: 0, y: 20};
-        cash.setCollision(Polygon);
-        cash.setVertices([
-          {x: -20, y: -5},
-          {x: -20, y: 5},
-          {x: 20, y: 5},
-          {x: 20, y: -5}
-        ]);
-        cash.collision.onHandle = function (object, other) {
-          if (other == s.player_bot) {
-            object.alive = false;
-            other.salvage += 1;
-            gameWorld.playSound(Resources.coins);
-            for (var i = 0; i < 20; i++) {
-              var p = object.layer.add(Object.create(SpriteFont).init(other.x, other.y, Resources.expire_font, "$", {align: "center"}));
-              p.addBehavior(Velocity);
-              //p.blend = "destination-out";
-              p.addBehavior(FadeOut, {duration: 0, delay: Math.random()});
-              p.velocity = {x: randint(-20,20), y: randint(-20,20)};
-            }
-          }
-        };
+
+        gameWorld.boss.queue.push(toGrid(0, 0));
+        gameWorld.boss.payday = 1;
 
         //gameWorld.playSound(Resources.spawn, 0.5);
 
@@ -522,6 +499,17 @@ var onStart = function () {
   boss.modules = [];
   boss.angle = PI / 2;
   boss.z = 24;
+  boss.particles = boss.addBehavior(Periodic, {period: 0.1, rate: 0, callback: function () {
+    if (Math.random() < this.rate) {
+      var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
+      d.z = this.entity.z - 1;
+      d.behaviors[0].onEnd = function () {
+        this.entity.alive = false;
+      };
+      d.addBehavior(Velocity);
+      d.velocity = {x: 0, y: - 40};
+    }
+  }});
 /*
   var glow = this.bg.add(Object.create(Entity).init(boss.x, boss.y, boss.w, 8));
   glow.z = 23;
@@ -560,6 +548,7 @@ var onStart = function () {
   boss.collision.onHandle = function (object, other) {
     if (other.family == "player" && !gameWorld.boss.invulnerable) {
       object.health -= 1;
+      object.particles.rate = (10 - object.health) / 10;
       gameWorld.boss.invulnerable = true;
       gameWorld.boss.respond(s.player_bot);
       //gameWorld.boss.old_animation = gameWorld.boss.animation;
@@ -611,90 +600,18 @@ var onStart = function () {
 
   }
 
-  //boss.lerpFollow = boss.addBehavior(LerpFollow, {target: player_bot, rate: 0.3, offset: {x: 0, y: -gameWorld.height / 3, angle: false, z: false}});
-  //boss.addBehavior(HealthBar);
   gameWorld.boss = boss;
   boss.limbs = [];
-  /*
-  for (var i = 0; i < 6; i++) {
-    var theta = PI / 2 + i * PI2 / 6;
-    var limb = this.bg.add(Object.create(Circle).init(boss.x + Math.cos(theta) * 32, boss.y + Math.sin(theta) * 32, 15));
-    //limb.w = 12, limb.h = 12;
-    limb.angle = angle(limb.x, limb.y, boss.x, boss.y);
-    limb.setCollision(Polygon);
-    ////limb.blend = "destination-out";
-    limb.addBehavior(Follow, {target: gameWorld.boss, offset: {x: Math.cos(theta) * 32, y: Math.sin(theta) * 32, angle: false, z: -( i + 1)}});
-    limb.color = COLORS.tertiary;
-    limb.health = 2;
-    limb.opacity = 0.8;
-    limb.z = 13 + i;
-    boss.limbs.push(limb);
-    limb.collision.onHandle = function (object, other) {
-      if (other.family == "player" && !gameWorld.boss.invulnerable) {
-        // blowback
-        object.health -= 1;
-        gameWorld.boss.invulnerable = true;
-        gameWorld.boss.respond(s.player_bot);
-        gameWorld.boss.addBehavior(Delay, {duration: 1, callback: function () { this.entity.invulnerable = false}})
-        if (object.health <= 0) {
-          object.alive = false;
-        }
-        if (!other.projectile) {
-          var theta = angle(gameWorld.boss.x, gameWorld.boss.y, other.x, other.y);
-          
-          var goal = {x: 48 * Math.round((object.x + 56 * Math.cos(theta)) / 48), y:  48 * Math.round((object.y + 56 * Math.sin(theta)) / 48)}
   
-          // gridsize is 48, find nearest
-  
-          s.player_bot.removeBehavior((s.player_bot.lerpx));
-          s.player_bot.removeBehavior((s.player_bot.lerpy));
-          s.player_bot.angle = theta;
-          s.player_bot.move(s);
-          s.player_bot.lerpx.goal = goal.x;
-          s.player_bot.lerpy.goal = goal.y;
-        }
-      }
-    }
-  }*/
-  
-  // intro animation
-  //this.intro = true;
   this.bg.paused = false;
-  //this.fg.paused = false;
-
-  /*this.bg.camera.scale = 0.5;
-  //this.fg.camera.scale = 0.5;
-  this.bg.camera.x = -gameWorld.width / 4;
-  this.bg.camera.y = -gameWorld.height / 4;
-
-  this.bg.camera.lerpx = this.bg.camera.addBehavior(Lerp, {field: "x", object: s.bg.camera, goal: 0, rate: 3.5});
-  this.bg.camera.lerpy = this.bg.camera.addBehavior(Lerp, {field: "y", object: s.bg.camera, goal: 0, rate: 3.5});
-  this.bg.camera.lerp = this.bg.camera.addBehavior(Lerp, {field: "scale", object: s.bg.camera, goal: 1, rate: 3.5, threshold: 0.01, callback: function () {
-    s.intro = false;
-    s.player_bot.delay = player_bot.addBehavior(Delay, {duration: 1, remove: false, callback: function () {
-      this.entity.velocity = {x: 0, y: 0};
-      this.entity.acceleration = {x: 0, y: 0};
-      s.pause();
-    }});
-    this.entity.removeBehavior(this.entity.lerp);
-    this.entity.removeBehavior(this.entity.lerpx);
-    this.entity.removeBehavior(this.entity.lerpy);
-    
-  }});*/
+  
   this.pause();
 };
 var onUpdate = function (dt) {
   var s = this;
-  //if (this.intro) return; // for now...
 
   for (var i = 0; i < this.wave.length; i++) {
     if (!this.wave[i].alive) this.wave.splice(i, 1);
   }
-
-  /*if (this.bg.paused) {
-    gameWorld.filter.frequency.value = lerp(gameWorld.filter.frequency.value, 220, dt);
-  } else {
-    gameWorld.filter.frequency.value = lerp(gameWorld.filter.frequency.value, 24000, dt);
-  }*/
-    
+  
 };

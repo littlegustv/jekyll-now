@@ -219,10 +219,45 @@ Boss.beam = function () {
   this.delay = 1.5;
   this.callback = undefined;
 }
+Boss.pay = function () {
+  var cash = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 32, this.entity.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
+  cash.addBehavior(Velocity);
+  cash.family = "neutral";
+  //cash.blend = "destination-out";
+  cash.velocity = {x: 0, y: 20};
+  cash.setCollision(Polygon);
+  cash.setVertices([
+    {x: -20, y: -5},
+    {x: -20, y: 5},
+    {x: 20, y: 5},
+    {x: 20, y: -5}
+  ]);
+  cash.addBehavior(Lerp, {object: cash, field: "x", goal: WIDTH / 2, rate: 1});
+  cash.collision.onHandle = function (object, other) {
+    if (other == gameWorld.player) {
+      object.alive = false;
+      other.salvage += 1;
+      gameWorld.playSound(Resources.coins);
+      for (var i = 0; i < 20; i++) {
+        var p = object.layer.add(Object.create(SpriteFont).init(other.x, other.y, Resources.expire_font, "$", {align: "center"}));
+        p.addBehavior(Velocity);
+        //p.blend = "destination-out";
+        p.addBehavior(FadeOut, {duration: 0, delay: Math.random()});
+        p.velocity = {x: randint(-20,20), y: randint(-20,20)};
+      }
+    }
+  };
+  this.callback = undefined;
+}
 // create 'queue' of points to go to
 Boss.pick = function () {
   if (this.entity.queue.length > 0) {
-    this.callback = this.beam;
+    if (this.entity.payday) {
+      this.entity.payday = false;
+      this.callback = this.pay;
+    } else {
+      this.callback = this.beam;
+    }
     return this.entity.queue.pop();
   } else if (this.entity.enemy) {
     return toGrid(this.entity.x, choose([-1, 1]) * TILESIZE + this.entity.y);
@@ -1113,7 +1148,8 @@ function spawn(layer, key, player) {
       //enemy.addBehavior(Target, {target: player, speed: 0, turn_rate: 0, offset: {x: randint(-16, 16), y: randint(-16, 16)}});
       enemy.shoot = Weapons.burst;
       enemy.target = player;
-      enemy.x = enemy.x > WIDTH / 2 ? toGrid(WIDTH, 0).x : toGrid(0, 0).x;      
+      enemy.x = toGrid(WIDTH, 0).x;
+      enemy.angle = PI;      
       enemy.setVertices([
         {x: -3, y: -3}, {x: -3, y: 3}, {x: 3, y: 3}, {x: 3, y: -3}
       ]);     
@@ -1216,15 +1252,20 @@ function spawn(layer, key, player) {
     scrap.z = 3;
     scrap.scrap = true;
     scrap.setCollision(Polygon);
-    gameWorld.boss.queue.push(toGrid(0, scrap.y));
+    if (gameWorld.boss.queue.indexOf(toGrid(0, scrap.y)) == -1) {
+      gameWorld.boss.queue.unshift(toGrid(0, scrap.y));      
+    }
     scrap.collision.onHandle = function (object, other) {
       if (other == gameWorld.boss) {
         object.alive = false;
-        for (var i = 0; i < 2; i++) {
-          var p = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.dust));
-          p.addBehavior(Velocity);
-          p.velocity = {x: 0, y: -40 + randint(-10,10)};
-          p.addBehavior(FadeOut, {duration: 0.2, delay: 2});
+        // fix me: play 'processing' or HEALING sound, animation?
+        for (var i = 0; i < 10; i++) {
+          var h = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.heart));
+          h.z = other.z + 1;
+          var theta = Math.random() * PI2;
+          h.addBehavior(Velocity);
+          h.velocity = {x: 20 * Math.cos(theta), y: 20 * Math.sin(theta) };
+          h.addBehavior(FadeOut, {duration: 0.2, delay: randint(1, 2)});
         }
         other.health = Math.min(other.maxhealth, other.health + 1); // repair!
         if (other.health >= other.maxhealth && !other.unforgiving && other.enemy) {
