@@ -477,28 +477,7 @@ var onStart = function () {
     //[10]
   ];
 
-  //this.waves = [[2, 2, 2]]
-  /*
-  var gate = this.bg.add(Object.create(Sprite).init(32, gameWorld.height / 2, Resources.gate));
-  gate.setCollision(Polygon);
-  gate.collision.onHandle = function (object, other) {
-      if (other === s.player_bot) {
-        if (other.hasFTL) {
-          if (gameWorld.boss.alive) {
-            gameWorld.ending = 2;
-          } else {
-            gameWorld.ending = 3;
-          }
-          gameWorld.setScene(2);
-        } else {
-
-        }
-      }
-  }*/
-
-
   var boss = this.bg.add(Object.create(Sprite).init(toGrid(0, 100).x, toGrid(0, 100).y, Resources.boss));
-  //boss.blend = "destination-out";
   boss.animation = 0;
   boss.offset = {x: 6, y: 0};
   boss.modules = [];
@@ -515,12 +494,6 @@ var onStart = function () {
       d.velocity = {x: 0, y: - 40};
     }
   }});
-/*
-  var glow = this.bg.add(Object.create(Entity).init(boss.x, boss.y, boss.w, 8));
-  glow.z = 23;
-  glow.offset = glow.addBehavior(Follow, {target: boss, offset: {x: 0, y: 0, z: -1}});
-  boss.glow = glow;
-  glow.color = COLORS.nullary;*/
 
   boss.family = "neutral";
   boss.maxhealth = 10;
