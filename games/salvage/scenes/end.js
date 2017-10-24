@@ -14,6 +14,7 @@ var onStart =  function () {
 
     var gate = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 8, Resources.gate));
     gate.z = 10;
+    gate.animation = 2;
     gate.angle = PI;
 
     var player = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 32, Resources.viper));

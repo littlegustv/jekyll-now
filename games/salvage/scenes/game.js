@@ -298,19 +298,24 @@ var onStart = function () {
       var coords = toGrid(this.player_bot.x, this.player_bot.y);
       if (coords.y === MIN.y && (coords.x == MIN.x + TILESIZE * 2 || coords.x == MIN.x + TILESIZE * 3)) {
         if (!player_bot.hasFTL) {
+          gate.animation = 1;
+          gate.addBehavior(Delay, {duration: 1, callback: function () {
+            this.entity.animation = 0;
+            this.entity.removeBehavior(this);
+          }});
           var warning = this.bg.add(Object.create(SpriteFont).init(gate.x, gate.y - 4, Resources.expire_font, "denied.", {spacing: -2, align: "center"}));
           //gameWorld.playSound(Resources.denied);
-          warning.addBehavior(FadeOut, {duration: 0, delay: 1});
+          warning.addBehavior(FadeOut, {duration: 0.5, delay: 0.5});
+          warning.addBehavior(Velocity);
+          warning.velocity = {x: 0, y: 20, angle: PI / 12};
           gameWorld.playSound(Resources.denied);
         } else {
           gameWorld.playSound(Resources.approved);
-          gate.frame = 0;
-          gate.frameDelay = 0;
-          gate.animation = 1;
-          gate.behaviors[0].onEnd = function () {
+          gate.animation = 2;
+          /*gate.behaviors[0].onEnd = function () {
             this.entity.animation = 2;
             this.entity.behaviors[0].onEnd = undefined;
-          };
+          };*/
         }
       } else if (coords.y < MIN.y) {
         if (gameWorld.boss.alive) {
