@@ -5,6 +5,9 @@ var onStart =  function () {
   var bg = fg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
   bg.color = "black";
   bg.z = -10;
+  var grid = fg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
+  grid.z = -9;
+
   fg.add(Object.create(SpriteFont).init(8, gameWorld.height / 2 - 16, Resources.expire_font, ENDINGS[gameWorld.ending], {spacing: -2, align: "left"}));
   fg.add(Object.create(SpriteFont).init(8, gameWorld.height / 2, Resources.expire_font, "Ending " + (gameWorld.ending + 1) + " of " + ENDINGS.length, {spacing: -2, align: "left"})).opacity = 0.8;
 
@@ -35,7 +38,7 @@ var onStart =  function () {
   } else if (gameWorld.ending === 4) {
     // insurrection
     var wreck = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 12, Resources.boss));
-    wreck.angle = -PI / 3;
+    wreck.angle = PI / 6;
     wreck.addBehavior(Periodic, {period: 0.1, callback: function () {
       if (Math.random() > 0.5) {        
         var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
@@ -49,7 +52,7 @@ var onStart =  function () {
     }});
   } else {
     var wreck = fg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 12, Resources.viper));
-    wreck.angle = -PI / 3;
+    wreck.angle = PI / 6;
     wreck.addBehavior(Periodic, {period: 0.1, callback: function () {
       if (Math.random() > 0.5) {        
         var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));

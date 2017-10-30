@@ -3,7 +3,7 @@
 
 var MAXHEALTH = 4, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(180, 320, "index.json");
-gameWorld.wave = 0;
+gameWorld.wave = 1;
 gameWorld.distance = 100;
 gameWorld.ending = 0;
 
@@ -45,18 +45,18 @@ var TILESIZE = 32;
 ]*/
 
 //var COLORS = SCHEMES[0];
-var COLORS = {
+/*var COLORS = {
   negative: "#000000",
   nullary: "#FFFFFF",
   primary: "darkcyan",//"#CC0000",
   secondary: "#ff4500",
   tertiary: "#994411"
-};
+};*/
 
 var COLORS = {
   negative: "#000000",
   nullary: "#FFFFFF",
-  primary: "deepskyblue",//"#AA0000",
+  primary: "#00bfff",//"#AA0000",
   secondary: "#000000",
   tertiary: "#000000"
 };
@@ -115,16 +115,6 @@ Radar.draw = function(ctx) {
   }
 };
 
-var Fanfare = Object.create(Behavior);
-Fanfare.update = function (dt) {
-  if (Math.random() * 100 < this.frequency) {
-    //console.log('fanfare!');
-    var c = this.entity.layer.add(Object.create(Circle).init(this.entity.x + randint(-this.entity.radius, this.entity.radius), this.entity.y + randint(-this.entity.radius, this.entity.radius), randint(this.radius.min, this.radius.max)));
-    c.color = choose(this.colors);
-    c.addBehavior(FadeOut, {duration: 0.1, delay: Math.random() / 2 + 0.5});
-  }
-};
-
 var Disable = Object.create(Behavior);
 Disable.update = function (dt) {
   if (this.cooldown === undefined) this.cooldown = 0;
@@ -140,6 +130,10 @@ Shielded.update = function (dt) {
     this.entity.shield += dt * this.rate;
     if (this.entity.shield >= 1) {
       gameWorld.playSound(Resources.shield_up);
+      var m = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y, Resources.expire_font, "shields up!", {spacing: -2, align: "center"}));
+      m.addBehavior(Velocity);
+      m.addBehavior(FadeOut, {delay: 0.5, duration: 0.2});
+      m.velocity = {x: 0, y: -30, angle: -PI / 12};
     }
   }
   else this.entity.shield = 1;
@@ -579,16 +573,18 @@ function lerp_angle (a1, a2, rate) {
 
 function projectileDie(p) {
   p.alive = false;
-  var expl = p.layer.add(Object.create(Circle).init(p.x, p.y, 8));
-  expl.color = "white";
-  //var expl = enemy.layer.add(Object.create(Sprite).init(enemy.x + randint(-8, 8), enemy.y + randint(-8, 8), Resources.explosion));
-  expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
-  expl.z = 3;
-  var flash = p.layer.add(Object.create(Circle).init(p.x, p.y, 12));
-  flash.z = 4;
-  flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
-  flash.color = "white"; COLORS.secondary;
-  //gameWorld.playSound(Resources.hit);
+  for (var i = 0; i < 20; i++) {    
+    // particle effect
+    var d = p.layer.add(Object.create(Sprite).init(p.x, p.y, Resources.dust));
+    d.addBehavior(Velocity);
+    d.animation = 1;
+    var theta = Math.random() * PI2;
+    var speed = randint(5, 30);
+    d.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
+    d.behaviors[0].onEnd = function () {
+      this.entity.alive = false;
+    };
+  }
 }
 
 var projectile_vertices = [
@@ -1233,14 +1229,20 @@ function spawn(layer, key, player) {
   layer.add(enemy);
   enemy.die = function () {
     enemy.alive = false;
-    var expl = enemy.layer.add(Object.create(Circle).init(enemy.x, enemy.y, 24));
-    expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
-    expl.color = "white";
-    expl.z = 1;
-    var flash = enemy.layer.add(Object.create(Circle).init(enemy.x, enemy.y, 32));
-    flash.z = 2;
-    flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
-    flash.color = "white"; //COLORS.secondary;
+
+    // particle effect
+    for (var i = 0; i < 40; i++) {
+      var d = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.dust));
+      d.addBehavior(Velocity);
+      d.animation = 0;
+      var theta = Math.random() * PI2;
+      var speed = randint(5, 50);
+      d.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
+      d.behaviors[0].onEnd = function () {
+        this.entity.alive = false;
+      };
+    }
+
     gameWorld.playSound(Resources.hit);        
     
     var scrap = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, this.sprite));
@@ -1259,12 +1261,19 @@ function spawn(layer, key, player) {
       if (other == gameWorld.boss) {
         object.alive = false;
         // fix me: play 'processing' or HEALING sound, animation?
-        for (var i = 0; i < 10; i++) {
-          var h = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.heart));
+        for (var i = 0; i < 20; i++) {
+          if (other.health < other.maxhealth) {          
+            var h = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.heart));
+            // gameWorld.playSound(Resources.processing);
+          } else {
+            var h = other.layer.add(Object.create(SpriteFont).init(other.x, other.y, Resources.expire_font, "$", {spacing: 0, align: "center"}));
+            gameWorld.playSound(Resources.coins);
+          }
           h.z = other.z + 1;
           var theta = Math.random() * PI2;
+          var speed = randint(7, 30);
           h.addBehavior(Velocity);
-          h.velocity = {x: 20 * Math.cos(theta), y: 20 * Math.sin(theta) };
+          h.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta) };
           h.addBehavior(FadeOut, {duration: 0.2, delay: randint(1, 2)});
         }
         other.health = Math.min(other.maxhealth, other.health + 1); // repair!

@@ -98,7 +98,8 @@ var onStart = function () {
   }
   this.shield = bg.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 8, Resources.icons));
   this.shield.animation = 1;
-  this.shield.addBehavior(Follow, {target: player_bot, offset: {x: 0, y: 0, z: -1, angle: -PI / 2, opacity: false}})
+  this.shield.scale = 1.5;
+  this.shield.addBehavior(Follow, {target: player_bot, offset: {x: 0, y: 0, z: -1, angle: false, opacity: false}});
   
   var s = this;
   this.updateHealthBar = function (object) {
@@ -184,6 +185,10 @@ var onStart = function () {
         if (object.shield >= 1) {
           object.shield = 0;
           gameWorld.playSound(Resources.shield_down);
+          var m = object.layer.add(Object.create(SpriteFont).init(object.x, object.y, Resources.expire_font, "shields down!", {spacing: -2, align: "center"}));
+          m.addBehavior(Velocity);
+          m.addBehavior(FadeOut, {delay: 0.5, duration: 0.2});
+          m.velocity = {x: 0, y: 30, angle: PI / 12};
           //object.addBehavior(Delay, {duration: 1.5, callback: function () { this.entity.noCollide = false; }})
         } else {
           object.health -= 1;
@@ -232,6 +237,8 @@ var onStart = function () {
   player_bot.die = function () {
     s.unpause();
     gameWorld.saved = false;
+    this.collision.onCheck = function (a, b) { return false; };
+    this.collision.onHandle = function (a, b) { return false; };
     s.pause = function () {};
     player_bot.removeBehavior(player_bot.lerpx);
     player_bot.removeBehavior(player_bot.lerpy);
@@ -247,14 +254,19 @@ var onStart = function () {
       }
       gameWorld.setScene(2, true);
     }});
-    var expl = this.layer.add(Object.create(Circle).init(this.x, this.y, 32));
-    //var expl = enemy.layer.add(Object.create(Sprite).init(thi));
-    expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
-    expl.z = 1;
-    var flash = this.layer.add(Object.create(Circle).init(this.x, this.y, 38));
-    flash.z = 2;
-    flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
-    flash.color = COLORS.secondary;
+
+    for (var i = 0; i < 80; i++) {
+      var d = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.dust));
+      d.addBehavior(Velocity);
+      d.animation = 0;//choose([0, 1]);
+      var theta = Math.random() * PI2;
+      var speed = randint(3, 50);
+      d.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
+      d.behaviors[0].onEnd = function () {
+        this.entity.alive = false;
+      };
+    }
+
     gameWorld.playSound(Resources.hit);
     gameWorld.wave = 0;
   };
@@ -312,10 +324,6 @@ var onStart = function () {
         } else {
           gameWorld.playSound(Resources.approved);
           gate.animation = 2;
-          /*gate.behaviors[0].onEnd = function () {
-            this.entity.animation = 2;
-            this.entity.behaviors[0].onEnd = undefined;
-          };*/
         }
       } else if (coords.y < MIN.y) {
         if (gameWorld.boss.alive) {
@@ -327,9 +335,6 @@ var onStart = function () {
       }
 
       this.bg.paused = true;
-      this.player_bot.velocity = {x: 0, y: 0};
-      this.player_bot.acceleration = {x: 0, y: 0};
-      this.player_bot.animation = 0;
       if (this.wave.length <= 0) {
         for (var i = 0; i < projectiles.length; i++) {
           if (projectiles[i].alive) {
@@ -373,6 +378,11 @@ var onStart = function () {
           }
         }
         this.current_wave += 1;
+        var announcement = t.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "wave " + this.current_wave, {spacing: -3, align: "center"}));
+        announcement.opacity = 0;
+        announcement.addBehavior(FadeIn, {duration: 0.3, delay: 0, maxOpacity: 1});
+        announcement.addBehavior(FadeOut, {duration: 0.3, delay: 0.5, maxOpacity: 1});
+        announcement.scale = 2;
 
         gameWorld.boss.queue.push(toGrid(0, 0));
         gameWorld.boss.payday = 1;
@@ -393,7 +403,7 @@ var onStart = function () {
   this.unpause = function () {
     this.bg.paused = false;
     //this.fg.paused = false;
-  }
+  };
   var s = this;
   var down = function (e) {
     var layer = s.store_layer.active ? s.store_layer : s.ui;    
@@ -434,11 +444,10 @@ var onStart = function () {
         s.player_bot.angle = Math.round(angle(s.player_bot.x - s.bg.camera.x, s.player_bot.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
       //}
     }
-  }
+  };
   
   var up = function (e) {
-  }
-  
+  };
   
   this.onMouseMove = move;
   this.onMouseUp = function (e) {
@@ -551,13 +560,17 @@ var onStart = function () {
   };
   boss.die = function (e) {
     // fix me: maybe here? (need to made non-collide)
-    var expl = this.layer.add(Object.create(Circle).init(this.x, this.y, 24));
-    expl.addBehavior(FadeOut, {duration: 0.5, delay: 0.2});
-    expl.z = 1;
-    var flash = this.layer.add(Object.create(Circle).init(this.x, this.y, 32));
-    flash.z = 2;
-    flash.addBehavior(FadeOut, {duration: 0, delay: 0.1});
-    flash.color = COLORS.secondary;
+    for (var i = 0; i < 80; i++) {
+      var d = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.dust));
+      d.addBehavior(Velocity);
+      d.animation = choose([0, 1]);
+      var theta = Math.random() * PI2;
+      var speed = randint(3, 50);
+      d.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
+      d.behaviors[0].onEnd = function () {
+        this.entity.alive = false;
+      };
+    }
     gameWorld.playSound(Resources.hit);
 
     s.unpause();

@@ -38,6 +38,9 @@ var onStart =  function () {
   back.color = "black";
   back.z = 0;
   this.nullaries.push(back);
+  
+  var grid = this.bg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
+  grid.z = 1;
 
   var title = this.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 6, gameWorld.height - 16, Resources.expire_font, "salvage", {spacing: -2, align: "center"}));
   //title.addBehavior(Oscillate, {field: "y", object: title, initial: gameWorld.height / 2, rate: 1, constant: 24});
@@ -64,9 +67,25 @@ var onStart =  function () {
     line.addBehavior(Wrap, {min: {x: -line.w / 2, y: 0}, max: {x: gameWorld.width + line.w / 2, y: gameWorld.height}});
     this.tertiaries.push(line);
   }*/
-  var buttons = ["new game", "mute", "credits", "achievements"];
+  var buttons = [
+    ["new game", function () {
+      gameWorld.setScene(1, true);
+    }],
+    ["tutorial", function () {
+      gameWorld.setScene(3, true);
+    }],
+    ["mute", function () {
+      gameWorld.muted = true;
+    }],
+    ["credits", function () {
+      //gameWorld.setScene(4, true);
+    }],
+    ["achievements", function () {
+      //gameWorld.setScene(5, true);
+    }]
+  ];
   for (var i = 0; i < buttons.length; i++) {
-    var b = this.bg.add(Object.create(SpriteFont).init(8, gameWorld.height / 4 + i * 16, Resources.expire_font, buttons[i], {spacing: -2, align: "left"}));
+    var b = this.bg.add(Object.create(SpriteFont).init(8, gameWorld.height / 4 + i * 16, Resources.expire_font, buttons[i][0], {spacing: -2, align: "left"}));
     var button = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 4 + i * 16, gameWorld.width, 16));
     button.family = "button";
     //b.blend = "destination-out";
@@ -74,9 +93,7 @@ var onStart =  function () {
     button.text = b;
     button.hover = function () { this.text.scale = 2;};
     button.unhover = function () { this.text.scale = 1; };
-    button.trigger = function () {
-      gameWorld.setScene(1, true);
-    };
+    button.trigger = buttons[i][1];
   }
   if (gameWorld.saved) {
     var b = this.bg.add(Object.create(SpriteFont).init(8, gameWorld.height / 4 - 16, Resources.expire_font, "resume", {spacing: -2, align: "left"}));
@@ -92,7 +109,7 @@ var onStart =  function () {
     };
   }
   
-  var ship = this.bg.add(Object.create(Sprite).init(0, 3 * gameWorld.height / 4, Resources.viper));
+  var ship = this.bg.add(Object.create(Sprite).init(0, MIN.y + 7 *  TILESIZE, Resources.viper));
   ship.addBehavior(Velocity);
   ship.velocity = {x: 40, y: 0};
   ship.addBehavior(Wrap, {min: {x: 0, y: 0}, max: {x: gameWorld.width, y: gameWorld.height}});
