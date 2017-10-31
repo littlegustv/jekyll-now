@@ -1267,7 +1267,7 @@ function spawn(layer, key, player) {
             // gameWorld.playSound(Resources.processing);
           } else {
             var h = other.layer.add(Object.create(SpriteFont).init(other.x, other.y, Resources.expire_font, "$", {spacing: 0, align: "center"}));
-            gameWorld.playSound(Resources.coins);
+            //gameWorld.playSound(Resources.coins);
           }
           h.z = other.z + 1;
           var theta = Math.random() * PI2;
@@ -1358,7 +1358,7 @@ var Store = {
       }
     },
     {
-      name: "Retaliate", price: 5, icon: 4, trigger: function (t) {
+      name: "Retaliate", price: 4, icon: 4, trigger: function (t) {
         if (!t.player.has_retaliate) {
           gameWorld.playSound(Resources.select);
           t.player.retaliate = 1;
@@ -1381,7 +1381,7 @@ var Store = {
       }
     },
     {
-      name: "FTL", price: 15, icon: 5, trigger: function (t) {
+      name: "Visa", price: 8, icon: 5, trigger: function (t) {
         if (!t.player.hasFTL) {
           t.player.hasFTL = true;
           return true;

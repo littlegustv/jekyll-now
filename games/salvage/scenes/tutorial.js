@@ -168,8 +168,16 @@ var onStart =  function () {
 
   this.onMouseDown = down;
   this.onMouseMove = move;
-  this.onTouchMove = move;
-  this.onTouchEnd = down;
+  this.onTouchMove = function (e) {
+    e.x = e.touch.x;
+    e.y = e.touch.y;
+    move(e);
+  }
+  this.onTouchEnd = function (e) {
+    e.x = e.touch.x;
+    e.y = e.touch.y;
+    down(e);
+  }
 
   this.pause();
 };
