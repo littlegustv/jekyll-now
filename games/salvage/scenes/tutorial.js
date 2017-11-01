@@ -68,7 +68,18 @@ var onStart =  function () {
         }
       }
     ],
-    ["you are now ready", function () { return false; }, function () {}]
+    ["you are now ready", function () { return false; }, function () {
+      var b = s.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "start game!", {spacing: -3, align: "center"}));
+      var button = s.fg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, 16));
+      button.family = "button";
+      button.opacity = 0;
+      button.text = b;
+      button.hover = function () { this.text.scale = 1.1;};
+      button.unhover = function () { this.text.scale = 1; };
+      button.trigger = function () {
+        gameWorld.setScene(1, true);
+      };
+    }]
   ];
   this.condition = function () { return true; };
 
@@ -160,7 +171,7 @@ var onStart =  function () {
   button.family = "button";
   button.opacity = 0;
   button.text = b;
-  button.hover = function () { this.text.scale = 2;};
+  button.hover = function () { this.text.scale = 1.1;};
   button.unhover = function () { this.text.scale = 1; };
   button.trigger = function () {
     gameWorld.setScene(0, true);

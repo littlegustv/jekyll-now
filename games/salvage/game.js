@@ -292,6 +292,9 @@ Hover.pick = function () {
 
 // single-level (does not move vertically, just turns around when reaches the end - for GROUND movement, but also others maybe)
 var Horizontal = Object.create(Hover);
+Horizontal.move = function (dt) {
+  this.entity.velocity = {x: sign(this.goal.x - this.entity.x) * this.speed , y: 0 };    
+};
 Horizontal.pick = function () {
   if (this.entity.x > WIDTH / 2) return toGrid(0, this.entity.y);
   else return toGrid(WIDTH, this.entity.y);
@@ -632,10 +635,10 @@ var Weapons = {
     f.strokeColor = COLORS.primary;
     f.width = 3;
     gameWorld.playSound(Resources.laser);
-    f.addBehavior(Velocity);
+    //f.addBehavior(Velocity);
     f.family = this.family;//"player";
     f.angle = this.shoot_angle;
-    f.velocity = {x: 40 * Math.cos(f.angle), y: 40 * Math.sin(f.angle)  };    
+    //f.velocity = {x: 40 * Math.cos(f.angle), y: 40 * Math.sin(f.angle)  };    
     f.addBehavior(Delay, {duration: 1.5, callback: function () {
       this.entity.alive = false;
       for (var i = 0; i < 10; i++) {
@@ -870,7 +873,7 @@ var Weapons = {
       a.collision.onHandle = projectileHit;
       a.addBehavior(Velocity);
       a.radius = 4;
-      a.addBehavior(Target, {target: this.target, turn_rate: 0.2, angle: this.angle, speed: 30, offset: {x: 0, y: 0}, set_angle: true});
+      a.addBehavior(Target, {target: this.target, turn_rate: 0.5, angle: this.angle, speed: 50, offset: {x: 0, y: 0}, set_angle: true});
       a.family = this.family;
       a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
       a.projectile = true;
@@ -1162,7 +1165,8 @@ function spawn(layer, key, player) {
       break;
     case 4: // minelayer
       enemy.addBehavior(Move, {duration: 1, speed: 8 }); // hmmm!
-      enemy.shoot = Weapons.proximity;
+      enemy.shoot = Weapons.firework;
+      enemy.shoot_angle = -PI / 2;      
       enemy.setVertices([
         {x: -4, y: 0}, {x: 0, y: 4}, {x: 4, y: 0}, {x: 0, y: -4}
       ]);

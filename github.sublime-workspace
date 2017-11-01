@@ -4,6 +4,22 @@
 		"selected_items":
 		[
 			[
+				"play",
+				"player_coordinates"
+			],
+			[
+				"max",
+				"maxhealth"
+			],
+			[
+				"exp",
+				"expire_font"
+			],
+			[
+				"add",
+				"addBehavior"
+			],
+			[
 				"set",
 				"setCollision"
 			],
@@ -498,22 +514,6 @@
 			[
 				"prive",
 				"private_message"
-			],
-			[
-				"date_ac",
-				"date_accessed_str"
-			],
-			[
-				"s",
-				"syllables"
-			],
-			[
-				"grou",
-				"group_params"
-			],
-			[
-				"ini",
-				"initial_replies_count"
 			]
 		]
 	},
@@ -523,7 +523,7 @@
 			"file": "games/salvage/game.js",
 			"settings":
 			{
-				"buffer_size": 49238,
+				"buffer_size": 52746,
 				"line_ending": "Unix"
 			}
 		},
@@ -531,7 +531,7 @@
 			"file": "games/salvage/scenes/game.js",
 			"settings":
 			{
-				"buffer_size": 25297,
+				"buffer_size": 22724,
 				"line_ending": "Unix"
 			}
 		},
@@ -539,23 +539,23 @@
 			"file": "games/salvage/scenes/menu.js",
 			"settings":
 			{
-				"buffer_size": 6593,
+				"buffer_size": 7127,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "games/salvage/js/raindrop.js",
+			"file": "games/salvage/scenes/tutorial.js",
 			"settings":
 			{
-				"buffer_size": 57591,
+				"buffer_size": 6736,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "games/salvage/scenes/end.js",
+			"file": "games/salvage/index.json",
 			"settings":
 			{
-				"buffer_size": 2828,
+				"buffer_size": 1779,
 				"line_ending": "Unix"
 			}
 		}
@@ -724,9 +724,10 @@
 	},
 	"file_history":
 	[
+		"/home/hellerb/Projects/github/littlegustv.github.io/games/salvage/js/raindrop.js",
+		"/home/hellerb/Projects/github/littlegustv.github.io/games/salvage/scenes/end.js",
 		"/home/hellerb/Projects/github/littlegustv.github.io/games/salvage/index.json",
 		"/home/hellerb/Projects/github/littlegustv.github.io/games/salvage/index.html",
-		"/home/hellerb/Projects/github/littlegustv.github.io/games/salvage/js/raindrop.js",
 		"/home/hellerb/Projects/github/littlegustv.github.io/index.html",
 		"/home/hellerb/sdbmss/app/models/name.rb",
 		"/home/hellerb/sdbmss/app/controllers/names_controller.rb",
@@ -850,8 +851,7 @@
 		"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/sunspot-2.2.0/lib/sunspot/search.rb",
 		"/home/hellerb/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/sunspot-2.2.0/lib/sunspot/field.rb",
 		"/home/hellerb/sdbmss/app/views/manuscripts/show.html.erb",
-		"/home/hellerb/sdbmss/app/controllers/manuscripts_controller.rb",
-		"/home/hellerb/sdbmss/public/404.html"
+		"/home/hellerb/sdbmss/app/controllers/manuscripts_controller.rb"
 	],
 	"find":
 	{
@@ -859,7 +859,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 90.0,
 		"where_history":
 		[
 			"/home/hellerb/Projects/github/littlegustv.github.io/games/salvage",
@@ -997,6 +997,33 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"fix me",
+			"projectileDie",
+			"console.log",
+			"projectileDie",
+			"message = ",
+			".pause",
+			"pause = func",
+			".stopped",
+			"salvage",
+			"salvage ",
+			"playSound(Resources.",
+			".heart",
+			"part",
+			"circle",
+			".dust",
+			"circle",
+			"Circle",
+			"onend",
+			"circle",
+			"projectileHit",
+			"spawn",
+			"wave.length",
+			"pause()",
+			"lerp, ",
+			"scale",
+			"wave",
+			"wave ==",
 			"hyperdrive",
 			"gate",
 			"pause = ",
@@ -1097,34 +1124,7 @@
 			"use this",
 			"legend",
 			"create new personal observation",
-			"create new",
-			"personal observa",
-			"personal obser",
-			"boost",
-			"def more_like_this",
-			"more_like_this",
-			"import",
-			">>>",
-			"benj",
-			"more_like_this",
-			"\\[.+\\*\\s\\s",
-			"\\[.+\\*\\s",
-			"\\[.+\\*",
-			"manuscript_date_search",
-			"control-panel {",
-			"display_value",
-			"more_like_this",
-			"advancedhelper",
-			"select_menu_for_field_operator",
-			"query_criteria_heading_html",
-			"find items that match",
-			"institution",
-			"num_lines",
-			"provenance_search",
-			"provenance",
-			"dropdown-meny",
-			"Price",
-			"_price"
+			"create new"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1270,7 +1270,7 @@
 	"groups":
 	[
 		{
-			"selected": 5,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -1278,15 +1278,15 @@
 					"file": "games/salvage/game.js",
 					"settings":
 					{
-						"buffer_size": 49238,
+						"buffer_size": 52746,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								49190,
-								49190
+								18448,
+								18448
 							]
 						],
 						"settings":
@@ -1386,7 +1386,125 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 18078.0,
+						"translation.y": 7554.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 0,
+					"file": "games/salvage/game.js",
+					"settings":
+					{
+						"buffer_size": 52746,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7837,
+								7837
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"devel": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": "load-save",
+							"sublimelinter_delay": 2,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": true,
+							"sublimelinter_gutter_marks_theme": "simple",
+							"sublimelinter_mark_style": "none",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2388.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1396,15 +1514,15 @@
 					"file": "games/salvage/scenes/game.js",
 					"settings":
 					{
-						"buffer_size": 25297,
+						"buffer_size": 22724,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								12197,
-								12197
+								11707,
+								11707
 							]
 						],
 						"settings":
@@ -1504,7 +1622,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3612.0,
+						"translation.y": 4040.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1514,15 +1632,15 @@
 					"file": "games/salvage/scenes/game.js",
 					"settings":
 					{
-						"buffer_size": 25297,
+						"buffer_size": 22724,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2553,
-								2553
+								9962,
+								9962
 							]
 						],
 						"settings":
@@ -1622,7 +1740,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 490.0,
+						"translation.y": 3304.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1632,15 +1750,15 @@
 					"file": "games/salvage/scenes/menu.js",
 					"settings":
 					{
-						"buffer_size": 6593,
+						"buffer_size": 7127,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4634,
-								4634
+								4636,
+								4636
 							]
 						],
 						"settings":
@@ -1740,142 +1858,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1141.0,
+						"translation.y": 1078.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "games/salvage/js/raindrop.js",
+					"file": "games/salvage/scenes/tutorial.js",
 					"settings":
 					{
-						"buffer_size": 57591,
+						"buffer_size": 6736,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1139,
-								1139
-							]
-						],
-						"settings":
-						{
-							"annotations":
-							[
-								"TODO",
-								"README",
-								"FIXME"
-							],
-							"csslint_options":
-							{
-								"adjoining-classes": "warning",
-								"box-model": true,
-								"box-sizing": "warning",
-								"compatible-vendor-prefixes": "warning",
-								"display-property-grouping": true,
-								"duplicate-background-images": "warning",
-								"duplicate-properties": true,
-								"empty-rules": true,
-								"errors": true,
-								"fallback-colors": "warning",
-								"floats": "warning",
-								"font-faces": "warning",
-								"font-sizes": "warning",
-								"gradients": "warning",
-								"ids": "warning",
-								"import": "warning",
-								"important": "warning",
-								"known-properties": true,
-								"outline-none": "warning",
-								"overqualified-elements": "warning",
-								"qualified-headings": "warning",
-								"regex-selectors": "warning",
-								"rules-count": "warning",
-								"shorthand": "warning",
-								"star-property-hack": "warning",
-								"text-indent": "warning",
-								"underscore-property-hack": "warning",
-								"unique-headings": "warning",
-								"universal-selector": "warning",
-								"vendor-prefix": true,
-								"zero-units": "warning"
-							},
-							"gjslint_ignore":
-							[
-								110
-							],
-							"gjslint_options":
-							[
-							],
-							"javascript_linter": "jshint",
-							"jshint_options":
-							{
-								"browser": true,
-								"devel": true,
-								"evil": true,
-								"regexdash": true,
-								"sub": true,
-								"trailing": true,
-								"wsh": true
-							},
-							"pep8": true,
-							"pep8_ignore":
-							[
-								"E501"
-							],
-							"perl_linter": "perlcritic",
-							"pyflakes_ignore":
-							[
-							],
-							"pyflakes_ignore_import_*": true,
-							"sublimelinter": "load-save",
-							"sublimelinter_delay": 2,
-							"sublimelinter_disable":
-							[
-							],
-							"sublimelinter_executable_map":
-							{
-							},
-							"sublimelinter_fill_outlines": false,
-							"sublimelinter_gutter_marks": true,
-							"sublimelinter_gutter_marks_theme": "simple",
-							"sublimelinter_mark_style": "none",
-							"sublimelinter_notes": false,
-							"sublimelinter_objj_check_ascii": false,
-							"sublimelinter_popup_errors_on_save": false,
-							"sublimelinter_syntax_map":
-							{
-								"C++": "c",
-								"Python Django": "python",
-								"Ruby on Rails": "ruby"
-							},
-							"sublimelinter_wrap_find": true,
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "games/salvage/scenes/end.js",
-					"settings":
-					{
-						"buffer_size": 2828,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1333,
-								1333
+								277,
+								277
 							]
 						],
 						"settings":
@@ -1972,6 +1973,124 @@
 							"sublimelinter_wrap_find": true,
 							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
 							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "games/salvage/index.json",
+					"settings":
+					{
+						"buffer_size": 1779,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								170,
+								170
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"devel": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": "load-save",
+							"sublimelinter_delay": 2,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": true,
+							"sublimelinter_gutter_marks_theme": "simple",
+							"sublimelinter_mark_style": "none",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
@@ -2032,6 +2151,10 @@
 		"height": 0.0,
 		"selected_items":
 		[
+			[
+				"index.json",
+				"games/salvage/index.json"
+			],
 			[
 				"salvend",
 				"games/salvage/scenes/end.js"
@@ -2539,10 +2662,6 @@
 			[
 				"entrytit",
 				"app/models/entry_title.rb"
-			],
-			[
-				"entryus",
-				"app/models/entry_use.rb"
 			]
 		],
 		"width": 0.0
