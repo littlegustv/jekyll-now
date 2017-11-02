@@ -523,7 +523,7 @@
 			"file": "games/salvage/game.js",
 			"settings":
 			{
-				"buffer_size": 52746,
+				"buffer_size": 52919,
 				"line_ending": "Unix"
 			}
 		},
@@ -547,7 +547,7 @@
 			"file": "games/salvage/scenes/tutorial.js",
 			"settings":
 			{
-				"buffer_size": 6736,
+				"buffer_size": 7454,
 				"line_ending": "Unix"
 			}
 		},
@@ -859,7 +859,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 90.0,
+		"height": 0.0,
 		"where_history":
 		[
 			"/home/hellerb/Projects/github/littlegustv.github.io/games/salvage",
@@ -997,6 +997,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"proximi",
+			"homing",
 			"fix me",
 			"projectileDie",
 			"console.log",
@@ -1122,9 +1124,7 @@
 			"use this type when",
 			"Use this",
 			"use this",
-			"legend",
-			"create new personal observation",
-			"create new"
+			"legend"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1270,7 +1270,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -1278,15 +1278,15 @@
 					"file": "games/salvage/game.js",
 					"settings":
 					{
-						"buffer_size": 52746,
+						"buffer_size": 52919,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								18448,
-								18448
+								19833,
+								19833
 							]
 						],
 						"settings":
@@ -1386,7 +1386,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 7554.0,
+						"translation.y": 8338.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1396,15 +1396,15 @@
 					"file": "games/salvage/game.js",
 					"settings":
 					{
-						"buffer_size": 52746,
+						"buffer_size": 52919,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7837,
-								7837
+								10193,
+								10193
 							]
 						],
 						"settings":
@@ -1504,7 +1504,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2388.0,
+						"translation.y": 3522.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1521,8 +1521,8 @@
 						"selection":
 						[
 							[
-								11707,
-								11707
+								18704,
+								18704
 							]
 						],
 						"settings":
@@ -1622,7 +1622,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4040.0,
+						"translation.y": 6168.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1868,15 +1868,15 @@
 					"file": "games/salvage/scenes/tutorial.js",
 					"settings":
 					{
-						"buffer_size": 6736,
+						"buffer_size": 7454,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								277,
-								277
+								6829,
+								6829
 							]
 						],
 						"settings":
@@ -1976,7 +1976,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1841.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -2151,6 +2151,10 @@
 		"height": 0.0,
 		"selected_items":
 		[
+			[
+				"tutor",
+				"games/salvage/scenes/tutorial.js"
+			],
 			[
 				"index.json",
 				"games/salvage/index.json"
@@ -2658,10 +2662,6 @@
 			[
 				"entryda",
 				"app/models/entry_date.rb"
-			],
-			[
-				"entrytit",
-				"app/models/entry_title.rb"
 			]
 		],
 		"width": 0.0

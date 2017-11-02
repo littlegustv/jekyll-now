@@ -40,8 +40,12 @@ var onStart = function () {
   b.color = "black";
   b.z = -10;
   
-  var grid = bg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
-  grid.z = -8;
+  var grid = bg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(1 + HEIGHT / TILESIZE) *  TILESIZE, Resources.grid));
+  grid.z = -9;
+
+  var cover = bg.add(Object.create(Entity).init(gameWorld.width / 2, MIN.y / 2 - 2, gameWorld.width, MIN.y - 4));
+  cover.z = -8;
+  cover.color = "black";
 
   //grid.blend = "destination-out";
 
@@ -51,27 +55,27 @@ var onStart = function () {
   //ground.blend = "destination-out";
   ground.setCollision(Polygon);
 
-  var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, 2, WIDTH - 8, 16, Resources.ground));
+  var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MIN.y - 14, WIDTH - 8, 8, Resources.ground));
   ceiling.z = -7;
   ceiling.angle = PI;
   ceiling.solid = true;
   ceiling.setCollision(Polygon);
 
-  var right = bg.add(Object.create(TiledBackground).init(WIDTH - 2, HEIGHT / 2, HEIGHT - 8, 8, Resources.ground));
+  var right = bg.add(Object.create(TiledBackground).init(WIDTH, MIN.y + (MAX.y - MIN.y) / 2 - 4, (MAX.y - MIN.y) + 22, 8, Resources.ground));
   right.angle = -PI / 2;
   right.z = -6;
   right.solid = true;
   //right.blend = "destination-out";
   right.setCollision(Polygon);
 
-  var left = bg.add(Object.create(TiledBackground).init(2, HEIGHT / 2, HEIGHT - 8, 8, Resources.ground));
+  var left = bg.add(Object.create(TiledBackground).init(0, MIN.y + (MAX.y - MIN.y) / 2 - 4, (MAX.y - MIN.y) + 22, 8, Resources.ground));
   left.z = -6;
   left.solid = true;
   left.angle = PI / 2;
   //left.blend = "destination-out";
   left.setCollision(Polygon);
   
-  var gate = bg.add(Object.create(Sprite).init(gameWorld.width / 2, 8, Resources.gate));
+  var gate = bg.add(Object.create(Sprite).init(gameWorld.width / 2, MIN.y - 14, Resources.gate));
   gate.setCollision(Polygon);
   gate.solid = true;
   gate.z = -5;
@@ -113,8 +117,8 @@ var onStart = function () {
     this.shield.opacity = Math.pow(object.shield, 2);
   };
 
-  var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 4, Resources.expire_font, "pause", {align: "center", spacing: -3}));
-  var menu_button = this.ui.add(Object.create(Entity).init(24, 8, 48, 16));
+  var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 12, Resources.expire_font, "pause", {align: "center", spacing: -3}));
+  var menu_button = this.ui.add(Object.create(Entity).init(24, 12, 48, 16));
   menu_button.family = "button";
   menu_button.opacity = 0;
   menu_button.trigger = function () {
@@ -132,8 +136,8 @@ var onStart = function () {
     menu_text.scale = 1;
   };
   
-  var mute_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width - 16, 4, Resources.expire_font, "mute", {align: "center", spacing: -3}));
-  var mute_button = this.ui.add(Object.create(Entity).init(gameWorld.width - 16, 8, 32, 16));
+  var mute_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width - 16, 12, Resources.expire_font, "mute", {align: "center", spacing: -3}));
+  var mute_button = this.ui.add(Object.create(Entity).init(gameWorld.width - 16, 12, 32, 16));
   mute_button.family = "button";
   mute_button.opacity = 0;
   mute_button.trigger = function () {
@@ -192,6 +196,7 @@ var onStart = function () {
           //object.addBehavior(Delay, {duration: 1.5, callback: function () { this.entity.noCollide = false; }})
         } else {
           object.health -= 1;
+          // retaliate upgrade
           if (object.retaliate >= 1) {
             var theta = angle(object.x, object.y, other.x, other.y);
             var p =object.layer.add(Object.create(Circle).init(object.x, object.y, 4));
@@ -349,8 +354,7 @@ var onStart = function () {
           var theta = Math.random() * PI2;
           var g = toGrid(boss.x + 64 * Math.cos(theta), boss.y + 64 * Math.sin(theta));
           if (gameWorld.boss.health >= gameWorld.boss.maxhealth && !gameWorld.boss.store_open) {
-            gameWorld.boss.store_open = t.bg.add(Object.create(Entity).init(gameWorld.boss.x + 32, gameWorld.boss.y, 16, 16));
-            
+            gameWorld.boss.store_open = t.bg.add(Object.create(Entity).init(gameWorld.boss.x + 32, gameWorld.boss.y, 16, 16));            
 
             //gameWorld.boss.store_open.angle = PI / 2;
             gameWorld.boss.store_open.opacity = 0;
@@ -361,12 +365,14 @@ var onStart = function () {
               }
             }
             //gameWorld.boss.animation = 2;
-            gameWorld.boss.store_open.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 32, y: 0, angle: false, z: 1}});
+            gameWorld.boss.store_offset = gameWorld.boss.store_open.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 24, y: 0, angle: false, z: 1}}).offset;
 
             var t1 = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 24, gameWorld.boss.y - 6, Resources.expire_font, "store", {spacing: -3, align: "center"}));
             var t2 = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 24, gameWorld.boss.y + 6, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
-            t1.addBehavior(Follow, {target: gameWorld.boss.store_open, offset: {x: -8, y: -6, alive: true, z: 1 }});
-            t2.addBehavior(Follow, {target: gameWorld.boss.store_open, offset: {x: -8, y: 6, alive: true, z: 1 }});
+            t1.addBehavior(Follow, {target: gameWorld.boss.store_open, offset: {x: 0, y: -6, alive: true, z: 1 }});
+            t2.addBehavior(Follow, {target: gameWorld.boss.store_open, offset: {x: 0, y: 6, alive: true, z: 1 }});
+            t1.z = gameWorld.boss.z + 2;
+            t2.z = gameWorld.boss.z + 2;
             //gameWorld.boss.animation = 1;
           /*  if (!gameWorld.boss.billboard || !gameWorld.boss.billboard.alive) {              
               gameWorld.boss.billboard = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
@@ -384,7 +390,7 @@ var onStart = function () {
         announcement.addBehavior(FadeOut, {duration: 0.3, delay: 0.5, maxOpacity: 1});
         announcement.scale = 2;
 
-        gameWorld.boss.queue.push(toGrid(0, 0));
+        gameWorld.boss.queue.push(toGrid(0, 0).y);
         gameWorld.boss.payday = 1;
 
         //gameWorld.playSound(Resources.spawn, 0.5);
@@ -528,10 +534,31 @@ var onStart = function () {
       this.unforgiving = true;
     }
   };
-  boss.addBehavior(Boss, {duration: 1.5, speed: 45, rate: 4, target: player_bot});
+  /*
+  boss.blink = function () {
+    gameWorld.boss.animation = 2;
+    gameWorld.boss.invulnerable = true;
+    gameWorld.boss.behaviors[0].onEnd = function () { 
+      this.entity.invulnerable = false;
+      gameWorld.boss.x = gameWorld.boss.x > gameWorld.width / 2 ? toGrid(0, 0).x : toGrid(gameWorld.width, 0).x;
+      gameWorld.boss.angle += PI;
+      gameWorld.boss.offset.x *= -1;
+      gameWorld.boss.store_offset.x *= -1;
+      gameWorld.boss.animation = 0;
+      if (gameWorld.boss.boss.goal) gameWorld.boss.boss.goal.x = gameWorld.boss.x;
+      gameWorld.boss.behaviors[0].onEnd = function () {};
+    };
+  }*/
+  boss.boss = boss.addBehavior(Boss, {duration: 1.5, speed: 45, rate: 4, target: player_bot});
   boss.velocity = {x: 0, y: 0};
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
+  boss.setVertices([
+    {x: -20, y: -10},
+    {x: 20, y: -10},
+    {x: 20, y: 24},
+    {x: -20, y: 24}
+  ])
   boss.collision.onHandle = function (object, other) {
     if (other.family == "player" && !gameWorld.boss.invulnerable) {
       object.health -= 1;

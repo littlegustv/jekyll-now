@@ -17,8 +17,8 @@ var ENDINGS = [
 
 var WIDTH = 180;
 var HEIGHT = 320;
-var MIN = {x: 10, y: 22};
-var MAX = {x: WIDTH - 10, y: HEIGHT - 10}; 
+var MIN = {x: 10, y: 44};
+var MAX = {x: WIDTH - 10, y: HEIGHT - 20}; 
 var TILESIZE = 32;
 
 /*var SCHEMES = [{
@@ -192,7 +192,7 @@ Boss.move = function (dt) {
     //this.entity.y = lerp(this.entity.y, this.goal.y, this.speed * dt);
     this.entity.velocity = {x: 0, y: clamp(this.rate * (this.goal.y - this.entity.y), -this.speed, this.speed)};
   }
-  this.entity.x = lerp(this.entity.x, this.goal.x, this.speed * dt); 
+  //this.entity.x = lerp(this.entity.x, this.goal.x, this.speed * dt); 
 }
 Boss.beam = function () {
   var beam = this.entity.layer.add(Object.create(Entity).init(gameWorld.width / 2, this.entity.y, gameWorld.width, 12));
@@ -252,9 +252,7 @@ Boss.pick = function () {
     } else {
       this.callback = this.beam;
     }
-    return this.entity.queue.pop();
-  } else if (this.entity.enemy) {
-    return toGrid(this.entity.x, choose([-1, 1]) * TILESIZE + this.entity.y);
+    return toGrid(this.entity.x, this.entity.queue.pop());
   } else {
     return toGrid(this.entity.x, this.entity.y);
   }
@@ -1258,8 +1256,8 @@ function spawn(layer, key, player) {
     scrap.z = 3;
     scrap.scrap = true;
     scrap.setCollision(Polygon);
-    if (gameWorld.boss.queue.indexOf(toGrid(0, scrap.y)) == -1) {
-      gameWorld.boss.queue.unshift(toGrid(0, scrap.y));      
+    if (gameWorld.boss.queue.indexOf(toGrid(0, scrap.y).y) == -1) {
+      gameWorld.boss.queue.unshift(toGrid(0, scrap.y).y);      
     }
     scrap.collision.onHandle = function (object, other) {
       if (other == gameWorld.boss) {
