@@ -1247,12 +1247,12 @@ function spawn(layer, key, player) {
 
     gameWorld.playSound(Resources.hit);        
     
-    var scrap = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, this.sprite));
-    scrap.behaviors = [];
+    var scrap = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, Resources.coin));//this.sprite));
+    //scrap.behaviors = [];
     //gameWorld.boss.addBehavior(TractorBeam, {target: scrap, turn_rate: 5, speed: 20, color: COLORS.tertiary, thickness: 2, width: 3.5, rate: 6, origin: {x: gameWorld.boss.x, y: gameWorld.boss.y}});
     scrap.addBehavior(Velocity);
-    scrap.velocity = {x: 0, y: 0, angle: PI};//angle: PI / 3};
-    scrap.opacity = 0.8;
+    scrap.velocity = {x: 0, y: 0};//, angle: PI};//angle: PI / 3};
+    //scrap.opacity = 0.8;
     scrap.z = 3;
     scrap.scrap = true;
     scrap.setCollision(Polygon);
