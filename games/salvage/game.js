@@ -254,7 +254,7 @@ Boss.pick = function () {
     }
     return toGrid(this.entity.x, this.entity.queue.pop());
   } else {
-    return toGrid(this.entity.x, this.entity.y);
+    return toGrid(this.entity.x, this.entity.y > HEIGHT / 2 ? toGrid(0, 0).y : toGrid(0, HEIGHT).y);
   }
 };
 
