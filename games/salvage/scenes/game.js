@@ -166,6 +166,14 @@ var onStart = function () {
   player_bot.shield = 0;
   player_bot.shield_sprite = this.shield;
   player_bot.z = Z.entity;
+  /*
+  player_bot.addBehavior(Wrap, {min: {x: 0, y: 0}, max: {x: WIDTH, y: HEIGHT}, callbackMaxX: function () {
+      this.entity.lerpx.goal = MIN.x;
+    },
+    callbackMinX: function () {
+      this.entity.lerpx.goal = MAX.x;
+    }
+  });*/
   //player_bot.addBehavior(Bound, {min: {x: 6, y: -gameWorld.height * 5}, max: {x: gameWorld.width - 6, y: 5 * gameWorld.height}});
   player_bot.salvage = 0;
   // new movement settings

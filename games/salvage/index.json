@@ -37,6 +37,7 @@
     {"path": "buy.wav"},
     {"path": "shield_down.wav"},
     {"path": "shield_up.wav"},
+    {"path": "decoy.wav"},
     {"path": "coins.wav"},
     {"path": "soundtrack.ogg"},
     {"path": "menu.ogg"},

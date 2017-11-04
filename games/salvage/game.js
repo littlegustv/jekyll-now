@@ -87,6 +87,23 @@ var buttonHover = function () {
 };
 var buttonUnHover = function () { this.opacity = 1;};
 
+/*
+// modified JUST for blink behavior mm...
+Wrap.update = function (dt) {
+  if (this.entity.x > this.max.x) {
+    this.entity.x = this.min.x + (this.entity.x - this.max.x);
+    if (this.callbackMaxX) this.callbackMaxX();
+  } else if (this.entity.x < this.min.x) {
+    this.entity.x = this.max.x  - (this.min.x - this.entity.x);
+    if (this.callbackMinX) this.callbackMinX();
+  }
+  if (this.entity.y > this.max.y) {
+    this.entity.y = this.min.y + (this.entity.y - this.max.y);
+  } else if (this.entity.y < this.min.y) {
+    this.entity.y = this.max.y  - (this.min.y - this.entity.y);
+  }
+}*/
+
 // 
 var HealthBar = Object.create(Behavior);
 HealthBar.draw = function (ctx) {
@@ -738,7 +755,7 @@ var Weapons = {
       this.move.goal = undefined;
       this.move.delay = 1;
     }
-    var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
+    var theta = this.target ? (this.target.decoy ? angle(this.x, this.y, this.target.decoy.x, this.target.decoy.y) : angle(this.x, this.y, this.target.x, this.target.y)) : this.angle;
     var warn = layer.add(Object.create(Entity).init(this.x + Math.cos(theta) * gameWorld.height, this.y + Math.sin(theta) * gameWorld.height, gameWorld.height * 2, 8));
     warn.color = COLORS.primary; //"#ff6347";
     warn.opacity = 0;
@@ -778,7 +795,7 @@ var Weapons = {
     a.family = this.family;//"player";
     a.projectile = true;
     //;
-    var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
+    var theta = this.target ? (this.target.decoy ? angle(this.x, this.y, this.target.decoy.x, this.target.decoy.y) : angle(this.x, this.y, this.target.x, this.target.y)) : this.angle;
     //if (this.target) console.log('target');
     a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)  };
     a.angle = theta;    
@@ -806,7 +823,7 @@ var Weapons = {
     a.family = this.family;//"player";
     a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
     a.projectile = true;
-    var theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
+    var theta = this.target ? (this.target.decoy ? angle(this.x, this.y, this.target.decoy.x, this.target.decoy.y) : angle(this.x, this.y, this.target.x, this.target.y)) : this.angle;
     if (this.target) console.log('target');
     a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)  };
     a.angle = theta;
@@ -840,7 +857,7 @@ var Weapons = {
     a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
     a.projectile = true;
     if (this.count % 15 === 0) {
-      this.theta = this.target ? angle(this.x, this.y, this.target.x, this.target.y) : this.angle;
+      this.theta = this.target ? (this.target.decoy ? angle(this.x, this.y, this.target.decoy.x, this.target.decoy.y) : angle(this.x, this.y, this.target.x, this.target.y)) : this.angle;
     }
     a.velocity = {x: 100 * Math.cos(this.theta), y: 100 * Math.sin(this.theta)  };
     a.angle = this.theta;
@@ -1297,7 +1314,14 @@ var movement_keys = ["standard"];
 // fix me: can remove
 var Movement = {
   standard: function (s) {
-    var goal = toGrid(Math.round(s.player_bot.x + this.distance * Math.cos(s.player_bot.angle)), Math.round(s.player_bot.y + this.distance * Math.sin(s.player_bot.angle)))
+    var x = Math.round(s.player_bot.x + this.distance * Math.cos(s.player_bot.angle)),
+        y = Math.round(s.player_bot.y + this.distance * Math.sin(s.player_bot.angle));
+    if (s.player_bot.blink && (x > MAX.x || x < MIN.x)) {
+      console.log('mm');
+      var goal = {x: x > MAX.x ? MAX.x + TILESIZE : MIN.x - TILESIZE, y: toGrid(x, y).y};
+    } else {
+      var goal = toGrid(x, y);      
+    }
     if (goal.x !== s.player_bot.x || goal.y !== s.player_bot.y) {       
       s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: goal.x, rate: this.speed, object: s.player_bot, callback: function () {
         //console.log('lerpx callback');
@@ -1349,6 +1373,7 @@ var Store = {
         }
       }
     },
+    /*,
     {
       name: "Radar", price: 3, icon: 2, trigger: function (t) {
         if (!t.player.has_rader) {
@@ -1377,6 +1402,41 @@ var Store = {
           t.player.has_repair = t.player.addBehavior(Repair);
           t.player.material = 0;
           return true;
+        } else {
+          return false;
+        }
+      }
+    },*/
+    {
+      name: "Speed", price: 3, icon: 3, trigger: function (t) {
+        if (t.player.speed < 8) {
+          t.player.speed = 8;
+          this.trigger = function () {};
+          return true;          
+        } else {
+          return false;
+        }
+      }
+    },
+    {
+      name: "Decoy", price: 4, icon: 3, trigger: function (t) {
+        if (!t.player.hasDecoy) {
+          t.player.hasDecoy = t.player.addBehavior(Periodic, {time: 4, period: 5, callback: function () {
+            // fix me: add sound, text to explain decoy is being launched
+            this.entity.decoy = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.viper));
+            this.entity.decoy.angle = this.entity.angle;
+            gameWorld.playSound(Resources.decoy);
+            var t = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y, Resources.expire_font, "decoy!", {spacing: -2, align: "center"}));
+            t.addBehavior(Velocity);
+            t.velocity = {x: 0, y: 10, angle: -PI };
+            t.addBehavior(FadeOut, {delay: 0.2, duration: 0.2});
+            var e = this.entity;
+            this.entity.decoy.addBehavior(Delay, {duration: 1.5, callback: function () {
+              this.entity.addBehavior(FadeOut, {duration: 0.2});
+              e.decoy = undefined;
+            }})
+          }});
+          return true;          
         } else {
           return false;
         }
