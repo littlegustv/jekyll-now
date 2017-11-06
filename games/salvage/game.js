@@ -1270,7 +1270,7 @@ function spawn(layer, key, player) {
     scrap.addBehavior(Velocity);
     scrap.velocity = {x: 0, y: 0};//, angle: PI};//angle: PI / 3};
     //scrap.opacity = 0.8;
-    scrap.z = 3;
+    scrap.z = 2.5;
     scrap.scrap = true;
     scrap.setCollision(Polygon);
     if (gameWorld.boss.queue.indexOf(toGrid(0, scrap.y).y) == -1) {
@@ -1373,40 +1373,6 @@ var Store = {
         }
       }
     },
-    /*,
-    {
-      name: "Radar", price: 3, icon: 2, trigger: function (t) {
-        if (!t.player.has_rader) {
-          t.player.has_radar = t.player.addBehavior(Radar);
-          return true;
-        } else {
-          return false;
-        }
-      }
-    },
-    {
-      name: "Retaliate", price: 4, icon: 4, trigger: function (t) {
-        if (!t.player.has_retaliate) {
-          gameWorld.playSound(Resources.select);
-          t.player.retaliate = 1;
-          t.player.has_retaliate = true;
-          return true;
-        } else {
-          return false;
-        }
-      }
-    },
-    {
-      name: "Repair", price: 6, icon: 3, trigger: function (t) {
-        if (!t.player.has_repair) {
-          t.player.has_repair = t.player.addBehavior(Repair);
-          t.player.material = 0;
-          return true;
-        } else {
-          return false;
-        }
-      }
-    },*/
     {
       name: "Speed", price: 3, icon: 3, trigger: function (t) {
         if (t.player.speed < 8) {
@@ -1440,6 +1406,21 @@ var Store = {
         } else {
           return false;
         }
+      }
+    },
+    {
+      name: "Bomb", price: 3, icon: 4, trigger: function (t) {
+        var enemies = gameWorld.scene.bg.entities.filter(function (e) { return e.family === "enemy"; });
+        for (var i = 0; i < enemies.length; i++) {
+          if (enemies[i].projectile) {
+            projectileDie(enemies[i])
+          } else if (enemies[i].die) {
+            enemies[i].die();            
+          } else {
+            console.log(enemies[i].x, enemies[i].y, "isn't projectile or something dieable")
+          }
+        }
+        return true;
       }
     },
     {

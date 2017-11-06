@@ -323,7 +323,7 @@ var onStart = function () {
       var coords = toGrid(this.player_bot.x, this.player_bot.y);
       if (coords.y === MIN.y && (coords.x == MIN.x + TILESIZE * 2 || coords.x == MIN.x + TILESIZE * 3)) {
         if (!player_bot.hasFTL) {
-          gate.animation = 1;
+          gate.animation = 0;
           gate.addBehavior(Delay, {duration: 1, callback: function () {
             this.entity.animation = 0;
             this.entity.removeBehavior(this);
@@ -336,7 +336,7 @@ var onStart = function () {
           gameWorld.playSound(Resources.denied);
         } else {
           gameWorld.playSound(Resources.approved);
-          gate.animation = 2;
+          gate.animation = 1;
         }
       } else if (coords.y < MIN.y) {
         if (gameWorld.boss.alive) {
