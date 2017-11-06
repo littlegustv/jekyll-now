@@ -329,12 +329,12 @@ var onStart = function () {
             this.entity.removeBehavior(this);
           }});
           var warning = this.bg.add(Object.create(SpriteFont).init(gate.x + 2, gate.y - 10, Resources.expire_font, "DENIED", {spacing: -1, align: "center"}));
-          //gameWorld.playSound(Resources.denied);
           warning.addBehavior(FadeOut, {duration: 0.5, delay: 0.5});
-          //warning.addBehavior(Velocity);
-          //warning.velocity = {x: 0, y: 20, angle: PI / 12};
           gameWorld.playSound(Resources.denied);
         } else {
+          var warning = this.bg.add(Object.create(SpriteFont).init(gate.x + 2, gate.y - 10, Resources.expire_font, "APPROVED", {spacing: -1, align: "center"}));
+          warning.addBehavior(FadeOut, {duration: 0.5, delay: 0.5});
+
           gameWorld.playSound(Resources.approved);
           gate.animation = 1;
         }
