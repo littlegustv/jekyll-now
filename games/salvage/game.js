@@ -1374,7 +1374,7 @@ var Store = {
       }
     },
     {
-      name: "Speed", price: 3, icon: 3, trigger: function (t) {
+      name: "Speed", price: 3, icon: 2, trigger: function (t) {
         if (t.player.speed < 8) {
           t.player.speed = 8;
           this.trigger = function () {};
