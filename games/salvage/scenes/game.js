@@ -328,11 +328,11 @@ var onStart = function () {
             this.entity.animation = 0;
             this.entity.removeBehavior(this);
           }});
-          var warning = this.bg.add(Object.create(SpriteFont).init(gate.x, gate.y - 4, Resources.expire_font, "denied.", {spacing: -2, align: "center"}));
+          var warning = this.bg.add(Object.create(SpriteFont).init(gate.x + 2, gate.y - 10, Resources.expire_font, "DENIED", {spacing: -1, align: "center"}));
           //gameWorld.playSound(Resources.denied);
           warning.addBehavior(FadeOut, {duration: 0.5, delay: 0.5});
-          warning.addBehavior(Velocity);
-          warning.velocity = {x: 0, y: 20, angle: PI / 12};
+          //warning.addBehavior(Velocity);
+          //warning.velocity = {x: 0, y: 20, angle: PI / 12};
           gameWorld.playSound(Resources.denied);
         } else {
           gameWorld.playSound(Resources.approved);
@@ -620,6 +620,7 @@ var onStart = function () {
       } else {
         gameWorld.ending = 4;
       }
+      gameWorld.player.collision.onHandle = function (a,b) {};
       gameWorld.setScene(2, true);
     }});
     gameWorld.wave = 0;

@@ -1103,18 +1103,6 @@ Joined.draw = function (ctx) {
   ctx.stroke();
 }
 
-var Repair = Object.create(Behavior);
-Repair.update = function (dt) {
-  if (this.time === undefined) this.time = 0;
-  this.time += dt;
-  if (this.time > 1 && this.entity.material > 0) {
-    this.entity.material -= 1;
-    this.time = 0;
-    this.entity.health = Math.min(MAXHEALTH, this.entity.health + 1);
-    gameWorld.scene.updateHealthBar(this.entity);
-  }
-}
-
 var Periodic = Object.create(Behavior);
 Periodic.update = function (dt) {
   if (this.time === undefined) this.time = 0;
@@ -1298,10 +1286,8 @@ function spawn(layer, key, player) {
         other.health = Math.min(other.maxhealth, other.health + 1); // repair!
         if (other.health >= other.maxhealth && !other.unforgiving && other.enemy) {
           other.removeBehavior(other.enemy);
+          other.enemy = undefined;
         }
-      } else if (other == player && other.material !== undefined) {
-        object.alive =false;
-        other.material += 1;
       }
     }
   };
@@ -1459,7 +1445,7 @@ var Store = {
       t.close();
     };
     close.hover = function () {
-        if (this.color != "#6DC72E") gameWorld.playSound(Resources.hover);
+      if (this.color != "#6DC72E") gameWorld.playSound(Resources.hover);
       this.color = "#6DC72E";
     };
     close.unhover = function () {
