@@ -116,7 +116,7 @@ var onStart =  function () {
     return !this.lerpx && !this.lerpy;
   };
   this.player = player;
-  this.player_bot = player; // fix me: rename player_bot;
+  this.player = player; // fix me: rename player;
   this.fg = fg;
   
   this.pause = function () {
@@ -156,7 +156,7 @@ var onStart =  function () {
       //return;
     }
     if (s.player.stopped()) {
-      //if (s.player_bot.velocity.x === 0 && s.player_bot.velocity.y === 0) {
+      //if (s.player.velocity.x === 0 && s.player.velocity.y === 0) {
         s.player.angle = Math.round(angle(s.player.x - s.fg.camera.x, s.player.y - s.fg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
       //}
     }

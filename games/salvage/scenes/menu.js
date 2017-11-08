@@ -51,24 +51,10 @@ var onStart =  function () {
   var ground = this.bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4, gameWorld.width, 8, Resources.ground));
   //ground.blend = "destination-out";
   ground.z = 10;
-  /*
-  var circle = this.bg.add(Object.create(Circle).init(gameWorld.width / 2, gameWorld.height, gameWorld.width / 2));
-  circle.z = 9;
-  circle.color = COLORS.primary;
-  this.primaries.push(circle);
-  */
-  
-/*  for (var i = 0; i < 20; i++) {
-    var line = this.bg.add(Object.create(Entity).init(randint(0, gameWorld.width), randint(0, 2 * gameWorld.height / 3), randint(gameWorld.width / 2, gameWorld.width * 2), 2));
-    line.color = COLORS.tertiary;
-    line.z = 7;
-    line.addBehavior(Velocity);
-    line.velocity = {x: 10, y: 00};
-    line.addBehavior(Wrap, {min: {x: -line.w / 2, y: 0}, max: {x: gameWorld.width + line.w / 2, y: gameWorld.height}});
-    this.tertiaries.push(line);
-  }*/
+
   var buttons = [
     ["new game", function () {
+      gameWorld.wave = 1;
       gameWorld.setScene(1, true);
     }],
     ["tutorial", function () {

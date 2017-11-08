@@ -1,41 +1,15 @@
-/*
-
-- enemy respecting boundaries
-- boss...
-
- */
-
-
 /* global Resources, Layer, gameWorld, MAXHEALTH, Entity, TiledBackground, Sprite, SpriteFont */
 var onStart = function () {
   this.wave = [];
   
   Resources.music = Resources.soundtrack;
-  //var super_bg = this.addLayer(Object.create(Layer).init(1000,1000));
-  //super_bggit.active = true;
-  //var parallax = this.addLayer(Object.create(Layer).init(1000,1000));
-  //var colorize = this.addLayer(Object.create(Layer).init(1000, 1000));
-  //colorize.add(Object.create(Entity).init(0, 0, 1000, 1000)).color = "#000000";//COLORS.negative;
-  //colorize.color = COLORS.negative;
   
   var bg = this.addLayer(Object.create(Layer).init(1000,1000));
   bg.active = true;
-  //var fg = this.addLayer(Object.create(Layer).init(1000,1000));
-  //fg.active = true;
-  //parallax.active = true;
-//
 
   var player_coordinates = toGrid(64, 64);
-  var player_bot = bg.add(Object.create(Sprite).init(player_coordinates.x, player_coordinates.y, Resources.viper));
-  
-  // is it worth doing this kind of grid??
-  /*for (var i = MIN.x - 16; i <= MAX.x + 16; i+= 32) {
-    for (var j = MIN.y - 16; j <= MAX.y + 16; j += 32) {
-      var b = bg.add(Object.create(Entity).init(i, j, 32, 32));
-      b.color = (i - (MIN.x - 16) % 64 + j - (MIN.y - 16)) % 64 == 0 ? "black" : "#111";
-      b.z = -10;
-    }
-  }*/
+  var player = bg.add(Object.create(Sprite).init(player_coordinates.x, player_coordinates.y, Resources.viper));
+
   var b = bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
   b.color = "black";
   b.z = -10;
@@ -47,12 +21,9 @@ var onStart = function () {
   cover.z = -8;
   cover.color = "black";
 
-  //grid.blend = "destination-out";
-
   var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MAX.y + 10, WIDTH, 12, Resources.ground));
   ground.z = -7;
   ground.solid = true;
-  //ground.blend = "destination-out";
   ground.setCollision(Polygon);
 
   var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MIN.y - 14, WIDTH - 8, 8, Resources.ground));
@@ -65,35 +36,26 @@ var onStart = function () {
   right.angle = -PI / 2;
   right.z = -6;
   right.solid = true;
-  //right.blend = "destination-out";
   right.setCollision(Polygon);
 
   var left = bg.add(Object.create(TiledBackground).init(0, MIN.y + (MAX.y - MIN.y) / 2 - 4, (MAX.y - MIN.y) + 22, 8, Resources.ground));
   left.z = -6;
   left.solid = true;
   left.angle = PI / 2;
-  //left.blend = "destination-out";
   left.setCollision(Polygon);
   
   var gate = bg.add(Object.create(Sprite).init(gameWorld.width / 2, MIN.y - 14, Resources.gate));
   gate.setCollision(Polygon);
   gate.solid = true;
   gate.z = -5;
-/*
-  for (var i = 0; i < 100; i++) {
-    var star = bg.add(Object.create(Entity).init(randint(0, gameWorld.width), randint(0, gameWorld.height), 2, 2));
-    star.z = -1;
-    star.color = "white";
-  }*/
 
   this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
   this.ui.active = true;
 
-  this.health_bar = []; 
+  this.health_bar = [];
   for (var i = 0.5; i < MAXHEALTH + 0.5; i++) {
     var h = bg.add(Object.create(Sprite).init(i * 16, gameWorld.height - 8, Resources.heart));
-    h.follow = h.addBehavior(Follow, {target: player_bot, offset: {x: 0, y: 0, z: 1, angle: false}});
-    //h.addBehavior(Trail, {interval: 0.06, maxlength: 4, record: []});
+    h.follow = h.addBehavior(Follow, {target: player, offset: {x: 0, y: 0, z: 1, angle: false}});
     h.radius = 2;
     h.addBehavior(Oscillate, {field: "x", object: h.follow.offset, initial: 0, constant: 16, time: i * PI / 5, func: "cos"});
     h.addBehavior(Oscillate, {field: "y", object: h.follow.offset, initial: 0, constant: 16, time: PI + i * PI / 5});
@@ -103,21 +65,21 @@ var onStart = function () {
   this.shield = bg.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 8, Resources.icons));
   this.shield.animation = 1;
   this.shield.scale = 1.5;
-  this.shield.addBehavior(Follow, {target: player_bot, offset: {x: 0, y: 0, z: -1, angle: false, opacity: false}});
+  this.shield.addBehavior(Follow, {target: player, offset: {x: 0, y: 0, z: -1, angle: false, opacity: false}});
   
   var s = this;
   this.updateHealthBar = function (object) {
     for (var i = 0; i < s.health_bar.length; i++) {
       if (i < object.health) {
-        s.health_bar[i].opacity = 0.8;
+        s.health_bar[i].animation = 0;
       } else if (i < MAXHEALTH) {
-        s.health_bar[i].opacity = 0.2;
+        s.health_bar[i].animation = 1;
       }
     }
     this.shield.opacity = Math.pow(object.shield, 2);
   };
 
-  var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 12, Resources.expire_font, "pause", {align: "center", spacing: -3}));
+  var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 12, Resources.expire_font, "menu", {align: "center", spacing: -3}));
   var menu_button = this.ui.add(Object.create(Entity).init(24, 12, 48, 16));
   menu_button.family = "button";
   menu_button.opacity = 0;
@@ -151,49 +113,32 @@ var onStart = function () {
   mute_button.unhover = function () {
     mute_text.scale = 1;
   };
+
+  player.setCollision(Polygon);
+  player.move = Movement.standard;
+  player.health = MAXHEALTH;
+  player.shield = 0;
+  // sprite object used to render shield up/down
+  player.shield_sprite = this.shield;
+  player.z = Z.entity;
+  player.salvage = 0;
+  // movement settings
+  player.speed = 6.5;
+  player.distance = TILESIZE;
+  player.noCollide = false;
   
-  //player_bot.blend = "destination-out";
-  player_bot.setCollision(Polygon);
-  player_bot.move = Movement.standard;
-  player_bot.min = {x: 16, y: 16};
-  player_bot.max = {x: WIDTH - 16, y: HEIGHT - 16};
-  player_bot.addBehavior(Accelerate);
-  player_bot.addBehavior(Velocity);
-  player_bot.velocity = {x: 0, y: 0};
-  player_bot.acceleration = {x: 0, y: 0};
-  player_bot.opacity = 1;
-  player_bot.health = MAXHEALTH;
-  player_bot.shield = 0;
-  player_bot.shield_sprite = this.shield;
-  player_bot.z = Z.entity;
-  /*
-  player_bot.addBehavior(Wrap, {min: {x: 0, y: 0}, max: {x: WIDTH, y: HEIGHT}, callbackMaxX: function () {
-      this.entity.lerpx.goal = MIN.x;
-    },
-    callbackMinX: function () {
-      this.entity.lerpx.goal = MAX.x;
-    }
-  });*/
-  //player_bot.addBehavior(Bound, {min: {x: 6, y: -gameWorld.height * 5}, max: {x: gameWorld.width - 6, y: 5 * gameWorld.height}});
-  player_bot.salvage = 0;
-  // new movement settings
-  player_bot.speed = 6.5;
-  player_bot.distance = TILESIZE;
-  player_bot.noCollide = false;
+  player.family = "player";
+  player.stopped = function () {
+    return !this.lerpx && !this.lerpy && !this.locked;
+  };
+  this.updateHealthBar(player);
+  gameWorld.player = player;
   
-  player_bot.family = "player";
-  player_bot.stopped = function () {
-    return !this.lerpx && !this.lerpy;
-  }
-  
-  this.updateHealthBar(player_bot);
-  gameWorld.player = player_bot;
-  player_bot.collision.onHandle = function (object, other) {
+  player.collision.onHandle = function (object, other) {
     if (object.noCollide) return;
     
     if (other.family == "enemy") {
-      if (!other.projectile) {
-      } else {
+      if (other.projectile) {
         if (object.shield >= 1) {
           object.shield = 0;
           gameWorld.playSound(Resources.shield_down);
@@ -201,42 +146,12 @@ var onStart = function () {
           m.addBehavior(Velocity);
           m.addBehavior(FadeOut, {delay: 0.5, duration: 0.2});
           m.velocity = {x: 0, y: 30, angle: PI / 12};
-          //object.addBehavior(Delay, {duration: 1.5, callback: function () { this.entity.noCollide = false; }})
         } else {
           object.health -= 1;
-          // retaliate upgrade
-          if (object.retaliate >= 1) {
-            var theta = angle(object.x, object.y, other.x, other.y);
-            var p =object.layer.add(Object.create(Circle).init(object.x, object.y, 4));
-            p.color = "white";
-            p.stroke = true;
-            p.strokeColor = COLORS.primary;
-            p.width = 2;
-            //      var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
-            //p.animation = 5;
-            p.setCollision(Polygon);
-            p.setVertices(projectile_vertices);
-            gameWorld.playSound(Resources.laser);
-            p.collision.onHandle = projectileHit;
-            p.addBehavior(Velocity);
-            p.family = "player";
-            p.projectile = true;
-            //;
-            //if (this.target) console.log('target');
-            p.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)  };
-            p.angle = theta;
-            p.addBehavior(Trail, {interval: 0.06, maxlength: 10, record: []});
-            projectiles.push(p);
-          }
           object.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
         }
         s.updateHealthBar(object);
         
-        //var expl = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.explosion));
-        //expl.addBehavior(FadeOut, {duration: 0, delay: 0.8});
-        
-        
-        //object.damage.timer = DAMAGE_COOLDOWN;
       }
       // should this be JUST on projectile hit? probably, right! (invulnerability)
       object.noCollide = true;
@@ -244,25 +159,22 @@ var onStart = function () {
     }
     if (object.health <= 0) {
       object.die();
-      //p.alive = false;
     }
   }
-  player_bot.die = function () {
+  player.die = function () {
     s.unpause();
     gameWorld.saved = false;
     this.collision.onCheck = function (a, b) { return false; };
     this.collision.onHandle = function (a, b) { return false; };
     s.pause = function () {};
-    player_bot.removeBehavior(player_bot.lerpx);
-    player_bot.removeBehavior(player_bot.lerpy);
-    player_bot.death = player_bot.addBehavior(Delay, {duration: 1.5, callback: function () {
-      player_bot.alive = false;
-      player_bot.death = undefined;
+    player.removeBehavior(player.lerpx);
+    player.removeBehavior(player.lerpy);
+    player.death = player.addBehavior(Delay, {duration: 1.5, callback: function () {
+      player.alive = false;
+      player.death = undefined;
       if (gameWorld.boss.alive && gameWorld.boss.health >= boss.maxhealth) {
-        console.log('first', gameWorld.boss.health, boss.maxhealth)
         gameWorld.ending = 0;
       } else if (gameWorld.boss.alive) {
-        console.log('second');
         gameWorld.ending = 1;
       }
       gameWorld.setScene(2, true);
@@ -283,56 +195,36 @@ var onStart = function () {
     gameWorld.playSound(Resources.hit);
     gameWorld.wave = 1;
   };
+  this.player = player;
   
   this.store_layer = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
   this.store_layer.active = false;
-  var store = Object.create(Store).init(this.store_layer, player_bot);
+  var store = Object.create(Store).init(this.store_layer, player);
   this.store = store;
-/*
-  var e = this.ui.add(Object.create(Entity).init(gameWorld.width / 2, 12, 48, 24));
-  var store_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, 12, Resources.expire_font, "store", {align: "center", spacing: -2}));
-  e.family = "button";
-  e.opacity = 0;
-  e.trigger = function () {
-    store.open();
-    gameWorld.playSound(Resources.select);
-  }
-  e.hover = function () {
-    if (store_text.scale != 2) gameWorld.playSound(Resources.hover);
-    store_text.scale = 2;
-  };
-  e.unhover = function () {
-    store_text.scale = 1;
-  };*/
 
-  this.player_bot = player_bot;
   var t = this;
-
-  bg.camera.addBehavior(Follow, {target: player_bot, offset: {x: -gameWorld.width / 2, y: -gameWorld.height / 2}, rate: 5});
+  // prevents 'shake' behavior from knocking camera out of bounds...
   bg.camera.addBehavior(Bound, {min: {x: 0, y:  0}, max: {x: WIDTH - gameWorld.width, y: HEIGHT - gameWorld.height}})
-  //fg.camera.addBehavior(Follow, {target: bg.camera, offset: {x: 0, y: 0}});
-  
+
   this.bg = bg;
-  //this.fg = fg;
   
   this.keydown = false;
   this.pause = function () {
-    if (!this.player_bot.lerpx && !this.player_bot.lerpy) {
+    if (this.player.stopped()) {
 
-      var coords = toGrid(this.player_bot.x, this.player_bot.y);
+      var coords = toGrid(this.player.x, this.player.y);
       this.bg.paused = true;
 
       // open store
       if (gameWorld.boss.store_open) {
         var store_coords = toGrid(gameWorld.boss.store_open.x, gameWorld.boss.store_open.y);
-        console.log(store_coords, coords)
         if (coords.y === store_coords.y && coords.x === store_coords.x) {
           s.store.open();
         }
       }
       // at gate
       if (coords.y === MIN.y && (coords.x == MIN.x + TILESIZE * 2 || coords.x == MIN.x + TILESIZE * 3)) {
-        if (!player_bot.hasFTL) {
+        if (!player.hasFTL) {
           gate.animation = 0;
           gate.addBehavior(Delay, {duration: 1, callback: function () {
             this.entity.animation = 0;
@@ -380,12 +272,6 @@ var onStart = function () {
 
             gameWorld.boss.store_open.opacity = 0;
             gameWorld.boss.store_open.setCollision(Polygon);
-            /*gameWorld.boss.store_open.collision.onHandle = function (a, b) {
-              if (b == player_bot) {
-                s.store.open();
-              }
-            }*/
-            //gameWorld.boss.animation = 2;
             gameWorld.boss.store_offset = gameWorld.boss.store_open.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 24, y: 0, angle: false, z: 1}}).offset;
 
             var t1 = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 24, gameWorld.boss.y - 6, Resources.expire_font, "store", {spacing: -3, align: "center"}));
@@ -393,15 +279,7 @@ var onStart = function () {
             t1.addBehavior(Follow, {target: gameWorld.boss.store_open, offset: {x: 0, y: -6, alive: true, z: 1 }});
             t2.addBehavior(Follow, {target: gameWorld.boss.store_open, offset: {x: 0, y: 6, alive: true, z: 1 }});
             t1.z = gameWorld.boss.z + 2;
-            t2.z = gameWorld.boss.z + 2;
-            //gameWorld.boss.animation = 1;
-          /*  if (!gameWorld.boss.billboard || !gameWorld.boss.billboard.alive) {              
-              gameWorld.boss.billboard = s.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x, gameWorld.boss.y, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
-              gameWorld.boss.billboard.opacity = 0;
-              gameWorld.boss.billboard.addBehavior(FadeIn, {duration: 0.5, maxOpacity: 1, delay: 0});
-              gameWorld.boss.billboard.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 0, y: 4, z: -1}});
-              gameWorld.boss.animation = 1;
-            }*/
+            t2.z = gameWorld.boss.z + 2;         
           }
         }
         var announcement = t.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "wave " + gameWorld.wave, {spacing: -3, align: "center"}));
@@ -413,12 +291,12 @@ var onStart = function () {
         gameWorld.boss.queue.push(toGrid(0, 0).y);
         gameWorld.boss.payday = 1;
 
-        //gameWorld.playSound(Resources.spawn, 0.5);
+        //gameWorld.playSound(Resources.spawn);
 
         for (var i = 0; i < gameWorld.wave; i++) {
           var k = i % this.waves.length;
           for (var j = 0; j < this.waves[k].length; j++) {
-            var enemy = spawn(this.bg, this.waves[k][j], this.player_bot);
+            var enemy = spawn(this.bg, this.waves[k][j], this.player);
             this.wave.push(enemy);            
           }
         }
@@ -428,7 +306,6 @@ var onStart = function () {
   }
   this.unpause = function () {
     this.bg.paused = false;
-    //this.fg.paused = false;
   };
   var s = this;
   var down = function (e) {
@@ -441,14 +318,13 @@ var onStart = function () {
       }
     }
     if (s.store_layer.active) return;
-    if (s.player_bot.death) {
-      s.player_bot.death.duration = 0;
+    if (s.player.death) {
+      s.player.death.duration = 0;
       return;
-    } else if (!s.player_bot.locked && s.player_bot.stopped()) {
-      s.player_bot.angle = Math.round(angle(s.player_bot.x - s.bg.camera.x, s.player_bot.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
-      s.player_bot.move(s)
+    } else if (s.player.stopped()) {
+      s.player.angle = Math.round(angle(s.player.x - s.bg.camera.x, s.player.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
+      s.player.move(s)
     }
-    //console.log(s.player_bot.locked, s.player_bot.stopped);
   }
   var move = function (e) {
     var layer = s.store_layer.active ? s.store_layer : s.ui;
@@ -465,10 +341,8 @@ var onStart = function () {
       }
       //return;
     }
-    if (!s.player_bot.locked && s.player_bot.stopped()) {
-      //if (s.player_bot.velocity.x === 0 && s.player_bot.velocity.y === 0) {
-        s.player_bot.angle = Math.round(angle(s.player_bot.x - s.bg.camera.x, s.player_bot.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
-      //}
+    if (s.player.stopped()) {
+      s.player.angle = Math.round(angle(s.player.x - s.bg.camera.x, s.player.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;      
     }
   };
   
@@ -495,19 +369,56 @@ var onStart = function () {
     e.x = e.touch.x, e.y = e.touch.y;
     move(e);
   };
+
+  this.onKeyDown = function (e) {
+    if (t.player.stopped()) {      
+      switch (e.keyCode) {
+        case 39:
+          t.player.angle = 0;
+          break;
+        case 40:
+          t.player.angle = PI / 2;
+          break;
+        case 37:
+          t.player.angle = PI;
+          break;
+        case 38:
+          t.player.angle = 3 * PI / 2;
+          break;
+      }
+    }
+  }
+
+  this.onKeyUp = function (e) {
+    if (t.player.stopped()) {      
+      switch (e.keyCode) {
+        case 39:
+          t.player.angle = 0;
+          break;
+        case 40:
+          t.player.angle = PI / 2;
+          break;
+        case 37:
+          t.player.angle = PI;
+          break;
+        case 38:
+          t.player.angle = 3 * PI / 2;
+          break;
+      }
+      if ([37,38,39,40].indexOf(e.keyCode) !== -1) {
+        t.player.move(t);
+      }
+    }
+  };
   
   this.waves = [
-    [0, 0], // drones --> done!
+    [0, 0],
     [1],
     [2],
     [3],
     [4],
     [5],
     [6],
-    //[7],
-    //[8],
-    //[9],
-    //[10]
   ];
 
   var boss = this.bg.add(Object.create(Sprite).init(toGrid(0, 100).x, toGrid(0, 100).y, Resources.boss));
@@ -529,8 +440,20 @@ var onStart = function () {
   }});
 
   boss.family = "neutral";
+  
   boss.maxhealth = 10;
   boss.health = boss.maxhealth;
+  boss.health_bar = [];
+  for (var i = 0; i < boss.maxhealth; i++) {
+    var h = bg.add(Object.create(Sprite).init(boss.x, boss.y, Resources.heart));
+    h.follow = h.addBehavior(Follow, {target: boss, offset: {x: randint(-8, 16), y: randint(-16, 16), z: 2}});
+    // fix me: improve pattern - decrease randomness, improve visibilty
+    // NOTE: SHOULD only become visible after first collision, maybe?
+    h.addBehavior(Oscillate, {field: "x", object: h.follow.offset, initial: h.follow.offset.x, constant: randint(12, 20), time: i * PI / 5, func: "cos"});
+    h.addBehavior(Oscillate, {field: "y", object: h.follow.offset, initial: h.follow.offset.y, constant: randint(12, 20), time: PI + i * PI / 5});
+    boss.health_bar.push(h);
+  }
+  
   boss.queue = [];
   boss.weapons = ["standard", "triple", "burst", "homing", "hitscan", "firework"];
   boss.respond = function (target) {
@@ -552,22 +475,8 @@ var onStart = function () {
       this.unforgiving = true;
     }
   };
-  /*
-  boss.blink = function () {
-    gameWorld.boss.animation = 2;
-    gameWorld.boss.invulnerable = true;
-    gameWorld.boss.behaviors[0].onEnd = function () { 
-      this.entity.invulnerable = false;
-      gameWorld.boss.x = gameWorld.boss.x > gameWorld.width / 2 ? toGrid(0, 0).x : toGrid(gameWorld.width, 0).x;
-      gameWorld.boss.angle += PI;
-      gameWorld.boss.offset.x *= -1;
-      gameWorld.boss.store_offset.x *= -1;
-      gameWorld.boss.animation = 0;
-      if (gameWorld.boss.boss.goal) gameWorld.boss.boss.goal.x = gameWorld.boss.x;
-      gameWorld.boss.behaviors[0].onEnd = function () {};
-    };
-  }*/
-  boss.boss = boss.addBehavior(Boss, {duration: 1.5, speed: 45, rate: 4, target: player_bot});
+  
+  boss.boss = boss.addBehavior(Boss, {duration: 1.5, speed: 45, rate: 4, target: player});
   boss.velocity = {x: 0, y: 0};
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
@@ -580,9 +489,16 @@ var onStart = function () {
   boss.collision.onHandle = function (object, other) {
     if (other.family == "player" && !gameWorld.boss.invulnerable) {
       object.health -= 1;
+      for (var i = 0; i < object.health_bar.length; i++) {
+        if (i <= object.health) {
+          object.health_bar[i].animation = 0;
+        } else {
+          object.health_bar[i].animation = 1;
+        }
+      }
       object.particles.rate = (10 - object.health) / 10;
       gameWorld.boss.invulnerable = true;
-      gameWorld.boss.respond(s.player_bot);
+      gameWorld.boss.respond(s.player);
       //gameWorld.boss.old_animation = gameWorld.boss.animation;
       gameWorld.boss.animation = 1;
       gameWorld.boss.addBehavior(Delay, {duration: 0.4, callback: function () { 
@@ -594,12 +510,12 @@ var onStart = function () {
       } else if (!other.projectile) {
         var theta = angle(object.x, object.y, other.x, other.y);
         var p = toGrid(object.x + 64 * Math.cos(theta), object.y + 64 * Math.sin(theta));
-        s.player_bot.removeBehavior((s.player_bot.lerpx));
-        s.player_bot.removeBehavior((s.player_bot.lerpy));
-        s.player_bot.angle = theta;
-        s.player_bot.move(s);
-        s.player_bot.lerpx.goal = p.x;
-        s.player_bot.lerpy.goal = p.y;
+        s.player.removeBehavior((s.player.lerpx));
+        s.player.removeBehavior((s.player.lerpy));
+        s.player.angle = theta;
+        s.player.move(s);
+        s.player.lerpx.goal = p.x;
+        s.player.lerpy.goal = p.y;
       }
     }
   };
@@ -625,7 +541,7 @@ var onStart = function () {
     this.death = this.addBehavior(Delay, {duration: 1.5, callback: function () {
       this.entity.alive = false;
       this.entity.death = undefined;
-      if (s.player_bot.hasFTL) {
+      if (s.player.hasFTL) {
         gameWorld.ending = 3;
       } else {
         gameWorld.ending = 4;

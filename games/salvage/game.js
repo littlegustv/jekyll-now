@@ -534,9 +534,11 @@ var Weapons = {
     f.strokeColor = COLORS.primary;
     f.width = 3;
     gameWorld.playSound(Resources.laser);
-    // FIX ME: allow player to destroy it before it explodes?
+    f.setCollision(Polygon);
+    f.setVertices(projectile_vertices);
+    f.projectile = true;
+    f.collision.onHandle = projectileHit;
     f.family = this.family;
-    //f.velocity = {x: 40 * Math.cos(f.angle), y: 40 * Math.sin(f.angle)  };    
     f.addBehavior(Delay, {duration: 1.5, callback: function () {
       this.entity.alive = false;
       for (var i = 0; i < 10; i++) {
@@ -554,7 +556,6 @@ var Weapons = {
         a.family = this.entity.family;//"player";
         a.projectile = true;
         a.angle = theta;
-        console.log(a.family);
         a.velocity = {x: 30 * Math.cos(a.angle), y: 30 * Math.sin(a.angle)  };
         a.addBehavior(Trail, {interval: 0.06, maxlength: 4, record: []});
         projectiles.push(a);
@@ -959,25 +960,25 @@ function spawn(layer, key, player) {
 
 var Movement = {
   standard: function (s) {
-    var x = Math.round(s.player_bot.x + this.distance * Math.cos(s.player_bot.angle)),
-        y = Math.round(s.player_bot.y + this.distance * Math.sin(s.player_bot.angle));
+    var x = Math.round(s.player.x + this.distance * Math.cos(s.player.angle)),
+        y = Math.round(s.player.y + this.distance * Math.sin(s.player.angle));
     var goal = toGrid(x, y);      
-    if (goal.x !== s.player_bot.x || goal.y !== s.player_bot.y) {       
-      s.player_bot.lerpx = s.player_bot.addBehavior(Lerp, {field: "x", goal: goal.x, rate: this.speed, object: s.player_bot, callback: function () {
+    if (goal.x !== s.player.x || goal.y !== s.player.y) {       
+      s.player.lerpx = s.player.addBehavior(Lerp, {field: "x", goal: goal.x, rate: this.speed, object: s.player, callback: function () {
         this.entity.removeBehavior(this);
         this.entity.lerpx = undefined;
         s.pause();
       }});
-      s.player_bot.lerpy = s.player_bot.addBehavior(Lerp, {field: "y", goal: goal.y, rate: this.speed, object: s.player_bot, callback: function () {
+      s.player.lerpy = s.player.addBehavior(Lerp, {field: "y", goal: goal.y, rate: this.speed, object: s.player, callback: function () {
         this.entity.removeBehavior(this);
         this.entity.lerpy = undefined;
         s.pause();
       }});
       s.unpause();
       gameWorld.playSound(Resources.move);
-      var d = s.player_bot.layer.add(Object.create(Sprite).init(s.player_bot.x, s.player_bot.y, Resources.dust));
+      var d = s.player.layer.add(Object.create(Sprite).init(s.player.x, s.player.y, Resources.dust));
       d.addBehavior(Velocity);
-      d.velocity = {x: -s.player_bot.velocity.x / 2, y: -s.player_bot.velocity.y / 2};
+      d.velocity = {x: 0, y: 0};
       d.addBehavior(FadeOut, {duration: 0.8});
     }
   }
@@ -1153,6 +1154,7 @@ var Store = {
     
   },
   open: function () {
+    this.player.locked = true;
     this.salvage.text = "$ " + this.player.salvage;
     
     for (var i = 0; i < this.layer.entities.length; i++) {
@@ -1179,9 +1181,9 @@ var Store = {
       this.layer.entities[i].lerp.goal = this.layer.entities[i].original;
     }
     this.layer.entities[0].lerp.callback = function () {
+      t.player.locked = false;
       this.callback = undefined;
       t.layer.active = false;
-      t.player.locked = false;
     }
     /*for (var i = 0; i < gameWorld.scene.layers.length; i++) {
       gameWorld.scene.layers[i].paused = false;
