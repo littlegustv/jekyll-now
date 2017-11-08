@@ -523,7 +523,7 @@
 			"file": "games/salvage/game.js",
 			"settings":
 			{
-				"buffer_size": 55250,
+				"buffer_size": 54794,
 				"line_ending": "Unix"
 			}
 		},
@@ -531,7 +531,7 @@
 			"file": "games/salvage/scenes/game.js",
 			"settings":
 			{
-				"buffer_size": 24095,
+				"buffer_size": 24241,
 				"line_ending": "Unix"
 			}
 		},
@@ -997,6 +997,12 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"invulnerable",
+			"ending = 4",
+			"unforgiving",
+			".material",
+			"spent",
+			".icons",
 			"gate.animation",
 			"projectileDie",
 			".trigger",
@@ -1118,13 +1124,7 @@
 			"selectnameauth",
 			"selectmodelauthority",
 			"selectmodel",
-			"reviewed",
-			"searchable",
-			"reviewed",
-			"@model",
-			"approve",
-			"flag problem",
-			"problem"
+			"reviewed"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1270,7 +1270,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -1278,15 +1278,15 @@
 					"file": "games/salvage/game.js",
 					"settings":
 					{
-						"buffer_size": 55250,
+						"buffer_size": 54794,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								44962,
-								44962
+								45005,
+								45005
 							]
 						],
 						"settings":
@@ -1386,7 +1386,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 17816.0,
+						"translation.y": 17564.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1396,15 +1396,15 @@
 					"file": "games/salvage/game.js",
 					"settings":
 					{
-						"buffer_size": 55250,
+						"buffer_size": 54794,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								20511,
-								20511
+								403,
+								403
 							]
 						],
 						"settings":
@@ -1504,7 +1504,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 8296.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1514,15 +1514,15 @@
 					"file": "games/salvage/scenes/game.js",
 					"settings":
 					{
-						"buffer_size": 24095,
+						"buffer_size": 24241,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								17037,
-								17037
+								12906,
+								12906
 							]
 						],
 						"settings":
@@ -1622,7 +1622,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 5174.0,
+						"translation.y": 4054.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1632,15 +1632,15 @@
 					"file": "games/salvage/scenes/game.js",
 					"settings":
 					{
-						"buffer_size": 24095,
+						"buffer_size": 24241,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								13268,
-								13268
+								21303,
+								21303
 							]
 						],
 						"settings":
@@ -1740,7 +1740,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4082.0,
+						"translation.y": 7232.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

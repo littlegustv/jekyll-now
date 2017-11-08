@@ -281,7 +281,7 @@ var onStart = function () {
     }
 
     gameWorld.playSound(Resources.hit);
-    gameWorld.wave = 0;
+    gameWorld.wave = 1;
   };
   
   this.store_layer = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
@@ -318,9 +318,19 @@ var onStart = function () {
   this.keydown = false;
   this.pause = function () {
     if (!this.player_bot.lerpx && !this.player_bot.lerpy) {
-      // 'denied' for gate
-      
+
       var coords = toGrid(this.player_bot.x, this.player_bot.y);
+      this.bg.paused = true;
+
+      // open store
+      if (gameWorld.boss.store_open) {
+        var store_coords = toGrid(gameWorld.boss.store_open.x, gameWorld.boss.store_open.y);
+        console.log(store_coords, coords)
+        if (coords.y === store_coords.y && coords.x === store_coords.x) {
+          s.store.open();
+        }
+      }
+      // at gate
       if (coords.y === MIN.y && (coords.x == MIN.x + TILESIZE * 2 || coords.x == MIN.x + TILESIZE * 3)) {
         if (!player_bot.hasFTL) {
           gate.animation = 0;
@@ -338,7 +348,9 @@ var onStart = function () {
           gameWorld.playSound(Resources.approved);
           gate.animation = 1;
         }
-      } else if (coords.y < MIN.y) {
+      } 
+      // through gate
+      else if (coords.y < MIN.y) {
         if (gameWorld.boss.alive) {
           gameWorld.ending = 2;
         } else {
@@ -347,8 +359,9 @@ var onStart = function () {
         gameWorld.setScene(2, true);
       }
 
-      this.bg.paused = true;
+      // if wave is finished
       if (this.wave.length <= 0) {
+        // remove last-wave's projectiles ?
         for (var i = 0; i < projectiles.length; i++) {
           if (projectiles[i].alive) {
             projectiles[i].alive = false;
@@ -358,20 +371,20 @@ var onStart = function () {
           }
         }
         projectiles = [];
-        if (this.current_wave % 2 === 0) {
+        // open store every OTHer wave
+        if (gameWorld.wave % 2 === 0) {
           var theta = Math.random() * PI2;
           var g = toGrid(boss.x + 64 * Math.cos(theta), boss.y + 64 * Math.sin(theta));
           if (gameWorld.boss.health >= gameWorld.boss.maxhealth && !gameWorld.boss.store_open) {
             gameWorld.boss.store_open = t.bg.add(Object.create(Entity).init(gameWorld.boss.x + 32, gameWorld.boss.y, 16, 16));            
 
-            //gameWorld.boss.store_open.angle = PI / 2;
             gameWorld.boss.store_open.opacity = 0;
             gameWorld.boss.store_open.setCollision(Polygon);
-            gameWorld.boss.store_open.collision.onHandle = function (a, b) {
+            /*gameWorld.boss.store_open.collision.onHandle = function (a, b) {
               if (b == player_bot) {
                 s.store.open();
               }
-            }
+            }*/
             //gameWorld.boss.animation = 2;
             gameWorld.boss.store_offset = gameWorld.boss.store_open.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 24, y: 0, angle: false, z: 1}}).offset;
 
@@ -391,8 +404,7 @@ var onStart = function () {
             }*/
           }
         }
-        this.current_wave += 1;
-        var announcement = t.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "wave " + this.current_wave, {spacing: -3, align: "center"}));
+        var announcement = t.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "wave " + gameWorld.wave, {spacing: -3, align: "center"}));
         announcement.opacity = 0;
         announcement.addBehavior(FadeIn, {duration: 0.3, delay: 0, maxOpacity: 1});
         announcement.addBehavior(FadeOut, {duration: 0.3, delay: 0.5, maxOpacity: 1});
@@ -484,8 +496,6 @@ var onStart = function () {
     move(e);
   };
   
-  this.current_wave = 0;
-
   this.waves = [
     [0, 0], // drones --> done!
     [1],
@@ -623,7 +633,7 @@ var onStart = function () {
       gameWorld.player.collision.onHandle = function (a,b) {};
       gameWorld.setScene(2, true);
     }});
-    gameWorld.wave = 0;
+    gameWorld.wave = 1;
 
   }
 
