@@ -7,7 +7,7 @@ var onStart = function () {
   var bg = this.addLayer(Object.create(Layer).init(1000,1000));
   bg.active = true;
 
-  var player_coordinates = toGrid(64, 64);
+  var player_coordinates = toGrid(64, 160);
   var player = bg.add(Object.create(Sprite).init(player_coordinates.x, player_coordinates.y, Resources.viper));
 
   var b = bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
@@ -446,11 +446,12 @@ var onStart = function () {
   boss.health_bar = [];
   for (var i = 0; i < boss.maxhealth; i++) {
     var h = bg.add(Object.create(Sprite).init(boss.x, boss.y, Resources.heart));
-    h.follow = h.addBehavior(Follow, {target: boss, offset: {x: randint(-8, 16), y: randint(-16, 16), z: 2}});
+    var theta = (i / boss.maxhealth) * PI - PI / 2;
+    h.follow = h.addBehavior(Follow, {target: boss, offset: {x: Math.cos(theta) * 24, y: Math.sin(theta) * 24, z: 1}});
     // fix me: improve pattern - decrease randomness, improve visibilty
     // NOTE: SHOULD only become visible after first collision, maybe?
-    h.addBehavior(Oscillate, {field: "x", object: h.follow.offset, initial: h.follow.offset.x, constant: randint(12, 20), time: i * PI / 5, func: "cos"});
-    h.addBehavior(Oscillate, {field: "y", object: h.follow.offset, initial: h.follow.offset.y, constant: randint(12, 20), time: PI + i * PI / 5});
+    //h.addBehavior(Oscillate, {field: "x", object: h.follow.offset, initial: h.follow.offset.x, constant: randint(12, 20), time: i * PI / 5, func: "cos"});
+    //h.addBehavior(Oscillate, {field: "y", object: h.follow.offset, initial: h.follow.offset.y, constant: randint(12, 20), time: PI + i * PI / 5});
     boss.health_bar.push(h);
   }
   
@@ -458,25 +459,26 @@ var onStart = function () {
   boss.weapons = ["standard", "triple", "burst", "homing", "hitscan", "firework"];
   boss.respond = function (target) {
     if (this.health >= this.maxhealth) {}
-    else if (this.health >= this.maxhealth - 1) { // warning shot
+    else if (this.health >= this.maxhealth - 1) { // warning shot (DONE)
       this.shoot = Weapons.standard;
-      // fix me: should be based on NORMAL to angle(this, target), i.e. two shots to either side
-      this.target = {x: target.x, y: target.y - 12};
+      var theta = angle(this.x, this.y, target.x, target.y), d = distance(this.x, this.y, target.x, target.y);      
+      this.target = {x: this.x + d * Math.cos(theta + PI / 6), y: this.y + d * Math.sin(theta + PI / 6)};
       this.shoot(this.layer);
-      this.target = {x: target.x, y: target.y + 12};
+      this.target = {x: this.x + d * Math.cos(theta - PI / 6), y: this.y + d * Math.sin(theta - PI / 6)};
       this.shoot(this.layer);
     } else if (!this.enemy) {
-      this.enemy = this.addBehavior(BossEnemy);
+      //this.enemy = this.addBehavior(BossEnemy);
       this.family = "enemy";
       this.target = target;
     }
-
-    if (this.health <= 3) {
+    if (!this.boss.goal) this.danger = true; // get moving if you are stopped, and just got hit!
+    if (this.health <= 5) {
       this.unforgiving = true;
     }
   };
   
-  boss.boss = boss.addBehavior(Boss, {duration: 1.5, speed: 45, rate: 4, target: player});
+  boss.boss = boss.addBehavior(Boss, {duration: 0.5, speed: 70, rate: 4, target: player});
+  boss.addBehavior(Bound, {min: MIN, max: MAX});
   boss.velocity = {x: 0, y: 0};
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
@@ -490,7 +492,7 @@ var onStart = function () {
     if (other.family == "player" && !gameWorld.boss.invulnerable) {
       object.health -= 1;
       for (var i = 0; i < object.health_bar.length; i++) {
-        if (i <= object.health) {
+        if (i < object.health) {
           object.health_bar[i].animation = 0;
         } else {
           object.health_bar[i].animation = 1;
@@ -501,18 +503,17 @@ var onStart = function () {
       gameWorld.boss.respond(s.player);
       //gameWorld.boss.old_animation = gameWorld.boss.animation;
       gameWorld.boss.animation = 1;
-      gameWorld.boss.addBehavior(Delay, {duration: 0.4, callback: function () { 
+      gameWorld.boss.addBehavior(Delay, {duration: 0.8, callback: function () { 
         this.entity.invulnerable = false;
         gameWorld.boss.animation = 0;
       }});
       if (object.health <= 0) {
         object.die();
-      } else if (!other.projectile) {
-        var theta = angle(object.x, object.y, other.x, other.y);
-        var p = toGrid(object.x + 64 * Math.cos(theta), object.y + 64 * Math.sin(theta));
+      } else if (!other.projectile) {        
+        var p = toGrid(object.x + 2 * TILESIZE, s.player.y);
         s.player.removeBehavior((s.player.lerpx));
         s.player.removeBehavior((s.player.lerpy));
-        s.player.angle = theta;
+        s.player.angle = 0;
         s.player.move(s);
         s.player.lerpx.goal = p.x;
         s.player.lerpy.goal = p.y;

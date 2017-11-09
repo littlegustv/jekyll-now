@@ -117,6 +117,27 @@ Move.pick = function () {
 
 // 
 var Boss = Object.create(Move);
+Boss.update = function (dt) {
+  if (this.goal) {
+    this.move(dt);
+    if (this.check()) {
+      if (this.callback) this.callback();
+      this.goal = undefined;
+      this.delay = this.duration;
+    }
+  } else if (this.delay > 0) {
+    this.delay -= dt;
+  } else {
+    if (this.entity.queue.length <= 0 && !this.entity.danger && this.entity.family === "enemy") {
+      var weapon = choose(this.entity.weapons.slice(0, this.entity.maxhealth - this.entity.health));
+      this.entity.shoot = Weapons[weapon];
+      this.delay = this.entity.shoot(this.entity.layer) * this.entity.health / this.entity.maxhealth;
+    } else {
+      this.goal = this.pick();
+      this.entity.danger = false;
+    }
+  }
+};
 Boss.move = function (dt) {
   if (Math.abs(this.goal.y - this.entity.y) > TILESIZE) {
     this.entity.velocity = {x: 0, y: sign(this.goal.y - this.entity.y) * this.speed };
