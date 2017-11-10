@@ -138,14 +138,7 @@ Boss.update = function (dt) {
       this.entity.store_open.alive = false;
       this.entity.store_open = undefined;
     }
-    if (this.entity.queue.length <= 0 && !this.entity.danger && this.entity.family === "enemy") {
-      var weapon = choose(this.entity.weapons.slice(0, this.entity.maxhealth - this.entity.health));
-      this.entity.shoot = Weapons[weapon];
-      this.delay = this.entity.shoot(this.entity.layer) * this.entity.health / this.entity.maxhealth;
-    } else {
-      this.goal = this.pick();
-      this.entity.danger = false;
-    }
+    this.goal = this.pick();
   }
 };
 Boss.move = function (dt) {
@@ -220,10 +213,44 @@ Boss.storetime = function () {
   t2.addBehavior(Follow, {target: this.entity.store_open, offset: {x: 0, y: 6, alive: true, z: 1 }});
   t1.z = this.entity.z + 2;
   t2.z = this.entity.z + 2;
+  this.callback = undefined;
   return 10;
-}
+};
+Boss.weapons = [
+  function (entity) {
+    console.log('working');
+    gameWorld.playSound(Resources.laser);
+    for (var i = 0; i < 10; i++) {
+      var theta = i * PI2 / 10;
+      var a = entity.layer.add(Object.create(Circle).init(entity.x, entity.y, 4));
+      a.color = "black";
+      a.stroke = true;
+      a.strokeColor = COLORS.primary;
+      a.width = 2;
+      a.setCollision(Polygon);
+      a.setVertices(projectile_vertices);
+      gameWorld.playSound(Resources.laser);
+      a.collision.onHandle = projectileHit;
+      a.addBehavior(Velocity);
+      a.family = entity.family;
+      a.projectile = true;
+      a.angle = theta;
+      a.velocity = {x: 30 * Math.cos(a.angle), y: 30 * Math.sin(a.angle)  };
+      a.addBehavior(Trail, {interval: 0.06, maxlength: 4, record: []});
+      projectiles.push(a);
+    }
+    return 1.6;
+  }
+];
+Boss.shoot = function () {
+  return choose(this.weapons)(this.entity);
+};
 // picks from queue, or patrols from top to bottom
 Boss.pick = function () {
+  if (this.entity.health < this.entity.maxhealth - 1) {
+    console.log('uhuh');
+    this.callback = this.shoot;
+  }
   if (this.entity.queue.length > 0) {
     if (this.entity.payday) {
       this.entity.payday = false;
@@ -231,7 +258,7 @@ Boss.pick = function () {
     } else if (this.entity.storeday) {
       this.entity.storeday = false;
       this.callback = this.storetime;
-    } else {      
+    } else {
       this.callback = this.beam;
     }
     return toGrid(this.entity.x, this.entity.queue.pop());
