@@ -97,9 +97,12 @@ Move.update = function (dt) {
   if (this.goal) {
     this.move(dt);
     if (this.check()) {
-      if (this.callback) this.callback();
       this.goal = undefined;
-      this.delay = this.duration;
+      if (this.callback) {
+        this.delay = this.callback();
+      } else {
+        this.delay = this.duration;        
+      }
     }
   } else if (this.delay > 0) {
     this.delay -= dt;
@@ -121,9 +124,12 @@ Boss.update = function (dt) {
   if (this.goal) {
     this.move(dt);
     if (this.check()) {
-      if (this.callback) this.callback();
       this.goal = undefined;
-      this.delay = this.duration;
+      if (this.callback) {
+        this.delay = this.callback();
+      } else {
+        this.delay = this.duration;        
+      }
     }
   } else if (this.delay > 0) {
     this.delay -= dt;
@@ -193,13 +199,33 @@ Boss.pay = function () {
     }
   };
   this.callback = undefined;
+  return this.duration;
 };
+Boss.storetime = function () {
+  this.entity.store_open = this.entity.layer.add(Object.create(Entity).init(this.entity.x + 32, this.entity.y, 16, 16));            
+
+  this.entity.store_open.opacity = 0;
+  this.entity.store_open.setCollision(Polygon);
+  this.entity.store_offset = this.entity.store_open.addBehavior(Follow, {target: this.entity, offset: {x: 24, y: 0, angle: false, z: 1}}).offset;
+
+  var t1 = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 24, this.entity.y - 6, Resources.expire_font, "store", {spacing: -3, align: "center"}));
+  var t2 = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 24, this.entity.y + 6, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
+  t1.addBehavior(Follow, {target: this.entity.store_open, offset: {x: 0, y: -6, alive: true, z: 1 }});
+  t2.addBehavior(Follow, {target: this.entity.store_open, offset: {x: 0, y: 6, alive: true, z: 1 }});
+  t1.z = this.entity.z + 2;
+  t2.z = this.entity.z + 2;
+  this.callback = undefined;
+  return 10;
+}
 // picks from queue, or patrols from top to bottom
 Boss.pick = function () {
   if (this.entity.queue.length > 0) {
     if (this.entity.payday) {
       this.entity.payday = false;
       this.callback = this.pay;
+    } else if (this.entity.storeday) {
+      this.entity.storeday = false;
+      this.callback = this.storetime;
     } else {
       this.callback = this.beam;
     }
@@ -549,39 +575,26 @@ var Weapons = {
     return 1.6;
   },
   firework: function (layer) {
-    var f = layer.add(Object.create(Circle).init(this.x, this.y, 8));
-    f.color = COLORS.negative;
-    f.stroke = true;
-    f.strokeColor = COLORS.primary;
-    f.width = 3;
     gameWorld.playSound(Resources.laser);
-    f.setCollision(Polygon);
-    f.setVertices(projectile_vertices);
-    f.projectile = true;
-    f.collision.onHandle = projectileHit;
-    f.family = this.family;
-    f.addBehavior(Delay, {duration: 1.5, callback: function () {
-      this.entity.alive = false;
-      for (var i = 0; i < 10; i++) {
-        var theta = i * PI2 / 10;
-        var a = this.entity.layer.add(Object.create(Circle).init(this.entity.x + this.entity.radius * Math.cos(theta), this.entity.y + this.entity.radius * Math.sin(theta), 4));
-        a.color = "black";
-        a.stroke = true;
-        a.strokeColor = COLORS.primary;
-        a.width = 2;
-        a.setCollision(Polygon);
-        a.setVertices(projectile_vertices);
-        gameWorld.playSound(Resources.laser);
-        a.collision.onHandle = projectileHit;
-        a.addBehavior(Velocity);
-        a.family = this.entity.family;//"player";
-        a.projectile = true;
-        a.angle = theta;
-        a.velocity = {x: 30 * Math.cos(a.angle), y: 30 * Math.sin(a.angle)  };
-        a.addBehavior(Trail, {interval: 0.06, maxlength: 4, record: []});
-        projectiles.push(a);
-      }
-    }});
+    for (var i = 0; i < 10; i++) {
+      var theta = i * PI2 / 10;
+      var a = layer.add(Object.create(Circle).init(this.x + this.w * Math.cos(theta), this.y + this.w * Math.sin(theta), 4));
+      a.color = "black";
+      a.stroke = true;
+      a.strokeColor = COLORS.primary;
+      a.width = 2;
+      a.setCollision(Polygon);
+      a.setVertices(projectile_vertices);
+      gameWorld.playSound(Resources.laser);
+      a.collision.onHandle = projectileHit;
+      a.addBehavior(Velocity);
+      a.family = this.family;
+      a.projectile = true;
+      a.angle = theta;
+      a.velocity = {x: 30 * Math.cos(a.angle), y: 30 * Math.sin(a.angle)  };
+      a.addBehavior(Trail, {interval: 0.06, maxlength: 4, record: []});
+      projectiles.push(a);
+    }
     return 4.6;
   },
   hitscan: function (layer) {
@@ -1206,6 +1219,7 @@ var Store = {
       this.callback = undefined;
       t.layer.active = false;
     }
+    gameWorld.boss.boss.delay = 0;
     /*for (var i = 0; i < gameWorld.scene.layers.length; i++) {
       gameWorld.scene.layers[i].paused = false;
     }*/

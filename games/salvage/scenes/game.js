@@ -265,22 +265,9 @@ var onStart = function () {
         projectiles = [];
         // open store every OTHer wave
         if (gameWorld.wave % 2 === 0) {
-          var theta = Math.random() * PI2;
-          var g = toGrid(boss.x + 64 * Math.cos(theta), boss.y + 64 * Math.sin(theta));
-          if (gameWorld.boss.health >= gameWorld.boss.maxhealth && !gameWorld.boss.store_open) {
-            gameWorld.boss.store_open = t.bg.add(Object.create(Entity).init(gameWorld.boss.x + 32, gameWorld.boss.y, 16, 16));            
-
-            gameWorld.boss.store_open.opacity = 0;
-            gameWorld.boss.store_open.setCollision(Polygon);
-            gameWorld.boss.store_offset = gameWorld.boss.store_open.addBehavior(Follow, {target: gameWorld.boss, offset: {x: 24, y: 0, angle: false, z: 1}}).offset;
-
-            var t1 = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 24, gameWorld.boss.y - 6, Resources.expire_font, "store", {spacing: -3, align: "center"}));
-            var t2 = t.bg.add(Object.create(SpriteFont).init(gameWorld.boss.x + 24, gameWorld.boss.y + 6, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
-            t1.addBehavior(Follow, {target: gameWorld.boss.store_open, offset: {x: 0, y: -6, alive: true, z: 1 }});
-            t2.addBehavior(Follow, {target: gameWorld.boss.store_open, offset: {x: 0, y: 6, alive: true, z: 1 }});
-            t1.z = gameWorld.boss.z + 2;
-            t2.z = gameWorld.boss.z + 2;         
-          }
+          //var theta = Math.random() * PI2;
+          //var g = toGrid(boss.x + 64 * Math.cos(theta), boss.y + 64 * Math.sin(theta));
+          
         }
         var announcement = t.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "wave " + gameWorld.wave, {spacing: -3, align: "center"}));
         announcement.opacity = 0;
@@ -288,8 +275,14 @@ var onStart = function () {
         announcement.addBehavior(FadeOut, {duration: 0.3, delay: 0.5, maxOpacity: 1});
         announcement.scale = 2;
 
+        if (gameWorld.boss.health >= gameWorld.boss.maxhealth && !gameWorld.boss.store_open) {
+          gameWorld.boss.queue.push(toGrid(0, gameWorld.height / 2).y);
+          gameWorld.boss.storeday = 1;
+        }
+
         gameWorld.boss.queue.push(toGrid(0, 0).y);
         gameWorld.boss.payday = 1;
+
 
         //gameWorld.playSound(Resources.spawn);
 
@@ -420,6 +413,8 @@ var onStart = function () {
     [5],
     [6],
   ];
+
+  this.waves = [[3,4]]
 
   var boss = this.bg.add(Object.create(Sprite).init(toGrid(0, 100).x, toGrid(0, 100).y, Resources.boss));
   boss.animation = 0;
