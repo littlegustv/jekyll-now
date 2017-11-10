@@ -414,8 +414,6 @@ var onStart = function () {
     [6],
   ];
 
-  this.waves = [[3,4]]
-
   var boss = this.bg.add(Object.create(Sprite).init(toGrid(0, 100).x, toGrid(0, 100).y, Resources.boss));
   boss.animation = 0;
   boss.offset = {x: 6, y: 0};

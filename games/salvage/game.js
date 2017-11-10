@@ -134,6 +134,10 @@ Boss.update = function (dt) {
   } else if (this.delay > 0) {
     this.delay -= dt;
   } else {
+    if (this.entity.store_open) {
+      this.entity.store_open.alive = false;
+      this.entity.store_open = undefined;
+    }
     if (this.entity.queue.length <= 0 && !this.entity.danger && this.entity.family === "enemy") {
       var weapon = choose(this.entity.weapons.slice(0, this.entity.maxhealth - this.entity.health));
       this.entity.shoot = Weapons[weapon];
@@ -198,10 +202,12 @@ Boss.pay = function () {
       }
     }
   };
+  //this.goal = toGrid(this.x, this.y);
   this.callback = undefined;
   return this.duration;
 };
 Boss.storetime = function () {
+  this.entity.velocity.y = 0;
   this.entity.store_open = this.entity.layer.add(Object.create(Entity).init(this.entity.x + 32, this.entity.y, 16, 16));            
 
   this.entity.store_open.opacity = 0;
@@ -214,7 +220,6 @@ Boss.storetime = function () {
   t2.addBehavior(Follow, {target: this.entity.store_open, offset: {x: 0, y: 6, alive: true, z: 1 }});
   t1.z = this.entity.z + 2;
   t2.z = this.entity.z + 2;
-  this.callback = undefined;
   return 10;
 }
 // picks from queue, or patrols from top to bottom
@@ -226,7 +231,7 @@ Boss.pick = function () {
     } else if (this.entity.storeday) {
       this.entity.storeday = false;
       this.callback = this.storetime;
-    } else {
+    } else {      
       this.callback = this.beam;
     }
     return toGrid(this.entity.x, this.entity.queue.pop());
