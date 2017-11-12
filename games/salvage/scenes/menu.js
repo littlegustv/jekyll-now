@@ -61,7 +61,21 @@ var onStart =  function () {
       gameWorld.setScene(3, true);
     }],
     ["mute", function () {
-      gameWorld.muted = true;
+      if (!gameWorld.muted) {
+        this.text.opacity = 0.5;
+        localStorage.salvageMuted = true;
+        gameWorld.muted = true;
+        window.muted = true;
+        if (gameWorld.audioContext && gameWorld.audioContext.suspend)
+          gameWorld.audioContext.suspend();
+      } else {
+        this.text.opacity = 1;
+        localStorage.salvageMuted = false;
+        gameWorld.muted = false;
+        window.muted = false;
+        if (gameWorld.audioContext && gameWorld.audioContext.resume)
+          gameWorld.audioContext.resume(); 
+      }
     }],
     ["credits", function () {
       //gameWorld.setScene(4, true);
@@ -70,6 +84,7 @@ var onStart =  function () {
       //gameWorld.setScene(5, true);
     }]
   ];
+  var mute_button_text;
   for (var i = 0; i < buttons.length; i++) {
     var b = this.bg.add(Object.create(SpriteFont).init(8, gameWorld.height / 4 + i * 16, Resources.expire_font, buttons[i][0], {spacing: -2, align: "left"}));
     var button = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 4 + i * 16, gameWorld.width, 16));
@@ -77,6 +92,7 @@ var onStart =  function () {
     //b.blend = "destination-out";
     button.opacity = 0;
     button.text = b;
+    if (buttons[i][0] === "mute") { mute_button_text = b; }
     button.hover = function () { this.text.scale = 2;};
     button.unhover = function () { this.text.scale = 1; };
     button.trigger = buttons[i][1];
@@ -93,6 +109,16 @@ var onStart =  function () {
     button.trigger = function () {
       gameWorld.setScene(1, false);
     };
+  }
+
+
+  if (localStorage && localStorage.salvageMuted == "true") {
+    localStorage.salvageMuted = true;
+    gameWorld.muted = true;
+    window.muted = true;
+    mute_button_text.opacity = 0.5;
+    if (gameWorld.audioContext && gameWorld.audioContext.suspend)
+      gameWorld.audioContext.suspend();
   }
   
   var ship = this.bg.add(Object.create(Sprite).init(0, MIN.y + 7 *  TILESIZE, Resources.viper));

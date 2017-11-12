@@ -121,8 +121,8 @@ Move.pick = function () {
 // 
 var Boss = Object.create(Move);
 Boss.update = function (dt) {
-  if (this.goal) {
-    this.move(dt);
+  /*if (this.goal) {
+    //this.move(dt);
     if (this.check()) {
       this.goal = undefined;
       if (this.callback) {
@@ -139,33 +139,39 @@ Boss.update = function (dt) {
       this.entity.store_open = undefined;
     }
     this.goal = this.pick();
-  }
+  }*/
 };
 Boss.move = function (dt) {
-  if (Math.abs(this.goal.y - this.entity.y) > TILESIZE) {
+  /*if (Math.abs(this.goal.y - this.entity.y) > TILESIZE) {
     this.entity.velocity = {x: 0, y: sign(this.goal.y - this.entity.y) * this.speed };
   } else {
     this.entity.velocity = {x: 0, y: clamp(this.rate * (this.goal.y - this.entity.y), -this.speed, this.speed)};
-  }
+  }*/
 };
 Boss.beam = function () {
-  var beam = this.entity.layer.add(Object.create(Entity).init(gameWorld.width / 2, this.entity.y, gameWorld.width, 12));
-  beam.opacity = 0;
+  var beam = this.entity.layer.add(Object.create(Circle).init(MIN.x, this.entity.y, gameWorld.height / 2));
   beam.color = "white";
-  beam.addBehavior(FadeIn, {duration: 0.1, maxOpacity: 1});
-  beam.addBehavior(FadeOut, {delay: 0.8, duration: 0.1});
-  beam.z = this.entity.z - 1;
-  beam.setCollision(Polygon);
-  gameWorld.playSound(Resources.process);
-  beam.collision.onHandle = function (a, b) {
-    if (b.scrap) {
-      b.scrap = false;
-      b.z = a.z + 1;
-      b.addBehavior(Lerp, {field: "x", goal: 0, rate: 1, object: b});
-    }
+  beam.addBehavior(Behavior, {update: function (dt) {
+    this.entity.radius -= 0.25 * dt * gameWorld.height;
+    if (this.entity.radius <= 0) this.entity.alive = false;
+  }});
+  beam.opacity = 0.5;
+  beam.addBehavior(FadeOut, {delay: 0, duration: 3});
+  beam.z = -9.5;
+  var scrap = this.entity.layer.entities.filter(function (e) { return e.scrap });
+  for (var i = 0; i < scrap.length; i++) {
+    var theta = angle(scrap[i].x, scrap[i].y, this.entity.x, this.entity.y);
+    scrap[i].velocity = {x: Math.cos(theta) * 75, y: Math.sin(theta) * 75};
   }
-  this.delay = 1.5;
-  this.callback = undefined;
+  gameWorld.playSound(Resources.process);
+  var t = this;
+  this.entity.addBehavior(Delay, { duration: 2, callback: function () {
+    t.pay();
+    if (gameWorld.wave % 2 === 0 && ! gameWorld.boss.store_open) {
+      t.storetime();
+    }
+    this.entity.removeBehavior(this);
+  }});
 }
 Boss.pay = function () {
   var cash = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 32, this.entity.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
@@ -201,6 +207,7 @@ Boss.pay = function () {
 };
 Boss.storetime = function () {
   this.entity.velocity.y = 0;
+  gameWorld.playSound(Resources.store);
   this.entity.store_open = this.entity.layer.add(Object.create(Entity).init(this.entity.x + 32, this.entity.y, 16, 16));            
 
   this.entity.store_open.opacity = 0;
@@ -211,6 +218,10 @@ Boss.storetime = function () {
   var t2 = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 24, this.entity.y + 6, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
   t1.addBehavior(Follow, {target: this.entity.store_open, offset: {x: 0, y: -6, alive: true, z: 1 }});
   t2.addBehavior(Follow, {target: this.entity.store_open, offset: {x: 0, y: 6, alive: true, z: 1 }});
+  t1.addBehavior(FadeIn, {maxOpacity: 1, duration: 0.3});
+  t2.addBehavior(FadeIn, {maxOpacity: 1, duration: 0.3});
+  t1.opacity = 0;
+  t2.opacity = 0;
   t1.z = this.entity.z + 2;
   t2.z = this.entity.z + 2;
   this.callback = undefined;
@@ -247,7 +258,7 @@ Boss.shoot = function () {
 };
 // picks from queue, or patrols from top to bottom
 Boss.pick = function () {
-  if (this.entity.health < this.entity.maxhealth - 1) {
+  /*if (this.entity.health < this.entity.maxhealth - 1) {
     console.log('uhuh');
     this.callback = this.shoot;
   }
@@ -264,7 +275,7 @@ Boss.pick = function () {
     return toGrid(this.entity.x, this.entity.queue.pop());
   } else {
     return toGrid(this.entity.x, this.entity.y > HEIGHT / 2 ? toGrid(0, 0).y : toGrid(0, HEIGHT).y);
-  }
+  }*/
 };
 
 // moves at right angle in approaching "spiral" - ish
@@ -999,6 +1010,7 @@ function spawn(layer, key, player) {
       if (other == gameWorld.boss) {
         object.alive = false;
         // fix me: play 'processing' or HEALING sound, animation?
+        gameWorld.playSound(Resources.work);
         for (var i = 0; i < 20; i++) {
           if (other.health < other.maxhealth) {          
             var h = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.heart));

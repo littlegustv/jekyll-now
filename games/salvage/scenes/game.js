@@ -294,6 +294,8 @@ var onStart = function () {
           }
         }
         gameWorld.wave++;
+
+        gameWorld.boss.boss.beam();
       }
     }
   }
@@ -414,9 +416,9 @@ var onStart = function () {
     [6],
   ];
 
-  this.waves = [[0], [0], [0], [0]];
+  this.waves = [[0], [], [], [], []];
 
-  var boss = this.bg.add(Object.create(Sprite).init(toGrid(0, 100).x, toGrid(0, 100).y, Resources.boss));
+  var boss = this.bg.add(Object.create(Sprite).init(toGrid(0, 100).x, toGrid(0, gameWorld.height / 2).y, Resources.boss));
   boss.animation = 0;
   boss.offset = {x: 6, y: 0};
   boss.modules = [];
@@ -438,7 +440,7 @@ var onStart = function () {
   
   boss.maxhealth = 10;
   boss.health = boss.maxhealth;
-  boss.health_bar = [];
+  /*boss.health_bar = [];
   for (var i = 0; i < boss.maxhealth; i++) {
     var h = bg.add(Object.create(Sprite).init(boss.x, boss.y, Resources.heart));
     var theta = (i / boss.maxhealth) * PI - PI / 2;
@@ -448,7 +450,7 @@ var onStart = function () {
     //h.addBehavior(Oscillate, {field: "x", object: h.follow.offset, initial: h.follow.offset.x, constant: randint(12, 20), time: i * PI / 5, func: "cos"});
     //h.addBehavior(Oscillate, {field: "y", object: h.follow.offset, initial: h.follow.offset.y, constant: randint(12, 20), time: PI + i * PI / 5});
     boss.health_bar.push(h);
-  }
+  }*/
   
   boss.queue = [];
   boss.weapons = ["standard", "triple", "burst", "homing", "hitscan", "firework"];
@@ -486,13 +488,6 @@ var onStart = function () {
   boss.collision.onHandle = function (object, other) {
     if (other.family == "player" && !gameWorld.boss.invulnerable) {
       object.health -= 1;
-      for (var i = 0; i < object.health_bar.length; i++) {
-        if (i < object.health) {
-          object.health_bar[i].animation = 0;
-        } else {
-          object.health_bar[i].animation = 1;
-        }
-      }
       object.particles.rate = (10 - object.health) / 10;
       gameWorld.boss.invulnerable = true;
       gameWorld.boss.respond(s.player);
