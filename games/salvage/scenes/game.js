@@ -236,7 +236,7 @@ var onStart = function () {
         } else {
           var warning = this.bg.add(Object.create(SpriteFont).init(gate.x + 2, gate.y - 10, Resources.expire_font, "APPROVED", {spacing: -1, align: "center"}));
           warning.addBehavior(FadeOut, {duration: 0.5, delay: 0.5});
-
+          cover.alive = false;
           gameWorld.playSound(Resources.approved);
           gate.animation = 1;
         }

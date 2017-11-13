@@ -1169,6 +1169,7 @@ var Store = {
     close.family = "button";
     close.color = "white";
     close.trigger = function () {
+      if (!t.opened) return;
       t.player.salvage -= t.spent;
       t.spent = 0;
       gameWorld.playSound(Resources.buy);
@@ -1210,6 +1211,7 @@ var Store = {
         icon.animation = t.buttons[i].icon;
         button.trigger = function () {
           // check price HERE
+          if (!t.opened) return;
           if (t.player.salvage - t.spent >= this.price)
           {
             if (t.buttons[j].trigger(t)) {
@@ -1233,6 +1235,7 @@ var Store = {
   },
   open: function () {
     this.player.locked = true;
+    this.opened = true;
     this.salvage.text = "$ " + this.player.salvage;
     
     for (var i = 0; i < this.layer.entities.length; i++) {
@@ -1255,6 +1258,7 @@ var Store = {
   },
   close: function () {
     var t = this;
+    this.opened = false;
     for (var i = 0; i < this.layer.entities.length; i++) {
       this.layer.entities[i].lerp.goal = this.layer.entities[i].original;
     }
