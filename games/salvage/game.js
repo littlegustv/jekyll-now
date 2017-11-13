@@ -227,32 +227,6 @@ Boss.storetime = function () {
   this.callback = undefined;
   return 10;
 };
-Boss.weapons = [
-  function (entity) {
-    console.log('working');
-    gameWorld.playSound(Resources.laser);
-    for (var i = 0; i < 10; i++) {
-      var theta = i * PI2 / 10;
-      var a = entity.layer.add(Object.create(Circle).init(entity.x, entity.y, 4));
-      a.color = "black";
-      a.stroke = true;
-      a.strokeColor = COLORS.primary;
-      a.width = 2;
-      a.setCollision(Polygon);
-      a.setVertices(projectile_vertices);
-      gameWorld.playSound(Resources.laser);
-      a.collision.onHandle = projectileHit;
-      a.addBehavior(Velocity);
-      a.family = entity.family;
-      a.projectile = true;
-      a.angle = theta;
-      a.velocity = {x: 30 * Math.cos(a.angle), y: 30 * Math.sin(a.angle)  };
-      a.addBehavior(Trail, {interval: 0.06, maxlength: 4, record: []});
-      projectiles.push(a);
-    }
-    return 1.6;
-  }
-];
 Boss.shoot = function () {
   return choose(this.weapons)(this.entity);
 };
@@ -821,7 +795,7 @@ BossEnemy.update = function (dt) {
   else {
     var weapon = choose(["firework","hitscan", "triple", "burst", "homing"]);
     this.entity.shoot = Weapons[weapon];
-    this.cooldown = this.entity.shoot(this.entity.layer) * (this.entity.health / this.entity.maxhealth);
+    this.cooldown = this.entity.shoot(this.entity.layer) * Math.ceil( 3 * this.entity.health / this.entity.maxhealth) / 3; // in thirds
   }
 }
 

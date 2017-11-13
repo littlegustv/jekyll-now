@@ -493,10 +493,11 @@ var onStart = function () {
       gameWorld.boss.invulnerable = true;
       gameWorld.boss.respond(s.player);
       //gameWorld.boss.old_animation = gameWorld.boss.animation;
-      gameWorld.boss.animation = 1;
-      gameWorld.boss.addBehavior(Delay, {duration: 0.8, callback: function () { 
+      gameWorld.boss.animation = 3;
+      gameWorld.boss.addBehavior(Delay, {duration: 1.3, callback: function () { 
         this.entity.invulnerable = false;
-        gameWorld.boss.animation = 0;
+        gameWorld.boss.animation = 3 - Math.floor(3 * this.entity.health / this.entity.maxhealth);
+        console.log(gameWorld.boss.animation);
       }});
       if (object.health <= 0) {
         object.die();
