@@ -416,7 +416,7 @@ var onStart = function () {
     [6],
   ];
 
-  this.waves = [[0], [], [], [], []];
+  // this.waves = [[0], [], [], [], []];
 
   var boss = this.bg.add(Object.create(Sprite).init(toGrid(0, 100).x, toGrid(0, gameWorld.height / 2).y, Resources.boss));
   boss.animation = 0;
@@ -463,8 +463,9 @@ var onStart = function () {
       this.shoot(this.layer);
       this.target = {x: this.x + d * Math.cos(theta - PI / 6), y: this.y + d * Math.sin(theta - PI / 6)};
       this.shoot(this.layer);
+      this.shoot = undefined;
     } else if (!this.enemy) {
-      //this.enemy = this.addBehavior(BossEnemy);
+      this.enemy = this.addBehavior(BossEnemy);
       this.family = "enemy";
       this.target = target;
     }
@@ -500,13 +501,21 @@ var onStart = function () {
       if (object.health <= 0) {
         object.die();
       } else if (!other.projectile) {        
-        var p = toGrid(object.x + 2 * TILESIZE, s.player.y);
+        var p = toGrid(other.x, other.y), b = toGrid(object.x, object.y);
         s.player.removeBehavior((s.player.lerpx));
         s.player.removeBehavior((s.player.lerpy));
         s.player.angle = 0;
         s.player.move(s);
-        s.player.lerpx.goal = p.x;
-        s.player.lerpy.goal = p.y;
+        if (p.x > b.x) {
+          s.player.lerpx.goal = MIN.x + 2 * TILESIZE;
+          s.player.lerpy.goal = p.y;
+        } else if (p.y > b.y) {
+          s.player.lerpy.goal = b.y + 2 * TILESIZE;
+          s.player.lerpx.goal = p.x;
+        } else if (p.y < b.y) {
+          s.player.lerpy.goal = b.y - 2 * TILESIZE;
+          s.player.lerpx.goal = p.x;
+        }
       }
     }
   };

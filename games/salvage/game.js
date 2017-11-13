@@ -620,8 +620,8 @@ var Weapons = {
   firework: function (layer) {
     gameWorld.playSound(Resources.laser);
     for (var i = 0; i < 10; i++) {
-      var theta = i * PI2 / 10;
-      var a = layer.add(Object.create(Circle).init(this.x + this.w * Math.cos(theta), this.y + this.w * Math.sin(theta), 4));
+      var theta = (this.shoot_angle || 0) + i * PI2 / 10;
+      var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
       a.color = "black";
       a.stroke = true;
       a.strokeColor = COLORS.primary;
@@ -819,10 +819,9 @@ var BossEnemy = Object.create(Enemy);
 BossEnemy.update = function (dt) {
   if (this.cooldown > 0) this.cooldown -= dt;
   else {
-    // choose random from my weapons
-    var weapon = choose(this.entity.weapons.slice(0, this.entity.maxhealth - this.entity.health));
+    var weapon = choose(["firework","hitscan", "triple", "burst", "homing"]);
     this.entity.shoot = Weapons[weapon];
-    this.cooldown = this.entity.shoot(this.entity.layer);
+    this.cooldown = this.entity.shoot(this.entity.layer) * (this.entity.health / this.entity.maxhealth);
   }
 }
 
