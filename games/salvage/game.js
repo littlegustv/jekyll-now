@@ -18,7 +18,7 @@ var ENDINGS = [
 var WIDTH = 180;
 var HEIGHT = 320;
 var MIN = {x: 10, y: 44};
-var MAX = {x: WIDTH - 10, y: HEIGHT - 20}; 
+var MAX = {x: WIDTH - 10, y: HEIGHT - 20};
 var TILESIZE = 32;
 
 var COLORS = {
@@ -40,16 +40,16 @@ function toGrid(x, y) {
   var g = {
     x: clamp(Math.round((x - MIN.x) / TILESIZE) * TILESIZE + MIN.x, MIN.x, MAX.x),
     y: clamp(Math.round((y - MIN.y) / TILESIZE) * TILESIZE + MIN.y, MIN.y, MAX.y)
-  }
+  };
   if (gameWorld.player && gameWorld.player.hasFTL) {
     if (g.x == MIN.x + TILESIZE * 2 || g.x == MIN.x + TILESIZE * 3) { // halfway point?
-      g.y = clamp(Math.round((y - MIN.y) / TILESIZE) * TILESIZE + MIN.y, MIN.y - 32, MAX.y)
+      g.y = clamp(Math.round((y - MIN.y) / TILESIZE) * TILESIZE + MIN.y, MIN.y - 32, MAX.y);
     }
   }
   return g;
 }
 
-var buttonHover = function () { 
+var buttonHover = function () {
   if (this.opacity != 0.6) gameWorld.playSound(Resources.hover);
   this.opacity = 0.6;
 };
@@ -101,7 +101,7 @@ Move.update = function (dt) {
       if (this.callback) {
         this.delay = this.callback();
       } else {
-        this.delay = this.duration;        
+        this.delay = this.duration;
       }
     }
   } else if (this.delay > 0) {
@@ -158,7 +158,7 @@ Boss.beam = function () {
   beam.opacity = 0.5;
   beam.addBehavior(FadeOut, {delay: 0, duration: 3});
   beam.z = -9.5;
-  var scrap = this.entity.layer.entities.filter(function (e) { return e.scrap });
+  var scrap = this.entity.layer.entities.filter(function (e) { return e.scrap; });
   for (var i = 0; i < scrap.length; i++) {
     var theta = angle(scrap[i].x, scrap[i].y, this.entity.x, this.entity.y);
     scrap[i].velocity = {x: Math.cos(theta) * 75, y: Math.sin(theta) * 75};
@@ -172,7 +172,7 @@ Boss.beam = function () {
     }
     this.entity.removeBehavior(this);
   }});
-}
+};
 Boss.pay = function () {
   var cash = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 32, this.entity.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
   cash.addBehavior(Velocity);
@@ -208,7 +208,7 @@ Boss.pay = function () {
 Boss.storetime = function () {
   this.entity.velocity.y = 0;
   gameWorld.playSound(Resources.store);
-  this.entity.store_open = this.entity.layer.add(Object.create(Entity).init(this.entity.x + 32, this.entity.y, 16, 16));            
+  this.entity.store_open = this.entity.layer.add(Object.create(Entity).init(this.entity.x + 32, this.entity.y, 16, 16));
 
   this.entity.store_open.opacity = 0;
   this.entity.store_open.setCollision(Polygon);
@@ -1042,10 +1042,13 @@ var Store = {
     return this;
   },
   buttons: [
-    { name: "Health", price: 1, icon: 0, trigger: function (t) {
-        if (t.player.health < MAXHEALTH) {
-          t.player.health++;
-          gameWorld.scene.updateHealthBar(t.player);
+    { name: "Health", price: 1, icon: 0, 
+      trigger: function (t) {
+        t.player.health++;
+        gameWorld.scene.updateHealthBar(t.player);
+      },
+      check: function (t) {
+        if (t.player.health < MAXHEALTH) {        
           return true;
         } else {
           return false;
@@ -1053,10 +1056,13 @@ var Store = {
       }
     },
     {
-      name: "Shield", price: 2, icon: 1, trigger: function (t) {
+      name: "Shield", price: 2, icon: 1, 
+      trigger: function (t) {
+        t.player.has_shield = t.player.addBehavior(Shielded, {rate: 0.5});
+        gameWorld.scene.updateHealthBar(t.player);
+      },
+      check: function (t) {
         if (!t.player.has_shield) {
-          t.player.has_shield = t.player.addBehavior(Shielded, {rate: 0.5});
-          gameWorld.scene.updateHealthBar(t.player);
           return true;
         } else {
           return false;
@@ -1064,10 +1070,12 @@ var Store = {
       }
     },
     {
-      name: "Speed", price: 3, icon: 2, trigger: function (t) {
+      name: "Speed", price: 3, icon: 2,
+      trigger: function (t) {
+        t.player.speed = 8;
+      },
+      check: function (t) {
         if (t.player.speed < 8) {
-          t.player.speed = 8;
-          //this.trigger = function () {};
           return true;          
         } else {
           return false;
@@ -1075,22 +1083,25 @@ var Store = {
       }
     },
     {
-      name: "Decoy", price: 4, icon: 3, trigger: function (t) {
+      name: "Decoy", price: 4, icon: 3, 
+      trigger: function (t) {
+        t.player.hasDecoy = t.player.addBehavior(Periodic, {time: 4, period: 5, callback: function () {
+          this.entity.decoy = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.viper));
+          this.entity.decoy.angle = this.entity.angle;
+          gameWorld.playSound(Resources.decoy);
+          var t = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y, Resources.expire_font, "decoy!", {spacing: -2, align: "center"}));
+          t.addBehavior(Velocity);
+          t.velocity = {x: 0, y: 10, angle: -PI };
+          t.addBehavior(FadeOut, {delay: 0.2, duration: 0.2});
+          var e = this.entity;
+          this.entity.decoy.addBehavior(Delay, {duration: 1.5, callback: function () {
+            this.entity.addBehavior(FadeOut, {duration: 0.2});
+            e.decoy = undefined;
+          }})
+        }});
+      },
+      check: function (t) {
         if (!t.player.hasDecoy) {
-          t.player.hasDecoy = t.player.addBehavior(Periodic, {time: 4, period: 5, callback: function () {
-            this.entity.decoy = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.viper));
-            this.entity.decoy.angle = this.entity.angle;
-            gameWorld.playSound(Resources.decoy);
-            var t = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y, Resources.expire_font, "decoy!", {spacing: -2, align: "center"}));
-            t.addBehavior(Velocity);
-            t.velocity = {x: 0, y: 10, angle: -PI };
-            t.addBehavior(FadeOut, {delay: 0.2, duration: 0.2});
-            var e = this.entity;
-            this.entity.decoy.addBehavior(Delay, {duration: 1.5, callback: function () {
-              this.entity.addBehavior(FadeOut, {duration: 0.2});
-              e.decoy = undefined;
-            }})
-          }});
           return true;          
         } else {
           return false;
@@ -1098,7 +1109,8 @@ var Store = {
       }
     },
     {
-      name: "Bomb", price: 3, icon: 4, trigger: function (t) {
+      name: "Bomb", price: 3, icon: 4, 
+      trigger: function (t) {
         var enemies = gameWorld.scene.bg.entities.filter(function (e) { return e.family === "enemy"; });
         for (var i = 0; i < enemies.length; i++) {
           if (enemies[i].projectile) {
@@ -1109,13 +1121,18 @@ var Store = {
             console.log(enemies[i].x, enemies[i].y, "isn't projectile or something dieable")
           }
         }
+      },
+      check: function (t) {
         return true;
       }
     },
     {
-      name: "Visa", price: 8, icon: 5, trigger: function (t) {
+      name: "Visa", price: 8, icon: 5, 
+      trigger: function (t) {
+        t.player.hasFTL = true;
+      },
+      check: function (t) {
         if (!t.player.hasFTL) {
-          t.player.hasFTL = true;
           return true;
         } else {
           return false;
@@ -1158,6 +1175,7 @@ var Store = {
     //this.weapons = {};
     this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 4 + 24, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
     
+    var t = this;
     for (var i = 0; i < this.buttons.length; i++) {
       // probably need closure here
       (function () {
@@ -1169,13 +1187,18 @@ var Store = {
         button.color = "white";
         button.family = "button";
         button.price = t.buttons[j].price;
+        button.check = t.buttons[j].check;
         button.hover = function () {
-          var color = (t.player.salvage - t.spent >= this.price) ? "#6DC72E" : "#dddddd";
           // check if you can afford it here, change color accordingly
-            if (this.color != color) {
-              gameWorld.playSound(Resources.hover);
+          var color = "#dddddd"; 
+          if (t.player.salvage - t.spent < this.price);
+          else if (!this.check(t));
+          else
+            color = "#6DC72E";
+          if (this.color != color) {
+            gameWorld.playSound(Resources.hover);
             this.color = color;
-            }
+          }
         }
         button.unhover = function () {
           this.color = "white";
@@ -1187,7 +1210,8 @@ var Store = {
           if (!t.opened) return;
           if (t.player.salvage - t.spent >= this.price)
           {
-            if (t.buttons[j].trigger(t)) {
+            if (t.buttons[j].check(t)) {
+              t.buttons[j].trigger(t);
               t.spent += this.price;
               t.salvage.text = "$" + (t.player.salvage - t.spent);
               gameWorld.playSound(Resources.select);
@@ -1236,9 +1260,5 @@ var Store = {
       t.layer.active = false;
     }
     gameWorld.boss.boss.delay = 0;
-    /*for (var i = 0; i < gameWorld.scene.layers.length; i++) {
-      gameWorld.scene.layers[i].paused = false;
-    }*/
-    //gameWorld.boss.animation = 0;  
   }
 }

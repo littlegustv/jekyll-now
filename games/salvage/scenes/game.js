@@ -365,7 +365,7 @@ var onStart = function () {
     e.x = e.touch.x, e.y = e.touch.y;
     move(e);
   };
-
+/*
   this.onKeyDown = function (e) {
     if (t.player.stopped()) {      
       switch (e.keyCode) {
@@ -383,9 +383,9 @@ var onStart = function () {
           break;
       }
     }
-  }
+  }*/
 
-  this.onKeyUp = function (e) {
+  this.onKeyDown = function (e) {
     if (t.player.stopped()) {      
       switch (e.keyCode) {
         case 39:
