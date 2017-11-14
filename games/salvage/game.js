@@ -1067,7 +1067,7 @@ var Store = {
       name: "Speed", price: 3, icon: 2, trigger: function (t) {
         if (t.player.speed < 8) {
           t.player.speed = 8;
-          this.trigger = function () {};
+          //this.trigger = function () {};
           return true;          
         } else {
           return false;
@@ -1208,20 +1208,15 @@ var Store = {
   },
   open: function () {
     this.player.locked = true;
-    this.opened = true;
     this.salvage.text = "$ " + this.player.salvage;
     
     for (var i = 0; i < this.layer.entities.length; i++) {
       this.layer.entities[i].lerp.goal = this.layer.entities[i].goal;
-    }
-    var t = this;
+    }    var t = this;
     gameWorld.boss.store_open.alive = false;
     gameWorld.boss.store_open = undefined;    
     this.layer.entities[0].lerp.callback = function () {
-      /*for (var i = 0; i < gameWorld.scene.layers.length; i++) {
-        gameWorld.scene.layers[i].paused = true;
-        t.layer.paused = false;
-      }*/ 
+      t.opened = true;
     }
     this.layer.active = true;
     for (var i = 0; i < gameWorld.scene.layers.length; i++) {

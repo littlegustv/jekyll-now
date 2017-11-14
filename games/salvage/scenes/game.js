@@ -199,6 +199,7 @@ var onStart = function () {
   
   this.store_layer = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
   this.store_layer.active = false;
+  console.log(player.speed);
   var store = Object.create(Store).init(this.store_layer, player);
   this.store = store;
 
@@ -456,6 +457,9 @@ var onStart = function () {
   boss.weapons = ["standard", "triple", "burst", "homing", "hitscan", "firework"];
   boss.respond = function (target) {
     if (this.health >= this.maxhealth) {}
+    if (this.store_open) {
+      this.store_open.alive = false;
+    }
     else if (this.health >= this.maxhealth - 1) { // warning shot (DONE)
       this.shoot = Weapons.standard;
       var theta = angle(this.x, this.y, target.x, target.y), d = distance(this.x, this.y, target.x, target.y);      
@@ -507,13 +511,13 @@ var onStart = function () {
         s.player.removeBehavior((s.player.lerpy));
         s.player.angle = 0;
         s.player.move(s);
-        if (p.x > b.x) {
+        if (other.x > object.x) {
           s.player.lerpx.goal = MIN.x + 2 * TILESIZE;
           s.player.lerpy.goal = p.y;
-        } else if (p.y > b.y) {
+        } else if (other.y > object.y) {
           s.player.lerpy.goal = b.y + 2 * TILESIZE;
           s.player.lerpx.goal = p.x;
-        } else if (p.y < b.y) {
+        } else if (other.y < object.y) {
           s.player.lerpy.goal = b.y - 2 * TILESIZE;
           s.player.lerpx.goal = p.x;
         }
