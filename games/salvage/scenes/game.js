@@ -32,16 +32,16 @@ var onStart = function () {
   ceiling.solid = true;
   ceiling.setCollision(Polygon);
 
-  var right = bg.add(Object.create(TiledBackground).init(WIDTH, MIN.y + (MAX.y - MIN.y) / 2 - 4, (MAX.y - MIN.y) + 22, 8, Resources.ground));
-  right.angle = -PI / 2;
+  var right = bg.add(Object.create(TiledBackground).init(WIDTH + 12, MIN.y + (MAX.y - MIN.y) / 2 - 4, 32, (MAX.y - MIN.y) + 22, Resources.building));
+  //right.angle = -PI / 2;
   right.z = -6;
   right.solid = true;
   right.setCollision(Polygon);
 
-  var left = bg.add(Object.create(TiledBackground).init(0, MIN.y + (MAX.y - MIN.y) / 2 - 4, (MAX.y - MIN.y) + 22, 8, Resources.ground));
+  var left = bg.add(Object.create(TiledBackground).init(-12, MIN.y + (MAX.y - MIN.y) / 2 - 4, 32, (MAX.y - MIN.y) + 22, Resources.building));
   left.z = -6;
   left.solid = true;
-  left.angle = PI / 2;
+  //left.angle = PI / 2;
   left.setCollision(Polygon);
   
   var gate = bg.add(Object.create(Sprite).init(gameWorld.width / 2, MIN.y - 14, Resources.gate));
