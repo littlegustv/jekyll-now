@@ -2,6 +2,7 @@ var onStart =  function () {
   //Resources.music = Resources.menu;
   var player;
   var s = this;
+  var start = undefined;
 
   this.step = 0;
   this.steps = [
@@ -72,13 +73,16 @@ var onStart =  function () {
       var b = s.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "start game!", {spacing: -3, align: "center"}));
       var button = s.fg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, 16));
       button.family = "button";
-      button.opacity = 0;
+      button.color = "#6DC72E";
+      button.z = 1;
+      b.z = 2;
       button.text = b;
       button.hover = function () { this.text.scale = 1.1;};
       button.unhover = function () { this.text.scale = 1; };
       button.trigger = function () {
         gameWorld.setScene(1, true);
       };
+      start = button;
     }]
   ];
   this.condition = function () { return true; };
@@ -176,6 +180,7 @@ var onStart =  function () {
   button.trigger = function () {
     gameWorld.setScene(0, true);
   };
+  var menu_button = button;
 
   this.onMouseDown = down;
   this.onMouseMove = move;
@@ -189,6 +194,36 @@ var onStart =  function () {
     e.y = e.touch.y;
     down(e);
   }
+  this.onKeyDown = function (e) {
+    if ([37,38,39,40].indexOf(e.keyCode) !== -1 && s.player.stopped()) {
+      switch (e.keyCode) {
+        case 39:
+          s.player.angle = 0;
+          break;
+        case 40:
+          s.player.angle = PI / 2;
+          break;
+        case 37:
+          s.player.angle = PI;
+          break;
+        case 38:
+          s.player.angle = 3 * PI / 2;
+          break;
+      }
+      s.player.move(s);
+    }
+    switch (e.keyCode) {
+      case 13:
+        if (start) {
+          start.trigger();
+        }
+        break;
+      case 27:
+        menu_button.trigger();
+        break;
+    }
+  }
+
 
   this.pause();
 };

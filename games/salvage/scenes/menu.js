@@ -63,18 +63,10 @@ var onStart =  function () {
     ["mute", function () {
       if (!gameWorld.muted) {
         this.text.opacity = 0.5;
-        localStorage.salvageMuted = true;
-        gameWorld.muted = true;
-        window.muted = true;
-        if (gameWorld.audioContext && gameWorld.audioContext.suspend)
-          gameWorld.audioContext.suspend();
+        gameWorld.mute();
       } else {
         this.text.opacity = 1;
-        localStorage.salvageMuted = false;
-        gameWorld.muted = false;
-        window.muted = false;
-        if (gameWorld.audioContext && gameWorld.audioContext.resume)
-          gameWorld.audioContext.resume(); 
+        gameWorld.unmute();
       }
     }],
     ["credits", function () {
@@ -84,31 +76,54 @@ var onStart =  function () {
       //gameWorld.setScene(5, true);
     }]
   ];
+  var button_objects = [];
+  var selected = 0;
   var mute_button_text;
   for (var i = 0; i < buttons.length; i++) {
     var b = this.bg.add(Object.create(SpriteFont).init(8, gameWorld.height / 4 + i * 16, Resources.expire_font, buttons[i][0], {spacing: -2, align: "left"}));
     var button = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 4 + i * 16, gameWorld.width, 16));
     button.family = "button";
+    b.z = 2;
+    button.z = 1;
     //b.blend = "destination-out";
     button.opacity = 0;
     button.text = b;
     if (buttons[i][0] === "mute") { mute_button_text = b; }
-    button.hover = function () { this.text.scale = 2;};
-    button.unhover = function () { this.text.scale = 1; };
+    button.hover = function () {
+      if (this.color != "#6DC72E") gameWorld.playSound(Resources.hover);
+      this.color = "#6DC72E";
+      this.opacity = 1;
+    };
+    button.unhover = function () {
+      this.color = "white";
+      this.opacity = 0;
+    };
+
     button.trigger = buttons[i][1];
+    button_objects.push(button);
   }
   if (gameWorld.saved) {
     var b = this.bg.add(Object.create(SpriteFont).init(8, gameWorld.height / 4 - 16, Resources.expire_font, "resume", {spacing: -2, align: "left"}));
     var button = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 4 - 16, gameWorld.width, 16));
     button.family = "button";
+    b.z = 2;
+    button.z = 1;
     //b.blend = "destination-out";
     button.opacity = 0;
     button.text = b;
-    button.hover = function () { this.text.scale = 2;};
-    button.unhover = function () { this.text.scale = 1; };
+    button.hover = function () {
+      if (this.color != "#6DC72E") gameWorld.playSound(Resources.hover);
+      this.color = "#6DC72E";
+      this.opacity = 1;
+    };
+    button.unhover = function () {
+      this.color = "white";
+      this.opacity = 0;
+    };
     button.trigger = function () {
       gameWorld.setScene(1, false);
     };
+    button_objects.unshift(button);
   }
 
 
@@ -146,6 +161,26 @@ var onStart =  function () {
     this.tertiaries.forEach(function (e) { e.color = COLORS.tertiary; });
   };
 
+  var up = function () {
+    selected = modulo(selected - 1, button_objects.length);
+    for (var i = 0; i < button_objects.length; i++) {
+      button_objects[i].unhover();
+    }
+    button_objects[selected].hover();
+  };
+
+  var down = function () {
+    selected = modulo(selected + 1, button_objects.length);
+    for (var i = 0; i < button_objects.length; i++) {
+      button_objects[i].unhover();
+    }
+    button_objects[selected].hover();
+  };
+
+  var go = function () {
+    button_objects[selected].trigger();
+  };
+
   this.onClick = function (e) {
     var b = s.bg.onButton(e.x, e.y);
     if (b) {
@@ -159,13 +194,19 @@ var onStart =  function () {
       if (b == buttons[i]) b.hover();
       else buttons[i].unhover();
     }
-  }
+  };
+  this.onTouchStart = function (e) {
+    if (fullscreen) {
+      e.x = e.touch.x; e.y = e.touch.y;
+      this.onMouseMove(e);      
+    }
+  };
   this.onTouchMove = function (e) {
     if (fullscreen) {
       e.x = e.touch.x; e.y = e.touch.y;
       this.onMouseMove(e);      
     }
-  }
+  };
   this.onTouchEnd = function (e) {
     if (!fullscreen) {
       requestFullScreen();
@@ -173,12 +214,28 @@ var onStart =  function () {
     } else {
       e.x = e.touch.x; e.y = e.touch.y;
       var b = s.bg.onButton(e.x, e.y);
-      console.log(e, b);
       if (b) {
         b.trigger();
       }
     }
+  };
+  this.onKeyDown = function (e) {
+    switch (e.keyCode) {
+      case 38:
+        up();
+        break;
+      case 40:
+        down();
+        break;
+      case 13:
+        go();
+        break;
+    }
+  };
+  for (var i = 0; i < button_objects.length; i++) {
+    button_objects[i].unhover();
   }
+  button_objects[selected].hover();
 }
 
 var onUpdate = function () {

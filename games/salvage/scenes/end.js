@@ -111,6 +111,10 @@ var onStart =  function () {
       }
     }
   };
+
+  this.onKeyDown = function (e) {
+    gameWorld.setScene(0, true);
+  };
 };
 
 var onUpdate = function () {

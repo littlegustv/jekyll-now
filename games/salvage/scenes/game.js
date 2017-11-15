@@ -102,9 +102,17 @@ var onStart = function () {
   var mute_button = this.ui.add(Object.create(Entity).init(gameWorld.width - 16, 12, 32, 16));
   mute_button.family = "button";
   mute_button.opacity = 0;
+  if (gameWorld.muted) {
+    mute_text.opacity = 0.5;
+  }
   mute_button.trigger = function () {
-      gameWorld.playSound(Resources.select);
-    // mute!
+    if (gameWorld.muted) {
+      mute_text.opacity = 1;
+      gameWorld.unmute();
+    } else {
+      mute_text.opacity = 0.5;
+      gameWorld.mute();
+    }
   };
   mute_button.hover = function () {
     if (mute_text.scale != 1.2) gameWorld.playSound(Resources.hover);
@@ -354,6 +362,9 @@ var onStart = function () {
   this.onTouchStart = function (e) {
     if (!fullscreen) {
       requestFullScreen();
+    } else {
+      e.x = e.touch.x, e.y = e.touch.y;
+      move(e);  
     }
   }
   
@@ -365,28 +376,21 @@ var onStart = function () {
     e.x = e.touch.x, e.y = e.touch.y;
     move(e);
   };
-/*
-  this.onKeyDown = function (e) {
-    if (t.player.stopped()) {      
-      switch (e.keyCode) {
-        case 39:
-          t.player.angle = 0;
-          break;
-        case 40:
-          t.player.angle = PI / 2;
-          break;
-        case 37:
-          t.player.angle = PI;
-          break;
-        case 38:
-          t.player.angle = 3 * PI / 2;
-          break;
-      }
-    }
-  }*/
 
   this.onKeyDown = function (e) {
-    if (t.player.stopped()) {      
+    if (t.store.opened) {
+      switch (e.keyCode) {
+        case 13:
+          t.store.go();
+          break;
+        case 40:
+          t.store.up();
+          break;
+        case 38:
+          t.store.down();
+          break;
+      }
+    } else if (t.player.stopped()) {      
       switch (e.keyCode) {
         case 39:
           t.player.angle = 0;
@@ -399,6 +403,12 @@ var onStart = function () {
           break;
         case 38:
           t.player.angle = 3 * PI / 2;
+          break;
+        case 27:          
+          menu_button.trigger();
+          break;
+        case 77:
+          mute_button.trigger();
           break;
       }
       if ([37,38,39,40].indexOf(e.keyCode) !== -1) {

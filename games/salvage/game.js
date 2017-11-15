@@ -6,6 +6,27 @@ var gameWorld = Object.create(World).init(180, 320, "index.json");
 gameWorld.wave = 1;
 gameWorld.distance = 100;
 gameWorld.ending = 0;
+gameWorld.unmute = function () {
+  if (localStorage) {
+    localStorage.salvageMuted = false;
+  }
+  if (this.audioContext && this.audioContext.resume) {
+    this.audioContext.resume(); 
+  }
+  this.muted = false;
+  window.muted = false;
+  this.playSound(Resources.select);  
+}
+gameWorld.mute = function () {
+  if (localStorage) {
+    localStorage.salvageMuted = true;    
+  }
+  if (this.audioContext && this.audioContext.suspend) {
+    this.audioContext.suspend();
+  }
+  this.muted = true;
+  window.muted = true;
+}
 
 var ENDINGS = [
 	"Workplace Accident",
@@ -1174,16 +1195,17 @@ var Store = {
     };
     //this.weapons = {};
     this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 4 + 24, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
-    
+    this.button_objects = [];
+
     var t = this;
     for (var i = 0; i < this.buttons.length; i++) {
       // probably need closure here
       (function () {
         var j = i;
         var button = t.layer.add(Object.create(Entity).init(gameWorld.width  / 2, t.salvage.y + 16 * (1 + i), gameWorld.width / 2 + 24, 16));
-        var icon = t.layer.add(Object.create(Sprite).init(gameWorld.width / 4, t.salvage.y + 16 * (i + 1), Resources.icons));
-        var name = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, t.salvage.y + 16 * (i + 1), Resources.expire_font, t.buttons[i].name, {spacing: -2, align: "center"}));
-        var price = t.layer.add(Object.create(SpriteFont).init(3 * gameWorld.width / 4 + 8, t.salvage.y + 16 * (i + 1), Resources.expire_font, "$" + t.buttons[i].price, {spacing: -2, align: "right"}));
+        button.icon = t.layer.add(Object.create(Sprite).init(gameWorld.width / 4, t.salvage.y + 16 * (i + 1), Resources.icons));
+        button.name_text = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, t.salvage.y + 16 * (i + 1), Resources.expire_font, t.buttons[i].name, {spacing: -2, align: "center"}));
+        button.price_text = t.layer.add(Object.create(SpriteFont).init(3 * gameWorld.width / 4 + 8, t.salvage.y + 16 * (i + 1), Resources.expire_font, "$" + t.buttons[i].price, {spacing: -2, align: "right"}));
         button.color = "white";
         button.family = "button";
         button.price = t.buttons[j].price;
@@ -1203,8 +1225,8 @@ var Store = {
         button.unhover = function () {
           this.color = "white";
         }
-        button.z = -2, icon.z = -1, name.z = -1;
-        icon.animation = t.buttons[i].icon;
+        button.z = -2, button.icon.z = -1, button.name_text.z = -1, button.price_text.z = -1;
+        button.icon.animation = t.buttons[i].icon;
         button.trigger = function () {
           // check price HERE
           if (!t.opened) return;
@@ -1218,8 +1240,10 @@ var Store = {
             }
           }
         }
+        t.button_objects.push(button);
       })();
     }
+    this.button_objects.push(close);
     // allow for rotate transition
     for (var i = 0; i < this.layer.entities.length; i++) {
       this.layer.entities[i].origin = {x: 0, y: 240};
@@ -1230,8 +1254,35 @@ var Store = {
     }
     
   },
+  up: function () {
+    this.selected = modulo(this.selected + 1, this.button_objects.length);
+    for (var i = 0; i < this.button_objects.length; i++) {
+      this.button_objects[i].unhover();
+    }
+    this.button_objects[this.selected].hover();
+  },
+  down: function () {
+    this.selected = modulo(this.selected - 1, this.button_objects.length);
+    for (var i = 0; i < this.button_objects.length; i++) {
+      this.button_objects[i].unhover();
+    }
+    this.button_objects[this.selected].hover();
+  },
+  go: function () {
+    this.button_objects[this.selected].trigger();
+    for (var i = 0; i < this.button_objects.length; i++) {
+      this.button_objects[i].unhover();
+    }
+    this.button_objects[this.selected].hover();
+  },
   open: function () {
     this.player.locked = true;
+    this.selected = 0;
+    for (var i = 0; i < this.button_objects.length; i++) {
+      this.button_objects[i].unhover();
+    }
+    this.button_objects[this.selected].hover();
+
     this.salvage.text = "$ " + this.player.salvage;
     
     for (var i = 0; i < this.layer.entities.length; i++) {
