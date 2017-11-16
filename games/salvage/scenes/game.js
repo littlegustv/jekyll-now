@@ -62,9 +62,7 @@ var onStart = function () {
     h.strokeColor = "#DD0000";
     this.health_bar.push(h);
   }
-  this.shield = bg.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 8, Resources.icons));
-  this.shield.animation = 1;
-  this.shield.scale = 1.5;
+  this.shield = bg.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 8, Resources.shield));
   this.shield.addBehavior(Follow, {target: player, offset: {x: 0, y: 0, z: -1, angle: false, opacity: false}});
   
   var s = this;
@@ -327,7 +325,7 @@ var onStart = function () {
       return;
     } else if (s.player.stopped()) {
       s.player.angle = Math.round(angle(s.player.x - s.bg.camera.x, s.player.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
-      s.player.move(s)
+      s.player.move(s);
     }
   }
   var move = function (e) {
