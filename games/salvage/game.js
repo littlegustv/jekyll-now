@@ -2,7 +2,7 @@
 // canvas filter (color style); grayscale(70%) contrast(250%) brightness(90%);
 
 var MAXHEALTH = 4, DAMAGE_COOLDOWN = 0.5;
-var gameWorld = Object.create(World).init(180, 320, "index.json");
+var gameWorld = Object.create(World).init(320, 180, "index.json");
 gameWorld.wave = 1;
 gameWorld.distance = 100;
 gameWorld.ending = 0;
@@ -36,17 +36,17 @@ var ENDINGS = [
 	"Insurrection"
 ];
 
-var WIDTH = 180;
-var HEIGHT = 320;
-var MIN = {x: 10, y: 44};
-var MAX = {x: WIDTH - 10, y: HEIGHT - 20};
+var WIDTH = 320;
+var HEIGHT = 180;
 var TILESIZE = 32;
+var MIN = {x: 52, y: 10};
+var MAX = {x: MIN.x + TILESIZE * 8, y: HEIGHT - 10};
 
 var COLORS = {
   negative: "#000000",
   nullary: "#FFFFFF",
   primary: "#00bfff",//"#AA0000",
-  secondary: "#000000",
+  button: "#00bfff",
   tertiary: "#000000"
 };
 
@@ -119,6 +119,7 @@ Move.update = function (dt) {
     this.move(dt);
     if (this.check()) {
       this.goal = undefined;
+      this.entity.velocity = {x: 0, y: 0};
       if (this.callback) {
         this.delay = this.callback();
       } else {
@@ -170,7 +171,7 @@ Boss.move = function (dt) {
   }*/
 };
 Boss.beam = function () {
-  var beam = this.entity.layer.add(Object.create(Circle).init(MIN.x, this.entity.y, gameWorld.height / 2));
+  var beam = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y, HEIGHT));
   beam.color = "white";
   beam.addBehavior(Behavior, {update: function (dt) {
     this.entity.radius -= 0.25 * dt * gameWorld.height;
@@ -195,11 +196,11 @@ Boss.beam = function () {
   }});
 };
 Boss.pay = function () {
-  var cash = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 32, this.entity.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
+  var cash = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
   cash.addBehavior(Velocity);
   cash.family = "neutral";
   //cash.blend = "destination-out";
-  cash.velocity = {x: 0, y: 20};
+  cash.velocity = {x: 0, y: -20};
   cash.setCollision(Polygon);
   cash.setVertices([
     {x: -20, y: -5},
@@ -207,7 +208,7 @@ Boss.pay = function () {
     {x: 20, y: 5},
     {x: 20, y: -5}
   ]);
-  cash.addBehavior(Lerp, {object: cash, field: "x", goal: WIDTH / 2, rate: 1});
+  //cash.addBehavior(Lerp, {object: cash, field: "x", goal: WIDTH / 2, rate: 1});
   cash.collision.onHandle = function (object, other) {
     if (other == gameWorld.player) {
       object.alive = false;
@@ -229,11 +230,11 @@ Boss.pay = function () {
 Boss.storetime = function () {
   this.entity.velocity.y = 0;
   gameWorld.playSound(Resources.store);
-  this.entity.store_open = this.entity.layer.add(Object.create(Entity).init(this.entity.x + 32, this.entity.y, 16, 16));
+  this.entity.store_open = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y - TILESIZE, 16, 16));
 
   this.entity.store_open.opacity = 0;
   this.entity.store_open.setCollision(Polygon);
-  this.entity.store_offset = this.entity.store_open.addBehavior(Follow, {target: this.entity, offset: {x: 24, y: 0, angle: false, z: 1}}).offset;
+  this.entity.store_offset = this.entity.store_open.addBehavior(Follow, {target: this.entity, offset: {x: 0, y: -TILESIZE, angle: false, z: 1}}).offset;
 
   var t1 = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 24, this.entity.y - 6, Resources.expire_font, "store", {spacing: -3, align: "center"}));
   var t2 = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 24, this.entity.y + 6, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
@@ -267,7 +268,7 @@ Boss.pick = function () {
     } else {
       this.callback = this.beam;
     }
-    return toGrid(this.entity.x, this.entity.queue.pop());
+    return f(this.entity.x, this.entity.queue.pop());
   } else {
     return toGrid(this.entity.x, this.entity.y > HEIGHT / 2 ? toGrid(0, 0).y : toGrid(0, HEIGHT).y);
   }*/
@@ -279,7 +280,9 @@ Approach.pick = function () {
 
   var g = toGrid(this.entity.x + sign(this.target.x - this.entity.x) * TILESIZE, this.entity.y); // horiztonal
   var p = toGrid(this.target.x, this.target.y);
-  if (g.x !== p.x || g.y !== p.y) return g;
+  var b = toGrid(gameWorld.boss.x, gameWorld.boss.y);
+  if (g.x === b.x && g.y === b.y) return toGrid(this.entity.x, this.entity.y - TILESIZE);
+  else if (g.x !== p.x || g.y !== p.y) return g;
   else return toGrid(this.entity.x, this.entity.y + sign(this.target.y - this.entity.y) * TILESIZE);
 };
 
@@ -307,8 +310,8 @@ Horizontal.move = function (dt) {
   this.entity.velocity = {x: sign(this.goal.x - this.entity.x) * this.speed , y: 0 };    
 };
 Horizontal.pick = function () {
-  if (this.entity.x > WIDTH / 2) return toGrid(0, this.entity.y);
-  else return toGrid(WIDTH, this.entity.y);
+  if (this.entity.x > (this.min + this.max) / 2) return toGrid(this.min, this.entity.y);
+  else return toGrid(this.max, this.entity.y);
 };
 
 // something more aggressive? long delay, charges towards you?
@@ -910,12 +913,20 @@ function spawn(layer, key, player) {
       break;
     case 1: // armored train
       enemy.shoot = Weapons.triple;
-      enemy.addBehavior(Horizontal, {duration: 0.5, speed: 24, target: player}); // hmmm!
+      c.x = toGrid(choose([-1, 1]) * TILESIZE + b.x, 0).x;
+      if (c.x > b.x) {
+        var min = c.x, max = toGrid(MAX.x, 0).x;
+      } else {
+        var min = toGrid(0, 0).x, max = c.x;
+      }
+      enemy.x = c.x;
+      enemy.addBehavior(Horizontal, {duration: 0.5, speed: 24, target: player, min: min, max: max}); // hmmm!
       enemy.target = player;
       enemy.y = toGrid(100, 1000).y + 4;
       enemy.setVertices([
         {x: -3, y: -3}, {x: -3, y: 3}, {x: 3, y: 3}, {x: 3, y: -3}
-      ]);     
+      ]);
+      debug = enemy;
       break;
     case 2: // turret
       enemy.shoot = Weapons.burst;
@@ -927,7 +938,7 @@ function spawn(layer, key, player) {
       ]);     
       break;
     case 3: // bomber
-      enemy.addBehavior(Horizontal, {duration: 0.2, speed: 64, target: player});
+      enemy.addBehavior(Horizontal, {duration: 0.2, speed: 64, target: player, min: MIN.x, max: MAX.x});
       enemy.setVertices([
         {x: -5, y: -3}, {x: -5, y: 3}, {x: 5, y: 3}, {x: 5, y: -3}
       ]);
@@ -1163,7 +1174,7 @@ var Store = {
   ],
   createUI: function () {
 
-    var border = this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 128, gameWorld.height / 2, Resources.building));
+    var border = this.layer.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height / 2, 128, 8 * 16 + 24, Resources.building));
     border.z = -10;
     var b1 = this.layer.add(Object.create(Entity).init(border.x, border.y + 1, border.w - 8, border.h - 16));
     b1.color = "#000";
@@ -1174,9 +1185,9 @@ var Store = {
 
     var t = this;
     
-    var close = this.layer.add(Object.create(Entity).init(gameWorld.width / 2, 3 * gameWorld.height / 4 - 24, gameWorld.width / 2 + 24, 16));
+    var close = this.layer.add(Object.create(Entity).init(gameWorld.width / 2, border.y + border.h / 2 - 16, border.w - 18, 12));
     close.z = -7;
-    this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, 3 * gameWorld.height / 4 - 24, Resources.expire_font, "DONE", {align: "center", spacing: -2})).z = -6;
+    this.layer.add(Object.create(SpriteFont).init(close.x, close.y, Resources.expire_font, "DONE", {align: "center", spacing: -2})).z = -6;
     close.family = "button";
     close.color = "white";
     close.trigger = function () {
@@ -1187,14 +1198,14 @@ var Store = {
       t.close();
     };
     close.hover = function () {
-      if (this.color != "#6DC72E") gameWorld.playSound(Resources.hover);
-      this.color = "#6DC72E";
+      if (this.color != COLORS.button) gameWorld.playSound(Resources.hover);
+      this.color = COLORS.button;
     };
     close.unhover = function () {
       this.color = "white";
     };
     //this.weapons = {};
-    this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 4 + 24, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
+    this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, border.y - border.h / 2 + 24, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
     this.button_objects = [];
 
     var t = this;
@@ -1202,10 +1213,10 @@ var Store = {
       // probably need closure here
       (function () {
         var j = i;
-        var button = t.layer.add(Object.create(Entity).init(gameWorld.width  / 2, t.salvage.y + 16 * (1 + i), gameWorld.width / 2 + 24, 16));
-        button.icon = t.layer.add(Object.create(Sprite).init(gameWorld.width / 4, t.salvage.y + 16 * (i + 1), Resources.icons));
+        var button = t.layer.add(Object.create(Entity).init(gameWorld.width  / 2, t.salvage.y + 16 * (1 + i), border.w - 18, 16));
+        button.icon = t.layer.add(Object.create(Sprite).init(gameWorld.width / 2 - (border.w / 2 - 16), t.salvage.y + 16 * (i + 1), Resources.icons));
         button.name_text = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, t.salvage.y + 16 * (i + 1), Resources.expire_font, t.buttons[i].name, {spacing: -2, align: "center"}));
-        button.price_text = t.layer.add(Object.create(SpriteFont).init(3 * gameWorld.width / 4 + 8, t.salvage.y + 16 * (i + 1), Resources.expire_font, "$" + t.buttons[i].price, {spacing: -2, align: "right"}));
+        button.price_text = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + (border.w / 2 - 8), t.salvage.y + 16 * (i + 1), Resources.expire_font, "$" + t.buttons[i].price, {spacing: -2, align: "right"}));
         button.color = "white";
         button.family = "button";
         button.price = t.buttons[j].price;
@@ -1216,7 +1227,7 @@ var Store = {
           if (t.player.salvage - t.spent < this.price);
           else if (!this.check(t));
           else
-            color = "#6DC72E";
+            color = COLORS.button;
           if (this.color != color) {
             gameWorld.playSound(Resources.hover);
             this.color = color;

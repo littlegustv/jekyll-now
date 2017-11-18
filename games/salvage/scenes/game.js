@@ -38,11 +38,14 @@ var onStart = function () {
   right.solid = true;
   right.setCollision(Polygon);
 
-  var left = bg.add(Object.create(TiledBackground).init(-12, MIN.y + (MAX.y - MIN.y) / 2 - 4, 32, (MAX.y - MIN.y) + 22, Resources.building));
+  var left = bg.add(Object.create(TiledBackground).init(MIN.x - 22, MIN.y + (MAX.y - MIN.y) / 2 - 4, 32, (MAX.y - MIN.y) + 22, Resources.building));
   left.z = -6;
   left.solid = true;
   //left.angle = PI / 2;
   left.setCollision(Polygon);
+  var leftcover = bg.add(Object.create(Entity).init(MIN.x - 34, HEIGHT / 2, 48, HEIGHT));
+  leftcover.color = "black";
+  leftcover.z = -5;
   
   var gate = bg.add(Object.create(Sprite).init(gameWorld.width / 2, MIN.y - 14, Resources.gate));
   gate.setCollision(Polygon);
@@ -96,8 +99,8 @@ var onStart = function () {
     menu_text.scale = 1;
   };
   
-  var mute_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width - 16, 12, Resources.expire_font, "mute", {align: "center", spacing: -3}));
-  var mute_button = this.ui.add(Object.create(Entity).init(gameWorld.width - 16, 12, 32, 16));
+  var mute_text = this.ui.add(Object.create(SpriteFont).init(24, 24, Resources.expire_font, "mute", {align: "center", spacing: -3}));
+  var mute_button = this.ui.add(Object.create(Entity).init(24, 24, 32, 16));
   mute_button.family = "button";
   mute_button.opacity = 0;
   if (gameWorld.muted) {
@@ -426,12 +429,12 @@ var onStart = function () {
   ];
 
   // this.waves = [[0], [], [], [], []];
-
-  var boss = this.bg.add(Object.create(Sprite).init(toGrid(0, 100).x, toGrid(0, gameWorld.height / 2).y, Resources.boss));
+  var boss_coordinates = toGrid((MIN.x + MAX.x) / 2, MAX.y);
+  var boss = this.bg.add(Object.create(Sprite).init(boss_coordinates.x, boss_coordinates.y, Resources.boss));
   boss.animation = 0;
-  boss.offset = {x: 6, y: 0};
+  boss.offset = {x: 0, y: -12};
   boss.modules = [];
-  boss.angle = PI / 2;
+  //boss.angle = PI / 2;
   boss.z = 24;
   boss.particles = boss.addBehavior(Periodic, {period: 0.1, rate: 0, callback: function () {
     if (Math.random() < this.rate) {

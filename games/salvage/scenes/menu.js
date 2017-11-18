@@ -93,8 +93,8 @@ var onStart =  function () {
     button.text = b;
     if (buttons[i][0] === "mute") { mute_button_text = b; }
     button.hover = function () {
-      if (this.color != "#6DC72E") gameWorld.playSound(Resources.hover);
-      this.color = "#6DC72E";
+      if (this.color != COLORS.button) gameWorld.playSound(Resources.hover);
+      this.color = COLORS.button;
       this.opacity = 1;
     };
     button.unhover = function () {
@@ -115,8 +115,8 @@ var onStart =  function () {
     button.opacity = 0;
     button.text = b;
     button.hover = function () {
-      if (this.color != "#6DC72E") gameWorld.playSound(Resources.hover);
-      this.color = "#6DC72E";
+      if (this.color != COLORS.button) gameWorld.playSound(Resources.hover);
+      this.color = COLORS.button;
       this.opacity = 1;
     };
     button.unhover = function () {
