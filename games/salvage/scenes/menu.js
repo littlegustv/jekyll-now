@@ -39,14 +39,17 @@ var onStart =  function () {
   back.z = 0;
   this.nullaries.push(back);
   
-  var grid = this.bg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
-  grid.z = 1;
+  //var grid = this.bg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
+  //grid.z = 1;
 
-  var title = this.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 6, gameWorld.height - 16, Resources.expire_font, "salvage", {spacing: -2, align: "center"}));
+  var title = this.bg.add(Object.create(SpriteFont).init(2 * gameWorld.width / 3 + 6, gameWorld.height - 16, Resources.expire_font, "bastille day", {spacing: -2, align: "center"}));
   //title.addBehavior(Oscillate, {field: "y", object: title, initial: gameWorld.height / 2, rate: 1, constant: 24});
   //title.blend = "destination-out";
-  title.scale = 3;
+  title.scale = 1;
   title.z = 10;
+
+  var boss = this.bg.add(Object.create(Sprite).init(gameWorld.width / 4, gameWorld.height - 28, Resources.boss));
+  boss.z = 10;
   
   var ground = this.bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4, gameWorld.width, 8, Resources.ground));
   //ground.blend = "destination-out";
