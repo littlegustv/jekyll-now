@@ -63,8 +63,8 @@ function toGrid(x, y) {
     y: clamp(Math.round((y - MIN.y) / TILESIZE) * TILESIZE + MIN.y, MIN.y, MAX.y)
   };
   if (gameWorld.player && gameWorld.player.hasFTL) {
-    if (g.x == MIN.x + TILESIZE * 2 || g.x == MIN.x + TILESIZE * 3) { // halfway point?
-      g.y = clamp(Math.round((y - MIN.y) / TILESIZE) * TILESIZE + MIN.y, MIN.y - 32, MAX.y);
+    if (g.y == MIN.y + TILESIZE * 2 || g.y == MIN.y + TILESIZE * 3) { // halfway point?
+      g.x = clamp(Math.round((x - MIN.x) / TILESIZE) * TILESIZE + MIN.x, MIN.x - 2 * TILESIZE, MAX.x);
     }
   }
   return g;
@@ -171,7 +171,7 @@ Boss.move = function (dt) {
   }*/
 };
 Boss.beam = function () {
-  var beam = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y, HEIGHT));
+  var beam = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y, WIDTH / 2 - 16));
   beam.color = "white";
   beam.addBehavior(Behavior, {update: function (dt) {
     this.entity.radius -= 0.25 * dt * gameWorld.height;

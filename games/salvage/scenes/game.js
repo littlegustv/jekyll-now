@@ -26,29 +26,44 @@ var onStart = function () {
   ground.solid = true;
   ground.setCollision(Polygon);
 
-  var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MIN.y - 14, WIDTH - 8, 8, Resources.ground));
+  var ceiling = bg.add(Object.create(TiledBackground).init((MIN.x + MAX.x) / 2, MIN.y - 12, WIDTH - 8, 8, Resources.wall));
   ceiling.z = -7;
   ceiling.angle = PI;
   ceiling.solid = true;
   ceiling.setCollision(Polygon);
 
-  var right = bg.add(Object.create(TiledBackground).init(WIDTH + 12, MIN.y + (MAX.y - MIN.y) / 2 - 4, 32, (MAX.y - MIN.y) + 22, Resources.building));
-  //right.angle = -PI / 2;
+  var right = bg.add(Object.create(TiledBackground).init(WIDTH, MIN.y + (MAX.y - MIN.y) / 2 - 4,  (MAX.y - MIN.y) + 22, 8, Resources.wall));
+  right.angle = -PI / 2;
   right.z = -6;
   right.solid = true;
   right.setCollision(Polygon);
 
-  var left = bg.add(Object.create(TiledBackground).init(MIN.x - 22, MIN.y + (MAX.y - MIN.y) / 2 - 4, 32, (MAX.y - MIN.y) + 22, Resources.building));
+  var l1 = bg.add(Object.create(Entity).init(MIN.x / 2 - 6, MIN.y + TILESIZE - 12, MIN.x, TILESIZE * 2));
+  l1.z = -6;
+
+  var l2 = bg.add(Object.create(Entity).init(MIN.x / 2 - 6, MAX.y - TILESIZE + 12, MIN.x, TILESIZE * 2));
+  l2.z = -6;
+
+  var wall1 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 6, MIN.y + 2 * TILESIZE - 12, MIN.x, 8, Resources.wall));
+  wall1.z = -5.5;
+  wall1.angle = PI;
+
+  var wall2 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 6, MAX.y - 2 * TILESIZE + 12, MIN.x, 8, Resources.wall));
+  wall2.z = -5.5;
+
+  var left = bg.add(Object.create(TiledBackground).init(MIN.x - 8, MIN.y + (MAX.y - MIN.y) / 2 - 4, (MAX.y - MIN.y) + 22, 8, Resources.wall));
   left.z = -6;
+  left.angle = PI / 2;
   left.solid = true;
   //left.angle = PI / 2;
   left.setCollision(Polygon);
-  var leftcover = bg.add(Object.create(Entity).init(MIN.x - 34, HEIGHT / 2, 48, HEIGHT));
-  leftcover.color = "black";
-  leftcover.z = -5;
+  //var leftcover = bg.add(Object.create(Entity).init(MIN.x - 34, HEIGHT / 2, 48, HEIGHT));
+  //leftcover.color = "black";
+  //leftcover.z = -5;
   
-  var gate = bg.add(Object.create(Sprite).init(gameWorld.width / 2, MIN.y - 14, Resources.gate));
+  var gate = bg.add(Object.create(Sprite).init(MIN.x - 12, (MIN.y + MAX.y) / 2, Resources.gate));
   gate.setCollision(Polygon);
+  gate.angle = PI / 2;
   gate.solid = true;
   gate.z = -5;
 
@@ -233,7 +248,7 @@ var onStart = function () {
         }
       }
       // at gate
-      if (coords.y === MIN.y && (coords.x == MIN.x + TILESIZE * 2 || coords.x == MIN.x + TILESIZE * 3)) {
+      if (coords.x === MIN.x && (coords.y == MIN.y + TILESIZE * 2 || coords.y == MIN.y + TILESIZE * 3)) {
         if (!player.hasFTL) {
           gate.animation = 0;
           gate.addBehavior(Delay, {duration: 1, callback: function () {
@@ -252,7 +267,7 @@ var onStart = function () {
         }
       } 
       // through gate
-      else if (coords.y < MIN.y) {
+      else if (coords.x <= MIN.x - 2 * TILESIZE) {
         if (gameWorld.boss.alive) {
           gameWorld.ending = 2;
         } else {
