@@ -7,7 +7,7 @@ var onStart = function () {
   var bg = this.addLayer(Object.create(Layer).init(1000,1000));
   bg.active = true;
 
-  var player_coordinates = toGrid(64, 160);
+  var player_coordinates = toGrid(MIN.x + 4 * TILESIZE, MIN.y + 2 * TILESIZE);
   var player = bg.add(Object.create(Sprite).init(player_coordinates.x, player_coordinates.y, Resources.viper));
 
   var b = bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
@@ -289,27 +289,11 @@ var onStart = function () {
         }
         projectiles = [];
         // open store every OTHer wave
-        if (gameWorld.wave % 2 === 0) {
-          //var theta = Math.random() * PI2;
-          //var g = toGrid(boss.x + 64 * Math.cos(theta), boss.y + 64 * Math.sin(theta));
-          
-        }
-        var announcement = t.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "wave " + gameWorld.wave, {spacing: -3, align: "center"}));
+        var announcement = t.bg.add(Object.create(SpriteFont).init(MIN.x + 4 * TILESIZE + 8, gameWorld.height / 2, Resources.expire_font, "wave " + gameWorld.wave, {spacing: -3, align: "center"}));
         announcement.opacity = 0;
         announcement.addBehavior(FadeIn, {duration: 0.3, delay: 0, maxOpacity: 1});
         announcement.addBehavior(FadeOut, {duration: 0.3, delay: 0.5, maxOpacity: 1});
         announcement.scale = 2;
-
-        if (gameWorld.boss.health >= gameWorld.boss.maxhealth && !gameWorld.boss.store_open) {
-          gameWorld.boss.queue.push(toGrid(0, gameWorld.height / 2).y);
-          gameWorld.boss.storeday = 1;
-        }
-
-        gameWorld.boss.queue.push(toGrid(0, 0).y);
-        gameWorld.boss.payday = 1;
-
-
-        //gameWorld.playSound(Resources.spawn);
 
         for (var i = 0; i < gameWorld.wave; i++) {
           var k = i % this.waves.length;
@@ -533,19 +517,19 @@ var onStart = function () {
         object.die();
       } else if (!other.projectile) {        
         var p = toGrid(other.x, other.y), b = toGrid(object.x, object.y);
-        s.player.removeBehavior((s.player.lerpx));
-        s.player.removeBehavior((s.player.lerpy));
+        //s.player.removeBehavior((s.player.lerpx));
+        //s.player.removeBehavior((s.player.lerpy));
         s.player.angle = 0;
-        s.player.move(s);
-        if (other.x > object.x) {
-          s.player.lerpx.goal = MIN.x + 2 * TILESIZE;
-          s.player.lerpy.goal = p.y;
-        } else if (other.y > object.y) {
-          s.player.lerpy.goal = b.y + 2 * TILESIZE;
-          s.player.lerpx.goal = p.x;
-        } else if (other.y < object.y) {
-          s.player.lerpy.goal = b.y - 2 * TILESIZE;
-          s.player.lerpx.goal = p.x;
+        //s.player.move(s);
+        if (other.y < object.y) {
+          s.player.lerpy.goal = MAX.y - 2 * TILESIZE;
+          //s.player.lerpx.goal = p.x;
+        } else if (other.x > object.x) {
+          s.player.lerpx.goal = b.x + 2 * TILESIZE;
+          //s.player.lerpy.goal = p.y;
+        } else if (other.x < object.x) {
+          s.player.lerpx.goal = b.x - 2 * TILESIZE;
+          //s.player.lerpy.goal = p.y;
         }
       }
     }

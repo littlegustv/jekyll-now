@@ -1825,7 +1825,7 @@ var World = {
       this.audioContext.gn = this.audioContext.createGain();
       var t = this;
       window.addEventListener("focus", function (e) {
-        if (t.audioContext.resume) t.audioContext.resume();
+        if (t.audioContext.resume && !this.muted) t.audioContext.resume(); // push to raindrop
         t.startTime = new Date();
         t.speed = 1;
       });

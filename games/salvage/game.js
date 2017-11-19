@@ -189,7 +189,7 @@ Boss.beam = function () {
   var t = this;
   this.entity.addBehavior(Delay, { duration: 2, callback: function () {
     t.pay();
-    if (gameWorld.wave % 2 === 0 && ! gameWorld.boss.store_open) {
+    if (gameWorld.wave % 2 === 1 && ! gameWorld.boss.store_open) {
       t.storetime();
     }
     this.entity.removeBehavior(this);
