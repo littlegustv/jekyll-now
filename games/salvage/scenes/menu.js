@@ -55,6 +55,14 @@ var onStart =  function () {
   //ground.blend = "destination-out";
   ground.z = 10;
 
+  var wall = this.bg.add(Object.create(TiledBackground).init(gameWorld.width * 3 / 4, gameWorld.height / 2, gameWorld.height, 8, Resources.wall));
+  wall.angle = PI / 2;
+  wall.z = 13;
+
+  var wall2 = this.bg.add(Object.create(TiledBackground).init(gameWorld.width * 3 / 4 - 8, gameWorld.height / 2, gameWorld.height, 8, Resources.wall));
+  wall2.angle = -PI / 2;
+  wall2.z = 13;
+
   var buttons = [
     ["new game", function () {
       gameWorld.wave = 1;
@@ -72,11 +80,8 @@ var onStart =  function () {
         gameWorld.unmute();
       }
     }],
-    ["credits", function () {
-      //gameWorld.setScene(4, true);
-    }],
-    ["achievements", function () {
-      //gameWorld.setScene(5, true);
+    ["@e1sif", function () {
+      window.open("https://twitter.com/e1sif", "_blank");
     }]
   ];
   var button_objects = [];

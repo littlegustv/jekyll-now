@@ -21,7 +21,7 @@ var onStart = function () {
   cover.z = -8;
   cover.color = "black";
 
-  var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MAX.y + 10, WIDTH, 12, Resources.ground));
+  var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MAX.y + 12, WIDTH + 6, 12, Resources.ground));
   ground.z = -7;
   ground.solid = true;
   ground.setCollision(Polygon);
@@ -38,21 +38,21 @@ var onStart = function () {
   right.solid = true;
   right.setCollision(Polygon);
 
-  var l1 = bg.add(Object.create(Entity).init(MIN.x / 2 - 6, MIN.y + TILESIZE - 12, MIN.x, TILESIZE * 2));
+  var l1 = bg.add(Object.create(Entity).init(MIN.x / 2 - 8, MIN.y + TILESIZE - 12, MIN.x, TILESIZE * 2));
   l1.z = -6;
 
-  var l2 = bg.add(Object.create(Entity).init(MIN.x / 2 - 6, MAX.y - TILESIZE + 12, MIN.x, TILESIZE * 2));
+  var l2 = bg.add(Object.create(Entity).init(MIN.x / 2 - 8, MAX.y - TILESIZE + 12, MIN.x, TILESIZE * 2));
   l2.z = -6;
 
-  var wall1 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 6, MIN.y + 2 * TILESIZE - 12, MIN.x, 8, Resources.wall));
+  var wall1 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 8, MIN.y + 2 * TILESIZE - 12, MIN.x, 8, Resources.wall));
   wall1.z = -5.5;
   wall1.angle = PI;
 
-  var wall2 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 6, MAX.y - 2 * TILESIZE + 12, MIN.x, 8, Resources.wall));
+  var wall2 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 8, MAX.y - 2 * TILESIZE + 12, MIN.x, 8, Resources.wall));
   wall2.z = -5.5;
 
-  var left = bg.add(Object.create(TiledBackground).init(MIN.x - 8, MIN.y + (MAX.y - MIN.y) / 2 - 4, (MAX.y - MIN.y) + 22, 8, Resources.wall));
-  left.z = -6;
+  var left = bg.add(Object.create(TiledBackground).init(MIN.x - 12, MIN.y + (MAX.y - MIN.y) / 2 - 4, (MAX.y - MIN.y) + 22, 8, Resources.wall));
+  left.z = -5.4;
   left.angle = PI / 2;
   left.solid = true;
   //left.angle = PI / 2;
@@ -61,7 +61,7 @@ var onStart = function () {
   //leftcover.color = "black";
   //leftcover.z = -5;
   
-  var gate = bg.add(Object.create(Sprite).init(MIN.x - 12, (MIN.y + MAX.y) / 2, Resources.gate));
+  var gate = bg.add(Object.create(Sprite).init(MIN.x - 16, (MIN.y + MAX.y) / 2, Resources.gate));
   gate.setCollision(Polygon);
   gate.angle = PI / 2;
   gate.solid = true;
@@ -82,7 +82,8 @@ var onStart = function () {
   }
   this.shield = bg.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 8, Resources.shield));
   this.shield.addBehavior(Follow, {target: player, offset: {x: 0, y: 0, z: -1, angle: false, opacity: false}});
-  
+  player.shield_sprite = this.shield;
+
   var s = this;
   this.updateHealthBar = function (object) {
     for (var i = 0; i < s.health_bar.length; i++) {
@@ -114,19 +115,19 @@ var onStart = function () {
     menu_text.scale = 1;
   };
   
-  var mute_text = this.ui.add(Object.create(SpriteFont).init(24, 24, Resources.expire_font, "mute", {align: "center", spacing: -3}));
-  var mute_button = this.ui.add(Object.create(Entity).init(24, 24, 32, 16));
+  var mute_text = this.ui.add(Object.create(SpriteFont).init(24, gameWorld.height - 12, Resources.expire_font, "mute", {align: "center", spacing: -3}));
+  var mute_button = this.ui.add(Object.create(Entity).init(24, gameWorld.height - 12, 32, 16));
   mute_button.family = "button";
   mute_button.opacity = 0;
   if (gameWorld.muted) {
-    mute_text.opacity = 0.5;
+    mute_text.opacity = 0.8;
   }
   mute_button.trigger = function () {
     if (gameWorld.muted) {
       mute_text.opacity = 1;
       gameWorld.unmute();
     } else {
-      mute_text.opacity = 0.5;
+      mute_text.opacity = 0.8;
       gameWorld.mute();
     }
   };
@@ -158,11 +159,29 @@ var onStart = function () {
   this.updateHealthBar(player);
   gameWorld.player = player;
   
+  player.turn = function (angle) {
+    this.angle = angle;
+    switch (cardinal(angle)) {
+      case 0:
+        this.shield_sprite.offset = {x: 0, y: 0};
+        break;
+      case 1:
+        this.shield_sprite.offset = {x: 0, y: 1};
+        break;
+      case 2:
+        this.shield_sprite.offset = {x: 0, y: 1};
+        break;
+      case 3:
+        this.shield_sprite.offset = {x: -1, y: 0};
+        break;      
+    }
+  }
   player.collision.onHandle = function (object, other) {
     if (object.noCollide) return;
     
     if (other.family == "enemy") {
-      if (other.projectile) {
+      if (other.projectile || other.beam) {
+        other.beam = false;
         if (object.shield >= 1) {
           object.shield = 0;
           gameWorld.playSound(Resources.shield_down);
@@ -326,7 +345,7 @@ var onStart = function () {
       s.player.death.duration = 0;
       return;
     } else if (s.player.stopped()) {
-      s.player.angle = Math.round(angle(s.player.x - s.bg.camera.x, s.player.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
+      s.player.turn(Math.round(angle(s.player.x - s.bg.camera.x, s.player.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2);
       s.player.move(s);
     }
   }
@@ -346,7 +365,7 @@ var onStart = function () {
       //return;
     }
     if (s.player.stopped()) {
-      s.player.angle = Math.round(angle(s.player.x - s.bg.camera.x, s.player.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;      
+      s.player.turn(Math.round(angle(s.player.x - s.bg.camera.x, s.player.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2);
     }
   };
   
@@ -393,16 +412,16 @@ var onStart = function () {
     } else if (t.player.stopped()) {      
       switch (e.keyCode) {
         case 39:
-          t.player.angle = 0;
+          t.player.turn(0);
           break;
         case 40:
-          t.player.angle = PI / 2;
+          t.player.turn(PI / 2);
           break;
         case 37:
-          t.player.angle = PI;
+          t.player.turn(PI);
           break;
         case 38:
-          t.player.angle = 3 * PI / 2;
+          t.player.turn(3 * PI / 2);
           break;
         case 27:          
           menu_button.trigger();
@@ -427,11 +446,12 @@ var onStart = function () {
     [6],
   ];
 
+  //this.waves = [[6]];
   // this.waves = [[0], [], [], [], []];
   var boss_coordinates = toGrid((MIN.x + MAX.x) / 2, MAX.y);
   var boss = this.bg.add(Object.create(Sprite).init(boss_coordinates.x, boss_coordinates.y, Resources.boss));
   boss.animation = 0;
-  boss.offset = {x: 0, y: -12};
+  boss.offset = {x: 0, y: -16};
   boss.modules = [];
   //boss.angle = PI / 2;
   boss.z = 24;
@@ -464,7 +484,7 @@ var onStart = function () {
   }*/
   
   boss.queue = [];
-  boss.weapons = ["standard", "triple", "burst", "homing", "hitscan", "firework"];
+  boss.shoot_angle = 0;
   boss.respond = function (target) {
     if (this.health >= this.maxhealth) {}
     if (this.store_open) {
@@ -519,15 +539,17 @@ var onStart = function () {
         var p = toGrid(other.x, other.y), b = toGrid(object.x, object.y);
         //s.player.removeBehavior((s.player.lerpx));
         //s.player.removeBehavior((s.player.lerpy));
-        s.player.angle = 0;
         //s.player.move(s);
         if (other.y < object.y) {
+          s.player.turn(PI / 2);
           s.player.lerpy.goal = MAX.y - 2 * TILESIZE;
           //s.player.lerpx.goal = p.x;
         } else if (other.x > object.x) {
+          s.player.turn(0);
           s.player.lerpx.goal = b.x + 2 * TILESIZE;
           //s.player.lerpy.goal = p.y;
         } else if (other.x < object.x) {
+          s.player.turn(PI);
           s.player.lerpx.goal = b.x - 2 * TILESIZE;
           //s.player.lerpy.goal = p.y;
         }

@@ -14,8 +14,8 @@ var onStart =  function () {
         return player.targets.filter( function (e) { return e.alive; }).length <= 0;
       },
       function () {
-        for (var i = 0; i < 2; i++) {
-          var c = toGrid(randint(0, gameWorld.width), randint(gameWorld.height / 2, gameWorld.height - TILESIZE));
+        for (var i = -1; i <= 2; i += 2) {
+          var c = toGrid(player.x + TILESIZE * i, player.y);
           var a = s.fg.add(Object.create(Sprite).init(c.x, c.y, Resources.asteroid));
           a.setCollision(Polygon);
           a.z = 9;
@@ -43,29 +43,32 @@ var onStart =  function () {
         return player.targets.filter( function (e) { return e.alive; }).length <= 0;
       },
       function () {
-        for (var i = 0; i < 5; i++) {
-          var c = toGrid(randint(0, gameWorld.width), 0);
-          var a = s.fg.add(Object.create(Circle).init(c.x, c.y, 4));
-          a.color = "black";
-          a.stroke = true;
-          a.strokeColor = COLORS.primary;
-          a.width = 2;
-      //      var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
-          //a.animation = 5;
-          a.setCollision(Polygon);
-          a.setVertices(projectile_vertices);
-          a.collision.onHandle = projectileHit;
-          a.addBehavior(Velocity);
-          a.family = "enemy";
-          a.projectile = true;
-          //;
-          var theta = PI / 2;
-          //if (this.target) console.log('target');
-          a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)  };
-          a.angle = theta;
-          //a.addBehavior(CropDistance, {target: s.player, max: 10 * gameWorld.distance});
-          a.addBehavior(Trail, {interval: 0.06, maxlength: 10, record: []});
-          s.player.targets.push(a);
+        for (var i = MIN.x; i < MAX.x; i += TILESIZE) {
+          var c = toGrid(i, 0);
+          var p = toGrid(player.x, player.y);
+          if (c.x != ((p.x > (MIN.x + MAX.x) / 2) ? p.x - TILESIZE : p.x + TILESIZE )) {            
+            var a = s.fg.add(Object.create(Circle).init(c.x, c.y, 4));
+            a.color = "black";
+            a.stroke = true;
+            a.strokeColor = COLORS.primary;
+            a.width = 2;
+        //      var a = layer.add(Object.create(Entity).init(this.x, this.y, 2, 2));
+            //a.animation = 5;
+            a.setCollision(Polygon);
+            a.setVertices(projectile_vertices);
+            a.collision.onHandle = projectileHit;
+            a.addBehavior(Velocity);
+            a.family = "enemy";
+            a.projectile = true;
+            //;
+            var theta = PI / 2;
+            //if (this.target) console.log('target');
+            a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)  };
+            a.angle = theta;
+            //a.addBehavior(CropDistance, {target: s.player, max: 10 * gameWorld.distance});
+            a.addBehavior(Trail, {interval: 0.06, maxlength: 10, record: []});
+            s.player.targets.push(a);
+          }
         }
       }
     ],
@@ -93,10 +96,24 @@ var onStart =  function () {
   var bg = fg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
   bg.color = "black";
   bg.z = -10;
-  var grid = fg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
-  grid.z = -9;
 
-  var ground = fg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 6, gameWorld.width, 12, Resources.ground));
+  var grid = fg.add(Object.create(TiledBackground).init((MIN.x + MAX.x) / 2, MIN.y, 9 * TILESIZE - 30, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
+  grid.z = -9;
+  this.grid = grid;
+
+  var right = fg.add(Object.create(TiledBackground).init(WIDTH, MIN.y + (MAX.y - MIN.y) / 2 - 4,  (MAX.y - MIN.y) + 22, 8, Resources.wall));
+  right.angle = -PI / 2;
+  right.z = 12;
+
+  var left = fg.add(Object.create(TiledBackground).init(MIN.x / 2 + 6, MIN.y + (MAX.y - MIN.y) / 2 - 4,  (MAX.y - MIN.y) + 22, 8, Resources.wall));
+  left.angle = PI / 2;
+  left.z = 12;
+
+  var ceiling = fg.add(Object.create(TiledBackground).init((MIN.x + MAX.x) / 2, MIN.y - 12, WIDTH - 8, 8, Resources.wall));
+  ceiling.z = 12;
+  ceiling.angle = PI;
+
+  var ground = fg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height, gameWorld.width, 12, Resources.ground));
   ground.z = 11;
   ground.solid = true;
   ground.setCollision(Polygon);

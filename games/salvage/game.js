@@ -36,6 +36,10 @@ var ENDINGS = [
 	"Insurrection"
 ];
 
+function cardinal (angle) {
+  return Math.round(modulo((angle + 4 * PI), PI2) / (PI / 2));
+}
+
 var WIDTH = 320;
 var HEIGHT = 180;
 var TILESIZE = 32;
@@ -618,7 +622,7 @@ var Weapons = {
   firework: function (layer) {
     gameWorld.playSound(Resources.laser);
     for (var i = 0; i < 10; i++) {
-      var theta = (this.shoot_angle || 0) + i * PI2 / 10;
+      var theta = -PI / 2 + i * PI2 / 10;
       var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
       a.color = "black";
       a.stroke = true;
@@ -653,15 +657,19 @@ var Weapons = {
     warn.z = 0;
     warn.addBehavior(FadeIn, {duration: 0.5, maxOpacity: 1})
     warn.addBehavior(Delay, {duration: 0.5, callback: function () {
-      warn.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.5 });
       var a = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y, this.entity.w, 2));
       a.setCollision(Polygon);
       gameWorld.playSound(Resources.laser);
       a.family = "enemy";//"player";
-      a.projectile = true;
+      a.beam = true;
       a.z = 100;
       a.angle = this.entity.angle;
-      a.addBehavior(FadeOut, {duration: 0.05, delay: 0.3});
+      a.addBehavior(Delay, {duration: 0.3, callback: function () {
+        warn.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.2 });
+        this.entity.addBehavior(FadeOut, {duration: 0.2});
+        this.entity.beam = false;
+        this.entity.removeBehavior(this);
+      }})
       this.entity.removeBehavior(this);
     }});
     return 3;
@@ -757,11 +765,11 @@ var Weapons = {
       a.collision.onHandle = projectileHit;
       a.addBehavior(Velocity);
       a.radius = 4;
-      a.addBehavior(Target, {target: this.target, turn_rate: 0.5, angle: this.angle, speed: 50, offset: {x: 0, y: 0}, set_angle: true});
       a.family = this.family;
       a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
       a.projectile = true;
-      var theta = this.angle;
+      var theta = this.shoot_angle !== undefined ? this.shoot_angle : this.angle;
+      a.addBehavior(Target, {target: this.target, turn_rate: 0.5, angle: theta, speed: 50, offset: {x: 0, y: 0}, set_angle: true});
       a.velocity = {x: 90 * Math.cos(theta), y: 90 * Math.sin(theta)};
       a.angle = theta;
       a.addBehavior(Trail, {interval: 0.12, maxlength: 10})
@@ -818,8 +826,13 @@ BossEnemy.update = function (dt) {
   if (this.cooldown > 0) this.cooldown -= dt;
   else {
     var weapon = choose(["firework","hitscan", "triple", "burst", "homing"]);
+    weapon = "firework";
     this.entity.shoot = Weapons[weapon];
-    this.cooldown = this.entity.shoot(this.entity.layer) * Math.ceil( 3 * this.entity.health / this.entity.maxhealth) / 3; // in thirds
+    this.cooldown = this.entity.shoot(this.entity.layer) * Math.ceil( 3 * this.entity.health / this.entity.maxhealth) / 3;
+    if (weapon === "homing") {
+      this.entity.shoot_angle += PI;
+      this.entity.shoot(this.entity.layer) * Math.ceil( 3 * this.entity.health / this.entity.maxhealth) / 3;
+    }
   }
 }
 
@@ -883,7 +896,7 @@ Periodic.update = function (dt) {
   }
 }
 
-var sprites = ["drone", "train", "radar", "saucer", "thopter", "fighter", "walker"]
+var sprites = ["drone", "train", "radar", "saucer", "thopter", "fighter", "walker"];
 function spawn(layer, key, player) {
   var theta = Math.random() * PI2;
   var x = randint(MIN.x, MAX.x), y = randint(MIN.y, MAX.y);
@@ -904,7 +917,7 @@ function spawn(layer, key, player) {
   //enemy.blend = "destination-out";
   switch (key) {
     case 0: // drone
-      enemy.addBehavior(Approach, {duration: 1, speed: 5, target: player}); // hmmm!
+      enemy.addBehavior(Approach, {duration: 1.2, speed: 5, target: player, delay: 0.5}); // hmmm!
       enemy.shoot = Weapons.standard;
       enemy.target = player;
       enemy.setVertices([
@@ -913,14 +926,14 @@ function spawn(layer, key, player) {
       break;
     case 1: // armored train
       enemy.shoot = Weapons.triple;
-      c.x = toGrid(choose([-1, 1]) * TILESIZE + b.x, 0).x;
+      c.x = toGrid(choose([-1, 1]) * randint(1, 3) * TILESIZE + b.x, 0).x;
       if (c.x > b.x) {
         var min = c.x, max = toGrid(MAX.x, 0).x;
       } else {
         var min = toGrid(0, 0).x, max = c.x;
       }
       enemy.x = c.x;
-      enemy.addBehavior(Horizontal, {duration: 0.5, speed: 24, target: player, min: min, max: max}); // hmmm!
+      enemy.addBehavior(Horizontal, {duration: 0.5, speed: 24, target: player, min: min, max: max, delay: 0.5}); // hmmm!
       enemy.target = player;
       enemy.y = toGrid(100, 1000).y + 4;
       enemy.setVertices([
@@ -938,7 +951,7 @@ function spawn(layer, key, player) {
       ]);     
       break;
     case 3: // bomber
-      enemy.addBehavior(Horizontal, {duration: 0.2, speed: 64, target: player, min: MIN.x, max: MAX.x});
+      enemy.addBehavior(Horizontal, {duration: 0.2, speed: 64, target: player, min: MIN.x, max: MAX.x, delay: 0.2});
       enemy.setVertices([
         {x: -5, y: -3}, {x: -5, y: 3}, {x: 5, y: 3}, {x: 5, y: -3}
       ]);
@@ -947,7 +960,7 @@ function spawn(layer, key, player) {
       enemy.shoot = Weapons.bomb;
       break;
     case 4: // minelayer (except the mines are FIREWORKS)
-      enemy.addBehavior(Move, {duration: 1, speed: 8 });
+      enemy.addBehavior(Move, {duration: 1, speed: 8, delay: 1 });
       enemy.shoot = Weapons.firework;
       enemy.shoot_angle = -PI / 2;      
       enemy.setVertices([
@@ -955,7 +968,7 @@ function spawn(layer, key, player) {
       ]);
       break;
     case 5: // fighter shooting homing missiles
-      enemy.addBehavior(Approach, {duration: 1.1, speed: 8, target: player, turn: true});
+      enemy.addBehavior(Approach, {duration: 1.1, speed: 8, target: player, turn: true, delay: 1.1});
       enemy.target = player;
       enemy.shoot = Weapons.homing;
       enemy.setVertices([
@@ -963,7 +976,16 @@ function spawn(layer, key, player) {
       ]);
       break;
     case 6: // beam weapon!!
-      enemy.move = enemy.addBehavior(Horizontal, {duration: 0.4, speed: 32, target: player});
+
+      c.x = toGrid(choose([-1, 1]) * randint(1, 3) * TILESIZE + b.x, 0).x;
+      if (c.x > b.x) {
+        var min = c.x, max = toGrid(MAX.x, 0).x;
+      } else {
+        var min = toGrid(0, 0).x, max = c.x;
+      }
+      enemy.x = c.x;
+      enemy.move = enemy.addBehavior(Horizontal, {duration: 0.5, speed: 16, target: player, min: min, max: max, delay: 0.5}); // hmmm!
+
       enemy.animation = 0;
       enemy.target = player;
       enemy.shoot = Weapons.hitscan;
@@ -1102,7 +1124,7 @@ var Store = {
       }
     },
     {
-      name: "Speed", price: 3, icon: 2,
+      name: "Speed", price: 2, icon: 2,
       trigger: function (t) {
         t.player.speed = 8;
       },
@@ -1115,7 +1137,7 @@ var Store = {
       }
     },
     {
-      name: "Decoy", price: 4, icon: 3, 
+      name: "Decoy", price: 2, icon: 3, 
       trigger: function (t) {
         t.player.hasDecoy = t.player.addBehavior(Periodic, {time: 4, period: 5, callback: function () {
           this.entity.decoy = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.viper));
@@ -1141,7 +1163,7 @@ var Store = {
       }
     },
     {
-      name: "Bomb", price: 3, icon: 4, 
+      name: "Bomb", price: 2, icon: 4, 
       trigger: function (t) {
         var enemies = gameWorld.scene.bg.entities.filter(function (e) { return e.family === "enemy"; });
         for (var i = 0; i < enemies.length; i++) {
@@ -1159,7 +1181,7 @@ var Store = {
       }
     },
     {
-      name: "Visa", price: 8, icon: 5, 
+      name: "Visa", price: 7, icon: 5, 
       trigger: function (t) {
         t.player.hasFTL = true;
       },
@@ -1259,7 +1281,7 @@ var Store = {
     for (var i = 0; i < this.layer.entities.length; i++) {
       this.layer.entities[i].origin = {x: 0, y: 240};
       this.layer.entities[i].angle = -PI/2;
-      this.layer.entities[i].lerp = this.layer.entities[i].addBehavior(Lerp, {object: this.layer.entities[i], field: "angle", goal: 0, rate: 5});
+      this.layer.entities[i].lerp = this.layer.entities[i].addBehavior(Lerp, {object: this.layer.entities[i], field: "angle", goal: 0, rate: 8});
       this.layer.entities[i].goal = this.layer.entities[i].lerp.goal;
       this.layer.entities[i].original = this.layer.entities[i].angle;
     }
