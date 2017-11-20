@@ -281,7 +281,7 @@ Approach.pick = function () {
   var g = toGrid(this.entity.x + sign(this.target.x - this.entity.x) * TILESIZE, this.entity.y); // horiztonal
   var p = toGrid(this.target.x, this.target.y);
   var b = toGrid(gameWorld.boss.x, gameWorld.boss.y);
-  if (g.x === b.x && g.y === b.y) return toGrid(this.entity.x, this.entity.y - TILESIZE);
+  if (g.x === b.x && (g.y === b.y || this.entity.y + TILESIZE === b.y)) return toGrid(this.entity.x, this.entity.y - TILESIZE); // if we WOULD go towards the boss
   else if (g.x !== p.x || g.y !== p.y) return g;
   else return toGrid(this.entity.x, this.entity.y + sign(this.target.y - this.entity.y) * TILESIZE);
 };
