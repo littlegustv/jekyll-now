@@ -67,6 +67,10 @@ var onStart =  function () {
     // add tombstone    
   }
 
+  if (gameWorld.ending !== 0 && gameWorld.ending !== 1 ) {
+    COLORS.button = "#ff2800";
+  }
+
   var b = fg.add(Object.create(SpriteFont).init(48, gameWorld.height - 24, Resources.expire_font, "menu", {spacing: -2, align: "center"}));
   var button = fg.add(Object.create(Entity).init(48, gameWorld.height - 24, gameWorld.width, 16));
   button.family = "button";

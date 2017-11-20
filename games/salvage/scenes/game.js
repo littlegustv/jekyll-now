@@ -7,7 +7,7 @@ var onStart = function () {
   var bg = this.addLayer(Object.create(Layer).init(1000,1000));
   bg.active = true;
 
-  var player_coordinates = toGrid(64, 160);
+  var player_coordinates = toGrid(MIN.x + 4 * TILESIZE, MIN.y + 2 * TILESIZE);
   var player = bg.add(Object.create(Sprite).init(player_coordinates.x, player_coordinates.y, Resources.viper));
 
   var b = bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, gameWorld.height));
@@ -26,26 +26,44 @@ var onStart = function () {
   ground.solid = true;
   ground.setCollision(Polygon);
 
-  var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MIN.y - 14, WIDTH - 8, 8, Resources.ground));
+  var ceiling = bg.add(Object.create(TiledBackground).init((MIN.x + MAX.x) / 2, MIN.y - 12, WIDTH - 8, 8, Resources.wall));
   ceiling.z = -7;
   ceiling.angle = PI;
   ceiling.solid = true;
   ceiling.setCollision(Polygon);
 
-  var right = bg.add(Object.create(TiledBackground).init(WIDTH + 12, MIN.y + (MAX.y - MIN.y) / 2 - 4, 32, (MAX.y - MIN.y) + 22, Resources.building));
-  //right.angle = -PI / 2;
+  var right = bg.add(Object.create(TiledBackground).init(WIDTH, MIN.y + (MAX.y - MIN.y) / 2 - 4,  (MAX.y - MIN.y) + 22, 8, Resources.wall));
+  right.angle = -PI / 2;
   right.z = -6;
   right.solid = true;
   right.setCollision(Polygon);
 
-  var left = bg.add(Object.create(TiledBackground).init(-12, MIN.y + (MAX.y - MIN.y) / 2 - 4, 32, (MAX.y - MIN.y) + 22, Resources.building));
+  var l1 = bg.add(Object.create(Entity).init(MIN.x / 2 - 6, MIN.y + TILESIZE - 12, MIN.x, TILESIZE * 2));
+  l1.z = -6;
+
+  var l2 = bg.add(Object.create(Entity).init(MIN.x / 2 - 6, MAX.y - TILESIZE + 12, MIN.x, TILESIZE * 2));
+  l2.z = -6;
+
+  var wall1 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 6, MIN.y + 2 * TILESIZE - 12, MIN.x, 8, Resources.wall));
+  wall1.z = -5.5;
+  wall1.angle = PI;
+
+  var wall2 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 6, MAX.y - 2 * TILESIZE + 12, MIN.x, 8, Resources.wall));
+  wall2.z = -5.5;
+
+  var left = bg.add(Object.create(TiledBackground).init(MIN.x - 8, MIN.y + (MAX.y - MIN.y) / 2 - 4, (MAX.y - MIN.y) + 22, 8, Resources.wall));
   left.z = -6;
+  left.angle = PI / 2;
   left.solid = true;
   //left.angle = PI / 2;
   left.setCollision(Polygon);
+  //var leftcover = bg.add(Object.create(Entity).init(MIN.x - 34, HEIGHT / 2, 48, HEIGHT));
+  //leftcover.color = "black";
+  //leftcover.z = -5;
   
-  var gate = bg.add(Object.create(Sprite).init(gameWorld.width / 2, MIN.y - 14, Resources.gate));
+  var gate = bg.add(Object.create(Sprite).init(MIN.x - 12, (MIN.y + MAX.y) / 2, Resources.gate));
   gate.setCollision(Polygon);
+  gate.angle = PI / 2;
   gate.solid = true;
   gate.z = -5;
 
@@ -96,8 +114,8 @@ var onStart = function () {
     menu_text.scale = 1;
   };
   
-  var mute_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width - 16, 12, Resources.expire_font, "mute", {align: "center", spacing: -3}));
-  var mute_button = this.ui.add(Object.create(Entity).init(gameWorld.width - 16, 12, 32, 16));
+  var mute_text = this.ui.add(Object.create(SpriteFont).init(24, 24, Resources.expire_font, "mute", {align: "center", spacing: -3}));
+  var mute_button = this.ui.add(Object.create(Entity).init(24, 24, 32, 16));
   mute_button.family = "button";
   mute_button.opacity = 0;
   if (gameWorld.muted) {
@@ -230,7 +248,7 @@ var onStart = function () {
         }
       }
       // at gate
-      if (coords.y === MIN.y && (coords.x == MIN.x + TILESIZE * 2 || coords.x == MIN.x + TILESIZE * 3)) {
+      if (coords.x === MIN.x && (coords.y == MIN.y + TILESIZE * 2 || coords.y == MIN.y + TILESIZE * 3)) {
         if (!player.hasFTL) {
           gate.animation = 0;
           gate.addBehavior(Delay, {duration: 1, callback: function () {
@@ -249,7 +267,7 @@ var onStart = function () {
         }
       } 
       // through gate
-      else if (coords.y < MIN.y) {
+      else if (coords.x <= MIN.x - 2 * TILESIZE) {
         if (gameWorld.boss.alive) {
           gameWorld.ending = 2;
         } else {
@@ -271,27 +289,11 @@ var onStart = function () {
         }
         projectiles = [];
         // open store every OTHer wave
-        if (gameWorld.wave % 2 === 0) {
-          //var theta = Math.random() * PI2;
-          //var g = toGrid(boss.x + 64 * Math.cos(theta), boss.y + 64 * Math.sin(theta));
-          
-        }
-        var announcement = t.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "wave " + gameWorld.wave, {spacing: -3, align: "center"}));
+        var announcement = t.bg.add(Object.create(SpriteFont).init(MIN.x + 4 * TILESIZE + 8, gameWorld.height / 2, Resources.expire_font, "wave " + gameWorld.wave, {spacing: -3, align: "center"}));
         announcement.opacity = 0;
         announcement.addBehavior(FadeIn, {duration: 0.3, delay: 0, maxOpacity: 1});
         announcement.addBehavior(FadeOut, {duration: 0.3, delay: 0.5, maxOpacity: 1});
         announcement.scale = 2;
-
-        if (gameWorld.boss.health >= gameWorld.boss.maxhealth && !gameWorld.boss.store_open) {
-          gameWorld.boss.queue.push(toGrid(0, gameWorld.height / 2).y);
-          gameWorld.boss.storeday = 1;
-        }
-
-        gameWorld.boss.queue.push(toGrid(0, 0).y);
-        gameWorld.boss.payday = 1;
-
-
-        //gameWorld.playSound(Resources.spawn);
 
         for (var i = 0; i < gameWorld.wave; i++) {
           var k = i % this.waves.length;
@@ -426,12 +428,12 @@ var onStart = function () {
   ];
 
   // this.waves = [[0], [], [], [], []];
-
-  var boss = this.bg.add(Object.create(Sprite).init(toGrid(0, 100).x, toGrid(0, gameWorld.height / 2).y, Resources.boss));
+  var boss_coordinates = toGrid((MIN.x + MAX.x) / 2, MAX.y);
+  var boss = this.bg.add(Object.create(Sprite).init(boss_coordinates.x, boss_coordinates.y, Resources.boss));
   boss.animation = 0;
-  boss.offset = {x: 6, y: 0};
+  boss.offset = {x: 0, y: -12};
   boss.modules = [];
-  boss.angle = PI / 2;
+  //boss.angle = PI / 2;
   boss.z = 24;
   boss.particles = boss.addBehavior(Periodic, {period: 0.1, rate: 0, callback: function () {
     if (Math.random() < this.rate) {
@@ -515,19 +517,19 @@ var onStart = function () {
         object.die();
       } else if (!other.projectile) {        
         var p = toGrid(other.x, other.y), b = toGrid(object.x, object.y);
-        s.player.removeBehavior((s.player.lerpx));
-        s.player.removeBehavior((s.player.lerpy));
+        //s.player.removeBehavior((s.player.lerpx));
+        //s.player.removeBehavior((s.player.lerpy));
         s.player.angle = 0;
-        s.player.move(s);
-        if (other.x > object.x) {
-          s.player.lerpx.goal = MIN.x + 2 * TILESIZE;
-          s.player.lerpy.goal = p.y;
-        } else if (other.y > object.y) {
-          s.player.lerpy.goal = b.y + 2 * TILESIZE;
-          s.player.lerpx.goal = p.x;
-        } else if (other.y < object.y) {
-          s.player.lerpy.goal = b.y - 2 * TILESIZE;
-          s.player.lerpx.goal = p.x;
+        //s.player.move(s);
+        if (other.y < object.y) {
+          s.player.lerpy.goal = MAX.y - 2 * TILESIZE;
+          //s.player.lerpx.goal = p.x;
+        } else if (other.x > object.x) {
+          s.player.lerpx.goal = b.x + 2 * TILESIZE;
+          //s.player.lerpy.goal = p.y;
+        } else if (other.x < object.x) {
+          s.player.lerpx.goal = b.x - 2 * TILESIZE;
+          //s.player.lerpy.goal = p.y;
         }
       }
     }
