@@ -2,7 +2,7 @@
 // canvas filter (color style); grayscale(70%) contrast(250%) brightness(90%);
 
 var MAXHEALTH = 4, DAMAGE_COOLDOWN = 0.5;
-var gameWorld = Object.create(World).init(320, 180, "index.json");
+var gameWorld = Object.create(World).init(640, 360, "index.json");
 gameWorld.wave = 1;
 gameWorld.distance = 100;
 gameWorld.ending = 0;
@@ -40,11 +40,11 @@ function cardinal (angle) {
   return Math.round(modulo((angle + 4 * PI), PI2) / (PI / 2));
 }
 
-var WIDTH = 320;
-var HEIGHT = 180;
-var TILESIZE = 32;
-var MIN = {x: 52, y: 10};
-var MAX = {x: MIN.x + TILESIZE * 8, y: HEIGHT - 10};
+var WIDTH = 640;
+var HEIGHT = 360;
+var TILESIZE = 64;
+var MIN = {x: 52, y: 20};
+var MAX = {x: MIN.x + TILESIZE * 9, y: HEIGHT - 20};
 
 var COLORS = {
   negative: "#000000",
@@ -473,7 +473,7 @@ function projectileHit (object, other) {
 
 function projectileDie(p) {
   p.alive = false;
-  for (var i = 0; i < 20; i++) {    
+  for (var i = 0; i < 5; i++) {    
     // particle effect
     var d = p.layer.add(Object.create(Sprite).init(p.x, p.y, Resources.dust));
     d.addBehavior(Velocity);

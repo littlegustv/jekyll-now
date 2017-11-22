@@ -44,11 +44,11 @@ var onStart = function () {
   var l2 = bg.add(Object.create(Entity).init(MIN.x / 2 - 8, MAX.y - TILESIZE + 12, MIN.x, TILESIZE * 2));
   l2.z = -6;
 
-  var wall1 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 8, MIN.y + 2 * TILESIZE - 12, MIN.x, 8, Resources.wall));
+  var wall1 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 8, MIN.y + 2 * TILESIZE - 36, MIN.x, 8, Resources.wall));
   wall1.z = -5.5;
   wall1.angle = PI;
 
-  var wall2 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 8, MAX.y - 2 * TILESIZE + 12, MIN.x, 8, Resources.wall));
+  var wall2 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 8, MAX.y - 2 * TILESIZE + 36, MIN.x, 8, Resources.wall));
   wall2.z = -5.5;
 
   var left = bg.add(Object.create(TiledBackground).init(MIN.x - 12, MIN.y + (MAX.y - MIN.y) / 2 - 4, (MAX.y - MIN.y) + 22, 8, Resources.wall));
@@ -210,6 +210,7 @@ var onStart = function () {
     this.collision.onCheck = function (a, b) { return false; };
     this.collision.onHandle = function (a, b) { return false; };
     s.pause = function () {};
+    player.opacity = 0;
     player.removeBehavior(player.lerpx);
     player.removeBehavior(player.lerpy);
     player.death = player.addBehavior(Delay, {duration: 1.5, callback: function () {

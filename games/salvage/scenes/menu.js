@@ -48,7 +48,7 @@ var onStart =  function () {
   title.scale = 1;
   title.z = 10;
 
-  var boss = this.bg.add(Object.create(Sprite).init(120, gameWorld.height - 28, Resources.boss));
+  var boss = this.bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 44, Resources.boss));
   boss.z = 11;
   
   var ground = this.bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4, gameWorld.width, 8, Resources.ground));
