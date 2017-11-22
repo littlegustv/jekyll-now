@@ -148,7 +148,7 @@ var onStart = function () {
   player.z = Z.entity;
   player.salvage = 0;
   // movement settings
-  player.speed = 6.5;
+  player.speed = SPEEDS.player;
   player.distance = TILESIZE;
   player.noCollide = false;
   
@@ -287,7 +287,7 @@ var onStart = function () {
         }
       } 
       // through gate
-      else if (coords.x <= MIN.x - 2 * TILESIZE) {
+      else if (coords.x <= MIN.x - 1 * TILESIZE) {
         if (gameWorld.boss.alive) {
           gameWorld.ending = 2;
         } else {
@@ -447,6 +447,9 @@ var onStart = function () {
     [6],
   ];
 
+  //this.waves = [[2,2,2,2,2,2,2,2,2,2]];
+//  this.waves = [[0,0,1,2,3,4,5,6]];
+
   //this.waves = [[6]];
   // this.waves = [[0], [], [], [], []];
   var boss_coordinates = toGrid((MIN.x + MAX.x) / 2, MAX.y);
@@ -458,8 +461,8 @@ var onStart = function () {
   boss.z = 24;
   boss.particles = boss.addBehavior(Periodic, {period: 0.1, rate: 0, callback: function () {
     if (Math.random() < this.rate) {
-      var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
-      d.z = this.entity.z - 1;
+      var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x + randint(0, this.entity.w) - this.entity.w / 2, this.entity.y + this.entity.offset.y + randint(-this.entity.h / 2, this.entity.h / 2), Resources.dust));
+      d.z = this.entity.z + 1;
       d.behaviors[0].onEnd = function () {
         this.entity.alive = false;
       };
@@ -516,20 +519,20 @@ var onStart = function () {
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
   boss.setVertices([
-    {x: -20, y: -10},
-    {x: 20, y: -10},
+    {x: -20, y: -20},
+    {x: 20, y: -20},
     {x: 20, y: 24},
     {x: -20, y: 24}
   ])
   boss.collision.onHandle = function (object, other) {
     if (other.family == "player" && !gameWorld.boss.invulnerable) {
       object.health -= 1;
-      object.particles.rate = (10 - object.health) / 10;
+      object.particles.rate = 3 * (10 - object.health) / 10;
       gameWorld.boss.invulnerable = true;
       gameWorld.boss.respond(s.player);
       //gameWorld.boss.old_animation = gameWorld.boss.animation;
       gameWorld.boss.animation = 3;
-      gameWorld.boss.addBehavior(Delay, {duration: 1.3, callback: function () { 
+      gameWorld.boss.addBehavior(Delay, {duration: 0.3, callback: function () { 
         this.entity.invulnerable = false;
         gameWorld.boss.animation = 3 - Math.floor(3 * this.entity.health / this.entity.maxhealth);
         console.log(gameWorld.boss.animation);
@@ -603,6 +606,20 @@ var onUpdate = function (dt) {
 
   for (var i = 0; i < this.wave.length; i++) {
     if (!this.wave[i].alive) this.wave.splice(i, 1);
+  };
+
+  var enemies = this.bg.entities.filter(function (e) { return e.family == "enemy" || e.family == "neutral"; });
+  this.player.checkCollisions(0, enemies);
+
+  for (var i = 0; i < enemies.length; i++) {
+    if (!between(enemies[i].x, MIN.x - 1, MAX.x + 1) || !between(enemies[i].y, MIN.y - 1, MAX.y + 1)) {
+      if (enemies[i].projectile) {
+        projectileDie(enemies[i]);
+      } else if (enemies[i].die) {
+        enemies[i].die();
+      } else {
+        enemies[i].alive = false;
+      }
+    }
   }
-  
 };

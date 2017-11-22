@@ -42,9 +42,22 @@ function cardinal (angle) {
 
 var WIDTH = 640;
 var HEIGHT = 360;
+var ARM_TIME = 0.25;
 var TILESIZE = 64;
 var MIN = {x: 52, y: 20};
 var MAX = {x: MIN.x + TILESIZE * 9, y: HEIGHT - 20};
+var SPEEDS = {
+  gravity: 120,
+  projectile_fast: 200,//100,
+  projectile_normal: 160,//80,
+  projectile_slow: 40, //40,
+  player: 6.5,
+  enemy_fast: 8,
+  enemy_normal: 5.5,
+  enemy_horizontal: 48,
+  enemy_horizontal_fast: 128,
+  enemy_horizontal_slow: 32
+};
 
 var COLORS = {
   negative: "#000000",
@@ -367,9 +380,9 @@ Layer.update = function (dt) {
   for (var i = 0; i < this.entities.length; i++) {
     this.entities[i].update(dt);
   }
-  for (var i = 0; i < this.entities.length; i++) {
+  /*for (var i = 0; i < this.entities.length; i++) {
     this.entities[i].checkCollisions(i + 1, this.entities); // i + 1 instead of i
-  }
+  }*/
   for (var i = 0; i < this.entities.length; i++) {
     if (!this.entities[i].alive) {
       this.entities[i].end();
@@ -610,14 +623,17 @@ var Weapons = {
     a.collision.onHandle = projectileHit;
     a.addBehavior(Velocity);
     a.family = this.family;//"player";
-    a.projectile = true;
+    a.addBehavior(Delay, {duration: ARM_TIME, callback: function () {
+      this.entity.projectile = true;
+    }});
+    //a.projectile = true;
     a.velocity = {x: 0, y: 0};
     a.addBehavior(Accelerate);
-    a.acceleration = {x: 0, y: 60};
+    a.acceleration = {x: 0, y: SPEEDS.gravity};
     a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
-    a.addBehavior(Trail, {interval: 0.06, maxlength: 10, record: []});
+    a.addBehavior(Trail, {interval: 0.02, maxlength: 10, record: []});
     projectiles.push(a);
-    return 1.6;
+    return 1;
   },
   firework: function (layer) {
     gameWorld.playSound(Resources.laser);
@@ -634,13 +650,16 @@ var Weapons = {
       a.collision.onHandle = projectileHit;
       a.addBehavior(Velocity);
       a.family = this.family;
-      a.projectile = true;
+          a.addBehavior(Delay, {duration: ARM_TIME, callback: function () {
+      this.entity.projectile = true;
+    }});
+    //a.projectile = true;;
       a.angle = theta;
-      a.velocity = {x: 30 * Math.cos(a.angle), y: 30 * Math.sin(a.angle)  };
-      a.addBehavior(Trail, {interval: 0.06, maxlength: 4, record: []});
+      a.velocity = {x: SPEEDS.projectile_slow * Math.cos(a.angle), y: SPEEDS.projectile_slow * Math.sin(a.angle)  };
+      a.addBehavior(Trail, {interval: 0.02, maxlength: 10, record: []});
       projectiles.push(a);
     }
-    return 4.6;
+    return 3;
   },
   hitscan: function (layer) {
     var t = this;
@@ -655,7 +674,7 @@ var Weapons = {
     warn.opacity = 0;
     warn.angle = theta;
     warn.z = 0;
-    warn.addBehavior(FadeIn, {duration: 0.5, maxOpacity: 1})
+    warn.fade = warn.addBehavior(FadeIn, {duration: 0.5, maxOpacity: 1})
     warn.addBehavior(Delay, {duration: 0.5, callback: function () {
       var a = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y, this.entity.w, 2));
       a.setCollision(Polygon);
@@ -664,8 +683,10 @@ var Weapons = {
       a.beam = true;
       a.z = 100;
       a.angle = this.entity.angle;
+      var w = this.entity;
+      w.removeBehavior(w.fade);
       a.addBehavior(Delay, {duration: 0.3, callback: function () {
-        warn.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.2 });
+        w.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.2 });
         this.entity.addBehavior(FadeOut, {duration: 0.2});
         this.entity.beam = false;
         this.entity.removeBehavior(this);
@@ -686,12 +707,15 @@ var Weapons = {
     a.collision.onHandle = projectileHit;
     a.addBehavior(Velocity);
     a.family = this.family;
-    a.projectile = true;
+        a.addBehavior(Delay, {duration: ARM_TIME, callback: function () {
+      this.entity.projectile = true;
+    }});
+    //a.projectile = true;;
     var theta = this.target ? (this.target.decoy ? angle(this.x, this.y, this.target.decoy.x, this.target.decoy.y) : angle(this.x, this.y, this.target.x, this.target.y)) : this.angle;
-    a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)  };
+    a.velocity = {x: SPEEDS.projectile_normal * Math.cos(theta), y: SPEEDS.projectile_normal * Math.sin(theta)  };
     a.angle = theta;    
     a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
-    a.addBehavior(Trail, {interval: 0.06, maxlength: 10, record: []});
+    a.addBehavior(Trail, {interval: 0.02, maxlength: 10, record: []});
     projectiles.push(a);
     return 1.6;
   },
@@ -709,11 +733,14 @@ var Weapons = {
     a.addBehavior(Velocity);
     a.family = this.family;
     a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
-    a.projectile = true;
+        a.addBehavior(Delay, {duration: ARM_TIME, callback: function () {
+      this.entity.projectile = true;
+    }});
+    //a.projectile = true;;
     var theta = this.target ? (this.target.decoy ? angle(this.x, this.y, this.target.decoy.x, this.target.decoy.y) : angle(this.x, this.y, this.target.x, this.target.y)) : this.angle;
-    a.velocity = {x: 100 * Math.cos(theta), y: 100 * Math.sin(theta)  };
+    a.velocity = {x: SPEEDS.projectile_fast * Math.cos(theta), y: SPEEDS.projectile_fast * Math.sin(theta)  };
     a.angle = theta;
-    a.addBehavior(Trail, {interval: 0.06, maxlength: 10});
+    a.addBehavior(Trail, {interval: 0.02, maxlength: 10});
     projectiles.push(a);
 
     this.count += 1;
@@ -737,19 +764,22 @@ var Weapons = {
     a.addBehavior(Velocity);
     a.family = this.family;//"player";
     a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
-    a.projectile = true;
+        a.addBehavior(Delay, {duration: ARM_TIME, callback: function () {
+      this.entity.projectile = true;
+    }});
+    //a.projectile = true;;
     if (this.count % 15 === 0) {
       this.theta = this.target ? (this.target.decoy ? angle(this.x, this.y, this.target.decoy.x, this.target.decoy.y) : angle(this.x, this.y, this.target.x, this.target.y)) : this.angle;
     }
-    a.velocity = {x: 100 * Math.cos(this.theta), y: 100 * Math.sin(this.theta)  };
+    a.velocity = {x: SPEEDS.projectile_normal * Math.cos(this.theta), y: SPEEDS.projectile_normal * Math.sin(this.theta)  };
     a.angle = this.theta;
-    a.addBehavior(Trail, {interval: 0.06, maxlength: 10});
+    a.addBehavior(Trail, {interval: 0.02, maxlength: 10});
     
     projectiles.push(a);
     
     this.count += 1;
     if (this.count % 15 === 0) {
-      return 4;
+      return 3;
     } else {
       return 0.25;
     }
@@ -767,12 +797,15 @@ var Weapons = {
       a.radius = 4;
       a.family = this.family;
       a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
-      a.projectile = true;
+          a.addBehavior(Delay, {duration: ARM_TIME, callback: function () {
+      this.entity.projectile = true;
+    }});
+    //a.projectile = true;;
       var theta = this.shoot_angle !== undefined ? this.shoot_angle : this.angle;
-      a.addBehavior(Target, {target: this.target, turn_rate: 0.5, angle: theta, speed: 50, offset: {x: 0, y: 0}, set_angle: true});
-      a.velocity = {x: 90 * Math.cos(theta), y: 90 * Math.sin(theta)};
+      a.addBehavior(Target, {target: this.target, turn_rate: 0.5, angle: theta, speed: SPEEDS.projectile_normal, offset: {x: 0, y: 0}, set_angle: true});
+      a.velocity = {x: SPEEDS.projectile_normal * Math.cos(theta), y: SPEEDS.projectile_normal * Math.sin(theta)};
       a.angle = theta;
-      a.addBehavior(Trail, {interval: 0.12, maxlength: 10})
+      a.addBehavior(Trail, {interval: 0.02, maxlength: 10})
       a.addBehavior(Follow, {target: this, offset: {x: false, y: false, z: false, alive: true, angle: false}});
       projectiles.push(a);      
       return 1.6;     
@@ -826,7 +859,7 @@ BossEnemy.update = function (dt) {
   if (this.cooldown > 0) this.cooldown -= dt;
   else {
     var weapon = choose(["firework","hitscan", "triple", "burst", "homing"]);
-    weapon = "firework";
+    //weapon = "firework";
     this.entity.shoot = Weapons[weapon];
     this.cooldown = this.entity.shoot(this.entity.layer) * Math.ceil( 3 * this.entity.health / this.entity.maxhealth) / 3;
     if (weapon === "homing") {
@@ -917,7 +950,7 @@ function spawn(layer, key, player) {
   //enemy.blend = "destination-out";
   switch (key) {
     case 0: // drone
-      enemy.addBehavior(Approach, {duration: 1.2, speed: 5, target: player, delay: 0.5}); // hmmm!
+      enemy.addBehavior(Approach, {duration: 1.2, speed: SPEEDS.enemy_normal, target: player, delay: 0.5}); // hmmm!
       enemy.shoot = Weapons.standard;
       enemy.target = player;
       enemy.setVertices([
@@ -933,7 +966,7 @@ function spawn(layer, key, player) {
         var min = toGrid(0, 0).x, max = c.x;
       }
       enemy.x = c.x;
-      enemy.addBehavior(Horizontal, {duration: 0.5, speed: 24, target: player, min: min, max: max, delay: 0.5}); // hmmm!
+      enemy.addBehavior(Horizontal, {duration: 0.5, speed: SPEEDS.enemy_horizontal, target: player, min: min, max: max, delay: 0.5}); // hmmm!
       enemy.target = player;
       enemy.y = toGrid(100, 1000).y + 4;
       enemy.setVertices([
@@ -951,7 +984,7 @@ function spawn(layer, key, player) {
       ]);     
       break;
     case 3: // bomber
-      enemy.addBehavior(Horizontal, {duration: 0.2, speed: 64, target: player, min: MIN.x, max: MAX.x, delay: 0.2});
+      enemy.addBehavior(Horizontal, {duration: 0.2, speed: SPEEDS.enemy_horizontal_fast, target: player, min: MIN.x, max: MAX.x, delay: 0.2});
       enemy.setVertices([
         {x: -5, y: -3}, {x: -5, y: 3}, {x: 5, y: 3}, {x: 5, y: -3}
       ]);
@@ -960,7 +993,7 @@ function spawn(layer, key, player) {
       enemy.shoot = Weapons.bomb;
       break;
     case 4: // minelayer (except the mines are FIREWORKS)
-      enemy.addBehavior(Move, {duration: 1, speed: 8, delay: 1 });
+      enemy.addBehavior(Move, {duration: 1, speed: SPEEDS.enemy_normal, delay: 1 });
       enemy.shoot = Weapons.firework;
       enemy.shoot_angle = -PI / 2;      
       enemy.setVertices([
@@ -968,7 +1001,7 @@ function spawn(layer, key, player) {
       ]);
       break;
     case 5: // fighter shooting homing missiles
-      enemy.addBehavior(Approach, {duration: 1.1, speed: 8, target: player, turn: true, delay: 1.1});
+      enemy.addBehavior(Approach, {duration: 1.1, speed: SPEEDS.enemy_normal, target: player, turn: true, delay: 1.1});
       enemy.target = player;
       enemy.shoot = Weapons.homing;
       enemy.setVertices([
@@ -984,12 +1017,13 @@ function spawn(layer, key, player) {
         var min = toGrid(0, 0).x, max = c.x;
       }
       enemy.x = c.x;
-      enemy.move = enemy.addBehavior(Horizontal, {duration: 0.5, speed: 16, target: player, min: min, max: max, delay: 0.5}); // hmmm!
+      enemy.move = enemy.addBehavior(Horizontal, {duration: 0.5, speed: SPEEDS.enemy_horizontal_slow, target: player, min: min, max: max, delay: 0.5}); // hmmm!
 
       enemy.animation = 0;
       enemy.target = player;
       enemy.shoot = Weapons.hitscan;
-      enemy.y = toGrid(0, 1000).y + 4;
+      enemy.y = toGrid(0, 1000).y;
+      enemy.offset = {x: 0, y: 4};
       enemy.setVertices([
         {x: -6, y: -3}, {x: -6, y: 3}, {x: 6, y: 3}, {x: 6, y: -3}
       ]);
