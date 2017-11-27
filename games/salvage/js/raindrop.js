@@ -1823,17 +1823,17 @@ var World = {
     if (AudioContext) {
       this.audioContext = new AudioContext();
       this.audioContext.gn = this.audioContext.createGain();
-      var t = this;
-      window.addEventListener("focus", function (e) {
-        if (t.audioContext.resume && !this.muted) t.audioContext.resume(); // push to raindrop
-        t.startTime = new Date();
-        t.speed = 1;
-      });
-      window.addEventListener("blur", function (e) {
-        if (t.audioContext.suspend) t.audioContext.suspend();
-        t.speed = 0;
-      });
     }
+    var t = this;
+    window.addEventListener("focus", function (e) {
+      if (t.audioContext && t.audioContext.resume && !this.muted) t.audioContext.resume(); // push to raindrop
+      t.startTime = new Date();
+      t.speed = 1;
+    });
+    window.addEventListener("blur", function (e) {
+      if (t.audioContext && t.audioContext.suspend) t.audioContext.suspend();
+      t.speed = 0;
+    });
   },
   /* FIX ME: loads image, sound and data assets into global Resources array -> is there a better place to do this? */
   loadResources: function () {

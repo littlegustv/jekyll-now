@@ -45,7 +45,7 @@ var onStart =  function () {
   var title = this.bg.add(Object.create(SpriteFont).init(8, gameWorld.height - 16, Resources.expire_font, "bastille day", {spacing: -2, align: "left"}));
   //title.addBehavior(Oscillate, {field: "y", object: title, initial: gameWorld.height / 2, rate: 1, constant: 24});
   //title.blend = "destination-out";
-  title.scale = 1;
+  title.scale = 3;
   title.z = 10;
 
   var boss = this.bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 44, Resources.boss));
@@ -54,14 +54,15 @@ var onStart =  function () {
   var ground = this.bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4, gameWorld.width, 8, Resources.ground));
   //ground.blend = "destination-out";
   ground.z = 10;
-
+  
+/*
   var wall = this.bg.add(Object.create(TiledBackground).init(gameWorld.width * 3 / 4, gameWorld.height / 2, gameWorld.height, 8, Resources.wall));
   wall.angle = PI / 2;
   wall.z = 13;
-
   var wall2 = this.bg.add(Object.create(TiledBackground).init(gameWorld.width * 3 / 4 - 8, gameWorld.height / 2, gameWorld.height, 8, Resources.wall));
   wall2.angle = -PI / 2;
   wall2.z = 13;
+*/
 
   var buttons = [
     ["new game", function () {
@@ -80,7 +81,7 @@ var onStart =  function () {
         gameWorld.unmute();
       }
     }],
-    ["@e1sif", function () {
+    ["twitter", function () {
       window.open("https://twitter.com/e1sif", "_blank");
     }]
   ];
@@ -88,7 +89,7 @@ var onStart =  function () {
   var selected = 0;
   var mute_button_text;
   for (var i = 0; i < buttons.length; i++) {
-    var b = this.bg.add(Object.create(SpriteFont).init(8, gameWorld.height / 4 + i * 16, Resources.expire_font, buttons[i][0], {spacing: -2, align: "left"}));
+    var b = this.bg.add(Object.create(SpriteFont).init(8, gameWorld.height / 4 + i * 16, Resources.expire_font, buttons[i][0], {spacing: -1, align: "left"}));
     var button = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 4 + i * 16, gameWorld.width, 16));
     button.family = "button";
     b.z = 2;

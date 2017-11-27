@@ -609,7 +609,9 @@ var onUpdate = function (dt) {
   };
 
   var enemies = this.bg.entities.filter(function (e) { return e.family == "enemy" || e.family == "neutral"; });
+  var scrap = this.bg.entities.filter(function (e) { return e.scrap; });
   this.player.checkCollisions(0, enemies);
+  gameWorld.boss.checkCollisions(0, scrap);
 
   for (var i = 0; i < enemies.length; i++) {
     if (!between(enemies[i].x, MIN.x - 1, MAX.x + 1) || !between(enemies[i].y, MIN.y - 1, MAX.y + 1)) {
