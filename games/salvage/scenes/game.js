@@ -73,10 +73,10 @@ var onStart = function () {
   this.health_bar = [];
   for (var i = 0.5; i < MAXHEALTH + 0.5; i++) {
     var h = bg.add(Object.create(Sprite).init(i * 16, gameWorld.height - 8, Resources.heart));
-    h.follow = h.addBehavior(Follow, {target: player, offset: {x: 0, y: 0, z: 1, angle: false}});
+    h.follow = h.addBehavior(Follow, {target: player, offset: {x: 16 * Math.cos(i * PI / 4), y: 16 * Math.sin(PI + i * PI / 4), z: 1, angle: false}});
     h.radius = 2;
-    h.addBehavior(Oscillate, {field: "x", object: h.follow.offset, initial: 0, constant: 16, time: i * PI / 5, func: "cos"});
-    h.addBehavior(Oscillate, {field: "y", object: h.follow.offset, initial: 0, constant: 16, time: PI + i * PI / 5});
+    //h.addBehavior(Oscillate, {field: "x", object: h.follow.offset, initial: 0, constant: 16, time: i * PI / 5, func: "cos"});
+    //h.addBehavior(Oscillate, {field: "y", object: h.follow.offset, initial: 0, constant: 16, time: PI + i * PI / 5});
     h.strokeColor = "#DD0000";
     this.health_bar.push(h);
   }
@@ -87,7 +87,9 @@ var onStart = function () {
   var s = this;
   this.updateHealthBar = function (object) {
     for (var i = 0; i < s.health_bar.length; i++) {
-      if (i < object.health) {
+      if (object.health === 0) {
+        s.health_bar[i].alive = false;
+      } if (i < object.health) {
         s.health_bar[i].animation = 0;
       } else if (i < MAXHEALTH) {
         s.health_bar[i].animation = 1;
@@ -192,6 +194,10 @@ var onStart = function () {
         } else {
           object.health -= 1;
           object.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
+          object.animation = 1;
+          object.addBehavior(Delay, {duration: 0.2, callback: function () {
+            this.entity.animation = 0;
+          }});
         }
         s.updateHealthBar(object);
         
@@ -348,6 +354,8 @@ var onStart = function () {
     } else if (s.player.stopped()) {
       s.player.turn(Math.round(angle(s.player.x - s.bg.camera.x, s.player.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2);
       s.player.move(s);
+    } else {
+      s.player.buffer = Math.round(angle(s.player.x - s.bg.camera.x, s.player.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
     }
   }
   var move = function (e) {
@@ -397,6 +405,13 @@ var onStart = function () {
     move(e);
   };
 
+  var directions = {
+    39: 0,
+    40: PI / 2,
+    37: PI,
+    38: 3 * PI / 2
+  }
+
   this.onKeyDown = function (e) {
     if (t.store.opened) {
       switch (e.keyCode) {
@@ -434,6 +449,8 @@ var onStart = function () {
       if ([37,38,39,40].indexOf(e.keyCode) !== -1) {
         t.player.move(t);
       }
+    } else {
+      t.player.buffer = directions[e.keyCode];
     }
   };
   
@@ -623,5 +640,11 @@ var onUpdate = function (dt) {
         enemies[i].alive = false;
       }
     }
+  }
+
+  if (this.player.stopped() && this.player.buffer !== undefined) {
+    this.player.turn(this.player.buffer);
+    this.player.move(this);
+    this.player.buffer = undefined;
   }
 };

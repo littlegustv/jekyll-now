@@ -42,7 +42,7 @@ function cardinal (angle) {
 
 var WIDTH = 640;
 var HEIGHT = 360;
-var ARM_TIME = 0.25;
+var ARM_TIME = 0.1;
 var TILESIZE = 64;
 var MIN = {x: 52, y: 20};
 var MAX = {x: MIN.x + TILESIZE * 9, y: HEIGHT - 20};
@@ -251,7 +251,11 @@ Boss.storetime = function () {
 
   this.entity.store_open.opacity = 0;
   this.entity.store_open.setCollision(Polygon);
-  this.entity.store_offset = this.entity.store_open.addBehavior(Follow, {target: this.entity, offset: {x: 0, y: -TILESIZE, angle: false, z: 1}}).offset;
+  this.entity.store_offset = this.entity.store_open.addBehavior(Follow, {target: this.entity, offset: {x: 0, y: -TILESIZE, angle: false, z: -2}}).offset;
+
+  var store_emphasis = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y - 3 * TILESIZE / 4, TILESIZE / 4));
+  store_emphasis.addBehavior(Follow, {target: this.entity.store_open, offset: {alive: true, z: 0.5, x: 0, y: 0}});
+  store_emphasis.addBehavior(Oscillate, {field: "radius", object: store_emphasis, initial: TILESIZE / 4, constant: 8, time: 0, func: "sin", rate: 3});
 
   var t1 = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 24, this.entity.y - 6, Resources.expire_font, "store", {spacing: -3, align: "center"}));
   var t2 = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 24, this.entity.y + 6, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
@@ -696,7 +700,9 @@ var Weapons = {
     return 3;
   },
   standard: function (layer) {
-    var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
+    //var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
+    var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+    a.radius = 4;
     a.color = "black";
     a.stroke = true;
     a.strokeColor = COLORS.primary;
@@ -713,7 +719,7 @@ var Weapons = {
     //a.projectile = true;;
     var theta = this.target ? (this.target.decoy ? angle(this.x, this.y, this.target.decoy.x, this.target.decoy.y) : angle(this.x, this.y, this.target.x, this.target.y)) : this.angle;
     a.velocity = {x: SPEEDS.projectile_normal * Math.cos(theta), y: SPEEDS.projectile_normal * Math.sin(theta)  };
-    a.angle = theta;    
+    //a.angle = theta;    
     a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
     a.addBehavior(Trail, {interval: 0.02, maxlength: 10, record: []});
     projectiles.push(a);
@@ -845,7 +851,7 @@ Enemy.update = function (dt) {
 Enemy.draw = function (ctx) {
   if (this.cooldown > 0 && this.cooldown < 1) {
     ctx.beginPath();
-    ctx.arc(this.entity.x, this.entity.y, this.cooldown * 2 * this.entity.w, 0, PI2, true);
+    ctx.arc(this.entity.x, this.entity.y, this.cooldown * 2 * this.entity.w + this.entity.w / 2, 0, PI2, true);
     ctx.fillStyle = COLORS.primary; //"#ff6347";
     ctx.globalAlpha = 1 - (this.cooldown / 2);
     ctx.fill();

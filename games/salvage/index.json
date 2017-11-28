@@ -6,7 +6,7 @@
     {"name": "tutorial", "reload": true}
   ],
   "resources": [
-    {"path": "viper.png", "frames": 4, "animations": 1, "speed": 0.3},
+    {"path": "viper.png", "frames": 4, "animations": 2, "speed": 0.3},
     {"path": "drone.png", "frames": 6, "animations": 1, "speed": 0.1},
     {"path": "boss.png", "frames": 2, "animations": 1, "speed": 0.5},
     {"path": "train.png", "frames": 2, "animations": 1, "speed": 0.3},
@@ -16,6 +16,7 @@
     {"path": "gate.png", "frames": 1, "animations": 2, "speed": 0.4},
     {"path": "grid.png"},
     {"path": "shield.png"},
+    {"path": "projectile.png"},
     {"path": "wall.png"},
     {"path": "ground.png"},
     {"path": "heart.png", "animations": 2},
