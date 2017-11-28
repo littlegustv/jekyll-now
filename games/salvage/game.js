@@ -674,29 +674,34 @@ var Weapons = {
     }
     var theta = this.target ? (this.target.decoy ? angle(this.x, this.y, this.target.decoy.x, this.target.decoy.y) : angle(this.x, this.y, this.target.x, this.target.y)) : this.angle;
     var warn = layer.add(Object.create(Entity).init(this.x + Math.cos(theta) * gameWorld.height, this.y + Math.sin(theta) * gameWorld.height, gameWorld.height * 2, 8));
-    warn.color = COLORS.primary; //"#ff6347";
-    warn.opacity = 0;
-    warn.angle = theta;
-    warn.z = 0;
-    warn.fade = warn.addBehavior(FadeIn, {duration: 0.5, maxOpacity: 1})
-    warn.addBehavior(Delay, {duration: 0.5, callback: function () {
-      var a = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y, this.entity.w, 2));
-      a.setCollision(Polygon);
-      gameWorld.playSound(Resources.laser);
-      a.family = "enemy";//"player";
-      a.beam = true;
-      a.z = 100;
-      a.angle = this.entity.angle;
-      var w = this.entity;
-      w.removeBehavior(w.fade);
-      a.addBehavior(Delay, {duration: 0.3, callback: function () {
-        w.addBehavior(FadeOut, {maxOpacity: 1, duration: 0.2 });
-        this.entity.addBehavior(FadeOut, {duration: 0.2});
-        this.entity.beam = false;
-        this.entity.removeBehavior(this);
-      }})
-      this.entity.removeBehavior(this);
-    }});
+    (function () {
+      warn.color = COLORS.primary; //"#ff6347";
+      warn.opacity = 0;
+      warn.angle = theta;
+      warn.z = 0;
+      warn.fade = warn.addBehavior(FadeIn, {duration: 0.5, maxOpacity: 1})
+      warn.addBehavior(FadeOut, {delay: 1, duration: 0.2, maxOpacity: 1});
+      warn.addBehavior(Delay, {duration: 0.5, callback: function () {
+        var a = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y, this.entity.w, 2));
+        a.setCollision(Polygon);
+        gameWorld.playSound(Resources.laser);
+        a.family = "enemy";//"player";
+        a.beam = true;
+        a.z = 100;
+        a.angle = this.entity.angle;
+        var w = this.entity;
+        var t = this;
+        console.log('beam', a.angle);
+        //(function () {
+        w.removeBehavior(this);
+        a.addBehavior(Delay, {duration: 0.3, callback: function () {
+          this.entity.addBehavior(FadeOut, {duration: 0.2});
+          this.entity.beam = false;
+          this.entity.removeBehavior(this);
+        }});
+        //})();
+      }});
+    })();
     return 3;
   },
   standard: function (layer) {
