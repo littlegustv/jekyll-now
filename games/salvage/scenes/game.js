@@ -463,15 +463,15 @@ var onStart = function () {
     [5],
     [6],
   ];
-  this.waves = [[6, 6]];
+//  this.waves = [[6, 6]];
 
   //this.waves = [[2,2,2,2,2,2,2,2,2,2]];
 //  this.waves = [[0,0,1,2,3,4,5,6]];
 
   //this.waves = [[6]];
   // this.waves = [[0], [], [], [], []];
-  var boss_coordinates = toGrid((MIN.x + MAX.x) / 2, MAX.y);
-  var boss = this.bg.add(Object.create(Sprite).init(boss_coordinates.x, boss_coordinates.y, Resources.boss));
+  var boss_coordinates = toGrid(MIN.x + MAX.x / 2, MAX.y);
+  var boss = this.bg.add(Object.create(Sprite).init(boss_coordinates.x - TILESIZE / 2, boss_coordinates.y, Resources.boss));
   boss.animation = 0;
   boss.offset = {x: 0, y: -16};
   boss.modules = [];
@@ -537,10 +537,10 @@ var onStart = function () {
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
   boss.setVertices([
-    {x: -20, y: -20},
-    {x: 20, y: -20},
-    {x: 20, y: 24},
-    {x: -20, y: 24}
+    {x: -64, y: -32},
+    {x: 64, y: -32},
+    {x: 64, y: 32},
+    {x: -64, y: 32}
   ])
   boss.collision.onHandle = function (object, other) {
     if (other.family == "player" && !gameWorld.boss.invulnerable) {
@@ -564,11 +564,11 @@ var onStart = function () {
         //s.player.move(s);
         if (other.y < object.y) {
           s.player.turn(PI / 2);
-          s.player.lerpy.goal = MAX.y - 2 * TILESIZE;
+          s.player.lerpy.goal = MAX.y - 1 * TILESIZE;
           //s.player.lerpx.goal = p.x;
         } else if (other.x > object.x) {
           s.player.turn(0);
-          s.player.lerpx.goal = b.x + 2 * TILESIZE;
+          s.player.lerpx.goal = b.x + 1 * TILESIZE;
           //s.player.lerpy.goal = p.y;
         } else if (other.x < object.x) {
           s.player.turn(PI);

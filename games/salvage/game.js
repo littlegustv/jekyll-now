@@ -763,7 +763,7 @@ var Weapons = {
   },
   burst: function (layer) {
     if (this.count === undefined) this.count = 0;
-    var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
+    var a = layer.add(Object.create(Circle).init(this.x + this.offset.x, this.y + this.offset.y, 4));
     a.color = "black";
     a.stroke = true;
     a.strokeColor = COLORS.primary;
@@ -870,7 +870,6 @@ BossEnemy.update = function (dt) {
   if (this.cooldown > 0) this.cooldown -= dt;
   else {
     var weapon = choose(["firework","hitscan", "triple", "burst", "homing"]);
-    //weapon = "firework";
     this.entity.shoot = Weapons[weapon];
     this.cooldown = this.entity.shoot(this.entity.layer) * Math.ceil( 3 * this.entity.health / this.entity.maxhealth) / 3;
     if (weapon === "homing") {
