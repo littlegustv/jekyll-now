@@ -213,17 +213,21 @@ Boss.beam = function () {
   }});
 };
 Boss.pay = function () {
-  var cash = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y, Resources.expire_font, "$1 cash", {align: "center", spacing: -2}));
-  cash.addBehavior(Velocity);
+  var cash = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y - 48, Resources.expire_font, "$1.00", {align: "center", spacing: -2}));
+  var backdrop = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y - 48, 128, 32));
+  backdrop.addBehavior(Follow, {target: cash, offset: {x: 0, y: 0, z: -1}});
+  backdrop.color = "#02ff9e"
+  //cash.addBehavior(Velocity);
   cash.family = "neutral";
+  cash.addBehavior(Lerp, {field: "y", goal: MIN.y + 2 * TILESIZE, rate: 1, object: cash});
   //cash.blend = "destination-out";
-  cash.velocity = {x: 0, y: -20};
+  //cash.velocity = {x: 0, y: -20};
   cash.setCollision(Polygon);
   cash.setVertices([
-    {x: -20, y: -5},
-    {x: -20, y: 5},
-    {x: 20, y: 5},
-    {x: 20, y: -5}
+    {x: -64, y: -16},
+    {x: -64, y: 16},
+    {x: 64, y: 16},
+    {x: 64, y: -16}
   ]);
   //cash.addBehavior(Lerp, {object: cash, field: "x", goal: WIDTH / 2, rate: 1});
   cash.collision.onHandle = function (object, other) {
