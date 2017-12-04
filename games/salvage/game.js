@@ -43,7 +43,7 @@ function cardinal (angle) {
 var WIDTH = 640;
 var HEIGHT = 360;
 var ARM_TIME = 0.1;
-var TILESIZE = 64;
+var TILESIZE = 48;
 var MIN = {x: 52, y: 20};
 var MAX = {x: MIN.x + TILESIZE * 9, y: HEIGHT - 20};
 var SPEEDS = {
