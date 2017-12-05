@@ -42,18 +42,15 @@ var onStart =  function () {
   //var grid = this.bg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
   //grid.z = 1;
 
-  var title = this.bg.add(Object.create(SpriteFont).init(16, gameWorld.height - 32, Resources.expire_font, "bastille day", {spacing: -2, align: "left"}));
+  //var title = this.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height - 56, Resources.expire_font, "BASTILLE DAY", {spacing: 0, align: "center"}));
   //title.addBehavior(Oscillate, {field: "y", object: title, initial: gameWorld.height / 2, rate: 1, constant: 24});
   //title.blend = "destination-out";
-  title.scale = 4;
-  title.z = 10;
+  //title.z = 10;
 
-  var boss = this.bg.add(Object.create(Sprite).init(gameWorld.width - 128 - 8, gameWorld.height - 64, Resources.boss));
-  boss.scale = 2;
+  var boss = this.bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 36, Resources.boss));
   boss.z = 9;
   
-  var ground = this.bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 4, gameWorld.width, 8, Resources.ground));
-  ground.scale = 4;
+  var ground = this.bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 8, gameWorld.width, 16, Resources.skyline));
   //ground.blend = "destination-out";
   ground.z = 10;
   
@@ -91,9 +88,8 @@ var onStart =  function () {
   var selected = 0;
   var mute_button_text;
   for (var i = 0; i < buttons.length; i++) {
-    var b = this.bg.add(Object.create(SpriteFont).init(16, gameWorld.height / 4 + i * 32, Resources.expire_font, buttons[i][0], {spacing: -1, align: "left"}));
-    b.scale = 2;
-    var button = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 4 + i * 32, gameWorld.width, 32));
+    var b = this.bg.add(Object.create(SpriteFont).init(16, gameWorld.height / 4 + i * 16, Resources.expire_font, buttons[i][0], {spacing: -1, align: "left"}));
+    var button = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 4 + i * 16, gameWorld.width, 16));
     button.family = "button";
     b.z = 2;
     button.z = 1;
@@ -149,14 +145,12 @@ var onStart =  function () {
   }
   
   var ship = this.bg.add(Object.create(Sprite).init(0, gameWorld.height - 128, Resources.viper));
-  ship.scale = 4;
   ship.addBehavior(Velocity);
   ship.velocity = {x: 120, y: 0};
   ship.addBehavior(Wrap, {min: {x: 0, y: 0}, max: {x: gameWorld.width, y: gameWorld.height}});
   ship.z = 12;
   ship.addBehavior(Periodic, {period: 0.8, callback: function () {
     var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
-    d.scale = 4;
     d.z = this.entity.z - 1;
     d.behaviors[0].onEnd = function () {
       this.entity.alive = false;

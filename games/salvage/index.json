@@ -16,6 +16,7 @@
     {"path": "gate.png", "frames": 1, "animations": 2, "speed": 0.4},
     {"path": "grid.png"},
     {"path": "shield.png"},
+    {"path": "skyline.png"},
     {"path": "projectile.png"},
     {"path": "wall.png"},
     {"path": "ground.png"},

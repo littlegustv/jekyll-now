@@ -21,16 +21,22 @@ var onStart = function () {
   cover.z = -8;
   cover.color = "black";
 
-  var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MAX.y + 12, WIDTH + 6, 12, Resources.ground));
-  ground.z = -7;
-  ground.solid = true;
-  ground.setCollision(Polygon);
+  var skyline = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MAX.y + 12, WIDTH + 6, 16, Resources.skyline));
+  skyline.z = 25;
+  skyline.solid = true;
+  skyline.setCollision(Polygon);
 
-  var ceiling = bg.add(Object.create(TiledBackground).init((MIN.x + MAX.x) / 2, MIN.y - 12, WIDTH - 8, 8, Resources.wall));
+  var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MAX.y + 18, WIDTH + 6, 8, Resources.ground));
+  ground.z = 26;
+
+  var cover_bottom = bg.add(Object.create(Entity).init(WIDTH / 2, HEIGHT - 20, WIDTH, 40));
+  cover_bottom.z = 27;
+
+  /*var ceiling = bg.add(Object.create(TiledBackground).init((MIN.x + MAX.x) / 2, MIN.y - 12, WIDTH - 8, 8, Resources.wall));
   ceiling.z = -7;
   ceiling.angle = PI;
   ceiling.solid = true;
-  ceiling.setCollision(Polygon);
+  ceiling.setCollision(Polygon);*/
 
   var right = bg.add(Object.create(TiledBackground).init(WIDTH, MIN.y + (MAX.y - MIN.y) / 2 - 4,  (MAX.y - MIN.y) + 22, 8, Resources.wall));
   right.angle = -PI / 2;
@@ -38,7 +44,7 @@ var onStart = function () {
   right.solid = true;
   right.setCollision(Polygon);
 
-  var l1 = bg.add(Object.create(Entity).init(MIN.x / 2 - 8, MIN.y + TILESIZE - 12, MIN.x, TILESIZE * 2));
+  /*var l1 = bg.add(Object.create(Entity).init(MIN.x / 2 - 8, MIN.y + TILESIZE - 12, MIN.x, TILESIZE * 2));
   l1.z = -6;
 
   var l2 = bg.add(Object.create(Entity).init(MIN.x / 2 - 8, MAX.y - TILESIZE + 12, MIN.x, TILESIZE * 2));
@@ -49,23 +55,20 @@ var onStart = function () {
   wall1.angle = PI;
 
   var wall2 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 8, MAX.y - 2 * TILESIZE + 36, MIN.x, 8, Resources.wall));
-  wall2.z = -5.5;
+  wall2.z = -5.5;*/
 
-  var left = bg.add(Object.create(TiledBackground).init(MIN.x - 12, MIN.y + (MAX.y - MIN.y) / 2 - 4, (MAX.y - MIN.y) + 22, 8, Resources.wall));
-  left.z = -5.4;
-  left.angle = PI / 2;
-  left.solid = true;
+  var left = bg.add(Object.create(TiledBackground).init(16, HEIGHT / 2, 32, HEIGHT, Resources.wall));
+  left.z = 25.5;
   //left.angle = PI / 2;
-  left.setCollision(Polygon);
+  //left.solid = true;
+  //left.angle = PI / 2;
+  //left.setCollision(Polygon);
   //var leftcover = bg.add(Object.create(Entity).init(MIN.x - 34, HEIGHT / 2, 48, HEIGHT));
   //leftcover.color = "black";
   //leftcover.z = -5;
   
-  var gate = bg.add(Object.create(Sprite).init(MIN.x - 16, (MIN.y + MAX.y) / 2, Resources.gate));
-  gate.setCollision(Polygon);
-  gate.angle = PI / 2;
-  gate.solid = true;
-  gate.z = -5;
+  var gate = bg.add(Object.create(Sprite).init(16, (MIN.y + MAX.y) / 2, Resources.gate));
+  gate.z = 26;
 
   this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
   this.ui.active = true;
@@ -147,7 +150,7 @@ var onStart = function () {
   player.shield = 0;
   // sprite object used to render shield up/down
   player.shield_sprite = this.shield;
-  player.z = Z.entity;
+  player.z = 50;
   player.salvage = 0;
   // movement settings
   player.speed = SPEEDS.player;
