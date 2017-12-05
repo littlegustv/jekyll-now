@@ -29,18 +29,16 @@ var onStart = function () {
   var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MAX.y + 18, WIDTH + 6, 8, Resources.ground));
   ground.z = 26;
 
-  var cover_bottom = bg.add(Object.create(Entity).init(WIDTH / 2, HEIGHT - 20, WIDTH, 40));
-  cover_bottom.z = 27;
+  var cover = bg.add(Object.create(Entity).init(WIDTH / 2, 8, WIDTH, 16));
+  cover.z = 27;
+  var cover = bg.add(Object.create(Entity).init(WIDTH / 2, HEIGHT - 5, WIDTH, 10));
+  cover.z = 27;
 
-  /*var ceiling = bg.add(Object.create(TiledBackground).init((MIN.x + MAX.x) / 2, MIN.y - 12, WIDTH - 8, 8, Resources.wall));
-  ceiling.z = -7;
-  ceiling.angle = PI;
-  ceiling.solid = true;
-  ceiling.setCollision(Polygon);*/
+  var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MIN.y - 16, WIDTH, 16, Resources.sky));
+  ceiling.z = 26;
 
-  var right = bg.add(Object.create(TiledBackground).init(WIDTH, MIN.y + (MAX.y - MIN.y) / 2 - 4,  (MAX.y - MIN.y) + 22, 8, Resources.wall));
-  right.angle = -PI / 2;
-  right.z = -6;
+  var right = bg.add(Object.create(TiledBackground).init(MAX.x + 24, HEIGHT / 2, 32, HEIGHT, Resources.wall));
+  right.z = 25.5;
   right.solid = true;
   right.setCollision(Polygon);
 
@@ -75,24 +73,26 @@ var onStart = function () {
 
   this.health_bar = [];
   for (var i = 0.5; i < MAXHEALTH + 0.5; i++) {
-    var h = bg.add(Object.create(Sprite).init(i * 16, gameWorld.height - 8, Resources.heart));
-    h.follow = h.addBehavior(Follow, {target: player, offset: {x: 16 * Math.cos(i * PI / 4), y: 16 * Math.sin(PI + i * PI / 4), z: 1, angle: false}});
-    h.radius = 2;
+    var h = this.ui.add(Object.create(Sprite).init(WIDTH / 2 - MAXHEALTH * 24 / 2 + i * 24, 16, Resources.heart));
+    h.scale = 2;
+    //h.follow = h.addBehavior(Follow, {target: player, offset: {x: 16 * Math.cos(i * PI / 4), y: 16 * Math.sin(PI + i * PI / 4), z: 1, angle: false}});
+    //h.radius = 2;
     //h.addBehavior(Oscillate, {field: "x", object: h.follow.offset, initial: 0, constant: 16, time: i * PI / 5, func: "cos"});
     //h.addBehavior(Oscillate, {field: "y", object: h.follow.offset, initial: 0, constant: 16, time: PI + i * PI / 5});
-    h.strokeColor = "#DD0000";
+    //h.strokeColor = "#DD0000";
     this.health_bar.push(h);
   }
   this.shield = bg.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 8, Resources.shield));
   this.shield.addBehavior(Follow, {target: player, offset: {x: 0, y: 0, z: -1, angle: false, opacity: false}});
   player.shield_sprite = this.shield;
 
+  player.cash_counter = this.ui.add(Object.create(SpriteFont).init(WIDTH + 8, 16, Resources.expire_font, "$ 0", {spacing: -2, align: "right"}));
+  player.cash_counter.scale = 2;
+
   var s = this;
   this.updateHealthBar = function (object) {
     for (var i = 0; i < s.health_bar.length; i++) {
-      if (object.health === 0) {
-        s.health_bar[i].alive = false;
-      } if (i < object.health) {
+      if (i < object.health) {
         s.health_bar[i].animation = 0;
       } else if (i < MAXHEALTH) {
         s.health_bar[i].animation = 1;
@@ -101,9 +101,10 @@ var onStart = function () {
     this.shield.opacity = Math.pow(object.shield, 2);
   };
 
-  var menu_text = this.ui.add(Object.create(SpriteFont).init(24, 12, Resources.expire_font, "menu", {align: "center", spacing: -3}));
-  var menu_button = this.ui.add(Object.create(Entity).init(24, 12, 48, 16));
+  var menu_text = this.ui.add(Object.create(SpriteFont).init(36, 12, Resources.expire_font, "menu", {align: "center", spacing: -3}));
+  var menu_button = this.ui.add(Object.create(Entity).init(36, 12, 64, 16));
   menu_button.family = "button";
+  menu_text.scale = 2;
   menu_button.opacity = 0;
   menu_button.trigger = function () {
     if (s.bg.paused) {
@@ -113,16 +114,17 @@ var onStart = function () {
     }
   };
   menu_button.hover = function () {
-    if (menu_text.scale != 1.2) gameWorld.playSound(Resources.hover);
-    menu_text.scale = 1.2;
+    if (menu_text.scale != 2.2) gameWorld.playSound(Resources.hover);
+    menu_text.scale = 2.2;
   };
   menu_button.unhover = function () {
-    menu_text.scale = 1;
+    menu_text.scale = 2;
   };
   
-  var mute_text = this.ui.add(Object.create(SpriteFont).init(24, gameWorld.height - 12, Resources.expire_font, "mute", {align: "center", spacing: -3}));
-  var mute_button = this.ui.add(Object.create(Entity).init(24, gameWorld.height - 12, 32, 16));
+  var mute_text = this.ui.add(Object.create(SpriteFont).init(100, 12, Resources.expire_font, "mute", {align: "center", spacing: -3}));
+  var mute_button = this.ui.add(Object.create(Entity).init(100, 12, 48, 16));
   mute_button.family = "button";
+  mute_text.scale = 2;
   mute_button.opacity = 0;
   if (gameWorld.muted) {
     mute_text.opacity = 0.8;
@@ -137,11 +139,11 @@ var onStart = function () {
     }
   };
   mute_button.hover = function () {
-    if (mute_text.scale != 1.2) gameWorld.playSound(Resources.hover);
-    mute_text.scale = 1.2;
+    if (mute_text.scale != 2.2) gameWorld.playSound(Resources.hover);
+    mute_text.scale = 2.2;
   };
   mute_button.unhover = function () {
-    mute_text.scale = 1;
+    mute_text.scale = 2;
   };
 
   player.setCollision(Polygon);

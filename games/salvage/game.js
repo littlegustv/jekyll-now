@@ -44,8 +44,8 @@ var WIDTH = 640;
 var HEIGHT = 360;
 var ARM_TIME = 0.1;
 var TILESIZE = 48;
-var MIN = {x: 40, y: 12};
-var MAX = {x: MIN.x + TILESIZE * 12, y: HEIGHT - 60};
+var MIN = {x: 40, y: 40};
+var MAX = {x: MIN.x + TILESIZE * 12, y: HEIGHT - 32};
 var SPEEDS = {
   gravity: 120,
   projectile_fast: 200,//100,
@@ -213,27 +213,31 @@ Boss.beam = function () {
   }});
 };
 Boss.pay = function () {
-  var cash = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y - 48, Resources.expire_font, "$1.00", {align: "center", spacing: -2}));
-  var backdrop = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y - 48, 128, 32));
-  backdrop.addBehavior(Follow, {target: cash, offset: {x: 0, y: 0, z: -1}});
-  backdrop.color = "#02ff9e"
+   /*this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y - 48, Resources.expire_font, "$1.00", {align: "center", spacing: -2}));
+  var backdrop*/ 
+  var cash = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y - 48, Resources.bill));
+  //backdrop.addBehavior(Follow, {target: cash, offset: {x: 0, y: 0, z: -1}});
+  //backdrop.color = "#02ff9e"
   //cash.addBehavior(Velocity);
   cash.family = "neutral";
   cash.addBehavior(Lerp, {field: "y", goal: MIN.y + 2 * TILESIZE, rate: 1, object: cash});
   //cash.blend = "destination-out";
   //cash.velocity = {x: 0, y: -20};
   cash.setCollision(Polygon);
-  cash.setVertices([
-    {x: -64, y: -16},
+  /*cash.setVertices([
+    {x: -24, y: -16},
     {x: -64, y: 16},
     {x: 64, y: 16},
     {x: 64, y: -16}
-  ]);
+  ]);*/
   //cash.addBehavior(Lerp, {object: cash, field: "x", goal: WIDTH / 2, rate: 1});
   cash.collision.onHandle = function (object, other) {
     if (other == gameWorld.player) {
       object.alive = false;
       other.salvage += 1;
+      if (other.cash_counter) {
+        other.cash_counter.text = "$ " + other.salvage;
+      }
       gameWorld.playSound(Resources.coins);
       for (var i = 0; i < 20; i++) {
         var p = object.layer.add(Object.create(SpriteFont).init(other.x, other.y, Resources.expire_font, "$", {align: "center"}));
