@@ -631,19 +631,21 @@ var onUpdate = function (dt) {
     if (!this.wave[i].alive) this.wave.splice(i, 1);
   };
 
-  var enemies = this.bg.entities.filter(function (e) { return e.family == "enemy" || e.family == "neutral"; });
-  var scrap = this.bg.entities.filter(function (e) { return e.scrap; });
-  this.player.checkCollisions(0, enemies);
-  gameWorld.boss.checkCollisions(0, scrap);
+  if (!s.bg.paused) {
+    var enemies = this.bg.entities.filter(function (e) { return e.family == "enemy" || e.family == "neutral"; });
+    var scrap = this.bg.entities.filter(function (e) { return e.scrap; });
+    this.player.checkCollisions(0, enemies);
+    gameWorld.boss.checkCollisions(0, scrap);
 
-  for (var i = 0; i < enemies.length; i++) {
-    if (!between(enemies[i].x, MIN.x - 1, MAX.x + 1) || !between(enemies[i].y, MIN.y - 1, MAX.y + 1)) {
-      if (enemies[i].projectile) {
-        projectileDie(enemies[i]);
-      } else if (enemies[i].die) {
-        enemies[i].die();
-      } else {
-        enemies[i].alive = false;
+    for (var i = 0; i < enemies.length; i++) {
+      if (!between(enemies[i].x, MIN.x - 1, MAX.x + 1) || !between(enemies[i].y, MIN.y - 1, MAX.y + 1)) {
+        if (enemies[i].projectile) {
+          projectileDie(enemies[i]);
+        } else if (enemies[i].die) {
+          enemies[i].die();
+        } else {
+          enemies[i].alive = false;
+        }
       }
     }
   }
