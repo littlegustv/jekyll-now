@@ -38,6 +38,16 @@ var onStart =  function () {
   back.color = "black";
   back.z = 0;
   this.nullaries.push(back);
+/*
+  var test = this.bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 100, Resources.saucer));
+  test.addBehavior(KeyFrame, {loop: true, ease: "easeOutQuad", frames: [
+    {time: 0, state: {x: test.x + 25, y: test.y}},
+    {time: 1, state: {x: test.x + 25, y: test.y + 50}},
+    {time: 2, state: {x: test.x - 25, y: test.y + 50}},
+    {time: 2.5, state: {x: test.x - 25, y: test.y}},
+    {time: 3, state: {x: test.x + 25, y: test.y}}
+  ]});
+  debug = test;*/
   
   //var grid = this.bg.add(Object.create(TiledBackground).init(MIN.x, MIN.y, 2 * Math.ceil(WIDTH / TILESIZE) * TILESIZE, 2 * Math.ceil(HEIGHT / TILESIZE) * TILESIZE, Resources.grid));
   //grid.z = 1;

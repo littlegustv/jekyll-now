@@ -320,12 +320,12 @@ var onStart = function () {
         }
         projectiles = [];
         // open store every OTHer wave
-        var announcement = t.bg.add(Object.create(SpriteFont).init(MIN.x + 4 * TILESIZE + 8, gameWorld.height / 2, Resources.expire_font, "wave " + gameWorld.wave, {spacing: -3, align: "center"}));
+/*        var announcement = t.bg.add(Object.create(SpriteFont).init(MIN.x + 4 * TILESIZE + 8, gameWorld.height / 2, Resources.expire_font, "wave " + gameWorld.wave, {spacing: -3, align: "center"}));
         announcement.opacity = 0;
         announcement.addBehavior(FadeIn, {duration: 0.3, delay: 0, maxOpacity: 1});
         announcement.addBehavior(FadeOut, {duration: 0.3, delay: 0.5, maxOpacity: 1});
         announcement.scale = 2;
-
+*/
         for (var i = 0; i < gameWorld.wave; i++) {
           var k = i % this.waves.length;
           for (var j = 0; j < this.waves[k].length; j++) {
@@ -335,7 +335,7 @@ var onStart = function () {
         }
         gameWorld.wave++;
 
-        gameWorld.boss.boss.beam();
+        gameWorld.boss.boss.pay();
       }
     }
   }
@@ -476,7 +476,7 @@ var onStart = function () {
   //this.waves = [[6]];
   // this.waves = [[0], [], [], [], []];
   var boss_coordinates = toGrid(MIN.x + MAX.x / 2, MAX.y);
-  var boss = this.bg.add(Object.create(Sprite).init(boss_coordinates.x - TILESIZE / 2, boss_coordinates.y, Resources.boss));
+  var boss = this.bg.add(Object.create(Sprite).init(boss_coordinates.x, boss_coordinates.y, Resources.boss));
   boss.animation = 0;
   boss.offset = {x: 0, y: -16};
   boss.modules = [];
@@ -542,8 +542,8 @@ var onStart = function () {
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
   boss.setVertices([
-    {x: -64, y: -32},
-    {x: 64, y: -32},
+    {x: -64, y: -24},
+    {x: 64, y: -24},
     {x: 64, y: 32},
     {x: -64, y: 32}
   ])
@@ -573,7 +573,7 @@ var onStart = function () {
           //s.player.lerpx.goal = p.x;
         } else if (other.x > object.x) {
           s.player.turn(0);
-          s.player.lerpx.goal = b.x + 1 * TILESIZE;
+          s.player.lerpx.goal = b.x + 2 * TILESIZE;
           //s.player.lerpy.goal = p.y;
         } else if (other.x < object.x) {
           s.player.turn(PI);

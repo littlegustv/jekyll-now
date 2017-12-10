@@ -30,7 +30,7 @@
     {"path": "expire_font.png", "frames": 95, "animations": 1},
     {"path": "asteroid.png"},
     {"path": "blink.png", "frames": 7, "animations": 1, "speed": 0.1},
-    {"path": "dust.png", "animations": 2, "frames": 4, "speed": 0.2},
+    {"path": "dust.png", "animations": 4, "frames": 4, "speed": 0.2},
     {"path": "icons.png", "animations": 6},
     {"path": "hit.wav"},
     {"path": "process.wav"},

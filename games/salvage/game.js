@@ -93,6 +93,70 @@ var buttonHover = function () {
 };
 var buttonUnHover = function () { this.opacity = 1;};
 
+/* addBehavior(KeyFrame, {loop: true, frames: [
+  { time: 1, state: {x: 10, y: 10, angle: 0}},
+  { time: 2, state: {x: 10, y: 10, angle: PI}},
+  { time: 3, state: }
+]})
+*/
+
+// add to raindrop, and https://github.com/danro/jquery-easing/blob/master/jquery.easing.js
+var EASE = {
+  linear: function (start, end, t) {
+    return start + (end - start) * t;
+  },
+  easeInQuad: function (start, end, t) {
+    return (end - start) * t * t + start;
+  },
+  easeOutQuad: function (start, end, t) {
+    return -(end - start) *(t)*(t-2) + start;
+  },
+  easeOutBounce: function (start, end, t) {
+    var c = end - start;
+    if (t < (1/2.75)) {
+      return c*(7.5625*t*t) + start;
+    } else if (t < (2/2.75)) {
+      return c*(7.5625*(t-=(1.5/2.75))*t + .75) + start;
+    } else if (t < (2.5/2.75)) {
+      return c*(7.5625*(t-=(2.25/2.75))*t + .9375) + start;
+    } else {
+      return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + start;
+    }
+  }
+}
+// c = change, t = time, d = duration, b = base, x = ?
+// c -> (end - start)
+// t / d -> t
+// b -> b
+
+// add to raindrop
+var KeyFrame = Object.create(Behavior);
+KeyFrame.update = function (dt) {
+  if (this.time === undefined) this.time = 0;
+  this.time += dt;
+  for (var i = this.frames.length - 1; i >= 0; i--) {
+    if (this.time >=  this.frames[i].time) {
+      var frame = this.frames[i];
+      var next = this.frames[i + 1];
+      break;
+    }
+  }
+  if (next) {
+    var t = (this.time - frame.time) / (next.time - frame.time);
+    for (var key in frame.state) {
+      if (next.state[key] !== undefined) {
+        this.entity[key] = EASE[this.ease](frame.state[key], next.state[key], t);
+      }
+    }
+  } else {
+    if (this.loop) this.time = 0;
+    else this.entity.removeBehavior(this);
+  }
+}
+KeyFrame.interpolate = function (start, end, t) {
+  return (1 - t) * start + t * end
+}
+
 // used for player 'shield' upgrade
 var Shielded = Object.create(Behavior);
 Shielded.update = function (dt) {
@@ -205,7 +269,6 @@ Boss.beam = function () {
   gameWorld.playSound(Resources.process);
   var t = this;
   this.entity.addBehavior(Delay, { duration: 2, callback: function () {
-    t.pay();
     if (gameWorld.wave % 2 === 1 && ! gameWorld.boss.store_open) {
       t.storetime();
     }
@@ -213,42 +276,26 @@ Boss.beam = function () {
   }});
 };
 Boss.pay = function () {
-   /*this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y - 48, Resources.expire_font, "$1.00", {align: "center", spacing: -2}));
-  var backdrop*/ 
-  var cash = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y - 48, Resources.bill));
-  //backdrop.addBehavior(Follow, {target: cash, offset: {x: 0, y: 0, z: -1}});
-  //backdrop.color = "#02ff9e"
-  //cash.addBehavior(Velocity);
-  cash.family = "neutral";
-  cash.addBehavior(Lerp, {field: "y", goal: MIN.y + 2 * TILESIZE, rate: 1, object: cash});
-  //cash.blend = "destination-out";
-  //cash.velocity = {x: 0, y: -20};
-  cash.setCollision(Polygon);
-  /*cash.setVertices([
-    {x: -24, y: -16},
-    {x: -64, y: 16},
-    {x: 64, y: 16},
-    {x: 64, y: -16}
-  ]);*/
-  //cash.addBehavior(Lerp, {object: cash, field: "x", goal: WIDTH / 2, rate: 1});
-  cash.collision.onHandle = function (object, other) {
-    if (other == gameWorld.player) {
-      object.alive = false;
-      other.salvage += 1;
-      if (other.cash_counter) {
-        other.cash_counter.text = "$ " + other.salvage;
-      }
+  for (var i = 0; i < gameWorld.scene.layers.length; i++) {
+    gameWorld.scene.layers[i].paused = true;
+  }
+  var t = this;
+  gameWorld.scene.ui.paused = false;
+  var pd = gameWorld.scene.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "payday!", {spacing: -1, align: "center"}));
+  pd.addBehavior(KeyFrame, {loop: false, ease: 'linear', frames: [
+      {time: 0, state: { scale: 1 }},
+      {time: 0.3, state: { scale: 2, x: pd.x, y: pd.y }},
+      {time: 0.5, state: {x: pd.x, y: 16}},
+      {time: 0.8, state: {x: WIDTH - 16, y: 16}}
+    ], end: function () {
+      projectileDie(this.entity);
       gameWorld.playSound(Resources.coins);
-      for (var i = 0; i < 20; i++) {
-        var p = object.layer.add(Object.create(SpriteFont).init(other.x, other.y, Resources.expire_font, "$", {align: "center"}));
-        p.addBehavior(Velocity);
-        //p.blend = "destination-out";
-        p.addBehavior(FadeOut, {duration: 0, delay: Math.random()});
-        p.velocity = {x: randint(-20,20), y: randint(-20,20)};
-      }
-    }
-  };
-  //this.goal = toGrid(this.x, this.y);
+      gameWorld.player.salvage += 1;
+      gameWorld.player.cash_counter.text = "$ " + gameWorld.player.salvage;
+      //gameWorld.scene.bg.paused = false;
+      this.entity.alive = false;      
+      t.beam();
+    }});
   this.callback = undefined;
   return this.duration;
 };
