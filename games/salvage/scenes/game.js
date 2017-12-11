@@ -30,15 +30,15 @@ var onStart = function () {
   ground.z = 26;
 
   var cover = bg.add(Object.create(Entity).init(WIDTH / 2, 8, WIDTH, 16));
-  cover.z = 27;
+  cover.z = 23;
   var cover = bg.add(Object.create(Entity).init(WIDTH / 2, HEIGHT - 5, WIDTH, 10));
-  cover.z = 27;
+  cover.z = 23;
 
   var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MIN.y - 16, WIDTH, 16, Resources.sky));
   ceiling.z = 26;
 
   var right = bg.add(Object.create(TiledBackground).init(MAX.x + 24, HEIGHT / 2, 32, HEIGHT, Resources.wall));
-  right.z = 25.5;
+  right.z = 22;
   right.solid = true;
   right.setCollision(Polygon);
 
@@ -56,7 +56,7 @@ var onStart = function () {
   wall2.z = -5.5;*/
 
   var left = bg.add(Object.create(TiledBackground).init(16, HEIGHT / 2, 32, HEIGHT, Resources.wall));
-  left.z = 25.5;
+  left.z = 22;
   //left.angle = PI / 2;
   //left.solid = true;
   //left.angle = PI / 2;
@@ -73,7 +73,7 @@ var onStart = function () {
 
   this.health_bar = [];
   for (var i = 0.5; i < MAXHEALTH + 0.5; i++) {
-    var h = this.ui.add(Object.create(Sprite).init(WIDTH / 2 - MAXHEALTH * 24 / 2 + i * 24, 16, Resources.heart));
+    var h = this.ui.add(Object.create(Sprite).init(WIDTH / 2 - MAXHEALTH * 28 / 2 + i * 28, 16, Resources.heart));
     h.scale = 2;
     //h.follow = h.addBehavior(Follow, {target: player, offset: {x: 16 * Math.cos(i * PI / 4), y: 16 * Math.sin(PI + i * PI / 4), z: 1, angle: false}});
     //h.radius = 2;
@@ -95,6 +95,9 @@ var onStart = function () {
       if (i < object.health) {
         s.health_bar[i].animation = 0;
       } else if (i < MAXHEALTH) {
+        if (s.health_bar[i].animation === 0) {
+          particles(s.health_bar[i], 10, 3);
+        }
         s.health_bar[i].animation = 1;
       }
     }
@@ -196,8 +199,10 @@ var onStart = function () {
           m.addBehavior(Velocity);
           m.addBehavior(FadeOut, {delay: 0.5, duration: 0.2});
           m.velocity = {x: 0, y: 30, angle: PI / 12};
+          particles(other, 5, 0);
         } else {
           object.health -= 1;
+          particles(other, 5, 3);
           object.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
           object.animation = 1;
           object.addBehavior(Delay, {duration: 0.2, callback: function () {
@@ -279,20 +284,22 @@ var onStart = function () {
         }
       }
       // at gate
-      if (coords.x === MIN.x && (coords.y == MIN.y + TILESIZE * 2 || coords.y == MIN.y + TILESIZE * 3)) {
+      if (coords.x === MIN.x && (coords.y == MIN.y + TILESIZE * 2 || coords.y == MIN.y + TILESIZE * 3 || coords.y == MIN.y + TILESIZE * 4)) {
         if (!player.hasFTL) {
           gate.animation = 0;
-          gate.addBehavior(Delay, {duration: 1, callback: function () {
-            this.entity.animation = 0;
-            this.entity.removeBehavior(this);
-          }});
-          var warning = this.bg.add(Object.create(SpriteFont).init(gate.x + 2, gate.y - 10, Resources.expire_font, "DENIED", {spacing: -1, align: "center"}));
+          var warning = this.bg.add(Object.create(SpriteFont).init(gate.x + 2, gate.y, Resources.expire_font, "LOCKED", {spacing: -1, align: "center"}));
           warning.addBehavior(FadeOut, {duration: 0.5, delay: 0.5});
+          warning.angle = -PI / 2;
+          warning.z = 50;
+          warning.scale = 2;
           gameWorld.playSound(Resources.denied);
         } else {
-          var warning = this.bg.add(Object.create(SpriteFont).init(gate.x + 2, gate.y - 10, Resources.expire_font, "APPROVED", {spacing: -1, align: "center"}));
+          var warning = this.bg.add(Object.create(SpriteFont).init(gate.x + 2, gate.y, Resources.expire_font, "OPEN!!", {spacing: -1, align: "center"}));
           warning.addBehavior(FadeOut, {duration: 0.5, delay: 0.5});
-          cover.alive = false;
+          warning.z = 50;
+          warning.angle = -PI / 2;
+          warning.scale = 2;
+          //cover.alive = false;
           gameWorld.playSound(Resources.approved);
           gate.animation = 1;
         }
@@ -569,15 +576,15 @@ var onStart = function () {
         //s.player.move(s);
         if (other.y < object.y) {
           s.player.turn(PI / 2);
-          s.player.lerpy.goal = MAX.y - 1 * TILESIZE;
+          s.player.lerpy.goal = MAX.y - 2 * TILESIZE;
           //s.player.lerpx.goal = p.x;
         } else if (other.x > object.x) {
           s.player.turn(0);
-          s.player.lerpx.goal = b.x + 2 * TILESIZE;
+          s.player.lerpx.goal = b.x + 3 * TILESIZE;
           //s.player.lerpy.goal = p.y;
         } else if (other.x < object.x) {
           s.player.turn(PI);
-          s.player.lerpx.goal = b.x - 2 * TILESIZE;
+          s.player.lerpx.goal = b.x - 3 * TILESIZE;
           //s.player.lerpy.goal = p.y;
         }
       }

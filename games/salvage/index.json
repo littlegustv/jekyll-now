@@ -20,6 +20,7 @@
     {"path": "skyline.png"},
     {"path": "sky.png"},
     {"path": "projectile.png"},
+    {"path": "scrap.png"},
     {"path": "wall.png"},
     {"path": "ground.png"},
     {"path": "heart.png", "animations": 2},

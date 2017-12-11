@@ -80,7 +80,7 @@ function toGrid(x, y) {
     y: clamp(Math.round((y - MIN.y) / TILESIZE) * TILESIZE + MIN.y, MIN.y, MAX.y)
   };
   if (gameWorld.player && gameWorld.player.hasFTL) {
-    if (g.y == MIN.y + TILESIZE * 2 || g.y == MIN.y + TILESIZE * 3) { // halfway point?
+    if (g.y == MIN.y + TILESIZE * 2 || g.y == MIN.y + TILESIZE * 3 || g.y == MIN.y + TILESIZE * 4) { // halfway point?
       g.x = clamp(Math.round((x - MIN.x) / TILESIZE) * TILESIZE + MIN.x, MIN.x - 2 * TILESIZE, MAX.x);
     }
   }
@@ -281,19 +281,18 @@ Boss.pay = function () {
   }
   var t = this;
   gameWorld.scene.ui.paused = false;
-  var pd = gameWorld.scene.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "payday!", {spacing: -1, align: "center"}));
+  var pd = gameWorld.scene.ui.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y - 32, Resources.expire_font, "payday! +$1", {spacing: -1, align: "center"}));
   pd.addBehavior(KeyFrame, {loop: false, ease: 'linear', frames: [
-      {time: 0, state: { scale: 1 }},
-      {time: 0.3, state: { scale: 2, x: pd.x, y: pd.y }},
-      {time: 0.5, state: {x: pd.x, y: 16}},
-      {time: 0.8, state: {x: WIDTH - 16, y: 16}}
+      {time: 0, state: { scale: 1, opacity: 0 }},
+      {time: 1, state: { scale: 2, x: pd.x, y: pd.y, opacity: 1 }},
+      {time: 1.4, state: {x: WIDTH - 16, y: 16}}
     ], end: function () {
-      projectileDie(this.entity);
+      //projectileDie(this.entity);
       gameWorld.playSound(Resources.coins);
       gameWorld.player.salvage += 1;
       gameWorld.player.cash_counter.text = "$ " + gameWorld.player.salvage;
       //gameWorld.scene.bg.paused = false;
-      this.entity.alive = false;      
+      this.entity.addBehavior(FadeOut, {duration: 0.3, maxOpacity: 1});
       t.beam();
     }});
   this.callback = undefined;
@@ -357,7 +356,7 @@ Approach.pick = function () {
   var g = toGrid(this.entity.x + sign(this.target.x - this.entity.x) * TILESIZE, this.entity.y); // horiztonal
   var p = toGrid(this.target.x, this.target.y);
   var b = toGrid(gameWorld.boss.x, gameWorld.boss.y);
-  if (g.x === b.x && (g.y === b.y || this.entity.y + TILESIZE === b.y)) return toGrid(this.entity.x, this.entity.y - TILESIZE); // if we WOULD go towards the boss
+  if ((g.x === b.x || g.x === b.x - TILESIZE || g.x === b.x + TILESIZE) && (g.y === b.y || this.entity.y + TILESIZE === b.y)) return toGrid(this.entity.x, this.entity.y - TILESIZE); // if we WOULD go towards the boss
   else if (g.x !== p.x || g.y !== p.y) return g;
   else return toGrid(this.entity.x, this.entity.y + sign(this.target.y - this.entity.y) * TILESIZE);
 };
@@ -543,13 +542,19 @@ function projectileHit (object, other) {
   }
 }
 
-function projectileDie(p) {
+function projectileDie(p, color) {
   p.alive = false;
-  for (var i = 0; i < 5; i++) {    
+  color = color === undefined ? 1 : color;
+  particles(p, 5, color);
+}
+
+function particles (p, count, color) {
+  for (var i = 0; i < count; i++) {    
     // particle effect
     var d = p.layer.add(Object.create(Sprite).init(p.x, p.y, Resources.dust));
     d.addBehavior(Velocity);
-    d.animation = 1;
+    d.animation = color;
+    d.z = p.z + 1;
     var theta = Math.random() * PI2;
     var speed = randint(5, 30);
     d.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
@@ -1024,13 +1029,14 @@ function spawn(layer, key, player) {
       break;
     case 1: // armored train
       enemy.shoot = Weapons.triple;
-      c.x = toGrid(choose([-1, 1]) * randint(1, 3) * TILESIZE + b.x, 0).x;
+      c.x = toGrid(choose([-1, 1]) * 2 * TILESIZE + b.x, 0).x;
       if (c.x > b.x) {
         var min = c.x, max = toGrid(MAX.x, 0).x;
       } else {
         var min = toGrid(0, 0).x, max = c.x;
       }
       enemy.x = c.x;
+      enemy.offset = {x: 0, y: 2};
       enemy.addBehavior(Horizontal, {duration: 0.5, speed: SPEEDS.enemy_horizontal, target: player, min: min, max: max, delay: 0.5}); // hmmm!
       enemy.target = player;
       enemy.y = toGrid(100, 1000).y + 4;
@@ -1075,7 +1081,8 @@ function spawn(layer, key, player) {
       break;
     case 6: // beam weapon!!
 
-      c.x = toGrid(choose([-1, 1]) * randint(1, 3) * TILESIZE + b.x, 0).x;
+      
+      c.x = toGrid(choose([-1, 1]) * 2 * TILESIZE + b.x, 0).x;
       if (c.x > b.x) {
         var min = c.x, max = toGrid(MAX.x, 0).x;
       } else {
@@ -1123,12 +1130,26 @@ function spawn(layer, key, player) {
     gameWorld.playSound(Resources.hit);        
     
     // scrap (coins??)
-    var scrap = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, Resources.coin));//this.sprite));
+    var scrap = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, this.sprite));
+    scrap.opacity = 0.8;
+    scrap.angle = this.angle;
     scrap.addBehavior(Velocity);
     scrap.velocity = {x: 0, y: 0};
     scrap.z = 2.5;
     scrap.scrap = true;
     scrap.setCollision(Polygon);
+    scrap.addBehavior(Periodic, {period: 0.1, callback: function () {
+      if (Math.random() <= 0.5) {
+        var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x + randint(0, this.entity.w) - this.entity.w / 2, this.entity.y + this.entity.offset.y + randint(-this.entity.h / 2, this.entity.h / 2), Resources.dust));
+        d.z = this.entity.z + 1;
+        d.opacity = this.entity.opacity;
+        d.behaviors[0].onEnd = function () {
+          this.entity.alive = false;
+        };
+        d.addBehavior(Velocity);
+        d.velocity = {x: 0, y: - 40};
+      }
+    }});
     if (gameWorld.boss.queue.indexOf(toGrid(0, scrap.y).y) == -1) {
       gameWorld.boss.queue.unshift(toGrid(0, scrap.y).y);      
     }
@@ -1137,7 +1158,7 @@ function spawn(layer, key, player) {
         object.alive = false;
         // fix me: play 'processing' or HEALING sound, animation?
         gameWorld.playSound(Resources.work);
-        for (var i = 0; i < 20; i++) {
+        /*for (var i = 0; i < 20; i++) {
           if (other.health < other.maxhealth) {          
             var h = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.heart));
           } else {
@@ -1149,7 +1170,7 @@ function spawn(layer, key, player) {
           h.addBehavior(Velocity);
           h.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta) };
           h.addBehavior(FadeOut, {duration: 0.2, delay: randint(1, 2)});
-        }
+        }*/
         other.health = Math.min(other.maxhealth, other.health + 1); // repair!
         if (other.health >= other.maxhealth && !other.unforgiving && other.enemy) {
           other.removeBehavior(other.enemy);
@@ -1280,7 +1301,7 @@ var Store = {
       }
     },
     {
-      name: "Visa", price: 7, icon: 5, 
+      name: "Gate Key", price: 7, icon: 5, 
       trigger: function (t) {
         t.player.hasFTL = true;
       },
@@ -1426,9 +1447,10 @@ var Store = {
       t.opened = true;
     }
     this.layer.active = true;
-    for (var i = 0; i < gameWorld.scene.layers.length; i++) {
+    /*for (var i = 0; i < gameWorld.scene.layers.length; i++) {
       gameWorld.scene.layers[i].paused = true;
-    }
+    }*/
+    gameWorld.scene.bg.paused = true;
     this.layer.paused = false;
   },
   close: function () {
