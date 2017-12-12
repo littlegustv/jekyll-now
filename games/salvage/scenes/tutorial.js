@@ -136,6 +136,10 @@ var onStart =  function () {
   /* player */
   var player_coordinates = toGrid(WIDTH / 2, HEIGHT / 2);
   player = fg.add(Object.create(Sprite).init(player_coordinates.x, player_coordinates.y, Resources.viper));
+  player.cursor = fg.add(Object.create(Sprite).init(player.x, player.y, Resources.target));
+  player.cursor.addBehavior(Follow, {target: player, offset: {x: 0, y: 0}});
+  player.cursor.offset = {x: TILESIZE, y: 0};
+  
   player.setCollision(Polygon);
   player.move = Movement.standard;
   player.speed = 6.5;
@@ -150,15 +154,17 @@ var onStart =  function () {
   };
   player.turn = function (angle) {
     this.angle = angle;
+    player.cursor.offset = {x: TILESIZE * Math.cos(player.angle), y: TILESIZE * Math.sin(player.angle)};    
   };
 
   this.player = player;
-  this.player = player; // fix me: rename player;
   this.fg = fg;
   
   this.pause = function () {
-    if (player.stopped()) {      
+    if (player.stopped()) {
       this.fg.paused = true;
+      player.cursor.opacity = 1;
+      console.log('what!');
     }
   };
   this.unpause = function () {
@@ -174,10 +180,10 @@ var onStart =  function () {
       }
     }
     if (s.player.stopped()) {
-      s.player.angle = Math.round(angle(s.player.x - s.fg.camera.x, s.player.y - s.fg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
+      s.player.turn(Math.round(angle(s.player.x - s.fg.camera.x, s.player.y - s.fg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2);
       s.player.move(s);
     } else {
-      s.player.buffer = Math.round(angle(s.player.x - s.bg.camera.x, s.player.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
+      s.player.buffer = Math.round(angle(s.player.x - s.fg.camera.x, s.player.y - s.fg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
     }
   };
   var move = function (e) {
@@ -267,20 +273,7 @@ var onStart =  function () {
   }
   this.onKeyDown = function (e) {
     if ([37,38,39,40].indexOf(e.keyCode) !== -1 && s.player.stopped()) {
-      switch (e.keyCode) {
-        case 39:
-          s.player.angle = 0;
-          break;
-        case 40:
-          s.player.angle = PI / 2;
-          break;
-        case 37:
-          s.player.angle = PI;
-          break;
-        case 38:
-          s.player.angle = 3 * PI / 2;
-          break;
-      }
+      s.player.turn(directions[e.keyCode]);
       s.player.move(s);
     } else if ([37,38,39,40].indexOf(e.keyCode) !== -1) {
       s.player.buffer = directions[e.keyCode];

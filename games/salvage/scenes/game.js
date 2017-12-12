@@ -139,6 +139,9 @@ var onStart = function () {
   player.speed = SPEEDS.player;
   player.distance = TILESIZE;
   player.noCollide = false;
+  player.cursor = bg.add(Object.create(Sprite).init(player.x, player.y, Resources.target));
+  player.cursor.addBehavior(Follow, {target: player, offset: {x: 0, y: 0}});
+  player.cursor.offset = {x: TILESIZE, y: 0};
   
   player.family = "player";
   player.stopped = function () {
@@ -149,6 +152,7 @@ var onStart = function () {
   
   player.turn = function (angle) {
     this.angle = angle;
+    player.cursor.offset = {x: TILESIZE * Math.cos(player.angle), y: TILESIZE * Math.sin(player.angle)};
     switch (cardinal(angle)) {
       case 0:
         this.shield_sprite.offset = {x: 0, y: 0};
@@ -253,6 +257,7 @@ var onStart = function () {
 
       var coords = toGrid(this.player.x, this.player.y);
       this.bg.paused = true;
+      this.player.cursor.opacity = 1;
 
       // open store
       if (gameWorld.boss.store_open) {

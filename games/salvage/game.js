@@ -1192,6 +1192,7 @@ function spawn(layer, key, player) {
 
 var Movement = {
   standard: function (s) {
+    s.player.cursor.opacity = 0;
     var x = Math.round(s.player.x + this.distance * Math.cos(s.player.angle)),
         y = Math.round(s.player.y + this.distance * Math.sin(s.player.angle));
     var goal = toGrid(x, y);      

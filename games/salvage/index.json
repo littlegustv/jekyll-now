@@ -17,6 +17,7 @@
     {"path": "grid.png"},
     {"path": "bill.png", "frames": 2, "speed": 0.3},
     {"path": "shield.png"},
+    {"path": "target.png"},
     {"path": "skyline.png"},
     {"path": "sky.png"},
     {"path": "projectile.png"},
