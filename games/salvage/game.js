@@ -1,6 +1,13 @@
 /* global Resources, Entity, Sprite, SpriteFont, TiledBackground, Behavior, World, randint, clamp, between */
 // canvas filter (color style); grayscale(70%) contrast(250%) brightness(90%);
 
+var directions = {
+  39: 0,
+  40: PI / 2,
+  37: PI,
+  38: 3 * PI / 2
+}
+
 var MAXHEALTH = 4, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(640, 360, "index.json");
 gameWorld.wave = 1;
@@ -29,11 +36,11 @@ gameWorld.mute = function () {
 }
 
 var ENDINGS = [
-	"Workplace Accident",
-	"Forgot Your Place?",
-	"Social Mobility",
-	"Terror is the order of the day",
-	"Insurrection"
+	"Workplace Accident", // normal in-game death
+	"Don't Forget Your Place", // failed insurrection
+	"Social Mobility", // buy key
+	"The Republic of Virtue", // buy key, still insurrection
+	"Insurrection" // simple insurrection
 ];
 
 function cardinal (angle) {

@@ -23,9 +23,6 @@ var onStart = function () {
 
   var skyline = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MAX.y + 12, WIDTH + 6, 16, Resources.skyline));
   skyline.z = 25;
-  skyline.solid = true;
-  skyline.setCollision(Polygon);
-
   var ground = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MAX.y + 18, WIDTH + 6, 8, Resources.ground));
   ground.z = 26;
 
@@ -39,34 +36,15 @@ var onStart = function () {
 
   var right = bg.add(Object.create(TiledBackground).init(MAX.x + 24, HEIGHT / 2, 32, HEIGHT, Resources.wall));
   right.z = 22;
-  right.solid = true;
-  right.setCollision(Polygon);
-
-  /*var l1 = bg.add(Object.create(Entity).init(MIN.x / 2 - 8, MIN.y + TILESIZE - 12, MIN.x, TILESIZE * 2));
-  l1.z = -6;
-
-  var l2 = bg.add(Object.create(Entity).init(MIN.x / 2 - 8, MAX.y - TILESIZE + 12, MIN.x, TILESIZE * 2));
-  l2.z = -6;
-
-  var wall1 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 8, MIN.y + 2 * TILESIZE - 36, MIN.x, 8, Resources.wall));
-  wall1.z = -5.5;
-  wall1.angle = PI;
-
-  var wall2 = bg.add(Object.create(TiledBackground).init(MIN.x / 2 - 8, MAX.y - 2 * TILESIZE + 36, MIN.x, 8, Resources.wall));
-  wall2.z = -5.5;*/
 
   var left = bg.add(Object.create(TiledBackground).init(16, HEIGHT / 2, 32, HEIGHT, Resources.wall));
   left.z = 22;
-  //left.angle = PI / 2;
-  //left.solid = true;
-  //left.angle = PI / 2;
-  //left.setCollision(Polygon);
-  //var leftcover = bg.add(Object.create(Entity).init(MIN.x - 34, HEIGHT / 2, 48, HEIGHT));
-  //leftcover.color = "black";
-  //leftcover.z = -5;
-  
+
   var gate = bg.add(Object.create(Sprite).init(16, (MIN.y + MAX.y) / 2, Resources.gate));
   gate.z = 26;
+
+  var leftcover = bg.add(Object.create(TiledBackground).init(0, HEIGHT / 2, 1, HEIGHT, Resources.wall));
+  leftcover.z = 51;
 
   this.ui = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
   this.ui.active = true;
@@ -417,13 +395,6 @@ var onStart = function () {
     move(e);
   };
 
-  var directions = {
-    39: 0,
-    40: PI / 2,
-    37: PI,
-    38: 3 * PI / 2
-  }
-
   this.onKeyDown = function (e) {
     if (t.store.opened) {
       switch (e.keyCode) {
@@ -634,7 +605,7 @@ var onStart = function () {
 var onUpdate = function (dt) {
   var s = this;
 
-  for (var i = 0; i < this.wave.length; i++) {
+  for (var i = this.wave.length - 1; i >= 0; i--) {
     if (!this.wave[i].alive) this.wave.splice(i, 1);
   };
 
@@ -644,7 +615,7 @@ var onUpdate = function (dt) {
     this.player.checkCollisions(0, enemies);
     gameWorld.boss.checkCollisions(0, scrap);
 
-    for (var i = 0; i < enemies.length; i++) {
+    for (var i = enemies.length - 1; i >= 0; i--) {
       if (!between(enemies[i].x, MIN.x - 1, MAX.x + 1) || !between(enemies[i].y, MIN.y - 1, MAX.y + 1)) {
         if (enemies[i].projectile) {
           projectileDie(enemies[i]);

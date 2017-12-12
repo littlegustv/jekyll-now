@@ -205,7 +205,7 @@ var onStart =  function () {
     button_objects[selected].trigger();
   };
 
-  this.onClick = function (e) {
+  this.onMouseDown = function (e) {
     var b = s.bg.onButton(e.x, e.y);
     if (b) {
       b.trigger();
