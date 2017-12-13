@@ -29,7 +29,7 @@ var onStart = function () {
   var cover = bg.add(Object.create(Entity).init(WIDTH / 2, 8, WIDTH, 16));
   cover.z = 23;
   var cover = bg.add(Object.create(Entity).init(WIDTH / 2, HEIGHT - 5, WIDTH, 10));
-  cover.z = 23;
+  cover.z = 25;
 
   var ceiling = bg.add(Object.create(TiledBackground).init(WIDTH / 2, MIN.y - 16, WIDTH, 16, Resources.sky));
   ceiling.z = 26;
@@ -452,7 +452,7 @@ var onStart = function () {
     [6],
   ];
 //  this.waves = [[6, 6]];
-  this.waves = [[0],[0],[0],[0]];
+  //this.waves = [[0],[0],[0],[0]];
 
   //this.waves = [[2,2,2,2,2,2,2,2,2,2]];
 //  this.waves = [[0,0,1,2,3,4,5,6]];
@@ -569,11 +569,13 @@ var onStart = function () {
   };
   boss.die = function (e) {
     // fix me: maybe here? (need to made non-collide)
-    for (var i = 0; i < 80; i++) {
-      var d = this.layer.add(Object.create(Sprite).init(this.x, this.y, Resources.dust));
+    this.opacity = 0;
+    for (var i = 0; i < 200; i++) {
+      var d = this.layer.add(Object.create(Sprite).init(this.x + randint(-this.w / 2, this.w / 2), this.y + randint(-this.h / 2, this.h / 2), Resources.dust));
       d.addBehavior(Velocity);
-      d.animation = choose([0, 1]);
-      var theta = Math.random() * PI2;
+      d.animation = 1;
+      //d.animation = choose([0, 1]);
+      var theta = (Math.random() * PI / 3 - PI / 6) + choose([0, 1]) * PI;
       var speed = randint(3, 50);
       d.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta)};
       d.behaviors[0].onEnd = function () {

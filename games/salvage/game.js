@@ -684,8 +684,8 @@ function lerp_angle (a1, a2, rate) {
 var Weapons = {
   bombard: function (layer) {
     gameWorld.playSound(Resources.laser);
-    for (var i = 0; i < 4; i++) {
-      var a = layer.add(Object.create(Sprite).init(this.x - this.w / 2 + (i + 0.5) * this.w / 4, this.y + 16 - 8 * i, Resources.projectile));
+    for (var i = 0; i < 3; i++) {
+      var a = layer.add(Object.create(Sprite).init(this.x - TILESIZE + i * TILESIZE, this.y - 8 * i, Resources.projectile));
       a.strokeColor = COLORS.primary;
       a.radius = 4;
       a.projectile = true;
@@ -979,7 +979,7 @@ BossEnemy.update = function (dt) {
   if (this.cooldown > 0) this.cooldown -= dt;
   else {
     var weapon = choose(["firework","hitscan", "triple", "burst", "homing"]);
-    weapon = "target_point";
+    //weapon = "burst";
     this.entity.shoot = Weapons[weapon];
     this.cooldown = this.entity.shoot(this.entity.layer) * Math.ceil( 3 * this.entity.health / this.entity.maxhealth) / 3;
     if (weapon === "homing") {
