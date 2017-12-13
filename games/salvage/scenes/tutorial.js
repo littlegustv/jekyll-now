@@ -258,7 +258,6 @@ var onStart =  function () {
     mute_text.scale = 2;
   };
 
-
   this.onMouseDown = down;
   this.onMouseMove = move;
   this.onTouchMove = function (e) {
