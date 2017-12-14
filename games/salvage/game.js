@@ -1,12 +1,21 @@
 /* global Resources, Entity, Sprite, SpriteFont, TiledBackground, Behavior, World, randint, clamp, between */
 // canvas filter (color style); grayscale(70%) contrast(250%) brightness(90%);
 
+var MODES = {
+  keyboard: 0,
+  touch: 1,
+  gamepad: 2,
+  mouse: 3
+};
+var MODE = undefined;
+var GAMEPAD = undefined;
+
 var directions = {
   39: 0,
   40: PI / 2,
   37: PI,
   38: 3 * PI / 2
-}
+};
 
 var MAXHEALTH = 4, DAMAGE_COOLDOWN = 0.5;
 var gameWorld = Object.create(World).init(640, 360, "index.json");
@@ -18,22 +27,22 @@ gameWorld.unmute = function () {
     localStorage.salvageMuted = false;
   }
   if (this.audioContext && this.audioContext.resume) {
-    this.audioContext.resume(); 
+    this.audioContext.resume();
   }
   this.muted = false;
   window.muted = false;
-  this.playSound(Resources.select);  
-}
+  this.playSound(Resources.select);
+};
 gameWorld.mute = function () {
   if (localStorage) {
-    localStorage.salvageMuted = true;    
+    localStorage.salvageMuted = true;
   }
   if (this.audioContext && this.audioContext.suspend) {
     this.audioContext.suspend();
   }
   this.muted = true;
   window.muted = true;
-}
+};
 
 var ENDINGS = [
 	"Workplace Accident", // normal in-game death
@@ -271,7 +280,8 @@ Boss.beam = function () {
   var scrap = this.entity.layer.entities.filter(function (e) { return e.scrap; });
   for (var i = 0; i < scrap.length; i++) {
     var theta = angle(scrap[i].x, scrap[i].y, this.entity.x, this.entity.y);
-    scrap[i].velocity = {x: Math.cos(theta) * 75, y: Math.sin(theta) * 75};
+    scrap[i].velocity.x = Math.cos(theta) * 75;
+    scrap[i].velocity.y = Math.sin(theta) * 75;
   }
   gameWorld.playSound(Resources.process);
   var t = this;
@@ -1184,7 +1194,7 @@ function spawn(layer, key, player) {
     scrap.opacity = 0.8;
     scrap.angle = this.angle;
     scrap.addBehavior(Velocity);
-    scrap.velocity = {x: 0, y: 0};
+    scrap.velocity = {x: 0, y: 0, angle: PI / 6};
     scrap.z = 2.5;
     scrap.scrap = true;
     scrap.setCollision(Polygon);

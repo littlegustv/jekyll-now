@@ -2,15 +2,16 @@ var onStart =  function () {
   //Resources.music = Resources.menu;
   var player;
   var s = this;
+
   var start = undefined;
   this.enemies = [];
 
   this.step = 0;
   this.steps = [
     // ["message", function () { condition }];
-    ["move the mouse to turn", function () { return player.angle !== 0; }, function () {}], // fix me: need to allow this to stay on screen for a time
-    ["click to move", function () { return ((player.x != player_coordinates.x || player.y != player_coordinates.y) && player.stopped()); }, function () {}],
-    ["hit objects to destroy them",
+    //[["", "move the mouse to turn"], function () { return player.angle !== 0; }, function () {}], // fix me: need to allow this to stay on screen for a time
+    [["use the arrow keys to move", "tap to move in a direction", "use l-stick to move", "click to move in a direction"], function () { return ((player.x != player_coordinates.x || player.y != player_coordinates.y) && player.stopped()); }, function () {}],
+    [["hit objects to destroy them"],
       function () {
         return player.targets.filter( function (e) { return e.alive; }).length <= 0;
       },
@@ -40,7 +41,7 @@ var onStart =  function () {
         }
       }
     ],
-    ["avoid things that are blue!",
+    [["avoid things that are blue!"],
       function () {
         return player.targets.filter( function (e) { return e.alive; }).length <= 0;
       },
@@ -77,7 +78,7 @@ var onStart =  function () {
         }
       }
     ],
-    ["you are now ready", function () { return false; }, function () {
+    [["you are now ready"], function () { return false; }, function () {
       var b = s.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2, Resources.expire_font, "start game!", {spacing: -3, align: "center"}));
       b.scale = 2;
       var button = s.fg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 2, gameWorld.width, 32));
@@ -258,8 +259,10 @@ var onStart =  function () {
     mute_text.scale = 2;
   };
 
-  this.onMouseDown = down;
-  this.onMouseMove = move;
+  if (MODE !== MODES.touch) {
+    this.onMouseDown = down;
+    this.onMouseMove = move;
+  }
   this.onTouchMove = function (e) {
     e.x = e.touch.x;
     e.y = e.touch.y;
@@ -295,7 +298,7 @@ var onStart =  function () {
 
 var onUpdate = function () {
   if (this.condition && this.condition()) {
-    this.message.text = this.steps[this.step][0];
+    this.message.text = this.steps[this.step][0][MODE % this.steps[this.step][0].length];
     this.condition = this.steps[this.step][1];
     this.steps[this.step][2]();
     this.step += 1;

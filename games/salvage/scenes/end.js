@@ -153,21 +153,22 @@ var onStart =  function () {
     mute_text.scale = 2;
   };
 
-
-  this.onMouseDown = function (e) {
-    var b = s.ui.onButton(e.x, e.y);
-    if (b) {
-      b.trigger();
-    }
-  };
-  this.onMouseMove = function (e) {
-    var buttons = s.ui.entities.filter(function (e) { return e.family === "button"; });
-    var b = s.ui.onButton(e.x, e.y);
-    for (var i = 0; i < buttons.length; i++) {
-      if (b == buttons[i]) b.hover();
-      else buttons[i].unhover();
-    }
-  };
+  if (MODE !== MODES.touch) {
+    this.onMouseDown = function (e) {
+      var b = s.ui.onButton(e.x, e.y);
+      if (b) {
+        b.trigger();
+      }
+    };
+    this.onMouseMove = function (e) {
+      var buttons = s.ui.entities.filter(function (e) { return e.family === "button"; });
+      var b = s.ui.onButton(e.x, e.y);
+      for (var i = 0; i < buttons.length; i++) {
+        if (b == buttons[i]) b.hover();
+        else buttons[i].unhover();
+      }
+    };
+  }
   this.onTouchMove = function (e) {
     if (fullscreen) {
       e.x = e.touch.x; e.y = e.touch.y;

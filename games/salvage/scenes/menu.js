@@ -205,34 +205,42 @@ var onStart =  function () {
     button_objects[selected].trigger();
   };
 
-  this.onMouseDown = function (e) {
-    var b = s.bg.onButton(e.x, e.y);
-    if (b) {
-      b.trigger();
-    }
-  };
-  this.onMouseMove = function (e) {
+  var move = function (e) {
     var buttons = s.bg.entities.filter(function (e) { return e.family === "button"; });
     var b = s.bg.onButton(e.x, e.y);
     for (var i = 0; i < buttons.length; i++) {
       if (b == buttons[i]) b.hover();
       else buttons[i].unhover();
     }
-  };
+  }
+
+  if (MODE !== MODES.touch) {    
+    this.onMouseDown = function (e) {
+      if (MODE === undefined) MODE = MODES.mouse;
+      var b = s.bg.onButton(e.x, e.y);
+      if (b) {
+        b.trigger();
+      }
+    };
+    this.onMouseMove = function (e) {
+      move(e);
+    };
+  }
   this.onTouchStart = function (e) {
     if (fullscreen) {
       e.x = e.touch.x; e.y = e.touch.y;
-      this.onMouseMove(e);      
+      move(e);      
     }
   };
   this.onTouchMove = function (e) {
     if (fullscreen) {
       e.x = e.touch.x; e.y = e.touch.y;
-      this.onMouseMove(e);      
+      move(e);      
     }
   };
   this.onTouchEnd = function (e) {
     if (!fullscreen) {
+      if (MODE === undefined) MODE = MODES.touch;
       requestFullScreen();
       return;
     } else {
@@ -244,6 +252,7 @@ var onStart =  function () {
     }
   };
   this.onKeyDown = function (e) {
+    if (MODE === undefined) MODE = MODES.keyboard;
     switch (e.keyCode) {
       case 38:
         up();
@@ -262,6 +271,34 @@ var onStart =  function () {
         break;
     }
   };
+
+  // push to raindrop -> make this a built-in function...
+  if (GAMEPAD === undefined && navigator.getGamepads) {
+    var gp = navigator.getGamepads();
+    console.log("GamePad Supported");
+    if (gp.length > 0) {
+      console.log("GamePad Found");
+      GAMEPAD = Object.create(GamePad).init();
+      var message = this.bg.add(Object.create(SpriteFont).init(WIDTH / 2, HEIGHT / 2 - 48, Resources.expire_font, "GamePad detected!  Press START to use.", {align: "center", spacing: -2}));
+      GAMEPAD.buttons.start.onStart = function () {
+        MODE = MODES.gamepad;
+      };
+      GAMEPAD.buttons.dup.onStart = up;
+      GAMEPAD.buttons.ddown.onStart = down;
+      GAMEPAD.buttons.dright.onStart = right;
+      GAMEPAD.buttons.dleft.onStart = left;
+      GAMEPAD.buttons.a.onStart = go;
+      // fix me: test, obsv, and add analog sticks, plus to other scenes --- you know the deal!
+    } else {
+      console.warn("No GamePad Found");
+    }
+  } else if (GAMEPAD !== undefined) {
+    // already have a gamepad object
+  } else {
+    console.warn("GamePad not supported.");
+  }
+
+
   for (var i = 0; i < button_objects.length; i++) {
     button_objects[i].unhover();
   }

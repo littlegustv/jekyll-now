@@ -53,13 +53,8 @@ var onStart = function () {
   for (var i = 0.5; i < MAXHEALTH + 0.5; i++) {
     var h = this.ui.add(Object.create(Sprite).init(WIDTH / 2 - MAXHEALTH * 28 / 2 + i * 28, 16, Resources.heart));
     h.scale = 2;
-    //h.follow = h.addBehavior(Follow, {target: player, offset: {x: 16 * Math.cos(i * PI / 4), y: 16 * Math.sin(PI + i * PI / 4), z: 1, angle: false}});
-    //h.radius = 2;
-    //h.addBehavior(Oscillate, {field: "x", object: h.follow.offset, initial: 0, constant: 16, time: i * PI / 5, func: "cos"});
-    //h.addBehavior(Oscillate, {field: "y", object: h.follow.offset, initial: 0, constant: 16, time: PI + i * PI / 5});
-    //h.strokeColor = "#DD0000";
     this.health_bar.push(h);
-  }
+  };
   this.shield = bg.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 8, Resources.shield));
   this.shield.addBehavior(Follow, {target: player, offset: {x: 0, y: 0, z: -1, angle: false, opacity: false}});
   player.shield_sprite = this.shield;
@@ -167,7 +162,7 @@ var onStart = function () {
         this.shield_sprite.offset = {x: -1, y: 0};
         break;      
     }
-  }
+  };
   player.collision.onHandle = function (object, other) {
     if (object.noCollide) return;
     
@@ -201,7 +196,7 @@ var onStart = function () {
     if (object.health <= 0) {
       object.die();
     }
-  }
+  };
   player.die = function () {
     s.unpause();
     gameWorld.saved = false;
@@ -376,11 +371,10 @@ var onStart = function () {
   var up = function (e) {
   };
   
-  this.onMouseMove = move;
-  this.onMouseUp = function (e) {
-    return;
+  if (MODE !== MODES.touch) {
+    this.onMouseDown = down;
+    this.onMouseMove = move;
   }
-  this.onMouseDown = down;
   
   this.onTouchStart = function (e) {
     if (!fullscreen) {
