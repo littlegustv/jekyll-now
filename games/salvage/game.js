@@ -4,11 +4,11 @@
 var MODES = {
   keyboard: 0,
   touch: 1,
-  gamepad: 2,
+  //gamepad: 2,
   mouse: 3
 };
 var MODE = undefined;
-var GAMEPAD = undefined;
+//var GAMEPAD = undefined;
 
 var directions = {
   39: 0,
@@ -56,6 +56,7 @@ function cardinal (angle) {
   return Math.round(modulo((angle + 4 * PI), PI2) / (PI / 2));
 }
 
+var TURN = 0.586 // the approximate time of a player turn
 var WIDTH = 640;
 var HEIGHT = 360;
 var ARM_TIME = 0.1;
@@ -67,7 +68,7 @@ var SPEEDS = {
   projectile_fast: 200,//100,
   projectile_normal: 160,//80,
   projectile_slow: 40, //40,
-  player: 6.5,
+  player: 6.5, // each turn take 0.586 seconds...
   enemy_fast: 8,
   enemy_normal: 5.5,
   enemy_horizontal: 48,
@@ -531,6 +532,8 @@ Delay.set = function (t) {
 };
 
 Lerp.update = function (dt) {
+  if (this.time === undefined) this.time = 0;
+    this.time += dt;
   if (this.field == "angle")
     this.object[this.field] = lerp_angle(this.object[this.field], this.goal, this.rate * dt);
   else
@@ -708,7 +711,7 @@ var Weapons = {
       a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
       a.addBehavior(Trail, {interval: 0.02, maxlength: 10, record: []});
     }
-    return 1.4;
+    return TURN * 3;
   },
   target_point: function (layer) {
     gameWorld.playSound(Resources.laser);
@@ -728,7 +731,7 @@ var Weapons = {
       a.addBehavior(Target, {target: {x: this.target.x, y: this.target.y}, turn_rate: 2, angle: theta, speed: SPEEDS.projectile_normal, offset: {x: 0, y: 0}, set_angle: true});
       a.addBehavior(FadeOut, {duration: 0, delay: 3});
     }
-    return 1.4;
+    return TURN * 3;
   },
   bomb: function (layer) {
     var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
@@ -753,7 +756,7 @@ var Weapons = {
     a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
     a.addBehavior(Trail, {interval: 0.02, maxlength: 10, record: []});
     projectiles.push(a);
-    return 1;
+    return TURN * 2;
   },
   firework: function (layer) {
     gameWorld.playSound(Resources.laser);
@@ -780,7 +783,7 @@ var Weapons = {
       a.addBehavior(Trail, {interval: 0.02, maxlength: 10, record: []});
       projectiles.push(a);
     }
-    return 3;
+    return TURN * 6;
   },
   hitscan: function (layer) {
     var t = this;
@@ -819,7 +822,7 @@ var Weapons = {
         //})();
       }});
     })();
-    return 3;
+    return TURN * 5;
   },
   standard: function (layer) {
     //var a = layer.add(Object.create(Circle).init(this.x, this.y, 4));
@@ -845,7 +848,7 @@ var Weapons = {
     a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
     a.addBehavior(Trail, {interval: 0.02, maxlength: 10, record: []});
     projectiles.push(a);
-    return 1.6;
+    return 3 * TURN;
   },
   triple: function (layer) {
     if (this.count === undefined) this.count = 0;
@@ -874,9 +877,9 @@ var Weapons = {
 
     this.count += 1;
     if (this.count % 3 === 0) {
-      return 3;
+      return 5 * TURN;
     } else {
-      return 0.5;
+      return TURN;
     }
   },
   burst: function (layer) {
@@ -909,9 +912,9 @@ var Weapons = {
     
     this.count += 1;
     if (this.count % 15 === 0) {
-      return 3;
+      return TURN * 5;
     } else {
-      return 0.25;
+      return TURN / 2;
     }
   },
   homing: function (layer) {
@@ -932,13 +935,13 @@ var Weapons = {
       }});
     //a.projectile = true;;
       var theta = this.shoot_angle !== undefined ? this.shoot_angle : this.angle;
-      a.addBehavior(Target, {target: this.target, turn_rate: 0.5, angle: theta, speed: SPEEDS.projectile_normal, offset: {x: 0, y: 0}, set_angle: true});
+      a.addBehavior(Target, {target: this.target, turn_rate: 1, angle: theta, speed: 2 * SPEEDS.projectile_slow, offset: {x: 0, y: 0}, set_angle: true});
       a.velocity = {x: SPEEDS.projectile_normal * Math.cos(theta), y: SPEEDS.projectile_normal * Math.sin(theta)};
       a.angle = theta;
       a.addBehavior(Trail, {interval: 0.02, maxlength: 10})
       a.addBehavior(Follow, {target: this, offset: {x: false, y: false, z: false, alive: true, angle: false}});
       projectiles.push(a);      
-      return 1.6;     
+      return TURN * 3;     
   }
 }
 
@@ -973,7 +976,7 @@ Enemy.update = function (dt) {
   }
 }
 Enemy.draw = function (ctx) {
-  if (this.cooldown > 0 && this.cooldown < 1) {
+  if (this.cooldown > 0 && this.cooldown < 2 * TURN) {
     ctx.beginPath();
     ctx.arc(this.entity.x, this.entity.y, this.cooldown * 2 * this.entity.w + this.entity.w / 2, 0, PI2, true);
     ctx.fillStyle = COLORS.primary; //"#ff6347";
@@ -1115,7 +1118,7 @@ function spawn(layer, key, player) {
       ]);     
       break;
     case 3: // bomber
-      enemy.addBehavior(Horizontal, {duration: 0.2, speed: SPEEDS.enemy_horizontal_fast, target: player, min: MIN.x, max: MAX.x, delay: 0.2});
+      enemy.addBehavior(Horizontal, {duration: 0, speed: TILESIZE / TURN, target: player, min: MIN.x, max: MAX.x, delay: 0.2});
       enemy.setVertices([
         {x: -5, y: -3}, {x: -5, y: 3}, {x: 5, y: 3}, {x: 5, y: -3}
       ]);
@@ -1164,7 +1167,7 @@ function spawn(layer, key, player) {
   var flash = layer.add(Object.create(Sprite).init(enemy.x, enemy.y, Resources.blink));
   flash.addBehavior(FadeOut, {duration: 0, delay: 0.7});
   enemy.family = "enemy";
-  enemy.addBehavior(Enemy, {cooldown: 0.5});
+  enemy.addBehavior(Enemy, {cooldown: TURN});
   enemy.collision.onHandle = function (object, other) {
     if (other.family == "player") {
       enemy.die();

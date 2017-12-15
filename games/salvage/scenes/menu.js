@@ -272,51 +272,11 @@ var onStart =  function () {
     }
   };
 
-  // push to raindrop -> make this a built-in function...
-  if (GAMEPAD === undefined && navigator.getGamepads) {
-    var gp = navigator.getGamepads();
-    console.log("GamePad Supported");
-    if (gp.length > 0) {
-      console.log("GamePad Found");
-      GAMEPAD = Object.create(GamePad).init();
-      var message = this.bg.add(Object.create(SpriteFont).init(WIDTH / 2, HEIGHT / 2 - 48, Resources.expire_font, "GamePad detected!  Press START to use.", {align: "center", spacing: -2}));
-      GAMEPAD.buttons.start.onStart = function () {
-        MODE = MODES.gamepad;
-      };
-      GAMEPAD.buttons.dup.onStart = up;
-      GAMEPAD.buttons.ddown.onStart = down;
-      GAMEPAD.buttons.dright.onStart = right;
-      GAMEPAD.buttons.dleft.onStart = left;
-      GAMEPAD.buttons.a.onStart = go;
-      // fix me: test, obsv, and add analog sticks, plus to other scenes --- you know the deal!
-    } else {
-      console.warn("No GamePad Found");
-    }
-  } else if (GAMEPAD !== undefined) {
-    // already have a gamepad object
-  } else {
-    console.warn("GamePad not supported.");
-  }
-
-
   for (var i = 0; i < button_objects.length; i++) {
     button_objects[i].unhover();
   }
   button_objects[selected].hover();
 }
 
-var onUpdate = function () {
-  /*if (Math.random() * 100 < 2) {
-    var w = randint(1, 4) * 4 + 4;
-    var square = this.bg.add(Object.create(Sprite).init(randint(0, gameWorld.width), -8, Resources.asteroid));
-    square.radius = square.w / 2;
-    square.strokeColor = COLORS.primary;
-    //square.color = COLORS.secondary;
-    square.z = 8;
-    square.addBehavior(Trail, {interval: 0.1, maxlength: 16, record: []});
-    square.velocity = {x: choose([10, -10]), y: 30};
-    square.addBehavior(Crop, {min: {x: -8, y: -10}, max: {x: gameWorld.width + 8, y: gameWorld.height - 6}});
-    square.addBehavior(Velocity);
-    //this.secondaries.push(square);
-  }*/
+var onUpdate = function (dt) {
 };

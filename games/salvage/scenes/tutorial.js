@@ -297,6 +297,7 @@ var onStart =  function () {
 };
 
 var onUpdate = function () {
+
   if (this.condition && this.condition()) {
     this.message.text = this.steps[this.step][0][MODE % this.steps[this.step][0].length];
     this.condition = this.steps[this.step][1];
