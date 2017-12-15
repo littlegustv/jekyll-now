@@ -989,62 +989,59 @@ Enemy.draw = function (ctx) {
 var BossEnemy = Object.create(Enemy);
 BossEnemy.patterns = [
   function (dt) { // cross, x, v, whatever!
-    if (this.pattern_cooldown > 0) this.pattern_cooldown -= dt; // fix me -> move to update
-    else {
-      for (var i = 0; i <= 4; i++) {        
-        this.entity.shoot = Weapons.hitscan;
-        this.entity.target = {x: this.entity.x + HEIGHT * Math.cos(i * PI / 2 + this.pattern_index * PI / 8), y: this.entity.y + HEIGHT * Math.sin(i * PI / 2 + this.pattern_index * PI / 8)};
-        this.entity.shoot(this.entity.layer);
-        this.pattern_cooldown = TURN;
-      }
-      this.pattern_index += 1;
-    }
-  },
-  function (dt) { // alternative firework
-    if (this.pattern_cooldown > 0) this.pattern_cooldown -= dt;
-    else {
-      this.entity.shoot = Weapons.firework;
-      this.entity.shoot_angle = this.pattern_index * PI / 8;
-      this.entity.shoot(this.entity.layer);
-      this.pattern_cooldown = 3 * TURN;
-      this.pattern_index += 1;
-    }
-  },
-  function (dt) { // alternative firework
-    if (this.pattern_cooldown > 0) this.pattern_cooldown -= dt;
-    else {
-      this.entity.shoot = Weapons.homing;
-      //this.entity.shoot_angle = this.pattern_index * PI / 8;
+    for (var i = 0; i <= 4; i++) {        
+      this.entity.shoot = Weapons.hitscan;
+      this.entity.target = {x: this.entity.x + HEIGHT * Math.cos(i * PI / 2 + this.pattern_index * PI / 8), y: this.entity.y + HEIGHT * Math.sin(i * PI / 2 + this.pattern_index * PI / 8)};
       this.entity.shoot(this.entity.layer);
       this.pattern_cooldown = TURN;
-      this.pattern_index += 0.5;
     }
+    this.pattern_index += 1;
+    if (this.pattern_index >= 4) this.endPattern(2 * TURN);
+  },
+  function (dt) { // alternative firework
+    this.entity.shoot = Weapons.firework;
+    this.entity.shoot_angle = this.pattern_index * PI / 8;
+    this.entity.shoot(this.entity.layer);
+    this.pattern_cooldown = 3 * TURN;
+    this.pattern_index += 1;
+
+    if (this.pattern_index >= 4) this.endPattern(4 * TURN);
+  },
+  function (dt) { // homing (a bit messy!)
+    this.entity.shoot = Weapons.homing;
+    //this.entity.shoot_angle = this.pattern_index * PI / 8;
+    this.entity.shoot(this.entity.layer);
+    this.pattern_cooldown = TURN / 2;
+    this.pattern_index += 1;
+
+    if (this.pattern_index >= 3) this.endPattern(4 * TURN);
+  },
+  function (dt) { // spiral
+    this.entity.shoot = Weapons.standard;
+    this.entity.target = {x: this.entity.x + HEIGHT * Math.cos(-this.pattern_index * PI / 12), y: this.entity.x + HEIGHT * Math.sin(-this.pattern_index * PI / 12)};
+    this.pattern_cooldown = TURN / 2;
+    this.pattern_index += 1;
+    this.entity.shoot(this.entity.layer);
+
+    if (this.pattern_index >= 12) this.endPattern(2 * TURN);
   }
 ];
+BossEnemy.endPattern = function(cooldown) {
+  this.pattern_cooldown = 0;
+  this.pattern_index = 0;
+  this.cooldown = 2 * TURN; // --> fix me --> allow to be specific to each pattern
+  this.pattern = undefined;
+}
 BossEnemy.update = function (dt) {
-  if (this.pattern_index >= 4) { // fix me --> allow to be specific for each pattern
-    this.pattern_cooldown = 0;
-    this.pattern_index = 0;
-    this.cooldown = 2 * TURN; // --> fix me --> allow to be specific to each pattern
-    this.pattern = undefined;
+  if (this.pattern) {
+    if (this.pattern_cooldown > 0) this.pattern_cooldown -= dt;
+    else this.pattern(dt);
   }
-  if (this.pattern) this.pattern(dt);
   else if (this.cooldown > 0) this.cooldown -= dt;
   else {
-    this.pattern_cooldown = 0;
-    this.pattern_index = 0;
+    this.endPattern(0);
     this.pattern = choose(this.patterns);
-    return;
-
-
-    var weapon = choose(["firework","hitscan", "triple", "burst", "homing"]);
-    //weapon = "burst";
-    this.entity.shoot = Weapons[weapon];
-    this.cooldown = this.entity.shoot(this.entity.layer) * Math.ceil( 3 * this.entity.health / this.entity.maxhealth) / 3;
-    if (weapon === "homing") {
-      this.entity.shoot_angle += PI;
-      this.entity.shoot(this.entity.layer) * Math.ceil( 3 * this.entity.health / this.entity.maxhealth) / 3;
-    }
+    //this.pattern = this.patterns[2];
   }
 }
 
