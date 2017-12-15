@@ -449,11 +449,6 @@ var onStart = function () {
 //  this.waves = [[6, 6]];
   //this.waves = [[0],[0],[0],[0]];
 
-  //this.waves = [[2,2,2,2,2,2,2,2,2,2]];
-//  this.waves = [[0,0,1,2,3,4,5,6]];
-
-  //this.waves = [[6]];
-  // this.waves = [[0], [], [], [], []];
   var boss_coordinates = toGrid(MIN.x + MAX.x / 2, MAX.y);
   var boss = this.bg.add(Object.create(Sprite).init(boss_coordinates.x, boss_coordinates.y, Resources.boss));
   boss.animation = 0;

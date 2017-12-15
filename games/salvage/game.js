@@ -761,7 +761,7 @@ var Weapons = {
   firework: function (layer) {
     gameWorld.playSound(Resources.laser);
     for (var i = 0; i < 10; i++) {
-      var theta = -PI / 2 + i * PI2 / 10;
+      var theta = -PI / 2 + i * PI2 / 10 + (this.shoot_angle || 0);
       var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
       a.radius = 4;
       a.color = "black";
@@ -811,7 +811,6 @@ var Weapons = {
         a.angle = this.entity.angle;
         var w = this.entity;
         var t = this;
-        console.log('beam', a.angle);
         //(function () {
         w.removeBehavior(this);
         a.addBehavior(Delay, {duration: 0.3, callback: function () {
@@ -988,9 +987,56 @@ Enemy.draw = function (ctx) {
 
 // special behavior for boss enemy
 var BossEnemy = Object.create(Enemy);
+BossEnemy.patterns = [
+  function (dt) { // cross, x, v, whatever!
+    if (this.pattern_cooldown > 0) this.pattern_cooldown -= dt; // fix me -> move to update
+    else {
+      for (var i = 0; i <= 4; i++) {        
+        this.entity.shoot = Weapons.hitscan;
+        this.entity.target = {x: this.entity.x + HEIGHT * Math.cos(i * PI / 2 + this.pattern_index * PI / 8), y: this.entity.y + HEIGHT * Math.sin(i * PI / 2 + this.pattern_index * PI / 8)};
+        this.entity.shoot(this.entity.layer);
+        this.pattern_cooldown = TURN;
+      }
+      this.pattern_index += 1;
+    }
+  },
+  function (dt) { // alternative firework
+    if (this.pattern_cooldown > 0) this.pattern_cooldown -= dt;
+    else {
+      this.entity.shoot = Weapons.firework;
+      this.entity.shoot_angle = this.pattern_index * PI / 8;
+      this.entity.shoot(this.entity.layer);
+      this.pattern_cooldown = 3 * TURN;
+      this.pattern_index += 1;
+    }
+  },
+  function (dt) { // alternative firework
+    if (this.pattern_cooldown > 0) this.pattern_cooldown -= dt;
+    else {
+      this.entity.shoot = Weapons.homing;
+      //this.entity.shoot_angle = this.pattern_index * PI / 8;
+      this.entity.shoot(this.entity.layer);
+      this.pattern_cooldown = TURN;
+      this.pattern_index += 0.5;
+    }
+  }
+];
 BossEnemy.update = function (dt) {
-  if (this.cooldown > 0) this.cooldown -= dt;
+  if (this.pattern_index >= 4) { // fix me --> allow to be specific for each pattern
+    this.pattern_cooldown = 0;
+    this.pattern_index = 0;
+    this.cooldown = 2 * TURN; // --> fix me --> allow to be specific to each pattern
+    this.pattern = undefined;
+  }
+  if (this.pattern) this.pattern(dt);
+  else if (this.cooldown > 0) this.cooldown -= dt;
   else {
+    this.pattern_cooldown = 0;
+    this.pattern_index = 0;
+    this.pattern = choose(this.patterns);
+    return;
+
+
     var weapon = choose(["firework","hitscan", "triple", "burst", "homing"]);
     //weapon = "burst";
     this.entity.shoot = Weapons[weapon];
