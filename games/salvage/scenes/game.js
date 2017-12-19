@@ -56,7 +56,7 @@ var onStart = function () {
     this.health_bar.push(h);
   };
   this.shield = bg.add(Object.create(Sprite).init(16 * (MAXHEALTH + 0.5), gameWorld.height - 8, Resources.shield));
-  this.shield.addBehavior(Follow, {target: player, offset: {x: 0, y: 0, z: -1, angle: false, opacity: false}});
+  this.shield.addBehavior(Follow, {target: player, offset: {x: 0, y: 0, z: -1, angle: false, opacity: false }});
   player.shield_sprite = this.shield;
 
   player.cash_counter = this.ui.add(Object.create(SpriteFont).init(WIDTH + 8, 16, Resources.expire_font, "$ 0", {spacing: -2, align: "right"}));
@@ -200,6 +200,7 @@ var onStart = function () {
   player.die = function () {
     s.unpause();
     gameWorld.saved = false;
+    this.shield_sprite.alive = false;
     this.collision.onCheck = function (a, b) { return false; };
     this.collision.onHandle = function (a, b) { return false; };
     s.pause = function () {};
@@ -289,11 +290,14 @@ var onStart = function () {
         } else {
           gameWorld.ending = 3;
         }
+        gameWorld.saved = false;
         gameWorld.setScene(2, true);
       }
 
       // if wave is finished
       if (this.wave.length <= 0) {
+        gameWorld.playSound(Resources.process);
+
         // remove last-wave's projectiles ?
         for (var i = 0; i < projectiles.length; i++) {
           if (projectiles[i].alive) {
@@ -490,18 +494,23 @@ var onStart = function () {
     if (this.health >= this.maxhealth) {}
     if (this.store_open) {
       this.store_open.alive = false;
+      this.store_open = undefined;
     }
-    else if (this.health >= this.maxhealth - 1) { // warning shot (DONE)
-      this.shoot = Weapons.standard;
-      var theta = angle(this.x, this.y, target.x, target.y), d = distance(this.x, this.y, target.x, target.y);      
-      this.target = {x: this.x + d * Math.cos(theta + PI / 6), y: this.y + d * Math.sin(theta + PI / 6)};
-      this.shoot(this.layer);
-      this.target = {x: this.x + d * Math.cos(theta - PI / 6), y: this.y + d * Math.sin(theta - PI / 6)};
-      this.shoot(this.layer);
-      this.shoot = undefined;
-    } else if (!this.enemy) {
+    if (!this.enemy) { // no more warning shot
+      // visual confirmation
+      var t = this;
+      var w = this.layer.add(Object.create(SpriteFont).init(this.x, this.y + this.offset.y, Resources.expire_font, 'that was a mistake.', {spacing: -2, align: 'center'}));
+      w.z = this.z + 1;
+      debug = w.addBehavior(KeyFrame, {loop: false, ease: 'linear', frames: [
+          {time: 0, state: {scale: 1, x: t.x, y: t.y, angle: 0}},
+          {time: 1, state: {scale: 2, x: t.x, y: t.y - 50, angle: -PI / 8}},
+          {time: 2, state: {scale: 2, x: t.x, y: t.y - 100, angle: PI2}},
+          {time: 3, state: {scale: 2, x: t.x, y: t.y - 150, angle: 2 * PI2}}
+        ]
+      });
+      w.addBehavior(FadeOut, {delay: 2, duration: 1});
+
       this.enemy = this.addBehavior(BossEnemy);
-      this.family = "enemy";
       this.target = target;
     }
     if (!this.boss.goal) this.danger = true; // get moving if you are stopped, and just got hit!
@@ -511,6 +520,7 @@ var onStart = function () {
   };
   
   boss.boss = boss.addBehavior(Boss, {duration: 0.5, speed: 70, rate: 4, target: player});
+  //boss.family = "enemy";
   boss.addBehavior(Bound, {min: MIN, max: MAX});
   boss.velocity = {x: 0, y: 0};
   boss.addBehavior(Velocity);
@@ -525,6 +535,14 @@ var onStart = function () {
     if (other.family == "player" && !gameWorld.boss.invulnerable) {
       object.health -= 1;
       object.particles.rate = 3 * (10 - object.health) / 10;
+
+      other.animation = 1;
+      other.noCollide = true;
+      other.addBehavior(Delay, {duration: 0.5, callback: function () {
+        this.entity.animation = 0;
+        this.entity.noCollide = false;
+      }});
+
       gameWorld.boss.invulnerable = true;
       gameWorld.boss.respond(s.player);
       //gameWorld.boss.old_animation = gameWorld.boss.animation;
@@ -543,17 +561,19 @@ var onStart = function () {
         //s.player.move(s);
         if (other.y < object.y) {
           s.player.turn(PI / 2);
-          s.player.lerpy.goal = MAX.y - 2 * TILESIZE;
+          s.player.lerpy.goal = MAX.y - 3 * TILESIZE;
           //s.player.lerpx.goal = p.x;
         } else if (other.x > object.x) {
           s.player.turn(0);
-          s.player.lerpx.goal = b.x + 3 * TILESIZE;
+          s.player.lerpx.goal = b.x + 4 * TILESIZE;
           //s.player.lerpy.goal = p.y;
         } else if (other.x < object.x) {
           s.player.turn(PI);
-          s.player.lerpx.goal = b.x - 3 * TILESIZE;
+          s.player.lerpx.goal = b.x - 4 * TILESIZE;
           //s.player.lerpy.goal = p.y;
         }
+        particles(s.player, 20, 0);
+        gameWorld.playSound(Resources.hit);
       }
     }
   };

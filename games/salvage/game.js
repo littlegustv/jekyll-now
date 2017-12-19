@@ -269,7 +269,7 @@ Boss.move = function (dt) {
   }*/
 };
 Boss.beam = function () {
-  var beam = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y, WIDTH / 2 - 16));
+  /*var beam = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y, WIDTH / 2 - 16));
   beam.color = "white";
   beam.addBehavior(Behavior, {update: function (dt) {
     this.entity.radius -= 0.25 * dt * gameWorld.height;
@@ -284,14 +284,13 @@ Boss.beam = function () {
     scrap[i].velocity.x = Math.cos(theta) * 75;
     scrap[i].velocity.y = Math.sin(theta) * 75;
   }
-  gameWorld.playSound(Resources.process);
   var t = this;
   this.entity.addBehavior(Delay, { duration: 2, callback: function () {
     if (gameWorld.wave % 2 === 1 && ! gameWorld.boss.store_open) {
       t.storetime();
     }
     this.entity.removeBehavior(this);
-  }});
+  }});*/
 };
 Boss.pay = function () {
   for (var i = 0; i < gameWorld.scene.layers.length; i++) {
@@ -311,7 +310,10 @@ Boss.pay = function () {
       gameWorld.player.cash_counter.text = "$ " + gameWorld.player.salvage;
       //gameWorld.scene.bg.paused = false;
       this.entity.addBehavior(FadeOut, {duration: 0.3, maxOpacity: 1});
-      t.beam();
+      //t.beam();
+      if (gameWorld.wave % 2 === 1 && ! gameWorld.boss.store_open) {
+        t.storetime();
+      }
     }});
   this.callback = undefined;
   return this.duration;
@@ -1009,8 +1011,14 @@ BossEnemy.patterns = [
   },
   function (dt) { // homing (a bit messy!)
     this.entity.shoot = Weapons.homing;
-    //this.entity.shoot_angle = this.pattern_index * PI / 8;
+    
+    this.entity.target = gameWorld.player.decoy ? gameWorld.player.decoy : gameWorld.player;
+
+    this.entity.shoot_angle = 0//this.pattern_index * PI / 8;
     this.entity.shoot(this.entity.layer);
+    this.entity.shoot_angle = PI;
+    this.entity.shoot(this.entity.layer);
+    
     this.pattern_cooldown = TURN / 2;
     this.pattern_index += 1;
 
@@ -1019,17 +1027,19 @@ BossEnemy.patterns = [
   function (dt) { // spiral
     this.entity.shoot = Weapons.standard;
     this.entity.target = {x: this.entity.x + HEIGHT * Math.cos(-this.pattern_index * PI / 12), y: this.entity.x + HEIGHT * Math.sin(-this.pattern_index * PI / 12)};
-    this.pattern_cooldown = TURN / 2;
-    this.pattern_index += 1;
+    this.entity.shoot(this.entity.layer);
+    this.entity.target = {x: this.entity.x + HEIGHT * Math.cos(-PI +this.pattern_index * PI / 12), y: this.entity.x + HEIGHT * Math.sin(-PI +this.pattern_index * PI / 12)};
     this.entity.shoot(this.entity.layer);
 
+    this.pattern_index += 1;
+    this.pattern_cooldown = TURN / 2;
     if (this.pattern_index >= 12) this.endPattern(2 * TURN);
   }
 ];
 BossEnemy.endPattern = function(cooldown) {
   this.pattern_cooldown = 0;
   this.pattern_index = 0;
-  this.cooldown = 2 * TURN; // --> fix me --> allow to be specific to each pattern
+  this.cooldown = cooldown;
   this.pattern = undefined;
 }
 BossEnemy.update = function (dt) {
@@ -1239,8 +1249,9 @@ function spawn(layer, key, player) {
     var scrap = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, this.sprite));
     scrap.opacity = 0.8;
     scrap.angle = this.angle;
+    var theta = angle(scrap.x, scrap.y, gameWorld.boss.x, gameWorld.boss.y);
     scrap.addBehavior(Velocity);
-    scrap.velocity = {x: 0, y: 0, angle: PI / 6};
+    scrap.velocity = {x: 20 * Math.cos(theta), y: 20 * Math.sin(theta), angle: PI / 6};
     scrap.z = 2.5;
     scrap.scrap = true;
     scrap.setCollision(Polygon);
@@ -1277,11 +1288,11 @@ function spawn(layer, key, player) {
           h.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta) };
           h.addBehavior(FadeOut, {duration: 0.2, delay: randint(1, 2)});
         }*/
-        other.health = Math.min(other.maxhealth, other.health + 1); // repair!
+        /*other.health = Math.min(other.maxhealth, other.health + 1); // repair!
         if (other.health >= other.maxhealth && !other.unforgiving && other.enemy) {
           other.removeBehavior(other.enemy);
           other.enemy = undefined;
-        }
+        }*/
       }
     }
   };
@@ -1496,6 +1507,7 @@ var Store = {
               t.buttons[j].trigger(t);
               t.spent += this.price;
               t.salvage.text = "$" + (t.player.salvage - t.spent);
+              gameWorld.player.cash_counter.text = "$ " + (t.player.salvage - t.spent);              
               gameWorld.playSound(Resources.select);
             }
           }

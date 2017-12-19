@@ -116,7 +116,6 @@ var onStart =  function () {
   menu_button.opacity = 0;
   menu_button.trigger = function () {
     gameWorld.setScene(0, true);
-    gameWorld.saved = true;
     gameWorld.playSound(Resources.select);
   };
   menu_button.hover = function () {
