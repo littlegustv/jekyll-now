@@ -3,6 +3,7 @@ var onStart = function () {
   this.wave = [];
   
   Resources.music = Resources.soundtrack;
+  gameWorld.earned = 0;
   
   var bg = this.addLayer(Object.create(Layer).init(1000,1000));
   bg.active = true;
@@ -40,8 +41,12 @@ var onStart = function () {
   var left = bg.add(Object.create(TiledBackground).init(16, HEIGHT / 2, 32, HEIGHT, Resources.wall));
   left.z = 22;
 
-  var gate = bg.add(Object.create(Sprite).init(16, (MIN.y + MAX.y) / 2, Resources.gate));
+  var gate = bg.add(Object.create(Sprite).init(16, MAX.y - TILESIZE + 10, Resources.gate));
   gate.z = 26;
+
+  var keyhole = bg.add(Object.create(Sprite).init(16, MAX.y - TILESIZE + 10, Resources.keyhole));
+  keyhole.z = 90;
+  keyhole.scale = 3;
 
   var leftcover = bg.add(Object.create(TiledBackground).init(0, HEIGHT / 2, 1, HEIGHT, Resources.wall));
   leftcover.z = 51;
@@ -174,17 +179,26 @@ var onStart = function () {
           gameWorld.playSound(Resources.shield_down);
           var m = object.layer.add(Object.create(SpriteFont).init(object.x, object.y, Resources.expire_font, "shields down!", {spacing: -2, align: "center"}));
           m.addBehavior(Velocity);
+          m.scale = 2;
           m.addBehavior(FadeOut, {delay: 0.5, duration: 0.2});
-          m.velocity = {x: 0, y: 30, angle: PI / 12};
+          m.velocity = {x: 0, y: 30 };
           particles(other, 5, 0);
         } else {
           object.health -= 1;
-          particles(other, 5, 3);
+          particles(other, 15, 3);
           object.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
           object.animation = 1;
           object.addBehavior(Delay, {duration: 0.2, callback: function () {
             this.entity.animation = 0;
           }});
+          if (object.health == 1) {
+            var warning = object.layer.add(Object.create(SpriteFont).init(object.x, object.y, Resources.expire_font, "Warning! Low Health!!", {align: "center", spacing: -2}));
+            warning.z = object.z + 1;
+            warning.scale = 2;
+            warning.addBehavior(Velocity);
+            warning.addBehavior(FadeOut, {delay: 0.5, duration: 0.2});
+            warning.velocity = {x: 0, y: 30 };
+          }
         }
         s.updateHealthBar(object);
         
@@ -194,6 +208,7 @@ var onStart = function () {
       object.addBehavior(Delay, {duration: 0.5, callback: function () { this.entity.noCollide = false; }});
     }
     if (object.health <= 0) {
+      gameWorld.endDescription = other.description;
       object.die();
     }
   };
@@ -246,6 +261,13 @@ var onStart = function () {
   bg.camera.addBehavior(Bound, {min: {x: 0, y:  0}, max: {x: WIDTH - gameWorld.width, y: HEIGHT - gameWorld.height}})
 
   this.bg = bg;
+
+/*  this.locked = {}//this.bg.add(Object.create(SpriteFont).init(gate.x, gate.y, Resources.expire_font, "LOCKED", {spacing: -1, align: "center"}));
+  //this.locked.addBehavior(FadeOut, {duration: 0.5, delay: 0.5});
+  this.locked.angle = -PI / 2;
+  this.locked.z = 50;
+  this.locked.scale = 2;
+*/
   
   this.keydown = false;
   this.pause = function () {
@@ -263,21 +285,18 @@ var onStart = function () {
         }
       }
       // at gate
-      if (coords.x === MIN.x && (coords.y == MIN.y + TILESIZE * 2 || coords.y == MIN.y + TILESIZE * 3 || coords.y == MIN.y + TILESIZE * 4)) {
+      if (coords.x === MIN.x && (coords.y == MAX.y  || coords.y == MAX.y - TILESIZE)) {
         if (!player.hasFTL) {
           gate.animation = 0;
-          var warning = this.bg.add(Object.create(SpriteFont).init(gate.x + 2, gate.y, Resources.expire_font, "LOCKED", {spacing: -1, align: "center"}));
-          warning.addBehavior(FadeOut, {duration: 0.5, delay: 0.5});
-          warning.angle = -PI / 2;
-          warning.z = 50;
-          warning.scale = 2;
           gameWorld.playSound(Resources.denied);
         } else {
-          var warning = this.bg.add(Object.create(SpriteFont).init(gate.x + 2, gate.y, Resources.expire_font, "OPEN!!", {spacing: -1, align: "center"}));
-          warning.addBehavior(FadeOut, {duration: 0.5, delay: 0.5});
-          warning.z = 50;
-          warning.angle = -PI / 2;
-          warning.scale = 2;
+          keyhole.alive = false;
+          /*this.locked.alive = false;
+          this.locked = this.bg.add(Object.create(SpriteFont).init(gate.x + 2, gate.y, Resources.expire_font, "OPEN!!", {spacing: -1, align: "center"}));
+          this.locked.addBehavior(FadeOut, {duration: 0.5, delay: 0.5});
+          this.locked.z = 50;
+          this.locked.angle = -PI / 2;
+          this.locked.scale = 2;*/
           //cover.alive = false;
           gameWorld.playSound(Resources.approved);
           gate.animation = 1;
@@ -518,6 +537,9 @@ var onStart = function () {
       this.unforgiving = true;
     }
   };
+
+  var test = this.bg.add(Object.create(Sprite).init(MIN.x, HEIGHT / 2, Resources.test));
+  test.z = boss.z + 50;
   
   boss.boss = boss.addBehavior(Boss, {duration: 0.5, speed: 70, rate: 4, target: player});
   //boss.family = "enemy";

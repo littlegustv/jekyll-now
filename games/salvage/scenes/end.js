@@ -4,14 +4,33 @@ var onStart =  function () {
   var fg = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
   this.fg = fg;
   var s = this;
+  var top = this.addLayer(Object.create(Layer).init(WIDTH, HEIGHT));
 
   this.ui = this.addLayer(Object.create(Layer).init(WIDTH, HEIGHT));
 
-  var e1 = fg.add(Object.create(SpriteFont).init(WIDTH / 2, gameWorld.height / 2 - 16, Resources.expire_font, ENDINGS[gameWorld.ending], {spacing: -2, align: "center"}));
-  var e2 = fg.add(Object.create(SpriteFont).init(WIDTH / 2, gameWorld.height / 2, Resources.expire_font, "Ending " + (gameWorld.ending + 1) + " of " + ENDINGS.length, {spacing: -2, align: "center"}));
+  var e1 = top.add(Object.create(SpriteFont).init(24, gameWorld.height / 2 - 22, Resources.expire_font, ENDINGS[gameWorld.ending], {spacing: -2, align: "left"}));
+  var e2 = top.add(Object.create(SpriteFont).init(24, gameWorld.height / 2, Resources.expire_font, "Ending " + (gameWorld.ending + 1) + " of " + ENDINGS.length, {spacing: -2, align: "left"}));
   e1.z = 50;
+  e1.scale = 2;
   e2.z = 51;
-  e2.opacity = 0.8;
+  e2.scale = 2;
+
+  //var description = ;
+
+  var earned = top.add(Object.create(SpriteFont).init(24, 3 * gameWorld.height / 4 - 34, Resources.expire_font, "You earned $" + gameWorld.earned + ".", {spacing: -2, align: "left"}));
+  earned.scale = 2;
+  var spent = top.add(Object.create(SpriteFont).init(24, 3 * gameWorld.height / 4 - 12, Resources.expire_font, "You spent $" + (gameWorld.earned - gameWorld.player.salvage) + ".", {spacing: -2, align: "left"}));
+  spent.scale = 2;
+
+  if (gameWorld.endDescription) {
+    var s = top.add(Object.create(Sprite).init(gameWorld.width -  48, 3 * gameWorld.height / 4 + 32, gameWorld.endDescription.sprite));
+    s.scale = 2;
+    s.z = 52;
+    var t = top.add(Object.create(SpriteFont).init(24, 3 * gameWorld.height / 4 + 32, Resources.expire_font, "You were destroyed by a " + gameWorld.endDescription.name + "!", {spacing: -2, align: "left"}));
+    t.scale = 2;
+    t.z = 53;
+    gameWorld.endDescription = undefined;
+  }
 
   var b = fg.add(Object.create(Entity).init(0, HEIGHT / 2, 3 * WIDTH, HEIGHT));
   b.color = "black";
@@ -43,15 +62,15 @@ var onStart =  function () {
   var left = fg.add(Object.create(TiledBackground).init(16, HEIGHT / 2, 32, HEIGHT, Resources.wall));
   left.z = 22;
 
-  var gate = fg.add(Object.create(Sprite).init(16, (MIN.y + MAX.y) / 2, Resources.gate));
+  var gate = fg.add(Object.create(Sprite).init(16, MAX.y - TILESIZE + 10, Resources.gate));
   gate.z = 26;
 
   
   if (gameWorld.ending === 2 || gameWorld.ending === 3) {
 
     fg.camera.x -= (WIDTH - 32);
-    e1.x -= (WIDTH - 32);
-    e2.x -= (WIDTH - 32);
+    //e1.x -= (WIDTH - 32);
+    //e2.x -= (WIDTH - 32);
     gate.animation = 1;
 
     var player = fg.add(Object.create(Sprite).init(-MIN.x, HEIGHT / 2, Resources.viper));

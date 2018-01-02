@@ -97,7 +97,7 @@ function toGrid(x, y) {
     y: clamp(Math.round((y - MIN.y) / TILESIZE) * TILESIZE + MIN.y, MIN.y, MAX.y)
   };
   if (gameWorld.player && gameWorld.player.hasFTL) {
-    if (g.y == MIN.y + TILESIZE * 2 || g.y == MIN.y + TILESIZE * 3 || g.y == MIN.y + TILESIZE * 4) { // halfway point?
+    if (g.y == MAX.y || g.y == MAX.y - TILESIZE) { // at gate
       g.x = clamp(Math.round((x - MIN.x) / TILESIZE) * TILESIZE + MIN.x, MIN.x - 2 * TILESIZE, MAX.x);
     }
   }
@@ -183,8 +183,9 @@ Shielded.update = function (dt) {
       gameWorld.playSound(Resources.shield_up);
       var m = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y, Resources.expire_font, "shields up!", {spacing: -2, align: "center"}));
       m.addBehavior(Velocity);
+      m.scale = 2;
       m.addBehavior(FadeOut, {delay: 0.5, duration: 0.2});
-      m.velocity = {x: 0, y: -30, angle: -PI / 12};
+      m.velocity = {x: 0, y: -30};
     }
   }
   else this.entity.shield = 1;
@@ -307,6 +308,7 @@ Boss.pay = function () {
       //projectileDie(this.entity);
       gameWorld.playSound(Resources.coins);
       gameWorld.player.salvage += 1;
+      gameWorld.earned += 1;
       gameWorld.player.cash_counter.text = "$ " + gameWorld.player.salvage;
       //gameWorld.scene.bg.paused = false;
       this.entity.addBehavior(FadeOut, {duration: 0.3, maxOpacity: 1});
@@ -742,6 +744,7 @@ var Weapons = {
     a.strokeColor = COLORS.primary;
     a.width = 2;
     a.radius = 4;
+    a.description = {name: "bomber", sprite: this.sprite};
     a.setCollision(Polygon);
     a.setVertices(projectile_vertices);
     gameWorld.playSound(Resources.laser);
@@ -784,6 +787,7 @@ var Weapons = {
       a.velocity = {x: SPEEDS.projectile_slow * Math.cos(a.angle), y: SPEEDS.projectile_slow * Math.sin(a.angle)  };
       a.addBehavior(Trail, {interval: 0.02, maxlength: 10, record: []});
       projectiles.push(a);
+      a.description = {name: "starfish", sprite: this.sprite};
     }
     return TURN * 6;
   },
@@ -796,6 +800,7 @@ var Weapons = {
     }
     var theta = this.target ? (this.target.decoy ? angle(this.x, this.y, this.target.decoy.x, this.target.decoy.y) : angle(this.x, this.y, this.target.x, this.target.y)) : this.angle;
     var warn = layer.add(Object.create(Entity).init(this.x + Math.cos(theta) * gameWorld.height, this.y + Math.sin(theta) * gameWorld.height, gameWorld.height * 2, 8));
+    gameWorld.playSound(Resources.beam);
     (function () {
       warn.color = COLORS.primary; //"#ff6347";
       warn.opacity = 0;
@@ -808,6 +813,7 @@ var Weapons = {
         a.setCollision(Polygon);
         gameWorld.playSound(Resources.laser);
         a.family = "enemy";//"player";
+        a.description = {name: "spotlight", sprite: t.sprite};
         a.beam = true;
         a.z = 100;
         a.angle = this.entity.angle;
@@ -834,6 +840,7 @@ var Weapons = {
     a.strokeColor = COLORS.primary;
     a.width = 2;
     a.setCollision(Polygon);
+    a.description = {name: "drone", sprite: this.sprite};
     a.setVertices(projectile_vertices);
     gameWorld.playSound(Resources.laser);
     a.collision.onHandle = projectileHit;
@@ -859,6 +866,7 @@ var Weapons = {
     a.strokeColor = COLORS.primary;
     a.width = 2;
     a.radius = 4;
+    a.description = {name: "demon bus", sprite: this.sprite};
     a.setCollision(Polygon);
     a.setVertices(projectile_vertices);
     gameWorld.playSound(Resources.laser);
@@ -891,6 +899,7 @@ var Weapons = {
     a.strokeColor = COLORS.primary;
     a.width = 2;
     a.radius = 4;
+    a.description = {name: "watcher", sprite: this.sprite};
     a.setCollision(Polygon);
     a.setVertices(projectile_vertices);
     gameWorld.playSound(Resources.laser);
@@ -926,6 +935,7 @@ var Weapons = {
       a.width = 2;
       a.radius = 4;
       a.setCollision(Polygon);
+      a.description = {name: "lurker", sprite: this.sprite};
       a.setVertices(projectile_vertices);
       a.collision.onHandle = projectileHit;
       a.addBehavior(Velocity);
@@ -1379,16 +1389,25 @@ var Store = {
       trigger: function (t) {
         t.player.hasDecoy = t.player.addBehavior(Periodic, {time: 4, period: 5, callback: function () {
           this.entity.decoy = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.viper));
+          this.entity.decoy.scale = 2;
           this.entity.decoy.angle = this.entity.angle;
           gameWorld.playSound(Resources.decoy);
-          var t = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y, Resources.expire_font, "decoy!", {spacing: -2, align: "center"}));
-          t.addBehavior(Velocity);
-          t.velocity = {x: 0, y: 10, angle: -PI };
-          t.addBehavior(FadeOut, {delay: 0.2, duration: 0.2});
+          var txt = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y, Resources.expire_font, "decoy active!!", {spacing: -2, align: "center"}));
+          txt.addBehavior(Velocity);
+          txt.scale = 2;
+          txt.z = t.player.z + 1;
+          txt.velocity = {x: 0, y: 10 };
+          txt.addBehavior(FadeOut, {delay: 0.4, duration: 0.2});
           var e = this.entity;
           this.entity.decoy.addBehavior(Delay, {duration: 1.5, callback: function () {
             this.entity.addBehavior(FadeOut, {duration: 0.2});
             e.decoy = undefined;
+            var txt = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y, Resources.expire_font, "decoy inactive.", {spacing: -2, align: "center"}));
+            txt.addBehavior(Velocity);
+            txt.scale = 2;
+            txt.z = t.player.z + 1;
+            txt.velocity = {x: 0, y: 10 };
+            txt.addBehavior(FadeOut, {delay: 0.4, duration: 0.2});
           }})
         }});
       },
