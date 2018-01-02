@@ -472,10 +472,11 @@ var onStart = function () {
 //  this.waves = [[6, 6]];
   //this.waves = [[0],[0],[0],[0]];
 
-  var boss_coordinates = toGrid(MIN.x + MAX.x / 2, MAX.y);
-  var boss = this.bg.add(Object.create(Sprite).init(boss_coordinates.x, boss_coordinates.y, Resources.boss));
+  var boss_coordinates = toGrid(MIN.x, (MIN.y + MAX.y) / 2);
+  var boss = this.bg.add(Object.create(Sprite).init(boss_coordinates.x, boss_coordinates.y, Resources.test));
   boss.animation = 0;
-  boss.offset = {x: 0, y: -16};
+  boss.angle = PI / 2;
+  boss.offset = {x: 16, y: 0};
   boss.modules = [];
   //boss.angle = PI / 2;
   boss.z = 24;
@@ -518,16 +519,21 @@ var onStart = function () {
     if (!this.enemy) { // no more warning shot
       // visual confirmation
       var t = this;
-      var w = this.layer.add(Object.create(SpriteFont).init(this.x, this.y + this.offset.y, Resources.expire_font, 'that was a mistake.', {spacing: -2, align: 'center'}));
+      var w = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2 + 48, Resources.expire_font, 'that was a mistake.', {spacing: -2, align: 'center'}));
       w.z = this.z + 1;
-      debug = w.addBehavior(KeyFrame, {loop: false, ease: 'linear', frames: [
+
+      /*debug = w.addBehavior(KeyFrame, {loop: false, ease: 'linear', frames: [
           {time: 0, state: {scale: 1, x: t.x, y: t.y, angle: 0}},
           {time: 1, state: {scale: 2, x: t.x, y: t.y - 50, angle: -PI / 8}},
           {time: 2, state: {scale: 2, x: t.x, y: t.y - 100, angle: PI2}},
           {time: 3, state: {scale: 2, x: t.x, y: t.y - 150, angle: 2 * PI2}}
         ]
-      });
-      w.addBehavior(FadeOut, {delay: 2, duration: 1});
+      });*/
+      w.scale = 2;
+      speechbubble(gameWorld.boss, w);
+      w.opacity = 0;
+      w.addBehavior(FadeIn, {duration: 0.1, delay: 0.6, maxOpacity: 1});
+      w.addBehavior(FadeOut, {delay: 1.2, duration: 0.1, maxOpacity: 1});
 
       this.enemy = this.addBehavior(BossEnemy);
       this.target = target;
@@ -538,8 +544,9 @@ var onStart = function () {
     }
   };
 
-  var test = this.bg.add(Object.create(Sprite).init(MIN.x, HEIGHT / 2, Resources.test));
-  test.z = boss.z + 50;
+  /*var test = this.bg.add(Object.create(Sprite).init(MIN.x + 16, HEIGHT / 2, Resources.test));
+  test.angle = PI / 2;
+  test.z = boss.z + 50;*/
   
   boss.boss = boss.addBehavior(Boss, {duration: 0.5, speed: 70, rate: 4, target: player});
   //boss.family = "enemy";
@@ -568,10 +575,10 @@ var onStart = function () {
       gameWorld.boss.invulnerable = true;
       gameWorld.boss.respond(s.player);
       //gameWorld.boss.old_animation = gameWorld.boss.animation;
-      gameWorld.boss.animation = 3;
+      gameWorld.boss.animation = 5;
       gameWorld.boss.addBehavior(Delay, {duration: 0.3, callback: function () { 
         this.entity.invulnerable = false;
-        gameWorld.boss.animation = 3 - Math.floor(3 * this.entity.health / this.entity.maxhealth);
+        gameWorld.boss.animation = 5 - Math.floor(5 * this.entity.health / this.entity.maxhealth);
         console.log(gameWorld.boss.animation);
       }});
       if (object.health <= 0) {
@@ -581,17 +588,17 @@ var onStart = function () {
         //s.player.removeBehavior((s.player.lerpx));
         //s.player.removeBehavior((s.player.lerpy));
         //s.player.move(s);
-        if (other.y < object.y) {
-          s.player.turn(PI / 2);
-          s.player.lerpy.goal = MAX.y - 3 * TILESIZE;
-          //s.player.lerpx.goal = p.x;
-        } else if (other.x > object.x) {
+        if (other.x > object.x) {
           s.player.turn(0);
-          s.player.lerpx.goal = b.x + 4 * TILESIZE;
+          s.player.lerpx.goal = MIN.x + 3 * TILESIZE;
+          //s.player.lerpx.goal = p.x;
+        } else if (other.y > object.y) {
+          s.player.turn(- PI / 2);
+          s.player.lerpy.goal = b.y + 3 * TILESIZE;
           //s.player.lerpy.goal = p.y;
-        } else if (other.x < object.x) {
-          s.player.turn(PI);
-          s.player.lerpx.goal = b.x - 4 * TILESIZE;
+        } else if (other.y < object.y) {
+          s.player.turn(PI / 2);
+          s.player.lerpy.goal = b.y - 3 * TILESIZE;
           //s.player.lerpy.goal = p.y;
         }
         particles(s.player, 20, 0);

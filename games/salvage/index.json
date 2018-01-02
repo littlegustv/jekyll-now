@@ -17,7 +17,7 @@
     {"path": "gate.png", "frames": 1, "animations": 2, "speed": 0.4},
     {"path": "grid.png"},
     {"path": "bill.png", "frames": 2, "speed": 0.3},
-    {"path": "test.png", "frames": 1, "speed": 0.3},
+    {"path": "test.png", "frames": 2, "animations": 6, "speed": 0.4},
     {"path": "keyhole.png"},
     {"path": "shield.png"},
     {"path": "target.png"},

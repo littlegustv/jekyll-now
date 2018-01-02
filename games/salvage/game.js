@@ -239,6 +239,38 @@ Move.pick = function () {
   return toGrid(this.entity.x + x * TILESIZE, x === 0 ? this.entity.y + choose([-1, 1]) * TILESIZE : this.entity.y);
 };
 
+function speechbubble(start, text) {
+  var map = [];
+  map.push([{x: 0, y: 0}, {x: 0, y: 2}]);
+  for (var i = 0; i < text.text.length; i++) {
+    map.push([{x: 1, y: 0}, {x: 1, y: 2}]);
+  }
+  map.push([{x: 2, y: 0}, {x: 2, y: 2}]);
+  var bubble = text.layer.add(Object.create(TileMap).init(text.x, text.y, Resources.bubble, map));
+  bubble.z = text.z - 1;
+  bubble.opacity = 0;
+  bubble.addBehavior(Follow, {target: text, offset: {x: false, y: false, z: false, alive: true}});
+  bubble.addBehavior(FadeIn, {delay: 0.4, duration: 0.1, maxOpacity: 1});
+  // fix me: need to calculate closest corner, then draw dots ONLY to there!
+  var w = 16 * map.length;
+  var y = start.y < text.y ? text.y - 16 : text.y + 16;
+  if (start.x > text.x) {
+    var corner = {x: text.x + w / 2, y: y};
+  } else {
+    var corner = {x: text.x - w / 2, y: y};
+  }
+  for (var i = 1; i < 4; i++) {
+    var dot = gameWorld.scene.ui.add(Object.create(Sprite).init(start.x +  i * (corner.x - start.x) / 3, start.y + i * (corner.y - start.y) / 3, Resources.bubble));
+    dot.behaviors = [];
+    dot.animation = 3;
+    dot.frame = 3 - i;
+    dot.z = text.z - 2;
+    dot.opacity = 0;
+    dot.addBehavior(FadeIn, {duration: 0.1, delay: 0.1 * i, maxOpacity: 1});
+    dot.addBehavior(Follow, {target: text, offset: {x: false, y: false, z: false, alive: true}});
+  }
+}
+
 // 
 var Boss = Object.create(Move);
 Boss.update = function (dt) {
@@ -298,12 +330,17 @@ Boss.pay = function () {
     gameWorld.scene.layers[i].paused = true;
   }
   var t = this;
-  gameWorld.scene.ui.paused = false;
-  var pd = gameWorld.scene.ui.add(Object.create(SpriteFont).init(this.entity.x, this.entity.y - 32, Resources.expire_font, "payday! +$1", {spacing: -1, align: "center"}));
-  pd.addBehavior(KeyFrame, {loop: false, ease: 'linear', frames: [
+  gameWorld.scene.ui.paused = false;  
+
+  var pd = gameWorld.scene.ui.add(Object.create(SpriteFont).init(this.entity.x + 128, this.entity.y - 32, Resources.expire_font, "payday! +$1", {spacing: -1, align: "center"}));
+  pd.z = 12;
+  pd.scale = 2;
+  speechbubble(gameWorld.boss, pd);
+  /*pd.addBehavior(KeyFrame, {loop: false, ease: 'linear', frames: [
       {time: 0, state: { scale: 1, opacity: 0 }},
-      {time: 1, state: { scale: 2, x: pd.x, y: pd.y, opacity: 1 }},
-      {time: 1.4, state: {x: WIDTH - 16, y: 16}}
+      {time: 2.5, state: {scale: 1, opacity: 0}},
+      {time: 3.5, state: { scale: 2, x: pd.x, y: pd.y, opacity: 1 }},
+      {time: 4, state: {x: WIDTH - 16, y: 16}}
     ], end: function () {
       //projectileDie(this.entity);
       gameWorld.playSound(Resources.coins);
@@ -316,18 +353,46 @@ Boss.pay = function () {
       if (gameWorld.wave % 2 === 1 && ! gameWorld.boss.store_open) {
         t.storetime();
       }
-    }});
+    }});*/
+  pd.addBehavior(FadeIn, {delay: 0.5, duration: 0.1, maxOpacity: 1});
+  pd.opacity = 0;
+  pd.addBehavior(FadeOut, {delay: 1, duration: 0.1, maxOpacity: 1});
+  pd.addBehavior(Delay, {duration: 1, callback: function () {
+    gameWorld.playSound(Resources.coins);
+    gameWorld.player.salvage += 1;
+    gameWorld.earned += 1;
+    gameWorld.player.cash_counter.text = "$ " + gameWorld.player.salvage;
+    //gameWorld.scene.bg.paused = false;
+    this.entity.addBehavior(FadeOut, {duration: 0.3, maxOpacity: 1});
+    //t.beam();
+    if (gameWorld.wave % 2 === 1 && ! gameWorld.boss.store_open) {
+      t.storetime();
+    }
+  }});
   this.callback = undefined;
+
   return this.duration;
 };
 Boss.storetime = function () {
   this.entity.velocity.y = 0;
   gameWorld.playSound(Resources.store);
+
+  var pd = gameWorld.scene.ui.add(Object.create(SpriteFont).init(this.entity.x + 128, this.entity.y + 32, Resources.expire_font, "store open!", {spacing: -1, align: "center"}));
+  pd.z = 12;
+  pd.scale = 2;
+  speechbubble(gameWorld.boss, pd);
+
+  pd.addBehavior(FadeIn, {delay: 0.5, duration: 0.1, maxOpacity: 1});
+  pd.opacity = 0;
+  pd.addBehavior(FadeOut, {delay: 1, duration: 0.1, maxOpacity: 1});
+
   this.entity.store_open = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y - TILESIZE, 16, 16));
 
   this.entity.store_open.opacity = 0;
   this.entity.store_open.setCollision(Polygon);
   this.entity.store_offset = this.entity.store_open.addBehavior(Follow, {target: this.entity, offset: {x: 0, y: -TILESIZE, angle: false, z: -2}}).offset;
+
+  // fix me: store position!
 
   var store_emphasis = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y - 3 * TILESIZE / 4, TILESIZE / 4));
   store_emphasis.addBehavior(Follow, {target: this.entity.store_open, offset: {alive: true, z: 0.5, x: 0, y: 0}});
@@ -813,7 +878,7 @@ var Weapons = {
         a.setCollision(Polygon);
         gameWorld.playSound(Resources.laser);
         a.family = "enemy";//"player";
-        a.description = {name: "spotlight", sprite: t.sprite};
+        a.description = {name: "spotlight", sprite: Resources.walker};
         a.beam = true;
         a.z = 100;
         a.angle = this.entity.angle;
@@ -1156,14 +1221,14 @@ function spawn(layer, key, player) {
     case 1: // armored train
       enemy.shoot = Weapons.triple;
       c.x = toGrid(choose([-1, 1]) * 2 * TILESIZE + b.x, 0).x;
-      if (c.x > b.x) {
+      /*if (c.x > b.x) {
         var min = c.x, max = toGrid(MAX.x, 0).x;
       } else {
         var min = toGrid(0, 0).x, max = c.x;
-      }
+      }*/
       enemy.x = c.x;
       enemy.offset = {x: 0, y: 2};
-      enemy.addBehavior(Horizontal, {duration: 0.5, speed: SPEEDS.enemy_horizontal, target: player, min: min, max: max, delay: 0.5}); // hmmm!
+      enemy.addBehavior(Horizontal, {duration: 0.5, speed: SPEEDS.enemy_horizontal, target: player, min: MIN.x, max: MAX.x, delay: 0.5}); // hmmm!
       enemy.target = player;
       enemy.y = toGrid(100, 1000).y + 4;
       enemy.setVertices([
@@ -1209,13 +1274,13 @@ function spawn(layer, key, player) {
 
       
       c.x = toGrid(choose([-1, 1]) * 2 * TILESIZE + b.x, 0).x;
-      if (c.x > b.x) {
+      /*if (c.x > b.x) {
         var min = c.x, max = toGrid(MAX.x, 0).x;
       } else {
         var min = toGrid(0, 0).x, max = c.x;
-      }
+      }*/
       enemy.x = c.x;
-      enemy.move = enemy.addBehavior(Horizontal, {duration: 0.5, speed: SPEEDS.enemy_horizontal_slow, target: player, min: min, max: max, delay: 0.5}); // hmmm!
+      enemy.move = enemy.addBehavior(Horizontal, {duration: 0.5, speed: SPEEDS.enemy_horizontal_slow, target: player, min: MIN.x, max: MAX.x, delay: 0.5}); // hmmm!
 
       enemy.animation = 0;
       enemy.target = player;
