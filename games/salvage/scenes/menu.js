@@ -65,7 +65,26 @@ var onStart =  function () {
   ground.scale = 2;
   //ground.blend = "destination-out";
   ground.z = 10;
-  
+  /*
+  var bubble = this.bg.add(Object.create(TileMap).init(gameWorld.width / 2, gameWorld.height / 2, Resources.bubble, [
+    [{x: 0, y: 0}, {x: 0, y: 2}],
+    [{x: 1, y: 0}, {x: 1, y: 2}],
+    [{x: 1, y: 0}, {x: 1, y: 2}],
+    [{x: 1, y: 0}, {x: 1, y: 2}],
+    [{x: 1, y: 0}, {x: 1, y: 2}],
+    [{x: 1, y: 0}, {x: 1, y: 2}],
+    [{x: 2, y: 0}, {x: 2, y: 2}]
+  ]));
+  bubble.scale = 2;
+
+  for (var i = 0; i < 3; i++) {
+    var b = this.bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height / 2 + 32 * (i + 1) + 16, Resources.bubble));
+    b.frame = i;
+    b.animation = 3;
+    b.scale = 2;
+    b.behaviors = [];
+  }*/
+
 /*
   var wall = this.bg.add(Object.create(TiledBackground).init(gameWorld.width * 3 / 4, gameWorld.height / 2, gameWorld.height, 8, Resources.wall));
   wall.angle = PI / 2;
