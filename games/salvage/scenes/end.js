@@ -9,7 +9,7 @@ var onStart =  function () {
   this.ui = this.addLayer(Object.create(Layer).init(WIDTH, HEIGHT));
 
   var e1 = top.add(Object.create(SpriteFont).init(24, gameWorld.height / 2 - 22, Resources.expire_font, ENDINGS[gameWorld.ending], {spacing: -2, align: "left"}));
-  var e2 = top.add(Object.create(SpriteFont).init(24, gameWorld.height / 2, Resources.expire_font, "Ending " + (gameWorld.ending + 1) + " of " + ENDINGS.length, {spacing: -2, align: "left"}));
+  var e2 = top.add(Object.create(SpriteFont).init(24, gameWorld.height / 2, Resources.expire_font, "(ending " + (gameWorld.ending + 1) + " of " + ENDINGS.length + ")", {spacing: -2, align: "left"}));
   e1.z = 50;
   e1.scale = 2;
   e2.z = 51;

@@ -62,7 +62,7 @@ var HEIGHT = 360;
 var ARM_TIME = 0.1;
 var TILESIZE = 48;
 var MIN = {x: 40, y: 40};
-var MAX = {x: MIN.x + TILESIZE * 12, y: HEIGHT - 32};
+var MAX = {x: MIN.x + TILESIZE * 12, y: MIN.y + TILESIZE * 6};
 var SPEEDS = {
   gravity: 120,
   projectile_fast: 200,//100,
@@ -91,6 +91,24 @@ var Z = { // fix me: is this used?
   obstacle: 4
 };
 
+function notPlayer (e) {
+  return !(e.x === gameWorld.player.x && e.y === gameWorld.player.y);
+}
+
+function shuffle () {
+  return 0.5 - Math.random();
+}
+
+function spawnPoints () {
+  return {
+    sky: Array(11).fill(1).map(function (e, index) { return toGrid(MIN.x + TILESIZE * index, MIN.y) }).filter(notPlayer).sort(shuffle),
+    wall: Array(6).fill(1).map(function (e, index) { return toGrid(MAX.x, MIN.y + TILESIZE * index) }).filter(notPlayer).sort(shuffle),
+    air: Array(10 * 4).fill(1).map(function (e, index) { return toGrid(MIN.x + TILESIZE * (1 + index % 10), MIN.y + (1 + Math.floor(index / 10)) * TILESIZE); }).filter(notPlayer).sort(shuffle),
+    ground: Array(11).fill(1).map(function (e, index) { return toGrid(MIN.x + TILESIZE * index, MAX.y) }).filter(notPlayer).sort(shuffle)
+    // all points from x >= 1, 1 >= y <= 5
+  }
+}
+
 function toGrid(x, y) {
   var g = {
     x: clamp(Math.round((x - MIN.x) / TILESIZE) * TILESIZE + MIN.x, MIN.x, MAX.x),
@@ -102,6 +120,10 @@ function toGrid(x, y) {
     }
   }
   return g;
+}
+
+function fromGrid(i, j) {
+  return {x: MIN.x + i * TILESIZE, y: MIN.y + j * TILESIZE}; 
 }
 
 var buttonHover = function () {
@@ -236,6 +258,10 @@ Move.update = function (dt) {
 };
 Move.pick = function () {
   var x = randint(-1, 2);
+  // don't go on 'boss' side
+  if (this.entity.x <= MIN.x + TILESIZE) {
+    x = choose([0, 1]);
+  }
   return toGrid(this.entity.x + x * TILESIZE, x === 0 ? this.entity.y + choose([-1, 1]) * TILESIZE : this.entity.y);
 };
 
@@ -440,12 +466,18 @@ Boss.pick = function () {
 var Approach = Object.create(Move);
 Approach.pick = function () {
 
-  var g = toGrid(this.entity.x + sign(this.target.x - this.entity.x) * TILESIZE, this.entity.y); // horiztonal
-  var p = toGrid(this.target.x, this.target.y);
-  var b = toGrid(gameWorld.boss.x, gameWorld.boss.y);
-  if ((g.x === b.x || g.x === b.x - TILESIZE || g.x === b.x + TILESIZE) && (g.y === b.y || this.entity.y + TILESIZE === b.y)) return toGrid(this.entity.x, this.entity.y - TILESIZE); // if we WOULD go towards the boss
-  else if (g.x !== p.x || g.y !== p.y) return g;
-  else return toGrid(this.entity.x, this.entity.y + sign(this.target.y - this.entity.y) * TILESIZE);
+  var me = toGrid(this.entity.x, this.entity.y);
+  var you = toGrid(this.target.x, this.target.y);
+
+  // if we are too close, move to the side
+  var options = [{x: me.x + TILESIZE, y: me.y}, {x: me.x - TILESIZE, y: me.y}, {x: me.x, y: me.y + TILESIZE}, {x: me.x, y: me.y - TILESIZE}];
+  options = options.filter(function (e) { return (e.x >= MIN.x + TILESIZE) && !(e.x === you.x && e.y === you.y); });
+  console.log(options.length);
+  options.sort(function (a, b) {
+    return distance(a.x, a.y, you.x, you.y) - distance(b.x, b.y, you.x, you.y);
+  });
+
+  return options[0];
 };
 
 // hover - tries to stay above or below, staying vertically aligned - FIX ME: is this used - and could it be?
@@ -1191,19 +1223,20 @@ Periodic.update = function (dt) {
 }
 
 var sprites = ["drone", "train", "radar", "saucer", "thopter", "fighter", "walker"];
-function spawn(layer, key, player) {
+function spawn(layer, key, player, points, nonce) {
   var theta = Math.random() * PI2;
-  var x = randint(MIN.x, MAX.x), y = randint(MIN.y, MAX.y);
-  var c = toGrid(x, y);
+  //var x = randint(MIN.x, MAX.x), y = randint(MIN.y, MAX.y);
+  //var c = toGrid(x, y);
   var p = toGrid(player.x, player.y);
   var b = toGrid(gameWorld.boss.x, gameWorld.boss.y);
   // clumsy way of making sure we don't spawn on top of player or boss
-  while ((c.x === p.x && c.y === p.y) || (c.x === b.x && c.y === b.y)) {
+  /*while ((c.x === p.x && c.y === p.y) || (c.x === b.x && c.y === b.y)) {
     x = randint(MIN.x, MAX.x), y = randint(MIN.y, MAX.y);
     c = toGrid(x, y);   
-  }
-  var enemy = Object.create(Sprite).init(c.x, c.y, Resources[sprites[key % sprites.length]]);
-  enemy.z = Z.entity;
+  }*/
+  var enemy = Object.create(Sprite).init(WIDTH / 2, HEIGHT / 2, Resources[sprites[key % sprites.length]]);
+  enemy.z = Z.entity + nonce;
+  nonce += 0.01;
   enemy.addBehavior(Velocity);
   enemy.velocity = {x: 0, y: 0};
   enemy.setCollision(Polygon);
@@ -1217,16 +1250,24 @@ function spawn(layer, key, player) {
       enemy.setVertices([
         {x: -3, y: -3}, {x: -3, y: 3}, {x: 3, y: 3}, {x: 3, y: -3}
       ]);
+      var point = points.air.pop();
+      enemy.x = point.x, enemy.y = point.y;
       break;
     case 1: // armored train
       enemy.shoot = Weapons.triple;
+      /*
       c.x = toGrid(choose([-1, 1]) * 2 * TILESIZE + b.x, 0).x;
-      /*if (c.x > b.x) {
+      if (c.x > b.x) {
         var min = c.x, max = toGrid(MAX.x, 0).x;
       } else {
         var min = toGrid(0, 0).x, max = c.x;
-      }*/
+      }
       enemy.x = c.x;
+      */
+      
+      var point = points.ground.pop();
+      enemy.x = point.x, enemy.y = point.y;
+
       enemy.offset = {x: 0, y: 2};
       enemy.addBehavior(Horizontal, {duration: 0.5, speed: SPEEDS.enemy_horizontal, target: player, min: MIN.x, max: MAX.x, delay: 0.5}); // hmmm!
       enemy.target = player;
@@ -1239,7 +1280,11 @@ function spawn(layer, key, player) {
     case 2: // turret
       enemy.shoot = Weapons.burst;
       enemy.target = player;
-      enemy.x = toGrid(WIDTH, 0).x;
+      //enemy.x = toGrid(WIDTH, 0).x;
+      
+      var point = points.wall.pop();
+      enemy.x = point.x, enemy.y = point.y;
+
       enemy.angle = PI;      
       enemy.setVertices([
         {x: -3, y: -3}, {x: -3, y: 3}, {x: 3, y: 3}, {x: 3, y: -3}
@@ -1250,11 +1295,20 @@ function spawn(layer, key, player) {
       enemy.setVertices([
         {x: -5, y: -3}, {x: -5, y: 3}, {x: 5, y: 3}, {x: 5, y: -3}
       ]);
-      enemy.y = toGrid(0, 0).y;
+      //enemy.y = toGrid(0, 0).y;
+      
+
+      var point = points.sky.pop();
+      enemy.x = point.x, enemy.y = point.y;
+
       enemy.addBehavior(Flip);
       enemy.shoot = Weapons.bomb;
       break;
     case 4: // minelayer (except the mines are FIREWORKS)
+      
+      var point = points.air.pop();
+      enemy.x = point.x, enemy.y = point.y;
+
       enemy.addBehavior(Move, {duration: 1, speed: SPEEDS.enemy_normal, delay: 1 });
       enemy.shoot = Weapons.firework;
       enemy.shoot_angle = -PI / 2;      
@@ -1263,6 +1317,8 @@ function spawn(layer, key, player) {
       ]);
       break;
     case 5: // fighter shooting homing missiles
+      var point = points.air.pop();
+      enemy.x = point.x, enemy.y = point.y;
       enemy.addBehavior(Approach, {duration: 1.1, speed: SPEEDS.enemy_normal, target: player, turn: true, delay: 1.1});
       enemy.target = player;
       enemy.shoot = Weapons.homing;
@@ -1272,20 +1328,14 @@ function spawn(layer, key, player) {
       break;
     case 6: // beam weapon!!
 
-      
-      c.x = toGrid(choose([-1, 1]) * 2 * TILESIZE + b.x, 0).x;
-      /*if (c.x > b.x) {
-        var min = c.x, max = toGrid(MAX.x, 0).x;
-      } else {
-        var min = toGrid(0, 0).x, max = c.x;
-      }*/
-      enemy.x = c.x;
+      var point = points.ground.pop();
+      enemy.x = point.x, enemy.y = point.y;
+
       enemy.move = enemy.addBehavior(Horizontal, {duration: 0.5, speed: SPEEDS.enemy_horizontal_slow, target: player, min: MIN.x, max: MAX.x, delay: 0.5}); // hmmm!
 
       enemy.animation = 0;
       enemy.target = player;
       enemy.shoot = Weapons.hitscan;
-      enemy.y = toGrid(0, 1000).y;
       enemy.offset = {x: 0, y: 4};
       enemy.setVertices([
         {x: -6, y: -3}, {x: -6, y: 3}, {x: 6, y: 3}, {x: 6, y: -3}

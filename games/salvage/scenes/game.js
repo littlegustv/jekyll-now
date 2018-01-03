@@ -37,6 +37,7 @@ var onStart = function () {
 
   var right = bg.add(Object.create(TiledBackground).init(MAX.x + 24, HEIGHT / 2, 32, HEIGHT, Resources.wall));
   right.z = 22;
+  right.angle = PI;
 
   var left = bg.add(Object.create(TiledBackground).init(16, HEIGHT / 2, 32, HEIGHT, Resources.wall));
   left.z = 22;
@@ -334,11 +335,13 @@ var onStart = function () {
         announcement.addBehavior(FadeOut, {duration: 0.3, delay: 0.5, maxOpacity: 1});
         announcement.scale = 2;
 */
+        var points = spawnPoints();
+        var nonce = 0;
         for (var i = 0; i < gameWorld.wave; i++) {
           var k = i % this.waves.length;
           for (var j = 0; j < this.waves[k].length; j++) {
-            var enemy = spawn(this.bg, this.waves[k][j], this.player);
-            this.wave.push(enemy);            
+            var enemy = spawn(this.bg, this.waves[k][j], this.player, points, nonce);
+            this.wave.push(enemy);
           }
         }
         gameWorld.wave++;
@@ -469,7 +472,7 @@ var onStart = function () {
     [6],
   ];
 
-//  this.waves = [[6, 6]];
+  //this.waves = [[6, 6, 6]];
   //this.waves = [[0],[0],[0],[0]];
 
   var boss_coordinates = toGrid(MIN.x, (MIN.y + MAX.y) / 2);
