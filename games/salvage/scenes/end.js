@@ -8,8 +8,8 @@ var onStart =  function () {
 
   this.ui = this.addLayer(Object.create(Layer).init(WIDTH, HEIGHT));
 
-  var e1 = top.add(Object.create(SpriteFont).init(24, gameWorld.height / 2 - 22, Resources.expire_font, ENDINGS[gameWorld.ending], {spacing: -2, align: "left"}));
-  var e2 = top.add(Object.create(SpriteFont).init(24, gameWorld.height / 2, Resources.expire_font, "(ending " + (gameWorld.ending + 1) + " of " + ENDINGS.length + ")", {spacing: -2, align: "left"}));
+  var e1 = top.add(Object.create(SpriteFont).init(44, gameWorld.height / 2 - 22, Resources.expire_font, ENDINGS[gameWorld.ending], {spacing: -2, align: "left"}));
+  var e2 = top.add(Object.create(SpriteFont).init(44, gameWorld.height / 2, Resources.expire_font, "(ending " + (gameWorld.ending + 1) + " of " + ENDINGS.length + ")", {spacing: -2, align: "left"}));
   e1.z = 50;
   e1.scale = 2;
   e2.z = 51;
@@ -17,16 +17,16 @@ var onStart =  function () {
 
   //var description = ;
 
-  var earned = top.add(Object.create(SpriteFont).init(24, 3 * gameWorld.height / 4 - 34, Resources.expire_font, "You earned $" + gameWorld.earned + ".", {spacing: -2, align: "left"}));
+  var earned = top.add(Object.create(SpriteFont).init(44, 3 * gameWorld.height / 4 - 34, Resources.expire_font, "You earned $" + gameWorld.earned + ".", {spacing: -2, align: "left"}));
   earned.scale = 2;
-  var spent = top.add(Object.create(SpriteFont).init(24, 3 * gameWorld.height / 4 - 12, Resources.expire_font, "You spent $" + (gameWorld.earned - gameWorld.player.salvage) + ".", {spacing: -2, align: "left"}));
+  var spent = top.add(Object.create(SpriteFont).init(44, 3 * gameWorld.height / 4 - 12, Resources.expire_font, "You spent $" + (gameWorld.earned - gameWorld.player.salvage) + ".", {spacing: -2, align: "left"}));
   spent.scale = 2;
 
   if (gameWorld.endDescription) {
     var s = top.add(Object.create(Sprite).init(gameWorld.width -  48, 3 * gameWorld.height / 4 + 32, gameWorld.endDescription.sprite));
     s.scale = 2;
     s.z = 52;
-    var t = top.add(Object.create(SpriteFont).init(24, 3 * gameWorld.height / 4 + 32, Resources.expire_font, "You were destroyed by a " + gameWorld.endDescription.name + "!", {spacing: -2, align: "left"}));
+    var t = top.add(Object.create(SpriteFont).init(44, 3 * gameWorld.height / 4 + 32, Resources.expire_font, "You were destroyed by a " + gameWorld.endDescription.name + "!", {spacing: -2, align: "left"}));
     t.scale = 2;
     t.z = 53;
     gameWorld.endDescription = undefined;

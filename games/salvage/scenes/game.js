@@ -325,37 +325,37 @@ var onStart = function () {
 
       // if wave is finished
       if (this.wave.length <= 0) {
-        gameWorld.playSound(Resources.process);
+        var scrap = this.bg.entities.filter(function (e) { return e.scrap; });
+        console.log('pausing, and having some scrap  still...');
+        if (scrap.length > 0) {
+          gameWorld.playSound(Resources.process);
 
-        // remove last-wave's projectiles ?
-        for (var i = 0; i < projectiles.length; i++) {
-          if (projectiles[i].alive) {
-            projectiles[i].alive = false;
-            var f = projectiles[i].layer.add(Object.create(Circle).init(projectiles[i].x, projectiles[i].y, 5));
-            f.color = COLORS.primary;
-            f.addBehavior(FadeOut, {duration: 0.1, delay: 0.1});
+          // remove last-wave's projectiles ?
+          for (var i = 0; i < projectiles.length; i++) {
+            if (projectiles[i].alive) {
+              //projectiles[i].alive = false;
+              projectileDie(projectiles[i]);
+              //var f = projectiles[i].layer.add(Object.create(Circle).init(projectiles[i].x, projectiles[i].y, 5));
+              //f.color = COLORS.primary;
+              //f.addBehavior(FadeOut, {duration: 0.1, delay: 0.1});
+            }
           }
-        }
-        projectiles = [];
-        // open store every OTHer wave
-/*        var announcement = t.bg.add(Object.create(SpriteFont).init(MIN.x + 4 * TILESIZE + 8, gameWorld.height / 2, Resources.expire_font, "wave " + gameWorld.wave, {spacing: -3, align: "center"}));
-        announcement.opacity = 0;
-        announcement.addBehavior(FadeIn, {duration: 0.3, delay: 0, maxOpacity: 1});
-        announcement.addBehavior(FadeOut, {duration: 0.3, delay: 0.5, maxOpacity: 1});
-        announcement.scale = 2;
-*/
-        var points = spawnPoints();
-        var nonce = 0;
-        for (var i = 0; i < gameWorld.wave; i++) {
-          var k = i % this.waves.length;
-          for (var j = 0; j < this.waves[k].length; j++) {
-            var enemy = spawn(this.bg, this.waves[k][j], this.player, points, nonce);
-            this.wave.push(enemy);
+          projectiles = [];
+          gameWorld.player.locked = true;
+          gameWorld.boss.boss.collect(scrap);
+        } else {
+          // spawn new enemies
+          var points = spawnPoints();
+          var nonce = 0;
+          for (var i = 0; i < gameWorld.wave; i++) {
+            var k = i % this.waves.length;
+            for (var j = 0; j < this.waves[k].length; j++) {
+              var enemy = spawn(this.bg, this.waves[k][j], this.player, points, nonce);
+              this.wave.push(enemy);
+            }
           }
+          gameWorld.wave++;          
         }
-        gameWorld.wave++;
-
-        gameWorld.boss.boss.pay();
       }
     }
   }
@@ -379,7 +379,7 @@ var onStart = function () {
     } else if (s.player.stopped()) {
       s.player.turn(Math.round(angle(s.player.x - s.bg.camera.x, s.player.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2);
       s.player.move(s);
-    } else {
+    } else if (!s.player.locked) {
       s.player.buffer = Math.round(angle(s.player.x - s.bg.camera.x, s.player.y - s.bg.camera.y, e.x, e.y) / (PI / 2)) * PI / 2;
     }
   }

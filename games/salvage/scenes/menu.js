@@ -57,9 +57,9 @@ var onStart =  function () {
   //title.blend = "destination-out";
   //title.z = 10;
 
-  var boss = this.bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 64, Resources.boss));
+/*  var boss = this.bg.add(Object.create(Sprite).init(gameWorld.width / 2, gameWorld.height - 64, Resources.boss));
   boss.scale = 2;
-  boss.z = 9;
+  boss.z = 9;*/
   
   var ground = this.bg.add(Object.create(TiledBackground).init(gameWorld.width / 2, gameWorld.height - 16, gameWorld.width, 16, Resources.skyline));
   ground.scale = 2;
@@ -119,7 +119,7 @@ var onStart =  function () {
   var selected = 0;
   var mute_button_text;
   for (var i = 0; i < buttons.length; i++) {
-    var b = this.bg.add(Object.create(SpriteFont).init((2 * i + 1) * gameWorld.width / 8, 16, Resources.expire_font, buttons[i][0], {spacing: -2, align: "center"}));
+    var b = this.bg.add(Object.create(SpriteFont).init((2 * i + 1) * gameWorld.width / 8, 16, Resources.expire_font, buttons[i][0], {spacing: -3, align: "center"}));
     var button = this.bg.add(Object.create(Entity).init((2 * i + 1) * gameWorld.width / 8, 16, gameWorld.width / 4, 32));
     button.family = "button";
     b.z = 2;
@@ -129,21 +129,15 @@ var onStart =  function () {
     button.opacity = 0;
     button.text = b;
     if (buttons[i][0] === "mute") { mute_button_text = b; }
-    button.hover = function () {
-      if (this.color != COLORS.button) gameWorld.playSound(Resources.hover);
-      this.color = COLORS.button;
-      this.opacity = 1;
-    };
-    button.unhover = function () {
-      this.color = "white";
-      this.opacity = 0;
-    };
+
+    button.hover = bracketHover;
+    button.unhover = bracketUnhover;
 
     button.trigger = buttons[i][1];
     button_objects.push(button);
   }
   if (gameWorld.saved) {
-    var b = this.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 3, Resources.expire_font, "resume current game", {spacing: -2, align: "center"}));
+    var b = this.bg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 3, Resources.expire_font, "resume current game", {spacing: -3, align: "center"}));
     var button = this.bg.add(Object.create(Entity).init(gameWorld.width / 2, gameWorld.height / 3, gameWorld.width, 32));
     button.family = "button";
     b.z = 2;
@@ -152,15 +146,10 @@ var onStart =  function () {
     //b.blend = "destination-out";
     button.opacity = 0;
     button.text = b;
-    button.hover = function () {
-      if (this.color != COLORS.button) gameWorld.playSound(Resources.hover);
-      this.color = COLORS.button;
-      this.opacity = 1;
-    };
-    button.unhover = function () {
-      this.color = "white";
-      this.opacity = 0;
-    };
+    
+    button.hover = bracketHover;
+    button.unhover = bracketUnhover;
+
     button.trigger = function () {
       gameWorld.setScene(1, false);
     };

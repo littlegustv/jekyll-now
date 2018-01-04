@@ -126,6 +126,17 @@ function fromGrid(i, j) {
   return {x: MIN.x + i * TILESIZE, y: MIN.y + j * TILESIZE}; 
 }
 
+var bracketHover = function () {
+  if (this.text.text.indexOf("[") === -1) {
+    this.text.text = "[ " + this.text.text + " ]";
+  }
+};
+var bracketUnhover = function () {
+  if (this.text && this.text.text.indexOf("[") !== -1) {
+    this.text.text = this.text.text.slice(2, this.text.text.length - 2);
+  }
+};
+
 var buttonHover = function () {
   if (this.opacity != 0.6) gameWorld.playSound(Resources.hover);
   this.opacity = 0.6;
@@ -351,17 +362,41 @@ Boss.beam = function () {
     this.entity.removeBehavior(this);
   }});*/
 };
-Boss.pay = function () {
+Boss.collect = function (scrap) {
   for (var i = 0; i < gameWorld.scene.layers.length; i++) {
-    gameWorld.scene.layers[i].paused = true;
+    gameWorld.scene.layers[i].paused = false;
+  }
+  for (var i = 0; i < scrap.length; i++) {
+    scrap[i].addBehavior(Lerp, {field: "x", rate: 2, goal: this.entity.x, object: scrap[i]});
+    scrap[i].addBehavior(Lerp, {field: "y", rate: 2, goal: this.entity.y, object: scrap[i]});
   }
   var t = this;
+  this.entity.addBehavior(Delay, {duration: 1, callback: function () {
+    t.pay();
+    this.entity.removeBehavior(this);
+  }});
+}
+Boss.pay = function () {
+  /*for (var i = 0; i < gameWorld.scene.layers.length; i++) {
+    gameWorld.scene.layers[i].paused = true;
+  }
   gameWorld.scene.ui.paused = false;  
+  */
+  var t = this;
 
   var pd = gameWorld.scene.ui.add(Object.create(SpriteFont).init(this.entity.x + 128, this.entity.y - 32, Resources.expire_font, "payday! +$1", {spacing: -1, align: "center"}));
   pd.z = 12;
   pd.scale = 2;
   speechbubble(gameWorld.boss, pd);
+  gameWorld.playSound(Resources.coins);
+
+  for (var i = 0; i < 10; i++) {
+    var coin = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y + randint(-48, 48), Resources.coin));   
+    coin.addBehavior(Lerp, {field: "x", rate: 2, goal: gameWorld.width + 6, object: coin});
+    coin.addBehavior(Lerp, {field: "y", rate: 2, goal: -6, object: coin});
+    coin.addBehavior(Crop, {min: {x: 0, y: 0}, max: {x: gameWorld.width, y: gameWorld.height}});
+  }
+
   /*pd.addBehavior(KeyFrame, {loop: false, ease: 'linear', frames: [
       {time: 0, state: { scale: 1, opacity: 0 }},
       {time: 2.5, state: {scale: 1, opacity: 0}},
@@ -394,10 +429,10 @@ Boss.pay = function () {
     if (gameWorld.wave % 2 === 1 && ! gameWorld.boss.store_open) {
       t.storetime();
     }
+    gameWorld.player.locked = false;    
+    gameWorld.scene.pause();
   }});
   this.callback = undefined;
-
-  return this.duration;
 };
 Boss.storetime = function () {
   this.entity.velocity.y = 0;
@@ -1375,8 +1410,8 @@ function spawn(layer, key, player, points, nonce) {
     scrap.opacity = 0.8;
     scrap.angle = this.angle;
     var theta = angle(scrap.x, scrap.y, gameWorld.boss.x, gameWorld.boss.y);
-    scrap.addBehavior(Velocity);
-    scrap.velocity = {x: 20 * Math.cos(theta), y: 20 * Math.sin(theta), angle: PI / 6};
+    //scrap.addBehavior(Velocity);
+    //scrap.velocity = {x: 20 * Math.cos(theta), y: 20 * Math.sin(theta), angle: PI / 6};
     scrap.z = 2.5;
     scrap.scrap = true;
     scrap.setCollision(Polygon);
