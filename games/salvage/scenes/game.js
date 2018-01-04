@@ -47,7 +47,7 @@ var onStart = function () {
 
   var keyhole = bg.add(Object.create(Sprite).init(16, MAX.y - TILESIZE + 10, Resources.keyhole));
   keyhole.z = 90;
-  keyhole.scale = 3;
+  keyhole.scale = 2;
 
   var leftcover = bg.add(Object.create(TiledBackground).init(0, HEIGHT / 2, 1, HEIGHT, Resources.wall));
   leftcover.z = 51;
@@ -290,6 +290,15 @@ var onStart = function () {
         if (!player.hasFTL) {
           gate.animation = 0;
           gameWorld.playSound(Resources.denied);
+          if (!gameWorld.locked || !gameWorld.locked.alive) {            
+            gameWorld.locked = this.ui.add(Object.create(SpriteFont).init(gate.x + 96, gate.y - 32, Resources.expire_font, "LOCKED.", {spacing: -2, align: "center"}));
+            gameWorld.locked.z = 100;
+            gameWorld.locked.scale = 2;
+            gameWorld.locked.opacity = 0;
+            gameWorld.locked.addBehavior(FadeIn, {delay: 0.4, duration: 0.2, maxOpacity: 1})
+            gameWorld.locked.addBehavior(FadeOut, {duration: 0.2, delay: 1, maxOpacity: 1});
+            speechbubble(keyhole, gameWorld.locked);
+          }
         } else {
           keyhole.alive = false;
           /*this.locked.alive = false;
@@ -522,7 +531,7 @@ var onStart = function () {
     if (!this.enemy) { // no more warning shot
       // visual confirmation
       var t = this;
-      var w = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height / 2 + 48, Resources.expire_font, 'that was a mistake.', {spacing: -2, align: 'center'}));
+      var w = s.ui.add(Object.create(SpriteFont).init(boss.x + 96, boss.y - 32, Resources.expire_font, 'that was a mistake.', {spacing: -2, align: 'center'}));
       w.z = this.z + 1;
 
       /*debug = w.addBehavior(KeyFrame, {loop: false, ease: 'linear', frames: [
