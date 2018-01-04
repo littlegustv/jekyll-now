@@ -71,7 +71,6 @@ var onStart =  function () {
             //if (this.target) console.log('target');
             a.velocity = {x: 80 * Math.cos(theta), y: 80 * Math.sin(theta)  };
             a.angle = theta;
-            //a.addBehavior(CropDistance, {target: s.player, max: 10 * gameWorld.distance});
             a.addBehavior(Trail, {interval: 0.06, maxlength: 10, record: []});
             s.player.targets.push(a);
           }

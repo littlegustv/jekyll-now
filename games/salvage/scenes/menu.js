@@ -184,15 +184,6 @@ var onStart =  function () {
   }});
   //ship.blend = "destination-out";
 
-  this.colorize = function (i) {
-    COLORS = SCHEMES[i];
-    this.nullaries.forEach(function (e) { e.color = COLORS.nullary; });
-    this.negatives.forEach(function (e) { e.color = COLORS.negative; });
-    this.primaries.forEach(function (e) { e.color = COLORS.primary; });
-    this.secondaries.forEach(function (e) { e.color = COLORS.secondary; });
-    this.tertiaries.forEach(function (e) { e.color = COLORS.tertiary; });
-  };
-
   var up = function () {
     selected = modulo(selected - 1, button_objects.length);
     for (var i = 0; i < button_objects.length; i++) {

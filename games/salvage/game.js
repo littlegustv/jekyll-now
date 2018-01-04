@@ -18,10 +18,11 @@ var directions = {
 };
 
 var MAXHEALTH = 4, DAMAGE_COOLDOWN = 0.5;
+
 var gameWorld = Object.create(World).init(640, 360, "index.json");
 gameWorld.wave = 1;
-gameWorld.distance = 100;
 gameWorld.ending = 0;
+
 gameWorld.unmute = function () {
   if (localStorage) {
     localStorage.salvageMuted = false;
@@ -33,6 +34,7 @@ gameWorld.unmute = function () {
   window.muted = false;
   this.playSound(Resources.select);
 };
+
 gameWorld.mute = function () {
   if (localStorage) {
     localStorage.salvageMuted = true;
@@ -78,28 +80,51 @@ var SPEEDS = {
 
 var COLORS = {
   negative: "#000000",
-  nullary: "#FFFFFF",
   primary: "#00bfff",//"#AA0000",
-  button: "#00bfff",
-  tertiary: "#000000"
+  button: "#00bfff", // used only in STORE now
 };
 
-var Z = { // fix me: is this used?
-  particle: 1,
-  projectile: 2,
-  entity: 3,
-  obstacle: 4
-};
+function speechbubble(start, text) {
+  var map = [];
+  map.push([{x: 0, y: 0}, {x: 0, y: 2}]);
+  for (var i = 0; i < text.text.length; i++) {
+    map.push([{x: 1, y: 0}, {x: 1, y: 2}]);
+  }
+  map.push([{x: 2, y: 0}, {x: 2, y: 2}]);
+  var bubble = text.layer.add(Object.create(TileMap).init(text.x, text.y, Resources.bubble, map));
+  bubble.z = text.z - 1;
+  bubble.opacity = 0;
+  bubble.addBehavior(Follow, {target: text, offset: {x: false, y: false, z: false, alive: true}});
+  bubble.addBehavior(FadeIn, {delay: 0.4, duration: 0.1, maxOpacity: 1});
+  // fix me: need to calculate closest corner, then draw dots ONLY to there!
+  var w = 16 * map.length;
+  var y = start.y < text.y ? text.y - 16 : text.y + 16;
+  if (start.x > text.x) {
+    var corner = {x: text.x + w / 2, y: y};
+  } else {
+    var corner = {x: text.x - w / 2, y: y};
+  }
+  for (var i = 1; i < 4; i++) {
+    var dot = gameWorld.scene.ui.add(Object.create(Sprite).init(start.x +  i * (corner.x - start.x) / 3, start.y + i * (corner.y - start.y) / 3, Resources.bubble));
+    dot.behaviors = [];
+    dot.animation = 3;
+    dot.frame = 3 - i;
+    dot.z = text.z - 2;
+    dot.opacity = 0;
+    dot.addBehavior(FadeIn, {duration: 0.1, delay: 0.1 * i, maxOpacity: 1});
+    dot.addBehavior(Follow, {target: text, offset: {x: false, y: false, z: false, alive: true}});
+  }
+}
 
-function notPlayer (e) {
+function notPlayer (e) { // used to avoid spawning enemies on player position
   return !(e.x === gameWorld.player.x && e.y === gameWorld.player.y);
 }
 
-function shuffle () {
+function shuffle () { // general utility function (for SORT)
   return 0.5 - Math.random();
 }
 
-function spawnPoints () {
+function spawnPoints () { // generate free 'points' for spawning algorithm
   return {
     sky: Array(11).fill(1).map(function (e, index) { return toGrid(MIN.x + TILESIZE * index, MIN.y) }).filter(notPlayer).sort(shuffle),
     wall: Array(6).fill(1).map(function (e, index) { return toGrid(MAX.x, MIN.y + TILESIZE * index) }).filter(notPlayer).sort(shuffle),
@@ -109,6 +134,7 @@ function spawnPoints () {
   }
 }
 
+// round to nearest grid position
 function toGrid(x, y) {
   var g = {
     x: clamp(Math.round((x - MIN.x) / TILESIZE) * TILESIZE + MIN.x, MIN.x, MAX.x),
@@ -122,10 +148,12 @@ function toGrid(x, y) {
   return g;
 }
 
+// convert from column/row coordinates to x and y
 function fromGrid(i, j) {
   return {x: MIN.x + i * TILESIZE, y: MIN.y + j * TILESIZE}; 
 }
 
+// button effect adds [] to text
 var bracketHover = function () {
   if (this.text.text.indexOf("[") === -1) {
     this.text.text = "[ " + this.text.text + " ]";
@@ -136,19 +164,12 @@ var bracketUnhover = function () {
     this.text.text = this.text.text.slice(2, this.text.text.length - 2);
   }
 };
-
+// simple button effect
 var buttonHover = function () {
   if (this.opacity != 0.6) gameWorld.playSound(Resources.hover);
   this.opacity = 0.6;
 };
 var buttonUnHover = function () { this.opacity = 1;};
-
-/* addBehavior(KeyFrame, {loop: true, frames: [
-  { time: 1, state: {x: 10, y: 10, angle: 0}},
-  { time: 2, state: {x: 10, y: 10, angle: PI}},
-  { time: 3, state: }
-]})
-*/
 
 // add to raindrop, and https://github.com/danro/jquery-easing/blob/master/jquery.easing.js
 var EASE = {
@@ -276,92 +297,13 @@ Move.pick = function () {
   return toGrid(this.entity.x + x * TILESIZE, x === 0 ? this.entity.y + choose([-1, 1]) * TILESIZE : this.entity.y);
 };
 
-function speechbubble(start, text) {
-  var map = [];
-  map.push([{x: 0, y: 0}, {x: 0, y: 2}]);
-  for (var i = 0; i < text.text.length; i++) {
-    map.push([{x: 1, y: 0}, {x: 1, y: 2}]);
-  }
-  map.push([{x: 2, y: 0}, {x: 2, y: 2}]);
-  var bubble = text.layer.add(Object.create(TileMap).init(text.x, text.y, Resources.bubble, map));
-  bubble.z = text.z - 1;
-  bubble.opacity = 0;
-  bubble.addBehavior(Follow, {target: text, offset: {x: false, y: false, z: false, alive: true}});
-  bubble.addBehavior(FadeIn, {delay: 0.4, duration: 0.1, maxOpacity: 1});
-  // fix me: need to calculate closest corner, then draw dots ONLY to there!
-  var w = 16 * map.length;
-  var y = start.y < text.y ? text.y - 16 : text.y + 16;
-  if (start.x > text.x) {
-    var corner = {x: text.x + w / 2, y: y};
-  } else {
-    var corner = {x: text.x - w / 2, y: y};
-  }
-  for (var i = 1; i < 4; i++) {
-    var dot = gameWorld.scene.ui.add(Object.create(Sprite).init(start.x +  i * (corner.x - start.x) / 3, start.y + i * (corner.y - start.y) / 3, Resources.bubble));
-    dot.behaviors = [];
-    dot.animation = 3;
-    dot.frame = 3 - i;
-    dot.z = text.z - 2;
-    dot.opacity = 0;
-    dot.addBehavior(FadeIn, {duration: 0.1, delay: 0.1 * i, maxOpacity: 1});
-    dot.addBehavior(Follow, {target: text, offset: {x: false, y: false, z: false, alive: true}});
-  }
-}
-
-// 
+// the boss doesn't move, but it is useful to have a defining behavior anyway?
 var Boss = Object.create(Move);
 Boss.update = function (dt) {
-  /*if (this.goal) {
-    //this.move(dt);
-    if (this.check()) {
-      this.goal = undefined;
-      if (this.callback) {
-        this.delay = this.callback();
-      } else {
-        this.delay = this.duration;        
-      }
-    }
-  } else if (this.delay > 0) {
-    this.delay -= dt;
-  } else {
-    if (this.entity.store_open) {
-      this.entity.store_open.alive = false;
-      this.entity.store_open = undefined;
-    }
-    this.goal = this.pick();
-  }*/
 };
 Boss.move = function (dt) {
-  /*if (Math.abs(this.goal.y - this.entity.y) > TILESIZE) {
-    this.entity.velocity = {x: 0, y: sign(this.goal.y - this.entity.y) * this.speed };
-  } else {
-    this.entity.velocity = {x: 0, y: clamp(this.rate * (this.goal.y - this.entity.y), -this.speed, this.speed)};
-  }*/
 };
-Boss.beam = function () {
-  /*var beam = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y, WIDTH / 2 - 16));
-  beam.color = "white";
-  beam.addBehavior(Behavior, {update: function (dt) {
-    this.entity.radius -= 0.25 * dt * gameWorld.height;
-    if (this.entity.radius <= 0) this.entity.alive = false;
-  }});
-  beam.opacity = 0.5;
-  beam.addBehavior(FadeOut, {delay: 0, duration: 3});
-  beam.z = -9.5;
-  var scrap = this.entity.layer.entities.filter(function (e) { return e.scrap; });
-  for (var i = 0; i < scrap.length; i++) {
-    var theta = angle(scrap[i].x, scrap[i].y, this.entity.x, this.entity.y);
-    scrap[i].velocity.x = Math.cos(theta) * 75;
-    scrap[i].velocity.y = Math.sin(theta) * 75;
-  }
-  var t = this;
-  this.entity.addBehavior(Delay, { duration: 2, callback: function () {
-    if (gameWorld.wave % 2 === 1 && ! gameWorld.boss.store_open) {
-      t.storetime();
-    }
-    this.entity.removeBehavior(this);
-  }});*/
-};
+// first collect the scrap, then pay money, then next wave
 Boss.collect = function (scrap) {
   for (var i = 0; i < gameWorld.scene.layers.length; i++) {
     gameWorld.scene.layers[i].paused = false;
@@ -377,13 +319,9 @@ Boss.collect = function (scrap) {
   }});
 }
 Boss.pay = function () {
-  /*for (var i = 0; i < gameWorld.scene.layers.length; i++) {
-    gameWorld.scene.layers[i].paused = true;
-  }
-  gameWorld.scene.ui.paused = false;  
-  */
   var t = this;
 
+  // fix me: improve timing!!
   var pd = gameWorld.scene.ui.add(Object.create(SpriteFont).init(this.entity.x + 128, this.entity.y - 32, Resources.expire_font, "payday! +$1", {spacing: -1, align: "center"}));
   pd.z = 12;
   pd.scale = 2;
@@ -396,37 +334,17 @@ Boss.pay = function () {
     coin.addBehavior(Lerp, {field: "y", rate: 2, goal: -6, object: coin});
     coin.addBehavior(Crop, {min: {x: 0, y: 0}, max: {x: gameWorld.width, y: gameWorld.height}});
   }
-
-  /*pd.addBehavior(KeyFrame, {loop: false, ease: 'linear', frames: [
-      {time: 0, state: { scale: 1, opacity: 0 }},
-      {time: 2.5, state: {scale: 1, opacity: 0}},
-      {time: 3.5, state: { scale: 2, x: pd.x, y: pd.y, opacity: 1 }},
-      {time: 4, state: {x: WIDTH - 16, y: 16}}
-    ], end: function () {
-      //projectileDie(this.entity);
-      gameWorld.playSound(Resources.coins);
-      gameWorld.player.salvage += 1;
-      gameWorld.earned += 1;
-      gameWorld.player.cash_counter.text = "$ " + gameWorld.player.salvage;
-      //gameWorld.scene.bg.paused = false;
-      this.entity.addBehavior(FadeOut, {duration: 0.3, maxOpacity: 1});
-      //t.beam();
-      if (gameWorld.wave % 2 === 1 && ! gameWorld.boss.store_open) {
-        t.storetime();
-      }
-    }});*/
-  pd.addBehavior(FadeIn, {delay: 0.5, duration: 0.1, maxOpacity: 1});
   pd.opacity = 0;
+  pd.addBehavior(FadeIn, {delay: 0.5, duration: 0.1, maxOpacity: 1});
   pd.addBehavior(FadeOut, {delay: 1, duration: 0.1, maxOpacity: 1});
+
   pd.addBehavior(Delay, {duration: 1, callback: function () {
     gameWorld.playSound(Resources.coins);
     gameWorld.player.salvage += 1;
     gameWorld.earned += 1;
     gameWorld.player.cash_counter.text = "$ " + gameWorld.player.salvage;
-    //gameWorld.scene.bg.paused = false;
     this.entity.addBehavior(FadeOut, {duration: 0.3, maxOpacity: 1});
-    //t.beam();
-    if (gameWorld.wave % 2 === 1 && ! gameWorld.boss.store_open) {
+    if (gameWorld.wave % 2 === 0 && ! gameWorld.boss.store_open) {
       t.storetime();
     }
     gameWorld.player.locked = false;    
@@ -435,7 +353,6 @@ Boss.pay = function () {
   this.callback = undefined;
 };
 Boss.storetime = function () {
-  this.entity.velocity.y = 0;
   gameWorld.playSound(Resources.store);
 
   var pd = gameWorld.scene.ui.add(Object.create(SpriteFont).init(this.entity.x + 128, this.entity.y + 32, Resources.expire_font, "store open!", {spacing: -1, align: "center"}));
@@ -447,15 +364,14 @@ Boss.storetime = function () {
   pd.opacity = 0;
   pd.addBehavior(FadeOut, {delay: 1, duration: 0.1, maxOpacity: 1});
 
-  this.entity.store_open = this.entity.layer.add(Object.create(Entity).init(this.entity.x, this.entity.y - TILESIZE, 16, 16));
+  this.entity.store_open = this.entity.layer.add(Object.create(Entity).init(this.entity.x + TILESIZE, this.entity.y, 16, 16));
 
   this.entity.store_open.opacity = 0;
   this.entity.store_open.setCollision(Polygon);
-  this.entity.store_offset = this.entity.store_open.addBehavior(Follow, {target: this.entity, offset: {x: 0, y: -TILESIZE, angle: false, z: -2}}).offset;
+  this.entity.store_offset = this.entity.store_open.addBehavior(Follow, {target: this.entity, offset: {x: TILESIZE, y: 0, angle: false, z: -2}}).offset;
 
   // fix me: store position!
-
-  var store_emphasis = this.entity.layer.add(Object.create(Circle).init(this.entity.x, this.entity.y - 3 * TILESIZE / 4, TILESIZE / 4));
+  var store_emphasis = this.entity.layer.add(Object.create(Circle).init(this.entity.x + TILESIZE, this.entity.y, TILESIZE / 4));
   store_emphasis.addBehavior(Follow, {target: this.entity.store_open, offset: {alive: true, z: 0.5, x: 0, y: 0}});
   store_emphasis.addBehavior(Oscillate, {field: "radius", object: store_emphasis, initial: TILESIZE / 4, constant: 8, time: 0, func: "sin", rate: 3});
 
@@ -844,7 +760,6 @@ var Weapons = {
       a.family = this.family;
       a.collision.onHandle = projectileHit;
       a.velocity = {x: 0, y: -80};
-      a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
       a.addBehavior(Trail, {interval: 0.02, maxlength: 10, record: []});
     }
     return TURN * 3;
@@ -861,7 +776,6 @@ var Weapons = {
       a.addBehavior(Velocity);
       a.family = this.family;
       a.collision.onHandle = projectileHit;
-      a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
       a.addBehavior(Trail, {interval: 0.02, maxlength: 10, record: []});
       var theta = i * PI;
       a.addBehavior(Target, {target: {x: this.target.x, y: this.target.y}, turn_rate: 2, angle: theta, speed: SPEEDS.projectile_normal, offset: {x: 0, y: 0}, set_angle: true});
@@ -890,7 +804,6 @@ var Weapons = {
     a.velocity = {x: 0, y: 0};
     a.addBehavior(Accelerate);
     a.acceleration = {x: 0, y: SPEEDS.gravity};
-    a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
     a.addBehavior(Trail, {interval: 0.02, maxlength: 10, record: []});
     projectiles.push(a);
     return TURN * 2;
@@ -911,9 +824,9 @@ var Weapons = {
       a.collision.onHandle = projectileHit;
       a.addBehavior(Velocity);
       a.family = this.family;
-          a.addBehavior(Delay, {duration: ARM_TIME, callback: function () {
-      this.entity.projectile = true;
-    }});
+      a.addBehavior(Delay, {duration: ARM_TIME, callback: function () {
+        this.entity.projectile = true;
+      }});
     //a.projectile = true;;
       a.angle = theta;
       a.velocity = {x: SPEEDS.projectile_slow * Math.cos(a.angle), y: SPEEDS.projectile_slow * Math.sin(a.angle)  };
@@ -985,7 +898,6 @@ var Weapons = {
     var theta = this.target ? (this.target.decoy ? angle(this.x, this.y, this.target.decoy.x, this.target.decoy.y) : angle(this.x, this.y, this.target.x, this.target.y)) : this.angle;
     a.velocity = {x: SPEEDS.projectile_normal * Math.cos(theta), y: SPEEDS.projectile_normal * Math.sin(theta)  };
     //a.angle = theta;    
-    a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
     a.addBehavior(Trail, {interval: 0.02, maxlength: 10, record: []});
     projectiles.push(a);
     return 3 * TURN;
@@ -1005,8 +917,7 @@ var Weapons = {
     a.collision.onHandle = projectileHit;
     a.addBehavior(Velocity);
     a.family = this.family;
-    a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
-        a.addBehavior(Delay, {duration: ARM_TIME, callback: function () {
+    a.addBehavior(Delay, {duration: ARM_TIME, callback: function () {
       this.entity.projectile = true;
     }});
     //a.projectile = true;;
@@ -1038,8 +949,7 @@ var Weapons = {
     a.collision.onHandle = projectileHit;
     a.addBehavior(Velocity);
     a.family = this.family;//"player";
-    a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
-        a.addBehavior(Delay, {duration: ARM_TIME, callback: function () {
+    a.addBehavior(Delay, {duration: ARM_TIME, callback: function () {
       this.entity.projectile = true;
     }});
     //a.projectile = true;;
@@ -1072,7 +982,6 @@ var Weapons = {
       a.collision.onHandle = projectileHit;
       a.addBehavior(Velocity);
       a.family = this.family;
-      a.addBehavior(CropDistance, {target: this, max: 10 * gameWorld.distance});
       a.addBehavior(Delay, {duration: ARM_TIME, callback: function () {
         this.entity.projectile = true;
       }});
@@ -1210,15 +1119,6 @@ FadeIn.start = function () {
   this.time = 0;
 };
 
-// just in case
-var CropDistance = Object.create(Behavior);
-CropDistance.update = function (dt) {
-  var d = distance(this.entity.x, this.entity.y, this.target.x, this.target.y);
-  if (d > this.max) {
-    this.entity.alive = false;
-  }
-}
-
 // RAINDROP -> animate 'onEnd'
 Animate.update = function (dt) {
   if (this.paused) return;
@@ -1270,7 +1170,7 @@ function spawn(layer, key, player, points, nonce) {
     c = toGrid(x, y);   
   }*/
   var enemy = Object.create(Sprite).init(WIDTH / 2, HEIGHT / 2, Resources[sprites[key % sprites.length]]);
-  enemy.z = Z.entity + nonce;
+  enemy.z = player.z - 2 + nonce;
   nonce += 0.01;
   enemy.addBehavior(Velocity);
   enemy.velocity = {x: 0, y: 0};
@@ -1456,7 +1356,6 @@ function spawn(layer, key, player, points, nonce) {
       }
     }
   };
-  enemy.addBehavior(CropDistance, {target: player, max: 10 * gameWorld.width});
   return enemy;
 }
 
@@ -1611,12 +1510,17 @@ var Store = {
     var b2 = this.layer.add(Object.create(Entity).init(border.x, border.y + 2, border.w - 16, border.h - 24));
     b2.color = "#fff";
     b2.z = -8;
+    border.scale = 2;
+    b1.scale = 2;
+    b2.scale = 2;
 
     var t = this;
     
-    var close = this.layer.add(Object.create(Entity).init(gameWorld.width / 2, border.y + border.h / 2 - 16, border.w - 18, 12));
+    var close = this.layer.add(Object.create(Entity).init(gameWorld.width / 2, border.y + border.h - 32, 2 * border.w - 32, 32));
     close.z = -7;
-    this.layer.add(Object.create(SpriteFont).init(close.x, close.y, Resources.expire_font, "DONE", {align: "center", spacing: -2})).z = -6;
+    close.text = this.layer.add(Object.create(SpriteFont).init(close.x, close.y, Resources.expire_font, "DONE", {align: "center", spacing: -2}))
+    close.text.z = -6;
+    close.text.scale = 2;
     close.family = "button";
     close.color = "white";
     close.trigger = function () {
@@ -1634,7 +1538,8 @@ var Store = {
       this.color = "white";
     };
     //this.weapons = {};
-    this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, border.y - border.h / 2 + 24, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
+    this.salvage = this.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, border.y - border.h + 48, Resources.expire_font, "$ 0", {align: "center", spacing: -2}));
+    this.salvage.scale = 2;
     this.button_objects = [];
 
     var t = this;
@@ -1642,14 +1547,17 @@ var Store = {
       // probably need closure here
       (function () {
         var j = i;
-        var button = t.layer.add(Object.create(Entity).init(gameWorld.width  / 2, t.salvage.y + 16 * (1 + i), border.w - 18, 16));
-        button.icon = t.layer.add(Object.create(Sprite).init(gameWorld.width / 2 - (border.w / 2 - 16), t.salvage.y + 16 * (i + 1), Resources.icons));
-        button.name_text = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, t.salvage.y + 16 * (i + 1), Resources.expire_font, t.buttons[i].name, {spacing: -2, align: "center"}));
-        button.price_text = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + (border.w / 2 - 8), t.salvage.y + 16 * (i + 1), Resources.expire_font, "$" + t.buttons[i].price, {spacing: -2, align: "right"}));
+        var button = t.layer.add(Object.create(Entity).init(gameWorld.width  / 2, t.salvage.y + 32 * (1 + i), 2 * border.w - 32, 32));
+        button.icon = t.layer.add(Object.create(Sprite).init(gameWorld.width / 2 - (border.w - 32), t.salvage.y + 32 * (i + 1), Resources.icons));
+        button.name_text = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2, t.salvage.y + 32 * (i + 1), Resources.expire_font, t.buttons[i].name, {spacing: -2, align: "center"}));
+        button.price_text = t.layer.add(Object.create(SpriteFont).init(gameWorld.width / 2 + (border.w - 8), t.salvage.y + 32 * (i + 1), Resources.expire_font, "$" + t.buttons[i].price, {spacing: -2, align: "right"}));
         button.color = "white";
         button.family = "button";
         button.price = t.buttons[j].price;
         button.check = t.buttons[j].check;
+        button.icon.scale = 2;
+        button.name_text.scale = 2;
+        button.price_text.scale = 2;
         button.hover = function () {
           // check if you can afford it here, change color accordingly
           var color = "#dddddd"; 
