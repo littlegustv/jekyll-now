@@ -478,8 +478,8 @@ var onStart = function () {
   var boss_coordinates = toGrid(MIN.x, (MIN.y + MAX.y) / 2);
   var boss = this.bg.add(Object.create(Sprite).init(boss_coordinates.x, boss_coordinates.y, Resources.test));
   boss.animation = 0;
-  boss.angle = PI / 2;
-  boss.offset = {x: 16, y: 0};
+  //boss.angle = PI / 2;
+  boss.offset = {x: 0, y: 0};
   boss.modules = [];
   //boss.angle = PI / 2;
   boss.z = 24;
@@ -558,10 +558,10 @@ var onStart = function () {
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
   boss.setVertices([
-    {x: -64, y: -24},
-    {x: 64, y: -24},
-    {x: 64, y: 32},
-    {x: -64, y: 32}
+    {x: -32, y: -64},
+    {x: 24, y: -64},
+    {x: 24, y: 64},
+    {x: -32, y: 64}
   ])
   boss.collision.onHandle = function (object, other) {
     if (other.family == "player" && !gameWorld.boss.invulnerable) {
@@ -578,7 +578,7 @@ var onStart = function () {
       gameWorld.boss.invulnerable = true;
       gameWorld.boss.respond(s.player);
       //gameWorld.boss.old_animation = gameWorld.boss.animation;
-      gameWorld.boss.animation = 5;
+      gameWorld.boss.animation = 3;
       gameWorld.boss.addBehavior(Delay, {duration: 0.3, callback: function () { 
         this.entity.invulnerable = false;
         gameWorld.boss.animation = 5 - Math.floor(5 * this.entity.health / this.entity.maxhealth);
@@ -605,7 +605,7 @@ var onStart = function () {
           //s.player.lerpy.goal = p.y;
         }
         particles(s.player, 20, 0);
-        gameWorld.playSound(Resources.hit);
+        gameWorld.playSound(Resources.boss_hit);
       }
     }
   };
