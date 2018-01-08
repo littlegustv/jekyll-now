@@ -10,7 +10,7 @@ var onStart =  function () {
   this.steps = [
     // ["message", function () { condition }];
     //[["", "move the mouse to turn"], function () { return player.angle !== 0; }, function () {}], // fix me: need to allow this to stay on screen for a time
-    [["use the arrow keys to move", "tap to move in a direction", "use l-stick to move", "click to move in a direction"], function () { return ((player.x != player_coordinates.x || player.y != player_coordinates.y) && player.stopped()); }, function () {}],
+    [["use the arrow keys to move", "swipe to move in a direction", "use l-stick to move", "click to move in a direction"], function () { return ((player.x != player_coordinates.x || player.y != player_coordinates.y) && player.stopped()); }, function () {}],
     [["hit objects to destroy them"],
       function () {
         return player.targets.filter( function (e) { return e.alive; }).length <= 0;
@@ -261,16 +261,50 @@ var onStart =  function () {
     this.onMouseDown = down;
     this.onMouseMove = move;
   }
-  this.onTouchMove = function (e) {
-    e.x = e.touch.x;
-    e.y = e.touch.y;
-    move(e);
+
+  // swipe controls
+  this.touch = {x: 0, y: 0};  
+
+  this.onTouchStart = function (e) {
+    if (!fullscreen) {
+      requestFullScreen();
+    } else {
+      s.touch = e.touch;
+    }
   }
   this.onTouchEnd = function (e) {
-    e.x = e.touch.x;
-    e.y = e.touch.y;
-    down(e);
-  }
+    e.x = e.touch.x, e.y = e.touch.y;
+    var layer = s.fg;  
+    if (layer.active && s.fg.paused) {
+      var b = layer.onButton(e.x, e.y);
+      if (b) {
+        b.trigger();
+        return;
+      }
+    }
+    if (s.player.stopped()) {
+      s.player.turn(Math.round(angle(s.touch.x, s.touch.y, e.x, e.y) / (PI / 2)) * PI / 2);
+      s.player.move(s);
+    }
+  };
+  this.onTouchMove = function (e) {
+    e.x = e.touch.x, e.y = e.touch.y;
+    var layer = s.fg;
+    if (layer.active) {
+      var b = layer.onButton(e.x, e.y);
+      if (b) {
+        b.hover();
+      }
+      var buttons = layer.entities.filter( function (e) { return e.family == "button"; });
+      for (var i = 0; i < buttons.length; i++) {
+        if (buttons[i] != b && buttons[i].unhover) {
+          buttons[i].unhover();
+        }
+      }
+    }
+  };
+
+
   this.onKeyDown = function (e) {
     if ([37,38,39,40].indexOf(e.keyCode) !== -1 && s.player.stopped()) {
       s.player.turn(directions[e.keyCode]);

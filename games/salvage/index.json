@@ -17,7 +17,7 @@
     {"path": "gate.png", "frames": 1, "animations": 2, "speed": 0.4},
     {"path": "grid.png"},
     {"path": "bill.png", "frames": 2, "speed": 0.3},
-    {"path": "test.png", "frames": 2, "animations": 4, "speed": 0.4},
+    {"path": "test.png", "frames": 2, "animations": 3, "speed": 0.4},
     {"path": "keyhole.png"},
     {"path": "shield.png"},
     {"path": "target.png"},
@@ -27,7 +27,7 @@
     {"path": "scrap.png"},
     {"path": "wall.png"},
     {"path": "ground.png"},
-    {"path": "heart.png", "animations": 2, "frames": 2, "speed": 0.3},
+    {"path": "heart.png", "animations": 2, "frames": 2, "speed": 0.25},
     {"path": "building.png"},
     {"path": "walker.png", "frames": 4, "animations": 1, "speed": 0.5},
     {"path": "saucer.png", "frames": 5, "animations": 1, "speed": 0.5},
@@ -48,6 +48,7 @@
     {"path": "work.wav"},
     {"path": "beam.wav"},
     {"path": "boss_hit.wav"},
+    {"path": "boss_invulnerable.wav"},
     {"path": "buy.wav"},
     {"path": "shield_down.wav"},
     {"path": "shield_up.wav"},
@@ -57,6 +58,7 @@
     {"path": "menu.ogg"},
     {"path": "hover.wav"},
     {"path": "select.wav"},
+    {"path": "move_fast.wav"},
     {"path": "move.wav"}
   ]
 }

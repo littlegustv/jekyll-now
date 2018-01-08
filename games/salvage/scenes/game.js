@@ -323,29 +323,32 @@ var onStart = function () {
         gameWorld.setScene(2, true);
       }
 
+
       // if wave is finished
       if (this.wave.length <= 0) {
+        // remove last-wave's projectiles ?
+        for (var i = 0; i < projectiles.length; i++) {
+          if (projectiles[i].alive) {
+            projectileDie(projectiles[i]);
+          }
+        }
+        projectiles = [];
         var scrap = this.bg.entities.filter(function (e) { return e.scrap; });
-        console.log('pausing, and having some scrap  still...');
+        //console.log('pausing, and having some scrap  still...');
         if (scrap.length > 0) {
           gameWorld.playSound(Resources.process);
-
-          // remove last-wave's projectiles ?
-          for (var i = 0; i < projectiles.length; i++) {
-            if (projectiles[i].alive) {
-              //projectiles[i].alive = false;
-              projectileDie(projectiles[i]);
-              //var f = projectiles[i].layer.add(Object.create(Circle).init(projectiles[i].x, projectiles[i].y, 5));
-              //f.color = COLORS.primary;
-              //f.addBehavior(FadeOut, {duration: 0.1, delay: 0.1});
-            }
-          }
-          projectiles = [];
           gameWorld.player.locked = true;
-          gameWorld.boss.boss.collect(scrap);
+          gameWorld.boss.boss.collect(scrap);            
         } else {
           // spawn new enemies
-          var points = spawnPoints();
+          if (gameWorld.boss.enemy) {
+            console.log('vulnerable again?')
+            gameWorld.boss.animation = 0;
+            gameWorld.boss.invulnerable = false;
+            var points = bossSpawnPoints();
+          } else {
+            var points = spawnPoints();            
+          }
           var nonce = 0;
           for (var i = 0; i < gameWorld.wave; i++) {
             var k = i % this.waves.length;
@@ -410,23 +413,51 @@ var onStart = function () {
     this.onMouseDown = down;
     this.onMouseMove = move;
   }
-  
+
+  // changed controls to swipe...
+  this.touch = {x: 0, y: 0};  
   this.onTouchStart = function (e) {
     if (!fullscreen) {
       requestFullScreen();
     } else {
-      e.x = e.touch.x, e.y = e.touch.y;
-      move(e);  
+      s.touch = e.touch;
+      //e.x = e.touch.x, e.y = e.touch.y;      
     }
   }
-  
   this.onTouchEnd = function (e) {
     e.x = e.touch.x, e.y = e.touch.y;
-    down(e);
+    var layer = s.store_layer.active ? s.store_layer : s.ui;    
+    if (layer.active && s.bg.paused) {
+      var b = layer.onButton(e.x, e.y);
+      if (b) {
+        b.trigger();
+        return;
+      }
+    }
+    if (s.store_layer.active) return;
+    if (s.player.death) {
+      s.player.death.duration = 0;
+      return;
+    } else if (s.player.stopped()) {
+      s.player.turn(Math.round(angle(s.touch.x, s.touch.y, e.x, e.y) / (PI / 2)) * PI / 2);
+      s.player.move(s);
+    }
   };
   this.onTouchMove = function (e) {
     e.x = e.touch.x, e.y = e.touch.y;
-    move(e);
+    var layer = s.store_layer.active ? s.store_layer : s.ui;
+    if (layer.active) {
+      var b = layer.onButton(e.x, e.y);
+      if (b) {
+        b.hover();
+      }
+      var buttons = layer.entities.filter( function (e) { return e.family == "button"; });
+      for (var i = 0; i < buttons.length; i++) {
+        if (buttons[i] != b && buttons[i].unhover) {
+          buttons[i].unhover();
+        }
+      }
+    }
   };
 
   this.onKeyDown = function (e) {
@@ -492,10 +523,19 @@ var onStart = function () {
   boss.modules = [];
   //boss.angle = PI / 2;
   boss.z = 24;
+
+  var bosshpbg = this.bg.add(Object.create(Entity).init(boss_coordinates.x - 24, boss_coordinates.y, 12, boss.h));
+  bosshpbg.color = "white";
+  bosshpbg.z = 25;
+
+  boss.healthbar = this.bg.add(Object.create(Entity).init(bosshpbg.x, bosshpbg.y, 8, boss.h - 4));
+  boss.healthbar.z = 26;
+
   boss.particles = boss.addBehavior(Periodic, {period: 0.1, rate: 0, callback: function () {
     if (Math.random() < this.rate) {
       var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x + randint(0, this.entity.w) - this.entity.w / 2, this.entity.y + this.entity.offset.y + randint(-this.entity.h / 2, this.entity.h / 2), Resources.dust));
       d.z = this.entity.z + 1;
+      d.animation = 3;
       d.behaviors[0].onEnd = function () {
         this.entity.alive = false;
       };
@@ -531,24 +571,32 @@ var onStart = function () {
     if (!this.enemy) { // no more warning shot
       // visual confirmation
       var t = this;
-      var w = s.ui.add(Object.create(SpriteFont).init(boss.x + 96, boss.y - 32, Resources.expire_font, 'that was a mistake.', {spacing: -2, align: 'center'}));
+      var w = s.ui.add(Object.create(SpriteFont).init(boss.x + 160, boss.y - 32, Resources.expire_font, 'THAT WAS A MISTAKE', {spacing: -1, align: 'center'}));
       w.z = this.z + 1;
 
-      /*debug = w.addBehavior(KeyFrame, {loop: false, ease: 'linear', frames: [
-          {time: 0, state: {scale: 1, x: t.x, y: t.y, angle: 0}},
-          {time: 1, state: {scale: 2, x: t.x, y: t.y - 50, angle: -PI / 8}},
-          {time: 2, state: {scale: 2, x: t.x, y: t.y - 100, angle: PI2}},
-          {time: 3, state: {scale: 2, x: t.x, y: t.y - 150, angle: 2 * PI2}}
-        ]
-      });*/
       w.scale = 2;
       speechbubble(gameWorld.boss, w);
       w.opacity = 0;
       w.addBehavior(FadeIn, {duration: 0.1, delay: 0.6, maxOpacity: 1});
       w.addBehavior(FadeOut, {delay: 1.2, duration: 0.1, maxOpacity: 1});
 
-      this.enemy = this.addBehavior(BossEnemy);
-      this.target = target;
+      // up the wave a couple times...
+      gameWorld.wave += 1;
+      if (gameWorld.boss.store_open) gameWorld.boss.store_open.alive = false;
+
+      // kill all current enemies...
+      for (var i = 0; i < this.layer.entities.length; i++) {
+        if (this.layer.entities[i].family === "enemy") {
+          if (this.layer.entities[i].die) this.layer.entities[i].die();
+          else if (this.layer.entities[i].projectile) projectileDie(this.layer.entities[i]);
+          else this.layer.entities[i].alive = false;
+        }
+      }
+
+      this.enemy = true;
+
+      //this.enemy = this.addBehavior(BossEnemy);
+      //this.target = target;
     }
     if (!this.boss.goal) this.danger = true; // get moving if you are stopped, and just got hit!
     if (this.health <= 5) {
@@ -563,6 +611,7 @@ var onStart = function () {
   boss.boss = boss.addBehavior(Boss, {duration: 0.5, speed: 70, rate: 4, target: player});
   //boss.family = "enemy";
   boss.addBehavior(Bound, {min: MIN, max: MAX});
+
   boss.velocity = {x: 0, y: 0};
   boss.addBehavior(Velocity);
   boss.setCollision(Polygon);
@@ -573,10 +622,38 @@ var onStart = function () {
     {x: -32, y: 64}
   ])
   boss.collision.onHandle = function (object, other) {
-    if (other.family == "player" && !gameWorld.boss.invulnerable) {
-      object.health -= 1;
-      object.particles.rate = 3 * (10 - object.health) / 10;
+    if (other.family == "player") {
+      if (!object.invulnerable) {
+        gameWorld.playSound(Resources.boss_hit);
+        gameWorld.boss.respond(s.player); // move that code here, maybe?
+        
+        object.health -= 1;
+        object.healthbar.h = object.health * (object.h - 4) / 12;
+        object.healthbar.y = object.y + (object.h - 4) / 2 - object.healthbar.h / 2; 
+        object.particles.rate = 3 * (10 - object.health) / 10;
+        // flash (white)
+        gameWorld.boss.animation = 2;
+        console.log('a hit!');
+        gameWorld.boss.addBehavior(Delay, {duration: 0.3, callback: function () { 
+          this.entity.invulnerable = true;
+          //this.entity.invulnerable = false;
+          this.entity.animation = 1; // invulnerable animation
+          console.log('but now invulnerable.');
+          this.entity.removeBehavior(this);
 
+          //gameWorld.boss.animation = 5 - Math.floor(5 * this.entity.health / this.entity.maxhealth);
+        }});
+        particles(other, 20, 0);
+      } else {
+        var blocked = object.layer.add(Object.create(SpriteFont).init(object.x, other.y, Resources.expire_font, "blocked", {spacing: -1, align: "center"}));
+        blocked.opacity = 0;
+        blocked.z = object.z + 10;
+        blocked.addBehavior(FadeIn, {duration: 0.2, maxOpacity: 1});
+        blocked.addBehavior(FadeOut, {duration: 0.2, delay: 0.8, maxOpacity: 1});
+        gameWorld.playSound(Resources.boss_invulnerable);
+      }
+
+      // player invulnerable
       other.animation = 1;
       other.noCollide = true;
       other.addBehavior(Delay, {duration: 0.5, callback: function () {
@@ -584,15 +661,6 @@ var onStart = function () {
         this.entity.noCollide = false;
       }});
 
-      gameWorld.boss.invulnerable = true;
-      gameWorld.boss.respond(s.player);
-      //gameWorld.boss.old_animation = gameWorld.boss.animation;
-      gameWorld.boss.animation = 3;
-      gameWorld.boss.addBehavior(Delay, {duration: 0.3, callback: function () { 
-        this.entity.invulnerable = false;
-        gameWorld.boss.animation = 5 - Math.floor(5 * this.entity.health / this.entity.maxhealth);
-        console.log(gameWorld.boss.animation);
-      }});
       if (object.health <= 0) {
         object.die();
       } else if (!other.projectile) {        
@@ -602,19 +670,17 @@ var onStart = function () {
         //s.player.move(s);
         if (other.x > object.x) {
           s.player.turn(0);
-          s.player.lerpx.goal = MIN.x + 3 * TILESIZE;
+          s.player.lerpx.goal = MIN.x + 1 * TILESIZE;
           //s.player.lerpx.goal = p.x;
         } else if (other.y > object.y) {
           s.player.turn(- PI / 2);
-          s.player.lerpy.goal = b.y + 3 * TILESIZE;
+          s.player.lerpy.goal = b.y + 2 * TILESIZE;
           //s.player.lerpy.goal = p.y;
         } else if (other.y < object.y) {
           s.player.turn(PI / 2);
-          s.player.lerpy.goal = b.y - 3 * TILESIZE;
+          s.player.lerpy.goal = b.y - 2 * TILESIZE;
           //s.player.lerpy.goal = p.y;
         }
-        particles(s.player, 20, 0);
-        gameWorld.playSound(Resources.boss_hit);
       }
     }
   };

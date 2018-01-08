@@ -124,13 +124,26 @@ function shuffle () { // general utility function (for SORT)
   return 0.5 - Math.random();
 }
 
-function spawnPoints () { // generate free 'points' for spawning algorithm
+var spawnPoints = function () { // generate free 'points' for spawning algorithm
+  //console.log('spawn points');  
   return {
     sky: Array(11).fill(1).map(function (e, index) { return toGrid(MIN.x + TILESIZE * index, MIN.y) }).filter(notPlayer).sort(shuffle),
     wall: Array(6).fill(1).map(function (e, index) { return toGrid(MAX.x, MIN.y + TILESIZE * index) }).filter(notPlayer).sort(shuffle),
     air: Array(10 * 4).fill(1).map(function (e, index) { return toGrid(MIN.x + TILESIZE * (1 + index % 10), MIN.y + (1 + Math.floor(index / 10)) * TILESIZE); }).filter(notPlayer).sort(shuffle),
     ground: Array(11).fill(1).map(function (e, index) { return toGrid(MIN.x + TILESIZE * index, MAX.y) }).filter(notPlayer).sort(shuffle)
     // all points from x >= 1, 1 >= y <= 5
+  }
+}
+
+var bossSpawnPoints = function () {
+  //console.log('boss spawn points');
+  return {
+    sky: Array(11).fill(1).map(function (e, index) { return toGrid(MIN.x + TILESIZE * (index + 1), MIN.y) }).filter(notPlayer).sort(function (a, b) { return b.x - a.x; }),
+    wall: Array(4).fill(1).map(function(e, index) { return toGrid(MIN.x, MIN.y + (index < 2 ? index * TILESIZE : (index + 3) * TILESIZE)) }).filter(notPlayer).sort(shuffle),
+    air: Array(10 * 4).fill(1).map(function (e, index) { return toGrid(MIN.x + TILESIZE * (1 + index % 10), MIN.y + (1 + Math.floor(index / 10)) * TILESIZE); }).filter(notPlayer).sort(function (a, b) {
+      return b.x - a.x;
+    }),
+    ground: Array(11).fill(1).map(function (e, index) { return toGrid(MIN.x + TILESIZE * (index + 1), MAX.y) }).filter(notPlayer).sort(function (a, b) { return b.x - a.x; })
   }
 }
 
@@ -313,13 +326,28 @@ Boss.collect = function (scrap) {
     scrap[i].addBehavior(Lerp, {field: "y", rate: 2, goal: this.entity.y, object: scrap[i]});
   }
   var t = this;
-  this.entity.addBehavior(Delay, {duration: 1, callback: function () {
-    t.pay();
-    this.entity.removeBehavior(this);
-  }});
+  if (!this.entity.enemy) {    
+    this.entity.addBehavior(Delay, {duration: 1, callback: function () {
+      t.pay();
+      this.entity.removeBehavior(this);
+    }});
+  } else {
+    this.entity.addBehavior(Delay, {duration: 1, callback: function () {
+      gameWorld.player.locked = false;    
+      gameWorld.scene.pause();
+      this.entity.removeBehavior(this);
+    }});
+  }
 }
+// FIX ME:add shield-opening animation
+Boss.unshield = function () {
+
+}
+
 Boss.pay = function () {
   var t = this;
+
+  gameWorld.player.buffer = undefined;
 
   // fix me: improve timing!!
   var pd = gameWorld.scene.ui.add(Object.create(SpriteFont).init(this.entity.x + 128, this.entity.y - 32, Resources.expire_font, "payday! +$1", {spacing: -1, align: "center"}));
@@ -330,25 +358,30 @@ Boss.pay = function () {
 
   for (var i = 0; i < 10; i++) {
     var coin = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y + randint(-48, 48), Resources.coin));   
-    coin.addBehavior(Lerp, {field: "x", rate: 2, goal: gameWorld.width + 6, object: coin});
-    coin.addBehavior(Lerp, {field: "y", rate: 2, goal: -6, object: coin});
-    coin.addBehavior(Crop, {min: {x: 0, y: 0}, max: {x: gameWorld.width, y: gameWorld.height}});
+    coin.z = 100;
+    coin.addBehavior(Lerp, {field: "x", rate: 3 + Math.random() * 0.5, goal: gameWorld.width + 6, object: coin});
+    coin.addBehavior(Lerp, {field: "y", rate: 3, goal: -6, object: coin});
+    coin.addBehavior(Delay, {duration: 0.7, callback: function () {
+      gameWorld.playSound(Resources.coins);
+      particles(this.entity, 4, 2);
+      this.entity.alive = false;
+    }});
+//    coin.addBehavior(Crop, {min: {x: 0, y: 0}, max: {x: gameWorld.width - 12, y: gameWorld.height - 6}});
   }
   pd.opacity = 0;
   pd.addBehavior(FadeIn, {delay: 0.5, duration: 0.1, maxOpacity: 1});
   pd.addBehavior(FadeOut, {delay: 1, duration: 0.1, maxOpacity: 1});
 
   pd.addBehavior(Delay, {duration: 1, callback: function () {
-    gameWorld.playSound(Resources.coins);
     gameWorld.player.salvage += 1;
     gameWorld.earned += 1;
     gameWorld.player.cash_counter.text = "$ " + gameWorld.player.salvage;
-    this.entity.addBehavior(FadeOut, {duration: 0.3, maxOpacity: 1});
     if (gameWorld.wave % 2 === 0 && ! gameWorld.boss.store_open) {
       t.storetime();
+    } else {
+      gameWorld.player.locked = false;    
+      gameWorld.scene.pause();
     }
-    gameWorld.player.locked = false;    
-    gameWorld.scene.pause();
   }});
   this.callback = undefined;
 };
@@ -386,10 +419,13 @@ Boss.storetime = function () {
   t1.z = this.entity.z + 2;
   t2.z = this.entity.z + 2;
   this.callback = undefined;
+
+  gameWorld.player.locked = false;    
+  gameWorld.scene.pause();
   return 10;
 };
 Boss.shoot = function () {
-  return choose(this.weapons)(this.entity);
+  //return choose(this.weapons)(this.entity);
 };
 // picks from queue, or patrols from top to bottom
 Boss.pick = function () {
@@ -1220,7 +1256,7 @@ function spawn(layer, key, player, points, nonce) {
       var point = points.wall.pop();
       enemy.x = point.x, enemy.y = point.y;
 
-      enemy.angle = PI;      
+      if (enemy.x > WIDTH / 2) enemy.angle = PI;      
       enemy.setVertices([
         {x: -3, y: -3}, {x: -3, y: 3}, {x: 3, y: 3}, {x: 3, y: -3}
       ]);     
@@ -1377,11 +1413,14 @@ var Movement = {
         s.pause();
       }});
       s.unpause();
-      gameWorld.playSound(Resources.move);
-      var d = s.player.layer.add(Object.create(Sprite).init(s.player.x, s.player.y, Resources.dust));
-      d.addBehavior(Velocity);
-      d.velocity = {x: 0, y: 0};
-      d.addBehavior(FadeOut, {duration: 0.8});
+      if (this.speed === SPEEDS.player) {
+        gameWorld.playSound(Resources.move);        
+        var d = s.player.layer.add(Object.create(Sprite).init(s.player.x, s.player.y, Resources.dust));
+        d.addBehavior(FadeOut, {duration: 0.8});
+      } else {
+        gameWorld.playSound(Resources.move_fast);        
+        particles(this, 3, 2);
+      }
     }
   }
 }
@@ -1423,7 +1462,7 @@ var Store = {
     {
       name: "Speed", price: 2, icon: 2,
       trigger: function (t) {
-        t.player.speed = 8;
+        t.player.speed = 10;
       },
       check: function (t) {
         if (t.player.speed < 8) {
@@ -1595,7 +1634,7 @@ var Store = {
     this.button_objects.push(close);
     // allow for rotate transition
     for (var i = 0; i < this.layer.entities.length; i++) {
-      this.layer.entities[i].origin = {x: 0, y: 240};
+      this.layer.entities[i].origin = {x: 0, y: 480};
       this.layer.entities[i].angle = -PI/2;
       this.layer.entities[i].lerp = this.layer.entities[i].addBehavior(Lerp, {object: this.layer.entities[i], field: "angle", goal: 0, rate: 8});
       this.layer.entities[i].goal = this.layer.entities[i].lerp.goal;

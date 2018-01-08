@@ -23,9 +23,9 @@ var onStart =  function () {
   spent.scale = 2;
 
   if (gameWorld.endDescription) {
-    var s = top.add(Object.create(Sprite).init(gameWorld.width -  48, 3 * gameWorld.height / 4 + 32, gameWorld.endDescription.sprite));
-    s.scale = 2;
-    s.z = 52;
+    var t0 = top.add(Object.create(Sprite).init(gameWorld.width -  48, 3 * gameWorld.height / 4 + 32, gameWorld.endDescription.sprite));
+    t0.scale = 2;
+    t0.z = 52;
     var t = top.add(Object.create(SpriteFont).init(44, 3 * gameWorld.height / 4 + 32, Resources.expire_font, "You were destroyed by a " + gameWorld.endDescription.name + "!", {spacing: -2, align: "left"}));
     t.scale = 2;
     t.z = 53;
