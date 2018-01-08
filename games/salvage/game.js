@@ -362,7 +362,6 @@ Boss.pay = function () {
     coin.addBehavior(Lerp, {field: "x", rate: 3 + Math.random() * 0.5, goal: gameWorld.width + 6, object: coin});
     coin.addBehavior(Lerp, {field: "y", rate: 3, goal: -6, object: coin});
     coin.addBehavior(Delay, {duration: 0.7, callback: function () {
-      gameWorld.playSound(Resources.coins);
       particles(this.entity, 4, 2);
       this.entity.alive = false;
     }});
@@ -373,6 +372,7 @@ Boss.pay = function () {
   pd.addBehavior(FadeOut, {delay: 1, duration: 0.1, maxOpacity: 1});
 
   pd.addBehavior(Delay, {duration: 1, callback: function () {
+    gameWorld.playSound(Resources.coins);
     gameWorld.player.salvage += 1;
     gameWorld.earned += 1;
     gameWorld.player.cash_counter.text = "$ " + gameWorld.player.salvage;
