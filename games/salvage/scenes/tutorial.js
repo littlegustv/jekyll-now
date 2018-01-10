@@ -302,6 +302,7 @@ var onStart =  function () {
         }
       }
     }
+    s.player.turn(Math.round(angle(s.touch.x, s.touch.y, e.x, e.y) / (PI / 2)) * PI / 2);
   };
 
 

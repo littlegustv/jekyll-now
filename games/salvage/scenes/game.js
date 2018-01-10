@@ -171,6 +171,10 @@ var onStart = function () {
   };
   player.collision.onHandle = function (object, other) {
     if (object.noCollide) return;
+
+    if (other.beam) {
+      console.log('is THIS what"s going on??');
+    }
     
     if (other.family == "enemy") {
       if (other.projectile || other.beam) {
@@ -273,7 +277,6 @@ var onStart = function () {
   this.keydown = false;
   this.pause = function () {
     if (this.player.stopped()) {
-
       var coords = toGrid(this.player.x, this.player.y);
       this.bg.paused = true;
       this.player.cursor.opacity = 1;
@@ -354,7 +357,7 @@ var onStart = function () {
             var k = i % this.waves.length;
             for (var j = 0; j < this.waves[k].length; j++) {
               var enemy = spawn(this.bg, this.waves[k][j], this.player, points, nonce);
-              this.wave.push(enemy);
+              if (enemy) this.wave.push(enemy);
             }
           }
           gameWorld.wave++;          
@@ -458,6 +461,7 @@ var onStart = function () {
         }
       }
     }
+    s.player.turn(Math.round(angle(s.touch.x, s.touch.y, e.x, e.y) / (PI / 2)) * PI / 2);
   };
 
   this.onKeyDown = function (e) {
@@ -511,6 +515,8 @@ var onStart = function () {
     [5],
     [6],
   ];
+
+  this.waves = [[3,3]];
 
   //this.waves = [[6, 6, 6]];
   //this.waves = [[0],[0],[0],[0]];
@@ -741,7 +747,8 @@ var onUpdate = function (dt) {
     gameWorld.boss.checkCollisions(0, scrap);
 
     for (var i = enemies.length - 1; i >= 0; i--) {
-      if (!between(enemies[i].x, MIN.x - 1, MAX.x + 1) || !between(enemies[i].y, MIN.y - 1, MAX.y + 1)) {
+      if (enemies[i].beam) {}
+      else if (!between(enemies[i].x, MIN.x - 1, MAX.x + 1) || !between(enemies[i].y, MIN.y - 1, MAX.y + 1)) {
         if (enemies[i].projectile) {
           projectileDie(enemies[i]);
         } else if (enemies[i].die) {

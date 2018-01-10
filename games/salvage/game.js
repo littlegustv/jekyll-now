@@ -132,8 +132,8 @@ var spawnPoints = function () { // generate free 'points' for spawning algorithm
     air: Array(10 * 4).fill(1).map(function (e, index) { return toGrid(MIN.x + TILESIZE * (1 + index % 10), MIN.y + (1 + Math.floor(index / 10)) * TILESIZE); }).filter(notPlayer).sort(shuffle),
     ground: Array(11).fill(1).map(function (e, index) { return toGrid(MIN.x + TILESIZE * index, MAX.y) }).filter(notPlayer).sort(shuffle)
     // all points from x >= 1, 1 >= y <= 5
-  }
-}
+  };
+};
 
 var bossSpawnPoints = function () {
   //console.log('boss spawn points');
@@ -144,8 +144,8 @@ var bossSpawnPoints = function () {
       return b.x - a.x;
     }),
     ground: Array(11).fill(1).map(function (e, index) { return toGrid(MIN.x + TILESIZE * (index + 1), MAX.y) }).filter(notPlayer).sort(function (a, b) { return b.x - a.x; })
-  }
-}
+  };
+};
 
 // round to nearest grid position
 function toGrid(x, y) {
@@ -356,22 +356,25 @@ Boss.pay = function () {
   speechbubble(gameWorld.boss, pd);
   gameWorld.playSound(Resources.coins);
 
-  for (var i = 0; i < 10; i++) {
-    var coin = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y + randint(-48, 48), Resources.coin));   
-    coin.z = 100;
-    coin.addBehavior(Lerp, {field: "x", rate: 3 + Math.random() * 0.5, goal: gameWorld.width + 6, object: coin});
-    coin.addBehavior(Lerp, {field: "y", rate: 3, goal: -6, object: coin});
-    coin.addBehavior(Delay, {duration: 0.7, callback: function () {
-      particles(this.entity, 4, 2);
-      this.entity.alive = false;
-    }});
-//    coin.addBehavior(Crop, {min: {x: 0, y: 0}, max: {x: gameWorld.width - 12, y: gameWorld.height - 6}});
+  for (var i = 0; i < 6; i++) {
+    this.entity.addBehavior(Delay, {duration: 0.4 + i * 0.1, callback: function () {
+      var coin = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y + randint(-48, 48), Resources.coin));   
+      coin.z = 100;
+      coin.addBehavior(Lerp, {field: "x", rate: 3, goal: gameWorld.width + 6, object: coin});
+      coin.addBehavior(Lerp, {field: "y", rate: 3, goal: -6, object: coin});
+      coin.addBehavior(Delay, {duration: 0.7, callback: function () {
+        particles(this.entity, 4, 2);
+        this.entity.alive = false;
+      }});
+      this.entity.removeBehavior(this);
+     }});
   }
+
   pd.opacity = 0;
   pd.addBehavior(FadeIn, {delay: 0.5, duration: 0.1, maxOpacity: 1});
-  pd.addBehavior(FadeOut, {delay: 1, duration: 0.1, maxOpacity: 1});
+  pd.addBehavior(FadeOut, {delay: 2, duration: 0.1, maxOpacity: 1});
 
-  pd.addBehavior(Delay, {duration: 1, callback: function () {
+  pd.addBehavior(Delay, {duration: 1.5, callback: function () {
     gameWorld.playSound(Resources.coins);
     gameWorld.player.salvage += 1;
     gameWorld.earned += 1;
@@ -382,7 +385,9 @@ Boss.pay = function () {
       gameWorld.player.locked = false;    
       gameWorld.scene.pause();
     }
+    this.entity.removeBehavior(this);
   }});
+  
   this.callback = undefined;
 };
 Boss.storetime = function () {
@@ -491,7 +496,12 @@ Horizontal.move = function (dt) {
   this.entity.velocity = {x: sign(this.goal.x - this.entity.x) * this.speed , y: 0 };    
 };
 Horizontal.pick = function () {
-  if (this.entity.x > (this.min + this.max) / 2) return toGrid(this.min, this.entity.y);
+  if (this.oldGoal) {
+    var g = this.oldGoal;
+    this.oldGoal = undefined;
+    return g;
+  }
+  else if (this.entity.x > (this.min + this.max) / 2) return toGrid(this.min, this.entity.y);
   else return toGrid(this.max, this.entity.y);
 };
 
@@ -820,7 +830,8 @@ var Weapons = {
     return TURN * 3;
   },
   bomb: function (layer) {
-    var a = layer.add(Object.create(Sprite).init(this.x, this.y, Resources.projectile));
+    var g = toGrid(this.x, this.y);
+    var a = layer.add(Object.create(Sprite).init(g.x, g.y, Resources.projectile));
     a.color = "black";
     a.stroke = true;
     a.strokeColor = COLORS.primary;
@@ -876,6 +887,7 @@ var Weapons = {
     var t = this;
     if (this.move) {
       this.velocity = {x: 0, y: 0};
+      this.move.oldGoal = this.move.goal;
       this.move.goal = undefined;
       this.move.delay = 1;
     }
@@ -1024,10 +1036,19 @@ var Weapons = {
     //a.projectile = true;;
       var theta = this.shoot_angle !== undefined ? this.shoot_angle : this.angle;
       a.addBehavior(Target, {target: this.target, turn_rate: 1, angle: theta, speed: 2 * SPEEDS.projectile_slow, offset: {x: 0, y: 0}, set_angle: true});
+
       a.velocity = {x: SPEEDS.projectile_normal * Math.cos(theta), y: SPEEDS.projectile_normal * Math.sin(theta)};
       a.angle = theta;
       a.addBehavior(Trail, {interval: 0.02, maxlength: 10})
-      a.addBehavior(Follow, {target: this, offset: {x: false, y: false, z: false, alive: true, angle: false}});
+
+      a.specialFollow = a.addBehavior(Behavior, {target: this});
+      a.specialFollow.update = function (dt) {
+        if (!this.target.alive) {
+          projectileDie(this.entity);
+          this.entity.removeBehavior(this);
+        }
+      }
+      //a.addBehavior(Follow, {target: this, offset: {x: false, y: false, z: false, alive: true, angle: false}});
       projectiles.push(a);      
       return TURN * 3;     
   }
@@ -1211,7 +1232,9 @@ function spawn(layer, key, player, points, nonce) {
   enemy.addBehavior(Velocity);
   enemy.velocity = {x: 0, y: 0};
   enemy.setCollision(Polygon);
+  //enemy.addBehavior(Crop, {min: {x: MIN.x, y: MIN.y}, max: {x: MAX.x, y: MAX.y}});
   enemy.addBehavior(Bound, {min: {x: MIN.x, y: MIN.y}, max: {x: MAX.x, y: MAX.y}});
+  
   //enemy.blend = "destination-out";
   switch (key) {
     case 0: // drone
@@ -1221,22 +1244,12 @@ function spawn(layer, key, player, points, nonce) {
       enemy.setVertices([
         {x: -3, y: -3}, {x: -3, y: 3}, {x: 3, y: 3}, {x: 3, y: -3}
       ]);
-      var point = points.air.pop();
+      var point = points.air.pop(); if (!point) return;
       enemy.x = point.x, enemy.y = point.y;
       break;
     case 1: // armored train
-      enemy.shoot = Weapons.triple;
-      /*
-      c.x = toGrid(choose([-1, 1]) * 2 * TILESIZE + b.x, 0).x;
-      if (c.x > b.x) {
-        var min = c.x, max = toGrid(MAX.x, 0).x;
-      } else {
-        var min = toGrid(0, 0).x, max = c.x;
-      }
-      enemy.x = c.x;
-      */
-      
-      var point = points.ground.pop();
+      enemy.shoot = Weapons.triple;      
+      var point = points.ground.pop(); if (!point) return;
       enemy.x = point.x, enemy.y = point.y;
 
       enemy.offset = {x: 0, y: 2};
@@ -1253,7 +1266,7 @@ function spawn(layer, key, player, points, nonce) {
       enemy.target = player;
       //enemy.x = toGrid(WIDTH, 0).x;
       
-      var point = points.wall.pop();
+      var point = points.wall.pop(); if (!point) return;
       enemy.x = point.x, enemy.y = point.y;
 
       if (enemy.x > WIDTH / 2) enemy.angle = PI;      
@@ -1269,7 +1282,7 @@ function spawn(layer, key, player, points, nonce) {
       //enemy.y = toGrid(0, 0).y;
       
 
-      var point = points.sky.pop();
+      var point = points.sky.pop(); if (!point) return;
       enemy.x = point.x, enemy.y = point.y;
 
       enemy.addBehavior(Flip);
@@ -1277,7 +1290,7 @@ function spawn(layer, key, player, points, nonce) {
       break;
     case 4: // minelayer (except the mines are FIREWORKS)
       
-      var point = points.air.pop();
+      var point = points.air.pop(); if (!point) return;
       enemy.x = point.x, enemy.y = point.y;
 
       enemy.addBehavior(Move, {duration: 1, speed: SPEEDS.enemy_normal, delay: 1 });
@@ -1288,7 +1301,7 @@ function spawn(layer, key, player, points, nonce) {
       ]);
       break;
     case 5: // fighter shooting homing missiles
-      var point = points.air.pop();
+      var point = points.air.pop(); if (!point) return;
       enemy.x = point.x, enemy.y = point.y;
       enemy.addBehavior(Approach, {duration: 1.1, speed: SPEEDS.enemy_normal, target: player, turn: true, delay: 1.1});
       enemy.target = player;
@@ -1299,7 +1312,7 @@ function spawn(layer, key, player, points, nonce) {
       break;
     case 6: // beam weapon!!
 
-      var point = points.ground.pop();
+      var point = points.ground.pop(); if (!point) return;
       enemy.x = point.x, enemy.y = point.y;
 
       enemy.move = enemy.addBehavior(Horizontal, {duration: 0.5, speed: SPEEDS.enemy_horizontal_slow, target: player, min: MIN.x, max: MAX.x, delay: 0.5}); // hmmm!
@@ -1346,8 +1359,6 @@ function spawn(layer, key, player, points, nonce) {
     scrap.opacity = 0.8;
     scrap.angle = this.angle;
     var theta = angle(scrap.x, scrap.y, gameWorld.boss.x, gameWorld.boss.y);
-    //scrap.addBehavior(Velocity);
-    //scrap.velocity = {x: 20 * Math.cos(theta), y: 20 * Math.sin(theta), angle: PI / 6};
     scrap.z = 2.5;
     scrap.scrap = true;
     scrap.setCollision(Polygon);
@@ -1371,24 +1382,6 @@ function spawn(layer, key, player, points, nonce) {
         object.alive = false;
         // fix me: play 'processing' or HEALING sound, animation?
         gameWorld.playSound(Resources.work);
-        /*for (var i = 0; i < 20; i++) {
-          if (other.health < other.maxhealth) {          
-            var h = other.layer.add(Object.create(Sprite).init(other.x, other.y, Resources.heart));
-          } else {
-            var h = other.layer.add(Object.create(SpriteFont).init(other.x, other.y, Resources.expire_font, "$", {spacing: 0, align: "center"}));
-          }
-          h.z = other.z + 1;
-          var theta = Math.random() * PI2;
-          var speed = randint(7, 30);
-          h.addBehavior(Velocity);
-          h.velocity = {x: speed * Math.cos(theta), y: speed * Math.sin(theta) };
-          h.addBehavior(FadeOut, {duration: 0.2, delay: randint(1, 2)});
-        }*/
-        /*other.health = Math.min(other.maxhealth, other.health + 1); // repair!
-        if (other.health >= other.maxhealth && !other.unforgiving && other.enemy) {
-          other.removeBehavior(other.enemy);
-          other.enemy = undefined;
-        }*/
       }
     }
   };
