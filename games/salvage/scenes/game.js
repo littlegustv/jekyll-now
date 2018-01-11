@@ -516,7 +516,7 @@ var onStart = function () {
     [6],
   ];
 
-  this.waves = [[3,3]];
+  //this.waves = [[3,3]];
 
   //this.waves = [[6, 6, 6]];
   //this.waves = [[0],[0],[0],[0]];
