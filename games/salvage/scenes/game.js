@@ -369,7 +369,7 @@ var onStart = function () {
             }
             heart.z = 24;
             heart.addBehavior(Velocity);              
-            heart.velocity = {x: 0, y: 40};
+            heart.velocity = {x: 0, y: 30};
             heart.radius = 4;
             heart.scale = 2;
 
@@ -379,7 +379,7 @@ var onStart = function () {
             announcement.z = 100;
             announcement.scale = 2;
             announcement.angle = PI / 2;
-            announcement.velocity = {x: 0, y: 20, angle: PI / 6};
+            announcement.velocity = {x: 0, y: 15, angle: PI / 6};
 
             //heart.addBehavior(Accelerate);
             //heart.acceleration = {x: 0, y: SPEEDS.gravity};
