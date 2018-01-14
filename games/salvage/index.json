@@ -55,7 +55,6 @@
     {"path": "decoy.wav"},
     {"path": "coins.wav"},
     {"path": "soundtrack.ogg"},
-    {"path": "menu.ogg"},
     {"path": "hover.wav"},
     {"path": "select.wav"},
     {"path": "move_fast.wav"},
