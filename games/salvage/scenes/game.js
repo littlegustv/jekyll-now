@@ -57,7 +57,7 @@ var onStart = function () {
 
   this.health_bar = [];
   for (var i = 0.5; i < MAXHEALTH + 0.5; i++) {
-    var h = this.ui.add(Object.create(Sprite).init(WIDTH / 2 - MAXHEALTH * 28 / 2 + i * 28, 16, Resources.heart));
+    var h = this.ui.add(Object.create(Sprite).init(i * 28, 16, Resources.heart));
     h.scale = 2;
     this.health_bar.push(h);
   };
@@ -83,11 +83,12 @@ var onStart = function () {
     this.shield.opacity = Math.pow(object.shield, 2);
   };
 
-  var menu_text = this.ui.add(Object.create(SpriteFont).init(36, 12, Resources.expire_font, "menu", {align: "center", spacing: -3}));
-  var menu_button = this.ui.add(Object.create(Entity).init(36, 12, 64, 16));
+  var menu_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2 - 60, 12, Resources.expire_font, "menu", {align: "center", spacing: -2}));
+  var menu_button = this.ui.add(Object.create(Entity).init(gameWorld.width / 2 - 60, 12, 120, 16));
   menu_button.family = "button";
   menu_text.scale = 2;
   menu_button.opacity = 0;
+  menu_button.text = menu_text;
   menu_button.trigger = function () {
     if (s.bg.paused) {
       gameWorld.setScene(0, true);
@@ -95,19 +96,15 @@ var onStart = function () {
       gameWorld.playSound(Resources.select);
     }
   };
-  menu_button.hover = function () {
-    if (menu_text.scale != 2.2) gameWorld.playSound(Resources.hover);
-    menu_text.scale = 2.2;
-  };
-  menu_button.unhover = function () {
-    menu_text.scale = 2;
-  };
+  menu_button.hover = bracketHover;
+  menu_button.unhover = bracketUnhover;
   
-  var mute_text = this.ui.add(Object.create(SpriteFont).init(100, 12, Resources.expire_font, "mute", {align: "center", spacing: -3}));
-  var mute_button = this.ui.add(Object.create(Entity).init(100, 12, 48, 16));
+  var mute_text = this.ui.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 60, 12, Resources.expire_font, "mute", {align: "center", spacing: -2}));
+  var mute_button = this.ui.add(Object.create(Entity).init(gameWorld.width / 2 + 60, 12, 120, 16));
   mute_button.family = "button";
   mute_text.scale = 2;
   mute_button.opacity = 0;
+  mute_button.text = mute_text;
   if (gameWorld.muted) {
     mute_text.opacity = 0.8;
   }
@@ -120,13 +117,8 @@ var onStart = function () {
       gameWorld.mute();
     }
   };
-  mute_button.hover = function () {
-    if (mute_text.scale != 2.2) gameWorld.playSound(Resources.hover);
-    mute_text.scale = 2.2;
-  };
-  mute_button.unhover = function () {
-    mute_text.scale = 2;
-  };
+  mute_button.hover = bracketHover;
+  mute_button.unhover = bracketUnhover;
 
   player.setCollision(Polygon);
   player.move = Movement.standard;
@@ -336,6 +328,10 @@ var onStart = function () {
             projectileDie(projectiles[i]);
           }
         }
+        if (this.heart) {
+          this.heart.die();
+        }
+        
         projectiles = [];
         var scrap = this.bg.entities.filter(function (e) { return e.scrap; });
         //console.log('pausing, and having some scrap  still...');
@@ -361,6 +357,43 @@ var onStart = function () {
               if (enemy) this.wave.push(enemy);
             }
           }
+          if (gameWorld.player.health <= 1 || (gameWorld.player.health <= 2 && Math.random() < 0.4)) {
+            console.log('adding heart!');
+            var g = toGrid(randint(WIDTH / 2, MAX.x), 0);
+            var heart = this.bg.add(Object.create(Sprite).init(g.x, g.y, Resources.heart));
+            heart.strokeColor = "red";
+            heart.die = function () {
+              gameWorld.scene.heart = undefined;
+              particles(this, 10, 3);
+              this.alive = false;
+            }
+            heart.z = 24;
+            heart.addBehavior(Velocity);              
+            heart.velocity = {x: 0, y: 40};
+            heart.radius = 4;
+            heart.scale = 2;
+
+            var announcement = this.bg.add(Object.create(SpriteFont).init(g.x, g.y, Resources.expire_font, ":)", {spacing: -2, align: "center"}));
+            announcement.addBehavior(FadeOut, {duration: 0.2, delay: 0.8});
+            announcement.addBehavior(Velocity);
+            announcement.z = 100;
+            announcement.scale = 2;
+            announcement.angle = PI / 2;
+            announcement.velocity = {x: 0, y: 20, angle: PI / 6};
+
+            //heart.addBehavior(Accelerate);
+            //heart.acceleration = {x: 0, y: SPEEDS.gravity};
+            heart.setCollision(Polygon);
+            heart.collision.onHandle = function (object, other) {
+              if (other === gameWorld.player) {
+                gameWorld.player.health = Math.min(4, gameWorld.player.health + 1);
+                object.die();
+                s.updateHealthBar(s.player);
+                gameWorld.playSound(Resources.heal);
+              }
+            }
+            this.heart = heart;
+          } 
           gameWorld.wave++;          
         }
       }
@@ -757,10 +790,13 @@ var onUpdate = function (dt) {
 
   if (!s.bg.paused) {
     var enemies = this.bg.entities.filter(function (e) { return e.family == "enemy" || e.family == "neutral"; });
+    if (this.heart) {
+      enemies.push(this.heart)
+    }
     var scrap = this.bg.entities.filter(function (e) { return e.scrap; });
     this.player.checkCollisions(0, enemies);
     gameWorld.boss.checkCollisions(0, scrap);
-
+    
     for (var i = enemies.length - 1; i >= 0; i--) {
       if (enemies[i].beam) {}
       else if (!between(enemies[i].x, MIN.x - 1, MAX.x + 1) || !between(enemies[i].y, MIN.y - 1, MAX.y + 1)) {

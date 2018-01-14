@@ -223,32 +223,31 @@ var onStart =  function () {
   };
 
 
-  var menu_text = this.fg.add(Object.create(SpriteFont).init(36, 12, Resources.expire_font, "menu", {align: "center", spacing: -3}));
-  var menu_button = this.fg.add(Object.create(Entity).init(36, 12, 64, 16));
+
+  var menu_text = this.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2 - 60, 12, Resources.expire_font, "menu", {align: "center", spacing: -2}));
+  var menu_button = this.fg.add(Object.create(Entity).init(gameWorld.width / 2 - 60, 12, 120, 16));
   menu_button.family = "button";
   menu_text.scale = 2;
-  menu_text.z = 50;
+  menu_text.z = 1000;
   menu_button.opacity = 0;
+  menu_button.text = menu_text;
   menu_button.trigger = function () {
     if (s.fg.paused) {
       gameWorld.setScene(0, true);
+      gameWorld.saved = true;
       gameWorld.playSound(Resources.select);
     }
   };
-  menu_button.hover = function () {
-    if (menu_text.scale != 2.2) gameWorld.playSound(Resources.hover);
-    menu_text.scale = 2.2;
-  };
-  menu_button.unhover = function () {
-    menu_text.scale = 2;
-  };
+  menu_button.hover = bracketHover;
+  menu_button.unhover = bracketUnhover;
   
-  var mute_text = this.fg.add(Object.create(SpriteFont).init(100, 12, Resources.expire_font, "mute", {align: "center", spacing: -3}));
-  var mute_button = this.fg.add(Object.create(Entity).init(100, 12, 48, 16));
+  var mute_text = this.fg.add(Object.create(SpriteFont).init(gameWorld.width / 2 + 60, 12, Resources.expire_font, "mute", {align: "center", spacing: -2}));
+  var mute_button = this.fg.add(Object.create(Entity).init(gameWorld.width / 2 + 60, 12, 120, 16));
   mute_button.family = "button";
   mute_text.scale = 2;
-  mute_text.z = 50;
+  mute_text.z = 1000;
   mute_button.opacity = 0;
+  mute_button.text = mute_text;
   if (gameWorld.muted) {
     mute_text.opacity = 0.8;
   }
@@ -261,13 +260,8 @@ var onStart =  function () {
       gameWorld.mute();
     }
   };
-  mute_button.hover = function () {
-    if (mute_text.scale != 2.2) gameWorld.playSound(Resources.hover);
-    mute_text.scale = 2.2;
-  };
-  mute_button.unhover = function () {
-    mute_text.scale = 2;
-  };
+  mute_button.hover = bracketHover;
+  mute_button.unhover = bracketUnhover;
 
   if (MODE !== MODES.touch) {
     this.onMouseDown = down;

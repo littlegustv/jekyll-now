@@ -38,6 +38,7 @@
     {"path": "process.wav"},
     {"path": "denied.wav"},
     {"path": "approved.wav"},
+    {"path": "heal.wav"},
     {"path": "hit_small.wav"},
     {"path": "laser.wav"},
     {"path": "store.wav"},

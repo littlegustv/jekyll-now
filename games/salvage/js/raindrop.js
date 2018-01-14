@@ -1743,9 +1743,11 @@ var World = {
     var request = new XMLHttpRequest();
     request.open("GET", gameinfo, true);
     var w = this;
+    console.log('loading game info');
     request.onload = function (data) {
       w.gameInfo = JSON.parse(request.response);
       w.createCanvas();
+      console.log('loaded', w.gameInfo);
       w.createDebug(); 
       w.loadResources();
     };
