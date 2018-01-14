@@ -26,6 +26,7 @@ var onStart =  function () {
           a.collision.onHandle = function (object, other) {
             if (other.family == "player") {
               object.alive = false;
+              gameWorld.playSound(Resources.hit_hard);
               for (var i = 0; i < 20; i++) {    
                 var d = object.layer.add(Object.create(Sprite).init(object.x, object.y, Resources.dust));
                 d.addBehavior(Velocity);
@@ -97,6 +98,9 @@ var onStart =  function () {
   this.condition = function () { return true; };
 
   var fg = this.addLayer(Object.create(Layer).init(gameWorld.width, gameWorld.height));
+  fg.camera.addBehavior(Bound, {min: {x: 0, y:  0}, max: {x: WIDTH - gameWorld.width, y: HEIGHT - gameWorld.height}})
+
+
   this.message = fg.add(Object.create(SpriteFont).init(gameWorld.width / 2, gameWorld.height - 72, Resources.expire_font, this.steps[this.step][0], {spacing: -2, align: "center"}));
   this.message.z = 100;
   this.message.scale = 2;
@@ -141,6 +145,14 @@ var onStart =  function () {
   player.cursor.offset = {x: TILESIZE, y: 0};
   
   player.setCollision(Polygon);
+  player.collision.onHandle = function (object, other) {
+    if (other.projectile) {
+      particles(other, 15, 3);
+      object.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
+      object.animation = 1;
+      object.addBehavior(Delay, {duration: 0.5, callback: function () { this.entity.animation = 0; this.entity.removeBehavior(this); }}); 
+    }
+  }
   player.move = Movement.standard;
   player.speed = 6.5;
   player.targets = [];
@@ -342,7 +354,8 @@ var onUpdate = function () {
   for (var i = this.enemies.length - 1; i >= 0; i--) {
     if (!between(this.enemies[i].x, MIN.x - 1, MAX.x + 1) || !between(this.enemies[i].y, MIN.y - 1, MAX.y + 1)) {
       if (this.enemies[i].projectile) {
-        projectileDie(this.enemies[i]);
+          gameWorld.playSound(Resources.hit_small);
+          projectileDie(this.enemies[i]);
       } else if (this.enemies[i].die) {
         this.enemies[i].die();
       } else {

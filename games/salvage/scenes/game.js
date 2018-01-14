@@ -279,6 +279,7 @@ var onStart = function () {
     if (this.player.stopped()) {
       var coords = toGrid(this.player.x, this.player.y);
       this.bg.paused = true;
+      this.bg_paused = 0;
       this.player.cursor.opacity = 1;
 
       // open store
@@ -668,6 +669,7 @@ var onStart = function () {
       }});
 
       if (object.health <= 0) {
+        object.collision.onHandle = function (a, b) {};
         object.die();
       } else if (!other.projectile) {        
         var p = toGrid(other.x, other.y), b = toGrid(object.x, object.y);
@@ -696,7 +698,7 @@ var onStart = function () {
     for (var i = 0; i < 200; i++) {
       var d = this.layer.add(Object.create(Sprite).init(this.x + randint(-this.w / 2, this.w / 2), this.y + randint(-this.h / 2, this.h / 2), Resources.dust));
       d.addBehavior(Velocity);
-      d.animation = 1;
+      d.animation = 0;
       //d.animation = choose([0, 1]);
       var theta = (Math.random() * PI / 3 - PI / 6) + choose([0, 1]) * PI;
       var speed = randint(3, 50);
@@ -736,6 +738,19 @@ var onStart = function () {
 var onUpdate = function (dt) {
   var s = this;
 
+  if (this.bg.paused) {
+    this.bg_paused += dt;
+    if (this.bg_paused > 3 && this.indicator === undefined) {
+      this.indicator = this.ui.add(Object.create(Circle).init(this.player.x, this.player.y, TILESIZE / 4));
+      this.indicator.color = "white";
+      this.indicator.opacity = 0.3;
+      this.indicator.addBehavior(Oscillate, {field: "radius", object: this.indicator, initial: TILESIZE / 4, constant: 8, time: 0, func: "sin", rate: 3});
+    }
+  } else if (this.indicator && this.indicator.alive) {
+    this.indicator.alive = false;
+    this.indicator = undefined;
+  }
+
   for (var i = this.wave.length - 1; i >= 0; i--) {
     if (!this.wave[i].alive) this.wave.splice(i, 1);
   };
@@ -751,6 +766,7 @@ var onUpdate = function (dt) {
       else if (!between(enemies[i].x, MIN.x - 1, MAX.x + 1) || !between(enemies[i].y, MIN.y - 1, MAX.y + 1)) {
         if (enemies[i].projectile) {
           projectileDie(enemies[i]);
+          gameWorld.playSound(Resources.hit_small);
         } else if (enemies[i].die) {
           enemies[i].die();
         } else {

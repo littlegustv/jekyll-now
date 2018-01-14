@@ -73,9 +73,9 @@ var SPEEDS = {
   player: 6.5, // each turn take 0.586 seconds...
   enemy_fast: 8,
   enemy_normal: 5.5,
-  enemy_horizontal: 48,
+  enemy_horizontal: 32,
   enemy_horizontal_fast: 128,
-  enemy_horizontal_slow: 32
+  enemy_horizontal_slow: 24
 };
 
 var COLORS = {
@@ -169,6 +169,7 @@ function fromGrid(i, j) {
 // button effect adds [] to text
 var bracketHover = function () {
   if (this.text.text.indexOf("[") === -1) {
+    gameWorld.playSound(Resources.hover);
     this.text.text = "[ " + this.text.text + " ]";
   }
 };
@@ -327,7 +328,7 @@ Boss.pay = function () {
     this.entity.addBehavior(Delay, {duration: 0.4 + i * 0.1, callback: function () {
       var coin = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y + randint(-48, 48), Resources.coin));   
       coin.z = 100;
-      coin.addBehavior(Lerp, {field: "x", rate: 3, goal: gameWorld.width + 6, object: coin});
+      coin.addBehavior(Lerp, {field: "x", rate: 3, goal: gameWorld.width + 64, object: coin});
       coin.addBehavior(Lerp, {field: "y", rate: 3, goal: -6, object: coin});
       coin.addBehavior(Delay, {duration: 0.7, callback: function () {
         particles(this.entity, 4, 2);
@@ -1229,7 +1230,7 @@ function spawn(layer, key, player, points, nonce) {
       ]);     
       break;
     case 3: // bomber
-      enemy.addBehavior(Horizontal, {duration: 0, speed: TILESIZE / TURN, target: player, min: MIN.x, max: MAX.x, delay: 0.2});
+      enemy.addBehavior(Horizontal, {duration: 0, speed: TILESIZE / (2 * TURN), target: player, min: MIN.x, max: MAX.x, delay: 0.2});
       enemy.setVertices([
         {x: -5, y: -3}, {x: -5, y: 3}, {x: 5, y: 3}, {x: 5, y: -3}
       ]);
@@ -1306,7 +1307,7 @@ function spawn(layer, key, player, points, nonce) {
         this.entity.alive = false;
       };
     }
-    gameWorld.playSound(Resources.hit);        
+    gameWorld.playSound(Resources.hit_hard);        
     
     // scrap (coins??)
     var scrap = enemy.layer.add(Object.create(Sprite).init(enemy.x, enemy.y, this.sprite));
@@ -1314,6 +1315,8 @@ function spawn(layer, key, player, points, nonce) {
     scrap.angle = this.angle;
     var theta = angle(scrap.x, scrap.y, gameWorld.boss.x, gameWorld.boss.y);
     scrap.z = 2.5;
+    scrap.addBehavior(Velocity);
+    scrap.velocity = {x: 0, y: 0, angle: PI / 6};
     scrap.scrap = true;
     scrap.setCollision(Polygon);
     scrap.addBehavior(Periodic, {period: 0.1, callback: function () {
@@ -1345,6 +1348,7 @@ function spawn(layer, key, player, points, nonce) {
 var Movement = {
   standard: function (s) {
     s.player.cursor.opacity = 0;
+
     var x = Math.round(s.player.x + this.distance * Math.cos(s.player.angle)),
         y = Math.round(s.player.y + this.distance * Math.sin(s.player.angle));
     var goal = toGrid(x, y);      
@@ -1455,7 +1459,7 @@ var Store = {
       }
     },
     {
-      name: "Bomb", price: 2, icon: 4, 
+      name: "Bomb", price: 1, icon: 4, 
       trigger: function (t) {
         var enemies = gameWorld.scene.bg.entities.filter(function (e) { return e.family === "enemy"; });
         for (var i = 0; i < enemies.length; i++) {

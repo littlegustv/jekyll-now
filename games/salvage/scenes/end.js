@@ -8,8 +8,8 @@ var onStart =  function () {
 
   this.ui = this.addLayer(Object.create(Layer).init(WIDTH, HEIGHT));
 
-  var e1 = top.add(Object.create(SpriteFont).init(44, gameWorld.height / 2 - 22, Resources.expire_font, ENDINGS[gameWorld.ending], {spacing: -2, align: "left"}));
-  var e2 = top.add(Object.create(SpriteFont).init(44, gameWorld.height / 2, Resources.expire_font, "(ending " + (gameWorld.ending + 1) + " of " + ENDINGS.length + ")", {spacing: -2, align: "left"}));
+  var e1 = top.add(Object.create(SpriteFont).init(44, gameWorld.height / 2 - 42, Resources.expire_font, ENDINGS[gameWorld.ending], {spacing: -2, align: "left"}));
+  var e2 = top.add(Object.create(SpriteFont).init(44, gameWorld.height / 2 - 20, Resources.expire_font, "(ending " + (gameWorld.ending + 1) + " of " + ENDINGS.length + ")", {spacing: -2, align: "left"}));
   e1.z = 50;
   e1.scale = 2;
   e2.z = 51;
@@ -17,16 +17,16 @@ var onStart =  function () {
 
   //var description = ;
 
-  var earned = top.add(Object.create(SpriteFont).init(44, 3 * gameWorld.height / 4 - 34, Resources.expire_font, "You earned $" + gameWorld.earned + ".", {spacing: -2, align: "left"}));
+  var earned = top.add(Object.create(SpriteFont).init(44, 3 * gameWorld.height / 4 - 54, Resources.expire_font, "You earned $" + gameWorld.earned + ".", {spacing: -2, align: "left"}));
   earned.scale = 2;
-  var spent = top.add(Object.create(SpriteFont).init(44, 3 * gameWorld.height / 4 - 12, Resources.expire_font, "You spent $" + (gameWorld.earned - gameWorld.player.salvage) + ".", {spacing: -2, align: "left"}));
+  var spent = top.add(Object.create(SpriteFont).init(44, 3 * gameWorld.height / 4 - 32, Resources.expire_font, "You spent $" + (gameWorld.earned - gameWorld.player.salvage) + ".", {spacing: -2, align: "left"}));
   spent.scale = 2;
 
   if (gameWorld.endDescription) {
-    var t0 = top.add(Object.create(Sprite).init(gameWorld.width -  48, 3 * gameWorld.height / 4 + 32, gameWorld.endDescription.sprite));
+    var t0 = top.add(Object.create(Sprite).init(gameWorld.width -  48, 3 * gameWorld.height / 4 + 12, gameWorld.endDescription.sprite));
     t0.scale = 2;
     t0.z = 52;
-    var t = top.add(Object.create(SpriteFont).init(44, 3 * gameWorld.height / 4 + 32, Resources.expire_font, "You were destroyed by a " + gameWorld.endDescription.name + "!", {spacing: -2, align: "left"}));
+    var t = top.add(Object.create(SpriteFont).init(44, 3 * gameWorld.height / 4 + 12, Resources.expire_font, "You were destroyed by a " + gameWorld.endDescription.name + "!", {spacing: -2, align: "left"}));
     t.scale = 2;
     t.z = 53;
     gameWorld.endDescription = undefined;
@@ -73,8 +73,9 @@ var onStart =  function () {
     //e2.x -= (WIDTH - 32);
     gate.animation = 1;
 
-    var player = fg.add(Object.create(Sprite).init(-MIN.x, HEIGHT / 2, Resources.viper));
+    var player = fg.add(Object.create(Sprite).init(-MIN.x, toGrid(0, 3 * HEIGHT / 4).y, Resources.viper));
     player.angle = PI;
+    player.scale = 1;
     player.z = 100;
     player.addBehavior(Velocity);
     player.addBehavior(Accelerate);
@@ -89,30 +90,40 @@ var onStart =  function () {
       d.addBehavior(Velocity);
       d.velocity = {x: 0, y: - this.entity.velocity.y};
     }});
+    gameWorld.playSound(Resources.escape);
   } else if (gameWorld.ending === 4) {
     // insurrection
-    var wreck = fg.add(Object.create(Sprite).init(gameWorld.width / 2, MAX.y - 8, Resources.boss));
-    wreck.animation = 2;
-    wreck.z = 23;
-    wreck.addBehavior(Periodic, {period: 0.05, callback: function () {
-      if (Math.random() < 1) {        
-        var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x + randint(0, this.entity.w) - this.entity.w / 2, this.entity.y, Resources.dust));
-        d.z = this.entity.z - 1;
-        d.behaviors[0].onEnd = function () {
-          this.entity.alive = false;
-        };
-        d.addBehavior(Velocity);
-        d.velocity = {x: 0, y: - 40};
-      }
+
+    var player = fg.add(Object.create(Sprite).init(-MIN.x, toGrid(0, 3 * HEIGHT / 4).y, Resources.viper));
+    player.angle = PI;
+    player.z = 100;
+    player.scale = 2;
+    player.addBehavior(Velocity);
+    player.velocity = {x: -96, y: 0};
+    player.addBehavior(Wrap, {min: MIN, max: MAX});
+    player.addBehavior(Periodic, {period: 0.1, callback: function () {
+      var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
+      d.z = this.entity.z - 1;
+      d.scale = 2;
+      d.animation = choose([0,1,3]);
+      d.behaviors[0].onEnd = function () {
+        this.entity.alive = false;
+      };
+      d.addBehavior(Velocity);
+      d.velocity = {x: 0, y: - this.entity.velocity.y};
     }});
+
   } else {
-    var wreck = fg.add(Object.create(Sprite).init(gameWorld.width / 2, MAX.y + 8, Resources.viper));
+    var wreck = fg.add(Object.create(Sprite).init(gameWorld.width / 2, MAX.y + 10, Resources.viper));
     wreck.angle = 0;
-    wreck.z = 100;
+    wreck.z = 24;
+    wreck.scale = 2;
+    wreck.behaviors = [];
     wreck.addBehavior(Periodic, {period: 0.1, callback: function () {
       if (Math.random() > 0.5) {        
         var d = this.entity.layer.add(Object.create(Sprite).init(this.entity.x, this.entity.y, Resources.dust));
         d.z = this.entity.z - 1;
+        d.scale = 2;
         d.behaviors[0].onEnd = function () {
           this.entity.alive = false;
         };

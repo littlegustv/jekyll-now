@@ -201,15 +201,21 @@ var onStart =  function () {
   };
 
   var go = function () {
+    gameWorld.playSound(Resources.select);
     button_objects[selected].trigger();
   };
 
   var move = function (e) {
-    var buttons = s.bg.entities.filter(function (e) { return e.family === "button"; });
+    //var buttons = s.bg.entities.filter(function (e) { return e.family === "button"; });
     var b = s.bg.onButton(e.x, e.y);
-    for (var i = 0; i < buttons.length; i++) {
-      if (b == buttons[i]) b.hover();
-      else buttons[i].unhover();
+    if (b) {    
+      for (var i = 0; i < button_objects.length; i++) {
+        if (b == button_objects[i]) { 
+          selected = i;
+          b.hover();
+        }
+        else button_objects[i].unhover();
+      }
     }
   }
 
@@ -219,6 +225,7 @@ var onStart =  function () {
       var b = s.bg.onButton(e.x, e.y);
       if (b) {
         b.trigger();
+        gameWorld.playSound(Resources.select);
       }
     };
     this.onMouseMove = function (e) {
@@ -247,6 +254,7 @@ var onStart =  function () {
       var b = s.bg.onButton(e.x, e.y);
       if (b) {
         b.trigger();
+        gameWorld.playSound(Resources.select);
       }
     }
   };
