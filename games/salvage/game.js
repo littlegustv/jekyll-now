@@ -184,7 +184,6 @@ var buttonHover = function () {
 };
 var buttonUnHover = function () { this.opacity = 1;};
 
-// add to raindrop, and https://github.com/danro/jquery-easing/blob/master/jquery.easing.js
 var EASE = {
   linear: function (start, end, t) {
     return start + (end - start) * t;
@@ -207,38 +206,6 @@ var EASE = {
       return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + start;
     }
   }
-}
-// c = change, t = time, d = duration, b = base, x = ?
-// c -> (end - start)
-// t / d -> t
-// b -> b
-
-// add to raindrop
-var KeyFrame = Object.create(Behavior);
-KeyFrame.update = function (dt) {
-  if (this.time === undefined) this.time = 0;
-  this.time += dt;
-  for (var i = this.frames.length - 1; i >= 0; i--) {
-    if (this.time >=  this.frames[i].time) {
-      var frame = this.frames[i];
-      var next = this.frames[i + 1];
-      break;
-    }
-  }
-  if (next) {
-    var t = (this.time - frame.time) / (next.time - frame.time);
-    for (var key in frame.state) {
-      if (next.state[key] !== undefined) {
-        this.entity[key] = EASE[this.ease](frame.state[key], next.state[key], t);
-      }
-    }
-  } else {
-    if (this.loop) this.time = 0;
-    else this.entity.removeBehavior(this);
-  }
-}
-KeyFrame.interpolate = function (start, end, t) {
-  return (1 - t) * start + t * end
 }
 
 // used for player 'shield' upgrade
@@ -505,9 +472,6 @@ Horizontal.pick = function () {
   else return toGrid(this.max, this.entity.y);
 };
 
-// something more aggressive? long delay, charges towards you?
-
-// RAINDROP fix (clearRect instead of fillRect...)
 Scene.draw = function (ctx) {
   ctx.clearRect(0, 0, gameWorld.width, gameWorld.height); // HERE!
   for (var i = 0; i < this.layers.length; i++) {
@@ -519,7 +483,6 @@ Scene.draw = function (ctx) {
   }
 };
 
-// RAINDROP 'active' flag for layer
 Scene.update = function (dt) {
   this.time += dt;
   for (var i = 0; i < this.layers.length; i++) {
@@ -529,20 +492,22 @@ Scene.update = function (dt) {
   this.onUpdate(dt);
 };
 
-// RAINDROP default draworder function
 Layer.drawOrder = function () {
     var t = this;
     return this.entities.sort(function (a, b) {
       if (a.z < b.z) return -1;
       else if (a.z === b.z) {
         if (a.y < b.y) return -1;
+        else if (a.y === b.y) {
+          if (a.x < b.x) return -1;
+          else return 1;
+        }
         else return 1;
       }
       else return 1;
     });
 };
 
-// RAINDROP collisions fix (maybe collision overhaul for raindrop though...)
 Layer.update = function (dt) {
   this.camera.update(dt);
   if (this.paused === true) {
@@ -566,7 +531,6 @@ Layer.update = function (dt) {
   }
 };
 
-// RAINDROP setScene work properly (reloading?)
 World.setScene = function (n, reload) {
   if (this.scenes[n].reload || reload === true) {
     console.log('reloading, supposedly');
@@ -577,14 +541,12 @@ World.setScene = function (n, reload) {
   this.addEventListeners(this.scene);
 };
 
-// RAINDROP - remove flickering on scenechange
 World.draw = function () {
   if (this.scene) {
     this.scene.draw(this.ctx);
   }
 };
 
-// RAINDROP - rework playsound overall
 World.playSound = function(sound, volume) {
   if (AudioContext) {
     var volume = volume || 1;
@@ -611,17 +573,17 @@ World.playSound = function(sound, volume) {
   }
 };
 
-// RAINDROP - not sure what's changed here...
+// this was a confused attempt to create a dual delay/periodic function - in the future, KEEP THEM SEPARATE!
 Delay.update = function (dt) {
   if (this.time === undefined) this.start();
   
   this.time += dt;
   if (this.time > this.duration) {
     this.callback();
-  this.time = undefined;
-  if (this.remove) {
-    this.entity.removeBehavior(this);
-  }
+    this.time = undefined;
+    if (this.remove) {
+      this.entity.removeBehavior(this);
+    }
   }
 };
 Delay.set = function (t) {
@@ -691,7 +653,6 @@ var projectile_vertices = [
 
 var projectiles = [];
 
-// RAINDROP - not sure what the change is here either!
 SpriteFont.draw = Sprite.draw;
 SpriteFont.onDraw = function (ctx) {
   for (var i = 0; i < this.text.length; i++) {
@@ -704,7 +665,7 @@ SpriteFont.onDraw = function (ctx) {
         Math.round(this.x - this.w / 2) + x + this.spacing * i, this.y - Math.round(this.h / 2), this.w, this.h);          
     }
   }
-}
+};
 
 // FIX ME: don't use triangles?
 var Triangle = Object.create(Entity);
@@ -738,7 +699,6 @@ Circle.onDraw = function (ctx) {
     ctx.stroke();
   }
 };
-// RAINDROP - allow cosine
 Oscillate.update = function (dt) {
   if (!this.started) this.start();
   this.time += this.rate * dt;
@@ -785,7 +745,6 @@ Trail.draw = function (ctx) {
   }
 };
 
-// RAINDROP - what's different???
 function lerp_angle (a1, a2, rate) {
   var r = a1 + short_angle(a1, a2) * rate;
   if (Math.abs(r - a2) < 0.01) return a2;
@@ -1054,7 +1013,6 @@ var Weapons = {
   }
 }
 
-// RAINDROP - firefox fullscreen fix (capitalization...)
 var fullscreen = false;
 function requestFullScreen () {
 // we've made the attempt, at least
@@ -1163,20 +1121,17 @@ BossEnemy.update = function (dt) {
   }
 }
 
-// RAINDROP - angle velocity?
 Velocity.update = function (dt) {
   this.entity.x += dt * this.entity.velocity.x;
   this.entity.y += dt * this.entity.velocity.y; 
   this.entity.angle += dt * this.entity.velocity.angle || 0;  
 };
 
-// FADEIN always uses 1 maxopacity??
 FadeIn.start = function () {
   this.maxOpacity = 1;
   this.time = 0;
 };
 
-// RAINDROP -> animate 'onEnd'
 Animate.update = function (dt) {
   if (this.paused) return;
   this.entity.frameDelay -= dt;
@@ -1202,7 +1157,6 @@ Target.update = function (dt) {
   this.entity.velocity = {x: Math.cos(this.angle) * this.speed, y: Math.sin(this.angle) * this.speed};
 };
 
-// RAINDROP - useful behavior! periodic callback
 var Periodic = Object.create(Behavior);
 Periodic.update = function (dt) {
   if (this.time === undefined) this.time = 0;

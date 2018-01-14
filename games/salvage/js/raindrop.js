@@ -1435,7 +1435,6 @@ var Layer = {
     for (var i = 0; i < this.entities.length; i++) {
       if (!this.entities[i].alive) {
         this.entities[i].end();
-        // push to raindrop - garbage collection
         delete this.entities[i];
         this.entities.splice(i, 1);
       }
@@ -1826,7 +1825,7 @@ var World = {
     }
     var t = this;
     window.addEventListener("focus", function (e) {
-      if (t.audioContext && t.audioContext.resume && !this.muted) t.audioContext.resume(); // push to raindrop
+      if (t.audioContext && t.audioContext.resume && !this.muted) t.audioContext.resume();
       t.startTime = new Date();
       t.speed = 1;
     });
@@ -1843,7 +1842,7 @@ var World = {
 
     this.resourceLoadCount = 0;
     this.resourceCount = this.gameInfo.resources.length;
-    this.ctx.fillStyle = "black";
+    this.ctx.fillStyle = "white";
     this.ctx.textAlign = "center";	
     this.ctx.fillRect(this.width / 2 - 25 * this.resourceCount + i * 50, this.height / 2 - 12, 50, 25);      
     this.ctx.fillText("loading...", this.width / 2, this.height / 2 - 50);
@@ -1895,7 +1894,6 @@ var World = {
   loadOGG: function (res, name) {
     var w = this;
     // cant play ogg, load mp3
-    // push to raindrop
     /*if (name == "soundtrack" || name == "soundtrackFast") {
       this.progressBar();
     }*/
@@ -1918,7 +1916,6 @@ var World = {
     request.onload = function() {
       w.audioContext.decodeAudioData(request.response, function(b) {
         Resources[name] = {buffer: b, play: false};
-        // push to raindrop (no 'special' i.e. broken loading for a file called 'soundtrack')
         if (false) { //(name == "soundtrack" || name == "soundtrackFast") {
 //          if (AudioContext && Resources.soundtrack && name == "soundtrack") w.musicLoop();
         } else {
