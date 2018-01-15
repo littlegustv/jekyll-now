@@ -42,12 +42,15 @@ var onStart = function () {
   var left = bg.add(Object.create(TiledBackground).init(16, HEIGHT / 2, 32, HEIGHT, Resources.wall));
   left.z = 22;
 
-  var gate = bg.add(Object.create(Sprite).init(16, MAX.y - TILESIZE + 10, Resources.gate));
+  var gate = bg.add(Object.create(Sprite).init(15, MAX.y - TILESIZE + 18, Resources.gate));
   gate.z = 26;
 
-  var keyhole = bg.add(Object.create(Sprite).init(16, MAX.y - TILESIZE + 10, Resources.keyhole));
+  var balcony = bg.add(Object.create(Sprite).init(52, 185, Resources.balcony));
+  balcony.z = 100;
+
+  var keyhole = bg.add(Object.create(Sprite).init(gate.x, gate.y, Resources.keyhole));
   keyhole.z = 90;
-  keyhole.scale = 2;
+  keyhole.scale = 1;
 
   var leftcover = bg.add(Object.create(TiledBackground).init(0, HEIGHT / 2, 1, HEIGHT, Resources.wall));
   leftcover.z = 51;
@@ -342,9 +345,21 @@ var onStart = function () {
         } else {
           // spawn new enemies
           if (gameWorld.boss.enemy) {
-            console.log('vulnerable again?')
-            gameWorld.boss.animation = 0;
-            gameWorld.boss.invulnerable = false;
+            if (gameWorld.boss.opacity === 0) {              
+              gameWorld.boss.opacity = 1;
+              gameWorld.boss.frame = 0;
+              gameWorld.boss.frameDelay = 0;
+              gameWorld.boss.animation = 2;
+              gameWorld.boss.behaviors[0].onEnd = function () {
+                console.log('vulnerable again?')
+                //this.entity.invulnerable = true;
+                this.entity.animation = 0;
+                this.entity.behaviors[0].onEnd = undefined;
+                this.entity.people.opacity = 1;
+                this.entity.invulnerable = false;
+              };
+            }
+
             var points = bossSpawnPoints();
           } else {
             var points = spawnPoints();            
@@ -556,20 +571,37 @@ var onStart = function () {
   //this.waves = [[0],[0],[0],[0]];
 
   var boss_coordinates = toGrid(MIN.x, (MIN.y + MAX.y) / 2);
-  var boss = this.bg.add(Object.create(Sprite).init(boss_coordinates.x, boss_coordinates.y, Resources.test));
+  //var boss = this.bg.add(Object.create(Sprite).init(boss_coordinates.x, boss_coordinates.y, Resources.test));
+  var boss = bg.add(Object.create(Sprite).init(51, 184, Resources.glass));
+  boss.z = 101;
+
+  boss.people = bg.add(Object.create(Sprite).init(51, 199, Resources.people));
+  boss.people.z = 102;  
   boss.animation = 0;
-  //boss.angle = PI / 2;
-  boss.offset = {x: 0, y: 0};
-  boss.modules = [];
-  //boss.angle = PI / 2;
-  boss.z = 24;
 
-  var bosshpbg = this.bg.add(Object.create(Entity).init(boss_coordinates.x - 24, boss_coordinates.y, 12, boss.h));
-  bosshpbg.color = "white";
-  bosshpbg.z = 25;
+  boss.maxhealth = 7;
+  boss.health = boss.maxhealth;
+  
+  boss.healthbar = [];
+  for (var i = 0; i < boss.maxhealth; i++) {
+    var h = bg.add(Object.create(Sprite).init(14, MIN.x + 84 + 20 * i, Resources.boss_heart));
+    h.z = 105 + 0.01 * i;
+    h.scale = 2;
+    boss.healthbar.push(h)
+  }
 
-  boss.healthbar = this.bg.add(Object.create(Entity).init(bosshpbg.x, bosshpbg.y, 8, boss.h - 4));
-  boss.healthbar.z = 26;
+  boss.updateHealthBar = function () {
+    for (var i = 0; i < this.healthbar.length; i++) {
+      if (i < this.health) {
+        this.healthbar[i].animation = 0;
+      } else {
+        if (this.healthbar[i].animation === 0) {
+          particles(this.healthbar[i], 5, 1);
+        }
+        this.healthbar[i].animation = 1;
+      }
+    }
+  }
 
   boss.particles = boss.addBehavior(Periodic, {period: 0.1, rate: 0, callback: function () {
     if (Math.random() < this.rate) {
@@ -586,8 +618,6 @@ var onStart = function () {
 
   boss.family = "neutral";
   
-  boss.maxhealth = 10;
-  boss.health = boss.maxhealth;
   /*boss.health_bar = [];
   for (var i = 0; i < boss.maxhealth; i++) {
     var h = bg.add(Object.create(Sprite).init(boss.x, boss.y, Resources.heart));
@@ -624,7 +654,8 @@ var onStart = function () {
       gameWorld.wave += 1;
       if (gameWorld.boss.store_open) gameWorld.boss.store_open.alive = false;
 
-      // kill all current enemies...
+      /* kill all current enemies...
+      */
       for (var i = 0; i < this.layer.entities.length; i++) {
         if (this.layer.entities[i].family === "enemy") {
           if (this.layer.entities[i].die) this.layer.entities[i].die();
@@ -668,23 +699,33 @@ var onStart = function () {
         gameWorld.boss.respond(s.player); // move that code here, maybe?
         
         object.health -= 1;
-        object.healthbar.h = object.health * (object.h - 4) / 12;
-        object.healthbar.y = object.y + (object.h - 4) / 2 - object.healthbar.h / 2; 
+        object.invulnerable = true;
+        object.updateHealthBar();
+        gameWorld.boss.frame = 0;
+        gameWorld.boss.frameDelay = 0;
+        gameWorld.boss.animation = 1;
+        gameWorld.boss.behaviors[0].onEnd = function () {
+          //this.entity.invulnerable = true;
+          this.entity.opacity = 0;
+          this.entity.animation = 0;
+          this.entity.behaviors[0].onEnd = undefined;
+        };
         object.particles.rate = 3 * (10 - object.health) / 10;
         // flash (white)
-        gameWorld.boss.animation = 2;
+        //gameWorld.boss.animation = 2;
+        //gameWorld.boss.opacity = 0;
+        gameWorld.boss.people.opacity = 0;
         console.log('a hit!');
         gameWorld.boss.addBehavior(Delay, {duration: 0.3, callback: function () { 
-          this.entity.invulnerable = true;
           //this.entity.invulnerable = false;
-          this.entity.animation = 1; // invulnerable animation
-          console.log('but now invulnerable.');
-          this.entity.removeBehavior(this);
+          //this.entity.animation = 1; // invulnerable animation
+          //console.log('but now invulnerable.');
+          //this.entity.removeBehavior(this);
 
           //gameWorld.boss.animation = 5 - Math.floor(5 * this.entity.health / this.entity.maxhealth);
         }});
         particles(other, 20, 0);
-      } else {
+      } else if (object.animation === 0) {
         var blocked = object.layer.add(Object.create(SpriteFont).init(object.x, other.y, Resources.expire_font, "blocked", {spacing: -1, align: "center"}));
         blocked.opacity = 0;
         blocked.z = object.z + 10;
@@ -727,10 +768,12 @@ var onStart = function () {
   };
   boss.die = function (e) {
     // fix me: maybe here? (need to made non-collide)
+    gameWorld.player.invulnerable = true;
     this.opacity = 0;
     for (var i = 0; i < 200; i++) {
       var d = this.layer.add(Object.create(Sprite).init(this.x + randint(-this.w / 2, this.w / 2), this.y + randint(-this.h / 2, this.h / 2), Resources.dust));
       d.addBehavior(Velocity);
+      d.z = 140;
       d.animation = 0;
       //d.animation = choose([0, 1]);
       var theta = (Math.random() * PI / 3 - PI / 6) + choose([0, 1]) * PI;
