@@ -147,7 +147,6 @@ var onStart =  function () {
   menu_button.text = menu_text;
   menu_button.trigger = function () {
     gameWorld.setScene(0, true);
-    gameWorld.saved = true;
     gameWorld.playSound(Resources.select);
   };
   menu_button.hover = bracketHover;
