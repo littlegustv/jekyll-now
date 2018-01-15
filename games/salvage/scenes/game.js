@@ -182,15 +182,13 @@ var onStart = function () {
           m.scale = 2;
           m.addBehavior(FadeOut, {delay: 0.5, duration: 0.2});
           m.velocity = {x: 0, y: 30 };
-          particles(other, 5, 0);
+          particles(other, 5, 0);          
+          object.animation = 1;
         } else {
           object.health -= 1;
           particles(other, 15, 3);
           object.layer.camera.addBehavior(Shake, {duration: 1, min: -60, max: 60});
           object.animation = 1;
-          object.addBehavior(Delay, {duration: 0.2, callback: function () {
-            this.entity.animation = 0;
-          }});
           if (object.health == 1) {
             var warning = object.layer.add(Object.create(SpriteFont).init(object.x, object.y, Resources.expire_font, "Warning! Low Health!!", {align: "center", spacing: -2}));
             warning.z = object.z + 1;
@@ -203,9 +201,13 @@ var onStart = function () {
         s.updateHealthBar(object);
         
       }
+      object.addBehavior(Delay, {duration: TURN, callback: function () {
+        this.entity.animation = 0;
+        this.entity.removeBehavior(this);
+      }});
       // should this be JUST on projectile hit? probably, right! (invulnerability)
       object.noCollide = true;
-      object.addBehavior(Delay, {duration: 0.5, callback: function () { this.entity.noCollide = false; }});
+      object.addBehavior(Delay, {duration: TURN, callback: function () { this.entity.noCollide = false; this.entity.removeBehavior(this); }});
     }
     if (object.health <= 0) {
       gameWorld.endDescription = other.description;
@@ -768,7 +770,7 @@ var onStart = function () {
   };
   boss.die = function (e) {
     // fix me: maybe here? (need to made non-collide)
-    gameWorld.player.invulnerable = true;
+    gameWorld.player.noCollide = true;
     this.opacity = 0;
     for (var i = 0; i < 200; i++) {
       var d = this.layer.add(Object.create(Sprite).init(this.x + randint(-this.w / 2, this.w / 2), this.y + randint(-this.h / 2, this.h / 2), Resources.dust));

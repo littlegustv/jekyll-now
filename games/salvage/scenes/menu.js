@@ -65,6 +65,15 @@ var onStart =  function () {
   ground.scale = 2;
   //ground.blend = "destination-out";
   ground.z = 10;
+
+  var title = this.bg.add(Object.create(SpriteFont).init(8, ground.y - 28, Resources.expire_font, "Salvage", {spacing: -2, align: "left"}));
+  title.scale = 2;
+  title.z = 11;
+
+  var version = this.bg.add(Object.create(SpriteFont).init(gameWorld.width + 16, ground.y - 28, Resources.expire_font, VERSION, {spacing: -2, align: "right"}));
+  version.scale = 2;
+  version.z = 11;
+
   /*
   var bubble = this.bg.add(Object.create(TileMap).init(gameWorld.width / 2, gameWorld.height / 2, Resources.bubble, [
     [{x: 0, y: 0}, {x: 0, y: 2}],

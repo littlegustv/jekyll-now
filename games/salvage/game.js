@@ -1,6 +1,8 @@
 /* global Resources, Entity, Sprite, SpriteFont, TiledBackground, Behavior, World, randint, clamp, between */
 // canvas filter (color style); grayscale(70%) contrast(250%) brightness(90%);
 
+var VERSION = "0.2.2";
+
 var MODES = {
   keyboard: 0,
   touch: 1,
@@ -69,7 +71,7 @@ var SPEEDS = {
   gravity: 120,
   projectile_fast: 200,//100,
   projectile_normal: 160,//80,
-  projectile_slow: 40, //40,
+  projectile_slow: 32, //40,
   player: 6.5, // each turn take 0.586 seconds...
   enemy_fast: 8,
   enemy_normal: 5.5,
@@ -377,20 +379,23 @@ Boss.storetime = function () {
   this.entity.store_offset = this.entity.store_open.addBehavior(Follow, {target: this.entity, offset: {x: TILESIZE, y: 0, angle: false, z: -2}}).offset;
 
   // fix me: store position!
-  var store_emphasis = this.entity.layer.add(Object.create(Circle).init(this.entity.x + TILESIZE, this.entity.y, TILESIZE / 4));
-  store_emphasis.addBehavior(Follow, {target: this.entity.store_open, offset: {alive: true, z: 0.5, x: 0, y: 0}});
-  store_emphasis.addBehavior(Oscillate, {field: "radius", object: store_emphasis, initial: TILESIZE / 4, constant: 8, time: 0, func: "sin", rate: 3});
+  //var store_emphasis = this.entity.layer.add(Object.create(Circle).init(this.entity.x + TILESIZE, this.entity.y, TILESIZE / 4));
+  var store_emphasis = this.entity.layer.add(Object.create(TiledBackground).init(this.entity.x + TILESIZE / 2, this.entity.y, 28, 1.5 * TILESIZE, Resources.store_highlight));
+  store_emphasis.addBehavior(Follow, {target: this.entity.store_open, offset: {alive: true, z: 0.5, x: false, y: false}});
+  //store_emphasis.addBehavior(Oscillate, {field: "radius", object: store_emphasis, initial: TILESIZE / 4, constant: 8, time: 0, func: "sin", rate: 3});
 
   var t1 = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 24, this.entity.y - 6, Resources.expire_font, "store", {spacing: -3, align: "center"}));
-  var t2 = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 24, this.entity.y + 6, Resources.expire_font, "open!", {spacing: -3, align: "center"}));
-  t1.addBehavior(Follow, {target: this.entity.store_open, offset: {x: 0, y: -6, alive: true, z: 1 }});
-  t2.addBehavior(Follow, {target: this.entity.store_open, offset: {x: 0, y: 6, alive: true, z: 1 }});
+  var t2 = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 24, this.entity.y + 6, Resources.expire_font, "open", {spacing: -3, align: "center"}));
+  var t3 = this.entity.layer.add(Object.create(SpriteFont).init(this.entity.x + 24, this.entity.y + 6, Resources.expire_font, "here!", {spacing: -3, align: "center"}));
+  t1.addBehavior(Follow, {target: this.entity.store_open, offset: {x: 0, y: -16, alive: true, z: 1 }});
+  t2.addBehavior(Follow, {target: this.entity.store_open, offset: {x: 0, y: 0, alive: true, z: 1 }});
+  t3.addBehavior(Follow, {target: this.entity.store_open, offset: {x: 0, y: 16, alive: true, z: 1 }});
   t1.addBehavior(FadeIn, {maxOpacity: 1, duration: 0.3});
   t2.addBehavior(FadeIn, {maxOpacity: 1, duration: 0.3});
+  t3.addBehavior(FadeIn, {maxOpacity: 1, duration: 0.3});
   t1.opacity = 0;
   t2.opacity = 0;
-  t1.z = this.entity.z + 2;
-  t2.z = this.entity.z + 2;
+  t3.opacity = 0;
   this.callback = undefined;
 
   gameWorld.player.locked = false;    
@@ -841,7 +846,7 @@ var Weapons = {
       projectiles.push(a);
       a.description = {name: "starfish", sprite: this.sprite};
     }
-    return TURN * 6;
+    return TURN * 7;
   },
   hitscan: function (layer) {
     var t = this;

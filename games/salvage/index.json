@@ -29,6 +29,7 @@
     {"path": "people.png", "animations": 1, "frames": 3, "speed": 0.5},
     {"path": "building.png"},
     {"path": "balcony.png"},
+    {"path": "store_highlight.png"},
     {"path": "glass.png", "animations": 3, "frames": 3, "speed": 0.2},
     {"path": "walker.png", "frames": 4, "animations": 1, "speed": 0.5},
     {"path": "saucer.png", "frames": 5, "animations": 1, "speed": 0.5},
