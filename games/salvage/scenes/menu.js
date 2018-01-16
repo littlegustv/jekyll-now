@@ -7,6 +7,8 @@ var onStart =  function () {
   this.tertiaries = [];
   var s = this;
 
+  window.focus();
+
   Resources.music = Resources.soundtrack;
   //if (gameWorld.soundtrack) gameWorld.soundtrack.stop()
   if (!gameWorld.soundtrack) {
