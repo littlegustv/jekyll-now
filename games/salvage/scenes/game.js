@@ -471,12 +471,12 @@ var onStart = function () {
   // changed controls to swipe...
   this.touch = {x: 0, y: 0};  
   this.onTouchStart = function (e) {
-    if (!fullscreen) {
-      requestFullScreen();
-    } else {
+    //if (!fullscreen) {
+    //  requestFullScreen();
+    //} else {
       s.touch = e.touch;
       //e.x = e.touch.x, e.y = e.touch.y;      
-    }
+    //}
   }
   this.onTouchEnd = function (e) {
     e.x = e.touch.x, e.y = e.touch.y;

@@ -196,17 +196,17 @@ var onStart =  function () {
     }
   };
   this.onTouchEnd = function (e) {
-    if (!fullscreen) {
-      requestFullScreen();
-      return;
-    } else {
+    //if (!fullscreen) {
+    //  requestFullScreen();
+    //  return;
+    //} else {
       e.x = e.touch.x; e.y = e.touch.y;
       var b = s.ui.onButton(e.x, e.y);
       console.log(e, b);
       if (b) {
         b.trigger();
       }
-    }
+    //}
   };
 
   this.onKeyDown = function (e) {

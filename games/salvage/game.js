@@ -1019,10 +1019,13 @@ var Weapons = {
   }
 }
 
-var fullscreen = false;
+//var fullscreen = false;
 function requestFullScreen () {
 // we've made the attempt, at least
-  fullscreen = true;
+  if (document.fullscreenElement !== undefined) {
+    console.log('already fullscreen');
+    return;
+  }
   console.log('requestingFullScreen');
   var body = document.documentElement;
   if (body.requestFullscreen) {

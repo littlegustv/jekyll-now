@@ -272,11 +272,11 @@ var onStart =  function () {
   this.touch = {x: 0, y: 0};  
 
   this.onTouchStart = function (e) {
-    if (!fullscreen) {
+    //if (!fullscreen) {
       requestFullScreen();
-    } else {
+    //} else {
       s.touch = e.touch;
-    }
+    //}
   }
   this.onTouchEnd = function (e) {
     e.x = e.touch.x, e.y = e.touch.y;

@@ -242,30 +242,30 @@ var onStart =  function () {
     };
   }
   this.onTouchStart = function (e) {
-    if (fullscreen) {
+    //if (fullscreen) {
       e.x = e.touch.x; e.y = e.touch.y;
       move(e);      
-    }
+    //}
   };
   this.onTouchMove = function (e) {
-    if (fullscreen) {
+    //if (fullscreen) {
       e.x = e.touch.x; e.y = e.touch.y;
       move(e);      
-    }
+    //}
   };
   this.onTouchEnd = function (e) {
-    if (!fullscreen) {
-      if (MODE === undefined) MODE = MODES.touch;
-      requestFullScreen();
-      return;
-    } else {
+    if (MODE === undefined) MODE = MODES.touch;
+    requestFullScreen();
+    //if (!fullscreen) {
+      //return;
+    //} else {
       e.x = e.touch.x; e.y = e.touch.y;
       var b = s.bg.onButton(e.x, e.y);
       if (b) {
         b.trigger();
         gameWorld.playSound(Resources.select);
       }
-    }
+    //}
   };
   this.onKeyDown = function (e) {
     if (MODE === undefined) MODE = MODES.keyboard;
