@@ -1,6 +1,6 @@
 this.onStart = function () {
-	var s = this;
-	var fg = s.add(Object.create(Layer).init(game.w, game.h));
+  var s = this;
+  var fg = s.add(Object.create(Layer).init(game.w, game.h));
   this.enemies = [];
   this.summons = [];
   var wall = fg.add(Object.create(TiledBackground).init(Resources.wall).set({x: game.w / 2, y: min.y, z: 9, w: game.w, h: 32}));
@@ -14,35 +14,35 @@ this.onStart = function () {
   this.enemies.push(monster);
   fg.add(Object.create(TiledBackground).init(Resources.floor)).set({x: game.w / 2, y: min.y + 4.5 * 16 + 16, z: 8, w: game.w, h: 9 * 16});
   this.onClick = function () {
-  	//alert('hey');
-  }
+    //alert('hey');
+  };
   this.onKeyDown = function (e) {
-  	switch (e.keyCode) {
-    	case 37:
-      	witch.x -= 16;
+    switch (e.keyCode) {
+      case 37:
+        witch.x -= 16;
         break;
       case 39:
-      	witch.x += 16;
+        witch.x += 16;
         break;
       case 38:
-      	witch.y -= 16;
+        witch.y -= 16;
         break;
       case 40:
-      	witch.y += 16;
+        witch.y += 16;
         break;
       case 81:
-      	witch.spell.set({x: witch.x, y: witch.y});
+        witch.spell.set({x: witch.x, y: witch.y});
         break;
       case 87:
-      	witch.spell.reset();
+        witch.spell.reset();
         break;
     }
     s.enemies.forEach(function (e) { e.enemy.move(); });
-  }
-	this.ready = true; // needed since not loaded from file, to add event listeners
-}
+  };
+  this.ready = true; // needed since not loaded from file, to add event listeners
+};
 this.onUpdate = function (dt) {
-	var s = this;
+  var s = this;
   if (this.enemies) {
     for (var i = this.enemies.length - 1; i >= 0; i--) {
       if (at(this.enemies[i], this.witch)) {
@@ -50,12 +50,12 @@ this.onUpdate = function (dt) {
         game.setScene(0, true);
       }
       for (var j = 0; j < this.summons.length; j++) {
-      	if (at(this.enemies[i], this.summons[j])) {
-        	this.enemies[i].alive = false;
+        if (at(this.enemies[i], this.summons[j])) {
+          this.enemies[i].alive = false;
           this.enemies.splice(i, 1);
           break;
         }
       }
     }
   }
-}
+};
