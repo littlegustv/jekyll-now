@@ -14,13 +14,31 @@ function fromGrid(p) {
   return {x: min.x + p.x * TILESIZE, y: min.y + p.y * TILESIZE};
 }
 
+var movesolid = function (p) {
+  for (var i = 0; i < this.layer.entities.length; i++) {
+      if (this.layer.entities[i].x === this.x + p.x && this.layer.entities[i].y === this.y + p.y && this.layer.entities[i].solid) return false;
+  }
+  this.x += p.x;
+  this.y += p.y;
+};
+
 var Fire = {
   square: function (entity, points) {
     for (var i = 0; i < points.length; i++) {
-      var flame = entity.layer.add(Object.create(Sprite).init(Resources.fire)).set({x: points[i].x + TILESIZE / 2, y: points[i].y, color: "orange", z: entity.z - 1, family: 'fire'});
-      game.scene.summons.push(flame); // fix me: bad global(ish) object reliance!
+      var flame = entity.layer.add(Object.create(Sprite).init(Resources.fire)).set({turns: 2, x: points[i].x + TILESIZE / 2, y: points[i].y, color: "orange", z: entity.z - 1, family: 'fire'});      
+      game.scene.summons.push(flame); // fix me: bad global(ish) object reliance! -> make this a subset of Spell behavior??
     }
-  }
+  },
+  line: function (entity, points) {
+    for (var i = 0; i < points.length; i++) {
+      if (points[i].x + TILESIZE / 2 === entity.x && points[i].y === entity.y) {
+        // none
+      } else {
+        var flame = entity.layer.add(Object.create(Sprite).init(Resources.fire)).set({turns: 2, x: points[i].x + TILESIZE / 2, y: points[i].y, color: "orange", z: entity.z - 1, family: 'fire'});
+        game.scene.summons.push(flame);        
+      }
+    }
+  },
 };
 
 // gridsize, offset
@@ -29,6 +47,18 @@ Spell.set = function (point) {
   this.points.push(point);
 };
 Spell.shapes = [
+  {
+    name: 'line',
+    points: [
+      {d: 1, theta: 0},
+    ]
+  },
+  {
+    name: 'line',
+    points: [
+      {d: 1, theta: PI / 2},
+    ]
+  },
   // square
   {
     name: 'square',
@@ -192,9 +222,9 @@ var Simple = Object.create(Behavior);
 Simple.move = function () {
   if (!this.resting) {
     if (Math.abs(this.target.x - this.entity.x) > Math.abs(this.target.y - this.entity.y)) {
-      this.entity.x += sign(this.target.x - this.entity.x) * TILESIZE;
+      this.entity.move({x: sign(this.target.x - this.entity.x) * TILESIZE, y: 0});
     } else {
-      this.entity.y += sign(this.target.y - this.entity.y) * TILESIZE;
+      this.entity.move({x: 0, y: sign(this.target.y - this.entity.y) * TILESIZE});
     }
     this.resting = true;
   } else {
