@@ -13,13 +13,29 @@ function toGrid(p) {
 function fromGrid(p) {
   return {x: min.x + p.x * TILESIZE, y: min.y + p.y * TILESIZE};
 }
+function sign (n) {
+  return n > 0 ? 1 : (n < 0 ? -1 : 0);
+}
 
 var movesolid = function (p) {
+
   for (var i = 0; i < this.layer.entities.length; i++) {
       if (this.layer.entities[i].x === this.x + p.x && this.layer.entities[i].y === this.y + p.y && this.layer.entities[i].solid) return false;
   }
   this.x += p.x;
   this.y += p.y;
+  // fix me: need to keep this separate from enemies, maybe?
+  if (this.spell) {
+    var points = this.spell.lines();
+    if ((points.length - (this.spell.points.length - 1)) <= this.maxmana) {
+      this.mana = this.maxmana - (points.length - (this.spell.points.length - 1));
+    } else {
+      this.x -= p.x;
+      this.y -= p.y;
+      return false; // can't move when out of mana      
+    }
+  }
+  return true;
 };
 
 var Fire = {
@@ -45,6 +61,7 @@ var Fire = {
 var Spell = Object.create(Behavior);
 Spell.set = function (point) {
   this.points.push(point);
+  return true;
 };
 Spell.shapes = [
   {
@@ -160,6 +177,8 @@ Spell.check = function () {
 Spell.reset = function () {
   this.check();
   this.points = [];
+  //this.entity.mana = this.entity.maxmana;
+  return true;
 }
 Spell.update = function (dt) {
   if (this.time === undefined) this.time = 0;
@@ -207,13 +226,15 @@ Spell.lines = function () {
   return points;
 };
 Spell.draw = function (ctx) {
-  ctx.fillStyle = this.color;
-  ctx.globalAlpha = 0.9;
-  ctx.lineWidth = 2;
-  var points = this.lines();
-  for (var i = 0; i < points.length; i++) {
-    ctx.fillRect(points[i].x, points[i].y, TILESIZE, TILESIZE);
-    ctx.drawImage(Resources.icon.image, points[i].x, points[i].y);    
+  if (this.points.length > 0) {    
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = 0.9;
+    ctx.lineWidth = 2;
+    var points = this.lines();
+    for (var i = 0; i < points.length; i++) {
+      ctx.fillRect(points[i].x, points[i].y, TILESIZE, TILESIZE);
+      ctx.drawImage(Resources.icon.image, points[i].x, points[i].y);    
+    }
   }
 };
 

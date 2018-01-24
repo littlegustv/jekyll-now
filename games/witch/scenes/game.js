@@ -1,11 +1,24 @@
 this.onStart = function () {
   var s = this;
   var fg = s.add(Object.create(Layer).init(game.w, game.h));
+
+  //var ui = s.add(Object.create(Layer).init(game.w, game.h));  
+
   this.enemies = [];
   this.summons = [];
   var wall = fg.add(Object.create(TiledBackground).init(Resources.barrel).set({x: game.w / 2, y: min.y + 8, z: 9, w: game.w, h: 16}));
 
-  var witch = fg.add(Object.create(Sprite).init(Resources.witch)).set({x: min.x + 2 * TILESIZE - 8, y: min.y + TILESIZE * 2, z: 10, move: movesolid});
+  var witch = fg.add(Object.create(Sprite).init(Resources.witch)).set({x: min.x + 2 * TILESIZE - 8, y: min.y + TILESIZE * 2, z: 10, move: movesolid, mana: 4, maxmana: 4});
+  witch.add(Behavior, {draw: function (ctx) {
+    for (var i = 0; i < this.entity.maxmana; i++) {
+      if (i < this.entity.mana) {        
+        ctx.fillStyle = "blue";
+      } else {
+        ctx.fillStyle = "aliceblue";
+      }
+      ctx.fillRect(game.w - 16 - 16 * i, game.h - 16, 14, 14);
+    }
+  }});
   witch.spell = witch.add(Spell, {points: [], color: "darkorange", threshold: 0.1});
   this.witch = witch;
   witch.add(Bound, {min: {x: 8, y: min.y + 16}, max: {x: game.w - 8, y: game.h - 16}});
@@ -20,45 +33,48 @@ this.onStart = function () {
     //alert('hey');
   };
   this.onKeyDown = function (e) {
+    var moved = false
     switch (e.keyCode) {
       case 27:
         game.setScene(0, true);
         break;
       case 37:
-        witch.move({x: -16, y: 0});
+        moved = witch.move({x: -16, y: 0});
         witch.animation = 2;
         break;
       case 39:
-        witch.move({x: 16, y: 0});
+        moved = witch.move({x: 16, y: 0});
         witch.animation = 3;
         break;
       case 38:
-        witch.move({x: 0, y: -16});
+        moved = witch.move({x: 0, y: -16});
         witch.animation = 1;
         break;
       case 40:
-        witch.move({x: 0, y: 16});
+        moved = witch.move({x: 0, y: 16});
         witch.animation = 0;
         break;
       case 81:
-        witch.spell.set({x: witch.x, y: witch.y});
+        moved = witch.spell.set({x: witch.x, y: witch.y});
         break;
       case 87:
-        witch.spell.reset();
+        moved = witch.spell.reset();
         break;
     }
-    for (var i = s.summons.length - 1; i >= 0; i--) {
-      s.summons[i].turns -= 1;
-      if (s.summons[i].turns <= 0) {
-        s.summons[i].alive = false;
-        var dust = s.summons[i].layer.add(Object.create(Sprite).init(Resources.dust)).set({x: s.summons[i].x, y: s.summons[i].y, animation: 3, z: s.summons[i].z});
-        dust.behaviors[0].onEnd = function () {
-          this.entity.alive = false;
-        };
-        s.summons.splice(i, 1);
+    if (moved) {
+      for (var i = s.summons.length - 1; i >= 0; i--) {
+        s.summons[i].turns -= 1;
+        if (s.summons[i].turns <= 0) {
+          s.summons[i].alive = false;
+          var dust = s.summons[i].layer.add(Object.create(Sprite).init(Resources.dust)).set({x: s.summons[i].x, y: s.summons[i].y, animation: 3, z: s.summons[i].z});
+          dust.behaviors[0].onEnd = function () {
+            this.entity.alive = false;
+          };
+          s.summons.splice(i, 1);
+        }
       }
+      s.enemies.forEach(function (e) { e.enemy.move(); });
     }
-    s.enemies.forEach(function (e) { e.enemy.move(); });
   };
   this.ready = true; // needed since not loaded from file, to add event listeners
 };
