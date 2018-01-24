@@ -8,18 +8,20 @@ this.onStart = function () {
   this.summons = [];
   var wall = fg.add(Object.create(TiledBackground).init(Resources.barrel).set({x: game.w / 2, y: min.y + 8, z: 9, w: game.w, h: 16}));
 
-  var witch = fg.add(Object.create(Sprite).init(Resources.witch)).set({x: min.x + 2 * TILESIZE - 8, y: min.y + TILESIZE * 2, z: 10, move: movesolid, mana: 4, maxmana: 4});
+  var witch = fg.add(Object.create(Sprite).init(Resources.witch)).set({x: min.x + 2 * TILESIZE - 8, y: min.y + TILESIZE * 2, z: 10, move: movesolid, usedmana: 0, mana: 4, maxmana: 4});
   witch.add(Behavior, {draw: function (ctx) {
     for (var i = 0; i < this.entity.maxmana; i++) {
-      if (i < this.entity.mana) {        
+      if (i < (this.entity.mana - this.entity.usedmana)) {        
         ctx.fillStyle = "blue";
+      } else if (i < this.entity.mana) {
+        ctx.fillStyle = "lightblue";
       } else {
         ctx.fillStyle = "aliceblue";
       }
       ctx.fillRect(game.w - 16 - 16 * i, game.h - 16, 14, 14);
     }
   }});
-  witch.spell = witch.add(Spell, {points: [], color: "darkorange", threshold: 0.1});
+  witch.spell = witch.add(Spell, {points: [], color: "darkorange", threshold: 0.1, regen: 2});
   this.witch = witch;
   witch.add(Bound, {min: {x: 8, y: min.y + 16}, max: {x: game.w - 8, y: game.h - 16}});
   var monster = fg.add(Object.create(Sprite).init(Resources.slime)).set({x: min.x + 12 * TILESIZE - 8, y: min.y + 4 * TILESIZE, z: 9, move: movesolid});

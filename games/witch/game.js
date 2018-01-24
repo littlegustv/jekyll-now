@@ -25,16 +25,17 @@ var movesolid = function (p) {
   this.x += p.x;
   this.y += p.y;
   // fix me: need to keep this separate from enemies, maybe?
-  if (this.spell) {
+  if (this.spell && this.spell.points.length > 0) {
     var points = this.spell.lines();
-    if ((points.length - (this.spell.points.length - 1)) <= this.maxmana) {
-      this.mana = this.maxmana - (points.length - (this.spell.points.length - 1));
+    if ((points.length - (this.spell.points.length - 1)) <= this.mana) {
+      this.usedmana = (points.length - (this.spell.points.length - 1));
     } else {
       this.x -= p.x;
       this.y -= p.y;
       return false; // can't move when out of mana      
     }
   }
+  if (this.spell) this.spell.turn();
   return true;
 };
 
@@ -59,6 +60,14 @@ var Fire = {
 
 // gridsize, offset
 var Spell = Object.create(Behavior);
+Spell.turn = function () {
+  if (this.turns === undefined) this.turns = 0;
+  this.turns += 1;
+  if (this.turns >= this.regen) {
+    this.entity.mana = Math.min(this.entity.mana + 1, this.entity.maxmana);
+    this.turns = 0;
+  }
+}
 Spell.set = function (point) {
   this.points.push(point);
   return true;
@@ -137,6 +146,9 @@ Spell.match = function (spell, attempt) {
 // pattern match various shapes
 Spell.check = function () {
   var points = [];
+  if (this.points[this.points.length - 1].x === this.entity.x && this.points[this.points.length - 1].y === this.entity.y) {
+    this.points.splice(this.points.length - 1, 1);
+  }
   var t = this;
   var max_distance = 0;
   for (var i = 0; i < this.points.length; i++) {
@@ -177,7 +189,8 @@ Spell.check = function () {
 Spell.reset = function () {
   this.check();
   this.points = [];
-  //this.entity.mana = this.entity.maxmana;
+  this.entity.mana -= this.entity.usedmana;
+  this.entity.usedmana = 0;
   return true;
 }
 Spell.update = function (dt) {
