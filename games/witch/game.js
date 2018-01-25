@@ -40,7 +40,7 @@ var movesolid = function (p) {
 };
 
 function createflame (point) {
-  var flame = entity.layer.add(Object.create(Sprite).init(Resources.fire)).set({turns: 2, x: point.x + TILESIZE / 2, y: point.y, color: "orange", z: entity.z - 1, family: 'fire'});      
+  var flame = game.scene.layers[0].add(Object.create(Sprite).init(Resources.fire)).set({turns: 2, x: point.x + TILESIZE / 2, y: point.y, color: "orange", z: 10, family: 'fire'});
   game.scene.summons.push(flame);
 }
 
