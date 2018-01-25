@@ -39,11 +39,15 @@ var movesolid = function (p) {
   return true;
 };
 
+function createflame (point) {
+  var flame = entity.layer.add(Object.create(Sprite).init(Resources.fire)).set({turns: 2, x: point.x + TILESIZE / 2, y: point.y, color: "orange", z: entity.z - 1, family: 'fire'});      
+  game.scene.summons.push(flame);
+}
+
 var Fire = {
   square: function (entity, points) {
     for (var i = 0; i < points.length; i++) {
-      var flame = entity.layer.add(Object.create(Sprite).init(Resources.fire)).set({turns: 2, x: points[i].x + TILESIZE / 2, y: points[i].y, color: "orange", z: entity.z - 1, family: 'fire'});      
-      game.scene.summons.push(flame); // fix me: bad global(ish) object reliance! -> make this a subset of Spell behavior??
+      createflame(points[i]);
     }
   },
   line: function (entity, points) {
@@ -51,8 +55,7 @@ var Fire = {
       if (points[i].x + TILESIZE / 2 === entity.x && points[i].y === entity.y) {
         // none
       } else {
-        var flame = entity.layer.add(Object.create(Sprite).init(Resources.fire)).set({turns: 2, x: points[i].x + TILESIZE / 2, y: points[i].y, color: "orange", z: entity.z - 1, family: 'fire'});
-        game.scene.summons.push(flame);        
+        createflame(points[i]);
       }
     }
   },
