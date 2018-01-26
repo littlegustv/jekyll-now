@@ -6,7 +6,8 @@ SIMPLE
 x- specific floor destinations for passengers
 x- visual indicator of requested floors, elevator current up/down status
 x- delayed exit destination on reaching floor
-- health for passengers (i.e. they can tolerate 3 mistakes)
+- health for passengers (i.e. they can tolerate 3 mistakes, X seconds waiting...)
+  - once exhausted, will start 'staircasing', i.e. going up/down one floor at a time until reaching destination (can all be done with one variable, one behavior, and a couple checkpoints?)
 
 TRICKY:
 - two teams as passenger 'spawner'
@@ -22,8 +23,6 @@ THEN:
   - can disable your floor/in-elevator camera, so you can't tell who is who
 - complications: once the ritual requires more steps, does the game get more interesting?
 
-THOUGHT:
-- likely have to be 'stairs' - once a certain time limit runs out, they take the stairs and gradually get to their destination anyway
   
 WHAT IS THE STRATEGY?? WHAT ARE THE 'RESOURCES' BEING MANAGED? HOW DO YOU MIN/MAX YOUR WAY TO VICTORY?
 
