@@ -6,8 +6,10 @@ SIMPLE
 x- specific floor destinations for passengers
 x- visual indicator of requested floors, elevator current up/down status
 x- delayed exit destination on reaching floor
-- health for passengers (i.e. they can tolerate 3 mistakes, X seconds waiting...)
-  - once exhausted, will start 'staircasing', i.e. going up/down one floor at a time until reaching destination (can all be done with one variable, one behavior, and a couple checkpoints?)
+x- health for passengers (i.e. they can tolerate 3 mistakes, X seconds waiting...)
+  x- once exhausted, will start 'staircasing', i.e. going up/down one floor at a time until reaching destination (can all be done with one variable, one behavior, and a couple checkpoints?)
+  - 'wait' time effect on health
+  - all health-damaging conditions (gone past, elevator changes direction [not far enough], waiting)
 
 TRICKY:
 - two teams as passenger 'spawner'
@@ -26,7 +28,7 @@ THEN:
   
 WHAT IS THE STRATEGY?? WHAT ARE THE 'RESOURCES' BEING MANAGED? HOW DO YOU MIN/MAX YOUR WAY TO VICTORY?
 
- */
+*/
 
 
 this.onStart = function () {
@@ -70,8 +72,26 @@ this.onStart = function () {
             this.entity.text = "" + this.entity.destination;
             this.entity.remove(this);
           }});
-        } else if (p.destination === 0 && i === 0) {
-          p.alive = false;
+        } else if (p.destination === 0 && i === 0) { // remove passenger from building
+          p.alive = false; // fix me: remove from FLOOR as well; make more generic check/bejavior?
+        } else { // gone past floor
+          p.health -= 1;
+          p.opacity = 0.25 + 0.25 * p.health;
+          if (p.health <= 0) {
+            p.add(Periodic, {direction: sign(p.destination - i), floor: i, period: 0.5, callback: function () {
+              var n = s.floors[this.floor].passengers.indexOf(this.entity);
+              s.floors[this.floor].passengers.splice(n, 1);
+              this.floor += this.direction;
+              if (s.floors[this.floor]) {
+                s.floors[this.floor].passengers.push(this.entity);
+                this.entity.y = s.floors[this.floor].y;
+              }
+              if (this.floor === this.entity.destination) {
+                this.entity.remove(this);
+                // fix me: trigger 'on arrive' actions
+              }
+            }});
+          }
         }
       }
     }
@@ -100,8 +120,9 @@ this.onStart = function () {
         game.elevator.indicator.text = game.elevator.direction;
         break;
       case 81:
+        // create new passenger at mezzanine
         var d = randint(1, FLOORS);
-        var n = s.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: game.w / 2, y: game.h - 8, z: 5, destination: d, text: "" + d});
+        var n = s.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({health: 1, x: game.w / 2, y: game.h - 8, z: 5, destination: d, text: "" + d});
         n.direction = function () {
           var f = tofloor(this.y);
           console.log(f, this.destination);
