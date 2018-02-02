@@ -51,61 +51,44 @@ this.onStart = function () {
   game.elevator = this.fg.add(Object.create(Entity).init()).set({direction: "up", passengers: [], x: game.w - 16, y: game.h - 8, w: 32, h: FLOORSIZE, color: "white", z: 3, floor: 0});
   game.elevator.indicator = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({text: game.elevator.direction, spacing: -2, align: "center"});
   game.elevator.indicator.add(Follow, {target: game.elevator, offset: {x: 0, y: -9, z: 1 }});
+  game.elevator.scene = s;
+  game.elevator.unfill = function (i) {
 
-  this.onMouseDown = function (e) {
-    var i = tofloor(e.y);
-    game.elevator.floor = i;
-    // move to floor
-    game.elevator.y = s.floors[i].y;
-    // remove old passengers
-    for (var j = game.elevator.passengers.length - 1; j >= 0; j--) {
+    for (var j = this.passengers.length - 1; j >= 0; j--) {
       // redundant code, but unfortunately the 'follow' behavior doesn't always happen between setting elevator Y and here (why would it!)
-      game.elevator.passengers[j].y = game.elevator.y;
-      if (game.elevator.passengers[j].direction() !== game.elevator.direction) {
-        var p = game.elevator.passengers.splice(j, 1)[0];
-        //p.follow.target = s.floors[i];
-        p.x = game.w / 2 + s.floors[i].passengers.length * 8;
-        s.floors[i].passengers.push(p);
-        if (p.destination !== 0 && i === p.destination) {
-          p.add(Delay, {duration: 1, callback: function () {
-            this.entity.destination = 0;
-            this.entity.text = "" + this.entity.destination;
-            this.entity.remove(this);
-          }});
-        } else if (p.destination === 0 && i === 0) { // remove passenger from building
-          p.alive = false; // fix me: remove from FLOOR as well; make more generic check/bejavior?
-        } else { // gone past floor
-          p.health -= 1;
-          p.opacity = 0.25 + 0.25 * p.health;
-          if (p.health <= 0) {
-            p.add(Periodic, {direction: sign(p.destination - i), floor: i, period: 0.5, callback: function () {
-              var n = s.floors[this.floor].passengers.indexOf(this.entity);
-              s.floors[this.floor].passengers.splice(n, 1);
-              this.floor += this.direction;
-              if (s.floors[this.floor]) {
-                s.floors[this.floor].passengers.push(this.entity);
-                this.entity.y = s.floors[this.floor].y;
-              }
-              if (this.floor === this.entity.destination) {
-                this.entity.remove(this);
-                // fix me: trigger 'on arrive' actions
-              }
-            }});
-          }
-        }
+      this.passengers[j].y = this.y;
+      if (this.passengers[j].direction() !== this.direction) {
+        var p = this.passengers.splice(j, 1)[0];
+        p.arrive(i);
       }
     }
-    // check for new passengers
+  }
+  game.elevator.fill = function (i) {
     for (var j = s.floors[i].passengers.length - 1; j >= 0; j--) {
-      if (s.floors[i].passengers[j].direction() === game.elevator.direction) {
+      if (s.floors[i].passengers[j].direction() === this.direction) {
         var p = s.floors[i].passengers.splice(j, 1)[0];
         //p.follow.target = game.elevator;
         //p.follow.offset.x = -game.elevator.passengers.length * 8;
-        p.x = game.elevator.x - game.elevator.passengers.length * 8
+        p.x = this.x - this.passengers.length * 8
         //console.log(p.follow.offset);
-        game.elevator.passengers.push(p);
+        this.passengers.push(p);
       }
     }
+  }
+  game.elevator.move = function (i) {
+
+    this.floor = i;
+    // move to floor
+    this.y = s.floors[i].y;
+    // remove old passengers
+    this.unfill(i);    
+    // check for new passengers
+    this.fill(i);
+  }
+
+  this.onMouseDown = function (e) {
+    var i = tofloor(e.y);
+    game.elevator.move(i);    
   };
   this.onMouseMove = function (e) {
     var i = tofloor(e.y);
@@ -118,6 +101,9 @@ this.onStart = function () {
       case 32:
         game.elevator.direction = (game.elevator.direction === "up" ? "down" : "up");
         game.elevator.indicator.text = game.elevator.direction;
+        var i = tofloor(game.elevator.y);
+        game.elevator.unfill(i);    
+        game.elevator.fill(i);
         break;
       case 81:
         // create new passenger at mezzanine
@@ -127,6 +113,42 @@ this.onStart = function () {
           var f = tofloor(this.y);
           console.log(f, this.destination);
           return this.destination > f ? "up" : (this.destination < f ? "down" : "at");
+        };
+        n.arrive = function (i) {
+          if (this.destination === 0 && i === 0) { // remove passenger from building
+            this.alive = false; // fix me: remove from FLOOR as well; make more generic check/bejavior?            
+            return;
+          } 
+
+          this.x = game.w / 2 + s.floors[i].passengers.length * 8;
+          s.floors[i].passengers.push(this);
+          if (i === this.destination) {
+            this.add(Delay, {duration: 1, callback: function () {
+              this.entity.destination = 0;
+              this.entity.text = "" + this.entity.destination;
+              this.entity.remove(this);
+            }});
+          } else { // gone past floor
+            this.health -= 1;
+            this.opacity = 0.25 + 0.25 * this.health;
+            if (this.health <= 0) {
+              // staircase
+              this.add(Periodic, {direction: sign(this.destination - i), floor: i, period: 0.5, callback: function () {
+                var n = s.floors[this.floor].passengers.indexOf(this.entity);
+                s.floors[this.floor].passengers.splice(n, 1);
+                this.floor += this.direction;
+                if (s.floors[this.floor]) {
+                  s.floors[this.floor].passengers.push(this.entity);
+                  this.entity.y = s.floors[this.floor].y;
+                }
+                if (this.floor === this.entity.destination) {
+                  this.entity.remove(this);
+                  this.entity.arrive(this.floor);
+                  // fix me: trigger 'on arrive' actions -> for passenger
+                }
+              }});
+            }
+          }          
         }
         //n.follow = n.add(Follow, {target: s.floors[0], offset: {x: game.w / 2, y: 0, z: 1}});
         s.floors[0].passengers.push(n);
