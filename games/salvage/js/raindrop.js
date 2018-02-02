@@ -1717,7 +1717,7 @@ var World = {
   },
   progressBar: function () {
     var n = Math.floor((this.width - 50) / this.resourceCount);
-    this.ctx.fillStyle = "black";
+    this.ctx.fillStyle = "#00bfff";
     this.ctx.fillRect(25 + this.resourceLoadCount * n, this.height / 2 - 12, n, 25);
     this.resourceLoadCount += 1;
     var t = this;
@@ -1844,9 +1844,9 @@ var World = {
 
     this.resourceLoadCount = 0;
     this.resourceCount = this.gameInfo.resources.length;
-    this.ctx.fillStyle = "pink";
+    this.ctx.fillStyle = "#00bfff";
     this.ctx.textAlign = "center";	
-    this.ctx.fillRect(this.width / 2 - 25 * this.resourceCount + i * 50, this.height / 2 - 12, 50, 25);      
+    this.ctx.fillRect(this.width / 2 - 25 * this.resourceCount + i * 50, this.height / 2 - 12, 50, 25);
     this.ctx.fillText("loading...", this.width / 2, this.height / 2 - 50);
     var w = this;
 
