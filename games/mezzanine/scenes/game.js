@@ -105,6 +105,7 @@ this.onStart = function () {
   }
 
   this.onMouseDown = function (e) {
+    console.log('mousedown', game.elevator);
     var i = tofloor(e.y);
     if ((game.elevator.direction === "up" && i >= game.elevator.floor) || (game.elevator.direction === "down" && i <= game.elevator.floor)) {
       game.elevator.move(i);      
@@ -119,6 +120,8 @@ this.onStart = function () {
   };
 
   this.onKeyDown = function (e) {
+
+    console.log('keydown', e.keyCode, game.elevator);
     switch(e.keyCode) {
       case 32:
         game.elevator.direction = (game.elevator.direction === "up" ? "down" : "up");
