@@ -7,6 +7,8 @@
     {"path": "passenger.png", "frames": 3, "animations": 1, "speed": 0.4},
     {"path": "expire_font.png", "frames": 95, "animations": 1},
     {"path": "building.png"},
+    {"path": "stair.png"},
+    {"path": "elevator.png"},
     {"path": "ground.png"},
     {"path": "asteroid.png"},
     {"path": "cathedral.png"}
