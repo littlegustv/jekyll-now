@@ -23,7 +23,7 @@ x- health for passengers (i.e. they can tolerate 3 mistakes, X seconds waiting..
   x- light up floor indicator to show which floors are requested
 
 TRICKY:
-- two teams as passenger 'spawner'
+x- two teams as passenger 'spawner'
 - new destination = random floor from remaining 'unchecked' floors
 - limited pool (i.e. if some are stuck on floors)
 - once found, all destinations will be on that floor
@@ -57,8 +57,8 @@ this.onStart = function () {
 
   this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: game.w / 2, y: 48, align: "center", spacing: -2, text: "The Mezzanine", z: 2});
 
-  var openers = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: game.w / 4, y: 12, align: "center", spacing: -2, text: "Opener", z: 2, available: 5});
-  var closers = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: 3 * game.w / 4, y: 12, align: "center", spacing: -2, text: "Closer", z: 2, available: 5});
+  var openers = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: game.w / 4, y: 12, align: "center", spacing: -2, text: "Opener 5", z: 2, available: 5});
+  var closers = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: 3 * game.w / 4, y: 12, align: "center", spacing: -2, text: "Closer 5", z: 2, available: 5});
 
   for (var i = 0; i < FLOORS; i++) {
     var f = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({passengers: [], x: 8, y: game.h - i * FLOORSIZE - 8, align: "center", spacing: -2, text: (i === 0 ? 'M' : "" + i), z: 2});
@@ -74,9 +74,19 @@ this.onStart = function () {
   }
 
   this.newpassenger = function () {
+    var f = randint(0, openers.available + closers.available) <= openers.available ? "opener" : "closer";
+    if (f == "opener") {
+      openers.available -= 1;
+      openers.text = "Opener " + openers.available;
+    }
+    else {
+      closers.text = "Opener " + closers.available;
+      closers.available -= 1;
+    }
+
     var d = randint(1, FLOORS);
     //var n = s.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({health: 3, x: game.w / 2, y: game.h - 8, z: 5, destination: d, text: "" + d});
-    var n = s.fg.add(Object.create(Sprite).init(Resources.passenger)).set({health: 3, x: game.w / 2, y: game.h - 8, z: 5, destination: d});
+    var n = s.fg.add(Object.create(Sprite).init(Resources[f])).set({faction: f, health: 3, x: game.w / 2, y: game.h - 8, z: 5, destination: d});
     n.direction = function () {
       var f = tofloor(this.y);
       //console.log(f, this.destination);
@@ -118,7 +128,14 @@ this.onStart = function () {
     n.arrive = function (i) {
       this.onelevator = false;
       if (this.destination === 0 && i === 0) { // remove passenger from building
-        this.alive = false; // fix me: remove from FLOOR as well; make more generic check/bejavior?            
+        this.alive = false; // fix me: remove from FLOOR as well; make more generic check/bejavior?  
+        if (this.faction == "opener") {
+          openers.available += 1;
+          openers.text = "Opener " + openers.available;
+        } else {
+          closers.available += 1;
+          closers.text = "Closer " + closers.available;
+        }        
         return;
       }
 
@@ -225,5 +242,5 @@ this.onStart = function () {
 
 };
 this.onUpdate = function (dt) {
-  
+
 };

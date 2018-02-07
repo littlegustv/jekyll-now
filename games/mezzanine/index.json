@@ -4,7 +4,8 @@
   ],
   "resources": [
     {"path": "dust.png", "frames": 4, "animations": 4, "speed": 0.2},
-    {"path": "passenger.png", "frames": 3, "animations": 1, "speed": 0.4},
+    {"path": "opener.png", "frames": 3, "animations": 1, "speed": 0.4},
+    {"path": "closer.png", "frames": 3, "animations": 1, "speed": 0.4},
     {"path": "expire_font.png", "frames": 95, "animations": 1},
     {"path": "building.png"},
     {"path": "interior.png"},
