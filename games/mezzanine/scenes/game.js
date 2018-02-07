@@ -3,7 +3,7 @@
 todo:
 
 BUGS:
- - sometimes controls seem unresponsive, but no error message??
+ x- sometimes controls seem unresponsive, but no error message??
  - sometimes staircase goes past correct floor, and just keeps going (up)
 
 SIMPLE
@@ -20,7 +20,7 @@ x- health for passengers (i.e. they can tolerate 3 mistakes, X seconds waiting..
   x- elevator max passenger count, positioning
   x- elevator movement direction restriction
 
-  - light up floor indicator to show which floors are requested
+  x- light up floor indicator to show which floors are requested
 
 TRICKY:
 - two teams as passenger 'spawner'
@@ -55,11 +55,95 @@ this.onStart = function () {
 
   this.fg.add(Object.create(TiledBackground).init(Resources.stair)).set({x: 64, y: game.h - (FLOORS / 4) * 32 + 10, w: 32, h: (FLOORS / 2) * 32 - 8, z: 3});
 
-  this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: game.w / 2, y: 32, align: "center", spacing: -2, text: "The Mezzanine", z: 2});
+  this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: game.w / 2, y: 48, align: "center", spacing: -2, text: "The Mezzanine", z: 2});
+
+  var openers = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: game.w / 4, y: 12, align: "center", spacing: -2, text: "Opener", z: 2, available: 5});
+  var closers = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: 3 * game.w / 4, y: 12, align: "center", spacing: -2, text: "Closer", z: 2, available: 5});
 
   for (var i = 0; i < FLOORS; i++) {
-    this.floors.push(this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({passengers: [], x: 8, y: game.h - i * FLOORSIZE - 8, align: "center", spacing: -2, text: (i === 0 ? 'M' : "" + i), z: 2}));
+    var f = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({passengers: [], x: 8, y: game.h - i * FLOORSIZE - 8, align: "center", spacing: -2, text: (i === 0 ? 'M' : "" + i), z: 2});
+    f.add(Behavior, {draw: function (ctx) {
+      if (this.entity.requested) {
+        ctx.beginPath();
+        ctx.arc(this.entity.x, this.entity.y, 8, 0, PI2, true);
+        ctx.fillStyle = "gold";
+        ctx.fill();
+      }
+    }});
+    this.floors.push(f);
   }
+
+  this.newpassenger = function () {
+    var d = randint(1, FLOORS);
+    //var n = s.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({health: 3, x: game.w / 2, y: game.h - 8, z: 5, destination: d, text: "" + d});
+    var n = s.fg.add(Object.create(Sprite).init(Resources.passenger)).set({health: 3, x: game.w / 2, y: game.h - 8, z: 5, destination: d});
+    n.direction = function () {
+      var f = tofloor(this.y);
+      //console.log(f, this.destination);
+      return this.destination > f ? "up" : (this.destination < f ? "down" : "at");
+    };
+    n.add(Behavior, {time: 0, patience: 5, update: function (dt) {
+      if (this.entity.onelevator) return;
+      else {            
+        this.time += dt;
+        if (this.time > this.patience) {
+          console.log('damage');
+          this.time = 0;
+          this.entity.damage();
+        }
+      }
+    }});
+    n.damage = function () {
+      this.health = Math.max(0, this.health - 1);
+      this.opacity = 0.25 + 0.25 * this.health;
+      var i = tofloor(this.y);
+      // staircase
+      if (this.health == 0) {
+        this.add(Periodic, {direction: sign(this.destination - i), floor: i, period: 0.5, callback: function () {
+          var n = s.floors[this.floor].passengers.indexOf(this.entity);
+          s.floors[this.floor].passengers.splice(n, 1);
+          this.floor += this.direction;
+          if (s.floors[this.floor]) {
+            s.floors[this.floor].passengers.push(this.entity);
+            this.entity.y = s.floors[this.floor].y;
+          }
+          if (this.floor === this.entity.destination) {
+            this.entity.remove(this);
+            this.entity.arrive(this.floor);
+            // fix me: trigger 'on arrive' actions -> for passenger
+          }
+        }});
+      }
+    };
+    n.arrive = function (i) {
+      this.onelevator = false;
+      if (this.destination === 0 && i === 0) { // remove passenger from building
+        this.alive = false; // fix me: remove from FLOOR as well; make more generic check/bejavior?            
+        return;
+      }
+
+      this.x = game.w / 2 + s.floors[i].passengers.length * 8;
+      s.floors[i].passengers.push(this);
+      if (i === this.destination) {
+        this.add(Delay, {duration: 1, callback: function () {
+          var j = this.entity.destination;
+          this.entity.destination = 0;
+          s.floors[j].requested = true;
+          this.entity.text = "" + this.entity.destination;
+          //this.entity.remove(this);
+          if (game.elevator.floor === j) game.elevator.fill(j);
+        }});
+      } else { // gone past floor
+        this.damage();
+      }
+    };
+    n.x = game.w / 2 + s.floors[0].passengers.length * 8;
+    //n.follow = n.add(Follow, {target: s.floors[0], offset: {x: game.w / 2, y: 0, z: 1}});
+    s.floors[0].passengers.push(n);
+    s.floors[0].requested = true;
+    if (game.elevator.floor === 0) game.elevator.fill(0);
+    return n;
+  };
 
   game.elevator = this.fg.add(Object.create(Sprite).init(Resources.elevator)).set({direction: "up", passengers: [], x: game.w - 16, y: game.h - 8, z: 3, floor: 0});
   game.elevator.indicator = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({text: game.elevator.direction, spacing: -2, align: "center"});
@@ -75,12 +159,14 @@ this.onStart = function () {
         p.arrive(i);
       }
     }
+    s.floors[i].requested = false;
   }
   game.elevator.fill = function (i) {
     for (var j = s.floors[i].passengers.length - 1; j >= 0; j--) {
       if (this.passengers.length >= CAPACITY) return;
       if (s.floors[i].passengers[j].direction() === this.direction) {
         var p = s.floors[i].passengers.splice(j, 1)[0];
+        s.floors[p.destination].requested = true;
         //p.follow.target = game.elevator;
         //p.follow.offset.x = -game.elevator.passengers.length * 8;
         p.x = this.x + this.w / 2 - p.w - this.passengers.length * 6;
@@ -107,7 +193,7 @@ this.onStart = function () {
   this.onMouseDown = function (e) {
     console.log('mousedown', game.elevator);
     var i = tofloor(e.y);
-    if ((game.elevator.direction === "up" && i >= game.elevator.floor) || (game.elevator.direction === "down" && i <= game.elevator.floor)) {
+    if ((game.elevator.direction == "up" && i >= game.elevator.floor) || (game.elevator.direction == "down" && i <= game.elevator.floor)) {
       game.elevator.move(i);      
     }
   };
@@ -124,7 +210,7 @@ this.onStart = function () {
     console.log('keydown', e.keyCode, game.elevator);
     switch(e.keyCode) {
       case 32:
-        game.elevator.direction = (game.elevator.direction === "up" ? "down" : "up");
+        game.elevator.direction = (game.elevator.direction == "up" ? "down" : "up");
         game.elevator.indicator.text = game.elevator.direction;
         var i = tofloor(game.elevator.y);
         game.elevator.unfill(i);    
@@ -132,75 +218,12 @@ this.onStart = function () {
         break;
       case 81:
         // create new passenger at mezzanine
-        var d = randint(1, FLOORS);
-        //var n = s.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({health: 3, x: game.w / 2, y: game.h - 8, z: 5, destination: d, text: "" + d});
-        var n = s.fg.add(Object.create(Sprite).init(Resources.passenger)).set({health: 3, x: game.w / 2, y: game.h - 8, z: 5, destination: d});
-        n.direction = function () {
-          var f = tofloor(this.y);
-          console.log(f, this.destination);
-          return this.destination > f ? "up" : (this.destination < f ? "down" : "at");
-        };
-        n.add(Behavior, {time: 0, patience: 5, update: function (dt) {
-          if (this.entity.onelevator) return;
-          else {            
-            this.time += dt;
-            if (this.time > this.patience) {
-              console.log('damage');
-              this.time = 0;
-              this.entity.damage();
-            }
-          }
-        }});
-        n.damage = function () {
-          this.health = Math.max(0, this.health - 1);
-          this.opacity = 0.25 + 0.25 * this.health;
-          var i = tofloor(this.y);
-          // staircase
-          if (this.health == 0) {
-            this.add(Periodic, {direction: sign(this.destination - i), floor: i, period: 0.5, callback: function () {
-              var n = s.floors[this.floor].passengers.indexOf(this.entity);
-              s.floors[this.floor].passengers.splice(n, 1);
-              this.floor += this.direction;
-              if (s.floors[this.floor]) {
-                s.floors[this.floor].passengers.push(this.entity);
-                this.entity.y = s.floors[this.floor].y;
-              }
-              if (this.floor === this.entity.destination) {
-                this.entity.remove(this);
-                this.entity.arrive(this.floor);
-                // fix me: trigger 'on arrive' actions -> for passenger
-              }
-            }});
-          }
-        };
-        n.arrive = function (i) {
-          this.onelevator = false;
-          if (this.destination === 0 && i === 0) { // remove passenger from building
-            this.alive = false; // fix me: remove from FLOOR as well; make more generic check/bejavior?            
-            return;
-          }
-
-          this.x = game.w / 2 + s.floors[i].passengers.length * 8;
-          s.floors[i].passengers.push(this);
-          if (i === this.destination) {
-            this.add(Delay, {duration: 1, callback: function () {
-              var j = this.entity.destination;
-              this.entity.destination = 0;
-              this.entity.text = "" + this.entity.destination;
-              //this.entity.remove(this);
-              if (game.elevator.floor === j) game.elevator.fill(j);
-            }});
-          } else { // gone past floor
-            this.damage();
-          }
-        };
-        //n.follow = n.add(Follow, {target: s.floors[0], offset: {x: game.w / 2, y: 0, z: 1}});
-        s.floors[0].passengers.push(n);
-        if (game.elevator.floor === 0) game.elevator.fill(0);
+        s.newpassenger();
         break;
     }
   };
 
 };
 this.onUpdate = function (dt) {
+  
 };
