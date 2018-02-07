@@ -5,6 +5,8 @@ todo:
 BUGS:
  x- sometimes controls seem unresponsive, but no error message??
  - sometimes staircase goes past correct floor, and just keeps going (up)
+ - floor passenger lengths are not resetting/removing passengers properly
+ - not properly 'checking' floors...
 
 SIMPLE
 x- specific floor destinations for passengers
@@ -57,8 +59,10 @@ this.onStart = function () {
 
   this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: game.w / 2, y: 48, align: "center", spacing: -2, text: "The Mezzanine", z: 2});
 
-  var openers = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: game.w / 4, y: 12, align: "center", spacing: -2, text: "Opener 5", z: 2, available: 5});
-  var closers = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: 3 * game.w / 4, y: 12, align: "center", spacing: -2, text: "Closer 5", z: 2, available: 5});
+  var openers = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: game.w / 4, y: 12, align: "center", spacing: -2, name: "Opener", text: "Opener 5", z: 2, available: 5, checked: new Array(FLOORS).fill(0).map(function (a, i) { return i }) });
+  var closers = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({x: 3 * game.w / 4, y: 12, align: "center", spacing: -2, name: "Closer", text: "Closer 5", z: 2, available: 5, checked: new Array(FLOORS).fill(0).map(function (a, i) { return i }) });
+
+  game.openers = openers;
 
   for (var i = 0; i < FLOORS; i++) {
     var f = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({passengers: [], x: 8, y: game.h - i * FLOORSIZE - 8, align: "center", spacing: -2, text: (i === 0 ? 'M' : "" + i), z: 2});
@@ -74,23 +78,19 @@ this.onStart = function () {
   }
 
   this.newpassenger = function () {
-    var f = randint(0, openers.available + closers.available) <= openers.available ? "opener" : "closer";
-    if (f == "opener") {
-      openers.available -= 1;
-      openers.text = "Opener " + openers.available;
-    }
-    else {
-      closers.text = "Opener " + closers.available;
-      closers.available -= 1;
-    }
+    //var f = randint(0, openers.available + closers.available) <= openers.available ? openers : closers;
+    var f = openers;
+    f.available -= 1;
+    f.text = f.name + " " + f.available;
+    var d = choose(f.checked);
 
-    var d = randint(1, FLOORS);
+    //var d = randint(1, FLOORS);
     //var n = s.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({health: 3, x: game.w / 2, y: game.h - 8, z: 5, destination: d, text: "" + d});
-    var n = s.fg.add(Object.create(Sprite).init(Resources[f])).set({faction: f, health: 3, x: game.w / 2, y: game.h - 8, z: 5, destination: d});
+    var n = s.fg.add(Object.create(Sprite).init(Resources[f.name.toLowerCase()])).set({faction: f, health: 3, x: game.w / 2, y: game.h - 8, z: 5, destination: d});
     n.direction = function () {
       var f = tofloor(this.y);
       //console.log(f, this.destination);
-      return this.destination > f ? "up" : (this.destination < f ? "down" : "at");
+      return this.destination > f ? DIR.up : (this.destination < f ? DIR.down : DIR.at);
     };
     n.add(Behavior, {time: 0, patience: 5, update: function (dt) {
       if (this.entity.onelevator) return;
@@ -110,6 +110,13 @@ this.onStart = function () {
       // staircase
       if (this.health == 0) {
         this.add(Periodic, {direction: sign(this.destination - i), floor: i, period: 0.5, callback: function () {
+          if (!s.floors[this.floor]) {
+            console.warn('Tried to go to a floor not in range.', this.floor);
+            return;
+          }
+
+          this.direction = sign(this.entity.destination - i);
+
           var n = s.floors[this.floor].passengers.indexOf(this.entity);
           s.floors[this.floor].passengers.splice(n, 1);
           this.floor += this.direction;
@@ -117,7 +124,7 @@ this.onStart = function () {
             s.floors[this.floor].passengers.push(this.entity);
             this.entity.y = s.floors[this.floor].y;
           }
-          if (this.floor === this.entity.destination) {
+          if (this.floor == this.entity.destination) {
             this.entity.remove(this);
             this.entity.arrive(this.floor);
             // fix me: trigger 'on arrive' actions -> for passenger
@@ -129,19 +136,16 @@ this.onStart = function () {
       this.onelevator = false;
       if (this.destination === 0 && i === 0) { // remove passenger from building
         this.alive = false; // fix me: remove from FLOOR as well; make more generic check/bejavior?  
-        if (this.faction == "opener") {
-          openers.available += 1;
-          openers.text = "Opener " + openers.available;
-        } else {
-          closers.available += 1;
-          closers.text = "Closer " + closers.available;
-        }        
+        this.faction.available += 1;
+        this.faction.text = this.faction.name + " " + this.faction.available;
         return;
       }
 
       this.x = game.w / 2 + s.floors[i].passengers.length * 8;
       s.floors[i].passengers.push(this);
       if (i === this.destination) {
+        this.faction.checked.splice(this.destination, 1);
+        console.log(this.faction.checked);
         this.add(Delay, {duration: 1, callback: function () {
           var j = this.entity.destination;
           this.entity.destination = 0;
@@ -162,8 +166,8 @@ this.onStart = function () {
     return n;
   };
 
-  game.elevator = this.fg.add(Object.create(Sprite).init(Resources.elevator)).set({direction: "up", passengers: [], x: game.w - 16, y: game.h - 8, z: 3, floor: 0});
-  game.elevator.indicator = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({text: game.elevator.direction, spacing: -2, align: "center"});
+  game.elevator = this.fg.add(Object.create(Sprite).init(Resources.elevator)).set({direction: DIR.up, passengers: [], x: game.w - 16, y: game.h - 8, z: 3, floor: 0});
+  game.elevator.indicator = this.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({text: "up", spacing: -2, align: "center"});
   game.elevator.indicator.add(Follow, {target: game.elevator, offset: {x: 0, y: -12, z: 1 }});
   game.elevator.scene = s;
   game.elevator.unfill = function (i) {
@@ -181,6 +185,7 @@ this.onStart = function () {
   game.elevator.fill = function (i) {
     for (var j = s.floors[i].passengers.length - 1; j >= 0; j--) {
       if (this.passengers.length >= CAPACITY) return;
+      
       if (s.floors[i].passengers[j].direction() === this.direction) {
         var p = s.floors[i].passengers.splice(j, 1)[0];
         s.floors[p.destination].requested = true;
@@ -210,7 +215,7 @@ this.onStart = function () {
   this.onMouseDown = function (e) {
     console.log('mousedown', game.elevator);
     var i = tofloor(e.y);
-    if ((game.elevator.direction == "up" && i >= game.elevator.floor) || (game.elevator.direction == "down" && i <= game.elevator.floor)) {
+    if ((game.elevator.direction === DIR.up && i >= game.elevator.floor) || (game.elevator.direction === DIR.down && i <= game.elevator.floor)) {
       game.elevator.move(i);      
     }
   };
@@ -227,8 +232,10 @@ this.onStart = function () {
     console.log('keydown', e.keyCode, game.elevator);
     switch(e.keyCode) {
       case 32:
-        game.elevator.direction = (game.elevator.direction == "up" ? "down" : "up");
-        game.elevator.indicator.text = game.elevator.direction;
+      console.log(game.elevator.direction);
+        game.elevator.direction = (game.elevator.direction === DIR.up ? DIR.down : DIR.up);
+      console.log(game.elevator.direction);   
+        game.elevator.indicator.text = game.elevator.direction === DIR.up ? "up" : "down";
         var i = tofloor(game.elevator.y);
         game.elevator.unfill(i);    
         game.elevator.fill(i);
