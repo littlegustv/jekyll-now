@@ -4,8 +4,8 @@ todo:
 
 BUGS:
  x- sometimes controls seem unresponsive, but no error message??
- - sometimes staircase goes past correct floor, and just keeps going (up)
- - floor passenger lengths are not resetting/removing passengers properly
+ x- sometimes staircase goes past correct floor, and just keeps going (up)
+ x- floor passenger lengths are not resetting/removing passengers properly
  - not properly 'checking' floors...
 
 SIMPLE
@@ -86,7 +86,7 @@ this.onStart = function () {
 
     //var d = randint(1, FLOORS);
     //var n = s.fg.add(Object.create(SpriteFont).init(Resources.expire_font)).set({health: 3, x: game.w / 2, y: game.h - 8, z: 5, destination: d, text: "" + d});
-    var n = s.fg.add(Object.create(Sprite).init(Resources[f.name.toLowerCase()])).set({faction: f, health: 3, x: game.w / 2, y: game.h - 8, z: 5, destination: d});
+    var n = s.fg.add(Object.create(Sprite).init(Resources[f.name.toLowerCase()])).set({faction: f, health: 3, x: game.w / 2, y: game.h - 8, z: 5, destination: d, uid: ++seed});
     n.direction = function () {
       var f = tofloor(this.y);
       //console.log(f, this.destination);
@@ -119,9 +119,15 @@ this.onStart = function () {
 
           var n = s.floors[this.floor].passengers.indexOf(this.entity);
           s.floors[this.floor].passengers.splice(n, 1);
+          // remove indicator if there is no-one else here who needs the elevator
+          var j = this.floor;
+          if (s.floors[this.floor].passengers.filter(function (p) { return p.destination !== j; }).length <= 0) {
+            s.floors[this.floor].requested = false;
+          } else {
+          }
+
           this.floor += this.direction;
           if (s.floors[this.floor]) {
-            s.floors[this.floor].passengers.push(this.entity);
             this.entity.y = s.floors[this.floor].y;
           }
           if (this.floor == this.entity.destination) {
