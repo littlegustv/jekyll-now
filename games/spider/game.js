@@ -19,6 +19,42 @@ Hybrid.update = function (dt) {
   }
 };
 
+
+Sprite.drawDebug = function (ctx) {
+  if (DEBUG) {
+    ctx.strokeStyle = "red";
+    if (this.getVertices) {
+      var v = this.getVertices();
+      ctx.beginPath();
+      ctx.moveTo(v[0].x, v[0].y);
+      for (var i = 1; i < v.length; i++) {
+        ctx.lineTo(v[i].x, v[i].y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+
+      /*var a = this.getAxes();
+      ctx.strokeStyle = "green";
+      ctx.beginPath();
+      for (var i = 0; i < a.length; i++) {
+        ctx.moveTo(this.x + a[i].x, this.y + a[i].y);
+        ctx.lineTo(100 * a[i].x + this.x, 100 * a[i].y + this.y);
+      }
+      ctx.closePath();
+      ctx.stroke();*/
+    }
+    /*ctx.fillStyle = "red";
+    ctx.fillText(Math.floor(this.x) + ", " + Math.floor(this.y), this.x, this.y);
+
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    ctx.strokeStyle = "blue";
+    ctx.lineTo(this.x + 200 * Math.cos(this.angle), this.y + 200 * Math.sin(this.angle));
+    ctx.stroke();*/
+  }
+}
+Entity.drawDebug = Sprite.drawDebug;
+
 // PUSH TO RAINDROP ALREADY???
 Layer.draw = function (ctx) {
   //this.ctx.fillStyle = this.bg;
@@ -35,3 +71,4 @@ Layer.draw = function (ctx) {
 }
 
 var game = Object.create(World).init(180, 320, "index.json");
+DEBUG = true;
