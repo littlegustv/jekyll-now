@@ -13,13 +13,13 @@ this.onStart = function () {
   // solids
   for (var i = 0; i < 100; i++) {
     var x = randint(-20, 20) * 16, y = randint(-20, 20) * 16;
-    x = 160 + 128 * (i % 2);
-    y = Math.floor(i / 2) * 16;
+    y = 160 + 128 * (i % 2);
+    x = Math.floor(i / 2) * 16;
     this.solids.push(fg.add(Object.create(Sprite).init(Resources.tile)).set({x: x, y: y, solid: true, z: 4, strands: [] }));
   }
   // enemies
   for (var i = 6; i <= 6; i++) {   
-    var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: this.solids[i].x + 16, y: this.solids[i].y, z: 3, family: FAMILY.enemy});
+    var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: this.solids[i].x + 16, y: this.solids[i].y + 16, z: 3, family: FAMILY.enemy});
     enemy.add(Behavior, {speed: 96, moved: 0, range: 128, direction: randint(0,4) * PI / 2, update: function (dt) {
       if (this.moved > this.range) {
         this.direction = modulo(this.direction + PI / 2, PI2);
@@ -49,8 +49,8 @@ this.onStart = function () {
       this.entity.setVertices([
         {x: 1, y: -d},
         {x: -1, y: -d},
-        {x: -1, y: -this.entity.h / 2},
-        {x: 1, y: -this.entity.h / 2},
+        {x: -this.entity.w / 2, y: this.entity.h / 2},
+        {x: this.entity.w / 2, y: this.entity.h / 2},
         /*{x: -this.entity.w / 2, y: -this.entity.h / 2},
         {x: -this.entity.w / 2, y: this.entity.h / 2},
         {x: this.entity.w / 2, y: this.entity.h / 2},
@@ -175,6 +175,7 @@ this.onStart = function () {
                 oth.behaviors = [];
                 s.enemies.splice(s.enemies.indexOf(oth), 1);
                 s.score.text = s.enemies.length + "";
+                //if (s.enemies.length <= 0) game.setScene(0, true);
               };
             }
 

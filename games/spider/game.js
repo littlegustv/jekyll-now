@@ -20,6 +20,32 @@ Hybrid.update = function (dt) {
 };
 
 
+Polygon.onCheck = function (o1, o2) {
+  if (!o1.getVertices || !o2.getVertices) return false;
+  else if (o1 == o2) return false;
+  //else if (distance(o1.x, o1.y, o2.x, o2.y) > Math.max(o1.h, o1.w) + Math.max(o2.h, o2.w)) return false;
+  var v1 = o1.getVertices(), v2 = o2.getVertices();
+  var a1 = o1.getAxes(), a2 = o2.getAxes();
+
+  var separate = false;
+
+  for (var i = 0; i < a1.length; i++) {
+    var p1 = project(a1[i], v1);
+    var p2 = project(a1[i], v2);
+
+    if (!overlap(p1, p2)) return false;
+  }
+
+  for (var i = 0; i < a2.length; i++) {
+    var p1 = project(a2[i], v1);
+    var p2 = project(a2[i], v2);
+
+    if (!overlap(p1, p2)) return false;
+  }
+  return true;
+}
+
+
 Sprite.drawDebug = function (ctx) {
   if (DEBUG) {
     ctx.strokeStyle = "red";
