@@ -1,3 +1,62 @@
+// push to raindrop: loader fix! (closure)
+World.loadResources = function () {
+  if (!this.gameInfo.resources) return;
+  //this.setupControls();
+  this.initAudio();
+
+  this.resourceLoadCount = 0;
+  this.resourceCount = this.gameInfo.resources.length;
+  this.ctx.fillStyle = "gray";
+  this.ctx.fillRect(this.width / 2 - 25 * this.resourceCount + i * 50, this.height / 2 - 12, 50, 25);      
+  this.ctx.fillText("loading...", this.width / 2, this.height / 2 - 50);
+  var w = this;
+
+  for (var i = 0; i < this.gameInfo.resources.length; i++ ) {
+    (function () {
+      var res = w.gameInfo.resources[i].path;
+      var e = res.indexOf(".");
+      var name = res.substring(0, e);
+      var ext = res.substring(e, res.length);
+      if (ext == ".png") {
+        Resources[name] = {image: new Image(), frames: w.gameInfo.resources[i].frames || 1, speed: w.gameInfo.resources[i].speed || 1, animations: w.gameInfo.resources[i].animations || 1 };
+        Resources[name].image.src = "res/" + res;
+        Resources[name].image.onload = function () {
+          w.progressBar();
+        }
+      }
+      else if (ext == ".ogg") {
+        w.loadOGG(res, name);
+  /*        Resources[name] = {sound: new Audio("res/" + res, streaming=false)};
+        w.progressBar();
+        Resources[name].sound.onload = function () {
+          console.log("loaded sound");
+        }*/
+      }
+      else if (ext == ".wav") {
+        w.loadOGG(res, name);
+      }
+      else if (ext == ".js") {
+        var request = new XMLHttpRequest();
+        request.open("GET", "res/" + res, true);
+        request.onload = function () {
+          w.sceneInfo = request.response;
+          w.progressBar();
+        };
+        request.send();
+      }
+      else if (ext == ".json") {
+        var request = new XMLHttpRequest();
+        request.open("GET", "res/" + res, true);
+        request.onload = function () {
+          Resources[name] = JSON.parse(request.response);
+          w.progressBar();
+        };
+        request.send();
+      }
+    })();
+  }
+};
+
 var FAMILY = {enemy: 1};
 
 var Hybrid = Object.create(Lerp);
@@ -18,7 +77,6 @@ Hybrid.update = function (dt) {
     this.callback();
   }
 };
-
 
 Polygon.onCheck = function (o1, o2) {
   if (!o1.getVertices || !o2.getVertices) return false;

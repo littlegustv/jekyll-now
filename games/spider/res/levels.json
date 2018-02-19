@@ -660,6 +660,7 @@
          "y":0
         }, 
         {
+         "color":"#00ff00",
          "draworder":"topdown",
          "name":"Enemies",
          "objects":[
@@ -678,23 +679,71 @@
                  "height":0,
                  "id":62,
                  "name":"Horizontal",
+                 "properties":
+                    {
+                     "goalx":16,
+                     "goaly":160
+                    },
+                 "propertytypes":
+                    {
+                     "goalx":"int",
+                     "goaly":"int"
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":56,
-                 "y":168
+                 "x":64,
+                 "y":160
                 }, 
                 {
                  "height":0,
                  "id":63,
                  "name":"Vertical",
+                 "properties":
+                    {
+                     "goaly":288
+                    },
+                 "propertytypes":
+                    {
+                     "goaly":"int"
+                    },
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":104,
-                 "y":104
+                 "x":128,
+                 "y":16
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "color":"#aa0000",
+         "draworder":"topdown",
+         "name":"Player",
+         "objects":[
+                {
+                 "height":16,
+                 "id":64,
+                 "name":"",
+                 "properties":
+                    {
+                     "Anchor":56
+                    },
+                 "propertytypes":
+                    {
+                     "Anchor":"int"
+                    },
+                 "rotation":90,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":64,
+                 "y":272
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -702,7 +751,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":64,
+ "nextobjectid":67,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.2",
