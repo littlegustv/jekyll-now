@@ -97,4 +97,3 @@ Layer.draw = function (ctx) {
 }
 
 var game = Object.create(World).init(180, 320, "index.json");
-DEBUG = true;
