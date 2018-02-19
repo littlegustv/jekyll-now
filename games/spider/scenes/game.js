@@ -99,7 +99,7 @@ this.onStart = function () {
   //fg.camera.add(Follow, {target: player, offset: { x: -game.w / 2, y: -game.h / 2}});
   fg.camera.x -= 18;
   fg.camera.y -= 8;
-  
+    
   this.onKeyDown = function (e) {
     if (player.locked) {
       s.buffer = e;
@@ -107,71 +107,10 @@ this.onStart = function () {
     }
     switch(e.keyCode) {
       case 37:
-        // check for wall
-        var goal = {
-          x: player.anchor.x + Math.round(16 * Math.cos(player.angle - PI)), 
-          y: player.anchor.y + Math.round(16 * Math.sin(player.angle - PI)), 
-          angle: player.angle - PI / 2
-        };
-        var block = {
-          x: player.x + Math.round(16 * Math.cos(player.angle - PI)), 
-          y: player.y + Math.round(16 * Math.sin(player.angle - PI))
-        }
-        for (var i = 0; i < s.solids.length; i++) {
-          if (s.solids[i].x === block.x && s.solids[i].y === block.y) {
-            goal.x = player.x;
-            goal.y = player.y
-            goal.angle = player.angle + PI / 2;
-            player.anchor = s.solids[i];
-            break;
-          }
-          if (s.solids[i].x === goal.x && s.solids[i].y === goal.y) {
-            console.log('should only be ONCE');
-            goal.x = s.solids[i].x + Math.round(16 * Math.cos(player.angle - PI / 2));
-            goal.y = s.solids[i].y + Math.round(16 * Math.sin(player.angle - PI / 2));
-            goal.angle = player.angle;
-            player.anchor = s.solids[i];
-          }
-        }
-        
-        player.locked = true;
-        player.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: Math.round(goal.angle / (PI / 2)) * PI / 2}, callback: function () {
-          this.entity.locked = false;
-          this.entity.remove(this);
-        }});
+        rotate(s, -PI);
         break;
       case 39:
-        var goal = {
-          x: player.anchor.x + Math.round(16 * Math.cos(player.angle)), 
-          y: player.anchor.y + Math.round(16 * Math.sin(player.angle)),
-          angle: player.angle + PI / 2
-        };
-        var block = {
-          x: player.x + Math.round(16 * Math.cos(player.angle)), 
-          y: player.y + Math.round(16 * Math.sin(player.angle))
-        };
-        for (var i = 0; i < s.solids.length; i++) {
-          if (s.solids[i].x === block.x && s.solids[i].y === block.y) {
-            goal.x = player.x;
-            goal.y = player.y
-            goal.angle = player.angle - PI / 2;
-            player.anchor = s.solids[i];
-            break;
-          }
-          if (s.solids[i].x === goal.x && s.solids[i].y === goal.y) {
-             console.log('should Only be ONCE');
-            goal.x = s.solids[i].x + Math.round(16 * Math.cos(player.angle - PI / 2));
-            goal.y = s.solids[i].y + Math.round(16 * Math.sin(player.angle - PI / 2));
-            goal.angle = player.angle;
-            player.anchor = s.solids[i];
-          }
-        }
-        
-        player.locked = true;
-        player.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: Math.round(goal.angle / (PI / 2)) * PI / 2}, callback: function () {
-          this.entity.locked = false;
-          this.entity.remove(this);
-        }});
+        rotate(s, 0);
         break;
       case 38:
         var destinations = s.solids.filter(function (solid) {

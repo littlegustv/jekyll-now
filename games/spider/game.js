@@ -103,6 +103,39 @@ Polygon.onCheck = function (o1, o2) {
   return true;
 }
 
+var rotate = function (scene, angle) {
+  var goal = {
+    x: scene.player.anchor.x + Math.round(16 * Math.cos(scene.player.angle + angle)), 
+    y: scene.player.anchor.y + Math.round(16 * Math.sin(scene.player.angle + angle)), 
+    angle: scene.player.angle + angle + PI / 2
+  };
+  var block = {
+    x: scene.player.x + Math.round(16 * Math.cos(scene.player.angle + angle)), 
+    y: scene.player.y + Math.round(16 * Math.sin(scene.player.angle + angle))
+  }
+  for (var i = 0; i < scene.solids.length; i++) {
+    if (scene.solids[i].x === block.x && scene.solids[i].y === block.y) {
+      goal.x = scene.player.x;
+      goal.y = scene.player.y
+      goal.angle = scene.player.angle + PI / 2;
+      scene.player.anchor = scene.solids[i];
+      break;
+    }
+    if (scene.solids[i].x === goal.x && scene.solids[i].y === goal.y) {
+      console.log('should only be ONCE');
+      goal.x = scene.solids[i].x + Math.round(16 * Math.cos(scene.player.angle - PI / 2));
+      goal.y = scene.solids[i].y + Math.round(16 * Math.sin(scene.player.angle - PI / 2));
+      goal.angle = scene.player.angle;
+      scene.player.anchor = scene.solids[i];
+    }
+  }
+  
+  scene.player.locked = true;
+  scene.player.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: Math.round(goal.angle / (PI / 2)) * PI / 2}, callback: function () {
+    this.entity.locked = false;
+    this.entity.remove(this);
+  }});
+};
 
 Sprite.drawDebug = function (ctx) {
   if (DEBUG) {
@@ -155,4 +188,4 @@ Layer.draw = function (ctx) {
 }
 
 var game = Object.create(World).init(180, 320, "index.json");
-DEBUG = true;
+//DEBUG = true;
