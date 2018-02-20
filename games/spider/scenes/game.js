@@ -44,6 +44,12 @@ this.onStart = function () {
       }});
     } else if (enemyinfo.name == "Wallhugger") {
       console.log('unimplemented');
+      enemy.anchor = this.solids.filter(function (e) { return e.id == enemyinfo.properties.Anchor; })[0];
+      enemy.add(Behavior, {update: function (dt) {
+        if (!this.entity.locked) {
+          rotate(s, this.entity, 0);
+        }
+      }});
     }
   }
   /*
@@ -95,7 +101,7 @@ this.onStart = function () {
     if (this.entity.y >= game.h) {
       current_room = (current_room + 1) % Resources.levels.length;
       game.setScene(0, true);
-    } else if (this.entity.y <= 0) {
+    } else if (this.entity.y < 0) {
       current_room = modulo(current_room - 1, Resources.levels.length);
       game.setScene(0, true);
     }
@@ -116,10 +122,10 @@ this.onStart = function () {
     }
     switch(e.keyCode) {
       case 37:
-        rotate(s, -PI);
+        rotate(s, player, -PI);
         break;
       case 39:
-        rotate(s, 0);
+        rotate(s, player, 0);
         break;
       case 38:
         var destinations = s.solids.filter(function (solid) {

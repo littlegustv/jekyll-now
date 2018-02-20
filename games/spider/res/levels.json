@@ -673,8 +673,12 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":16,
-                 "y":16
+                 "x":48,
+                 "y":96,
+                 "rotation": 90,
+                 "properties": {
+                        "Anchor": 60
+                 }
                 }, 
                 {
                  "height":0,
@@ -1460,7 +1464,11 @@
                  "visible":true,
                  "width":16,
                  "x":16,
-                 "y":16
+                 "y":16,
+                 "rotation": 180,
+                 "properties": {
+                        "Anchor": 1
+                 }
                 }, 
                 {
                  "height":0,
