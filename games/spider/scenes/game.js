@@ -14,7 +14,9 @@ this.onStart = function () {
   // solids
   for (var i = 0; i < Resources.levels[current_room].layers[1].objects.length; i++) {
     var solidinfo = Resources.levels[current_room].layers[1].objects[i];
-    this.solids.push(fg.add(Object.create(Sprite).init(Resources.tile)).set({x: solidinfo.x, y: solidinfo.y, solid: true, z: 4, strands: [], id: solidinfo.id }));
+    var solid = fg.add(Object.create(Sprite).init(Resources.tile)).set({x: solidinfo.x, y: solidinfo.y, solid: true, z: 4, strands: [], id: solidinfo.id });
+    solid.setCollision(Polygon);
+    this.solids.push(solid)
   }
 /*
   for (var i = 0; i < 100; i++) {
@@ -43,7 +45,7 @@ this.onStart = function () {
         this.start.y = this.entity.y;
       }});
     } else if (enemyinfo.name == "Wallhugger") {
-      console.log('unimplemented');
+      //console.log('unimplemented');
       enemy.anchor = this.solids.filter(function (e) { return e.id == enemyinfo.properties.Anchor; })[0];
       enemy.add(Behavior, {update: function (dt) {
         if (!this.entity.locked) {
@@ -141,14 +143,16 @@ this.onStart = function () {
             this.entity.locked = false;
             this.entity.remove(this);
             // strand - first check that the two blocks aren't already connected...
+            var w = Math.max(Math.abs(this.entity.root.x - this.entity.anchor.x), Math.abs(this.entity.root.y - this.entity.anchor.y))
             if (this.entity.root.strands.indexOf(this.entity.anchor) === -1 && this.entity.anchor.strands.indexOf(this.entity.root) === -1) {              
-              var e = this.entity.layer.add(Object.create(Entity).init()).set({
+              var e = this.entity.layer.add(Object.create(TiledBackground).init(Resources.web)).set({
                 z: this.entity.z - 1,
                 x: (this.entity.root.x + this.entity.anchor.x) / 2,
                 y: (this.entity.root.y + this.entity.anchor.y) / 2,
-                w: Math.abs(this.entity.root.x - this.entity.anchor.x) + 2,
-                h: Math.abs(this.entity.root.y - this.entity.anchor.y) + 2,
-                opacity: 0.2,
+                w: w,
+                h: 4,
+                angle: this.entity.angle - PI / 2,
+                opacity: 0.8,
                 root: this.entity.root,
                 anchor: this.entity.anchor
               });

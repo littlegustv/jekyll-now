@@ -4,10 +4,11 @@
   ],
   "resources": [
     {"path": "levels.json"},
-    {"path": "spider.png", "frames": 1, "animations": 1, "speed": 0.1},
+    {"path": "spider.png"},
+    {"path": "web.png"},
     {"path": "dust.png", "frames": 4, "animations": 1, "speed": 0.2},
-    {"path": "tile.png", "frames": 1, "animations": 1, "speed": 0.3},
+    {"path": "tile.png"},
     {"path": "font.png", "frames": 95, "animations": 1, "speed": 0.1},
-    {"path": "ghost.png", "frames": 1, "animations": 1, "speed": 0.3}
+    {"path": "ghost.png"}
   ]
 }
