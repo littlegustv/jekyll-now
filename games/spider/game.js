@@ -117,7 +117,7 @@ var rotate = function (scene, angle) {
     if (scene.solids[i].x === block.x && scene.solids[i].y === block.y) {
       goal.x = scene.player.x;
       goal.y = scene.player.y
-      goal.angle = scene.player.angle + PI / 2;
+      goal.angle = scene.player.angle + (angle === 0 ? -PI / 2 : PI / 2);
       scene.player.anchor = scene.solids[i];
       break;
     }
@@ -187,5 +187,6 @@ Layer.draw = function (ctx) {
   this.ctx.restore();
 }
 
+var current_room = 0;
 var game = Object.create(World).init(180, 320, "index.json");
 //DEBUG = true;

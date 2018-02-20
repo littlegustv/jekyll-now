@@ -1,6 +1,6 @@
 this.onStart = function () {
   var s = this;
-  console.log(Resources.levels);
+  //console.log(Resources.levels[current_room]);
   this.buffer = undefined;
   var fg = s.add(Object.create(Layer).init(game.w, game.h));
   var ui = s.add(Object.create(Layer).init(game.w, game.h));
@@ -12,8 +12,8 @@ this.onStart = function () {
   this.enemies = [];
   this.webs = [];
   // solids
-  for (var i = 0; i < Resources.levels.layers[1].objects.length; i++) {
-    var solidinfo = Resources.levels.layers[1].objects[i];
+  for (var i = 0; i < Resources.levels[current_room].layers[1].objects.length; i++) {
+    var solidinfo = Resources.levels[current_room].layers[1].objects[i];
     this.solids.push(fg.add(Object.create(Sprite).init(Resources.tile)).set({x: solidinfo.x, y: solidinfo.y, solid: true, z: 4, strands: [], id: solidinfo.id }));
   }
 /*
@@ -24,8 +24,8 @@ this.onStart = function () {
     this.solids.push(fg.add(Object.create(Sprite).init(Resources.tile)).set({x: x, y: y, solid: true, z: 4, strands: [] }));
   }*/
   // enemies
-  for (var i = 0; i < Resources.levels.layers[2].objects.length; i++) {
-    var enemyinfo = Resources.levels.layers[2].objects[i];
+  for (var i = 0; i < Resources.levels[current_room].layers[2].objects.length; i++) {
+    var enemyinfo = Resources.levels[current_room].layers[2].objects[i];
     var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: enemyinfo.x, y: enemyinfo.y, z: 3, family: FAMILY.enemy});
     enemy.setCollision(Polygon);
     enemy.setVertices([{x: -4, y: -4}, {x: -4, y: 4}, {x: 4, y: 4}, {x: 4, y: -4}]);
@@ -63,7 +63,7 @@ this.onStart = function () {
     this.enemies.push(enemy);
   }*/
 
-  var playerinfo = Resources.levels.layers[3].objects[0];
+  var playerinfo = Resources.levels[current_room].layers[3].objects[0];
   var anchor = this.solids.filter(function (e) { return e.id == playerinfo.properties.Anchor; })[0];
   var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: playerinfo.x, y: playerinfo.y, z: 3, anchor: anchor, angle: PI / 2 + PI2 * (playerinfo.rotation / 360) });
   this.player = player;
@@ -89,6 +89,15 @@ this.onStart = function () {
       ]);
     } else {
       this.entity.setVertices();
+    }
+  }});
+  player.add(Behavior, {update: function (dt) {
+    if (this.entity.y >= game.h) {
+      current_room = (current_room + 1) % Resources.levels.length;
+      game.setScene(0, true);
+    } else if (this.entity.y <= 0) {
+      current_room = modulo(current_room - 1, Resources.levels.length);
+      game.setScene(0, true);
     }
   }});
   player.setCollision(Polygon);
