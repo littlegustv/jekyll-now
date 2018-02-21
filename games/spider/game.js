@@ -1,3 +1,8 @@
+// raindrop
+function round(n, interval) {
+  return Math.round(n / interval) * interval;
+}
+
 // push to raindrop: loader fix! (closure)
 World.loadResources = function () {
   if (!this.gameInfo.resources) return;
