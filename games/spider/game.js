@@ -112,26 +112,28 @@ var rotate = function (scene, entity, angle) {
   var goal = {
     x: entity.anchor.x + Math.round(16 * Math.cos(entity.angle + angle)), 
     y: entity.anchor.y + Math.round(16 * Math.sin(entity.angle + angle)), 
-    angle: entity.angle + angle + PI / 2
+    angle: entity.angle + angle
   };
   var block = {
-    x: entity.x + Math.round(16 * Math.cos(entity.angle + angle)), 
+    x: entity.x + Math.round(16 * Math.cos(entity.angle + angle)),
     y: entity.y + Math.round(16 * Math.sin(entity.angle + angle))
   }
   for (var i = 0; i < scene.solids.length; i++) {
     if (scene.solids[i].x === block.x && scene.solids[i].y === block.y) {
+      console.log('blocked');
       goal.x = entity.x;
       goal.y = entity.y
-      goal.angle = entity.angle + (angle === 0 ? -PI / 2 : PI / 2);
+      goal.angle = entity.angle - angle;
       entity.anchor = scene.solids[i];
       break;
     }
     if (scene.solids[i].x === goal.x && scene.solids[i].y === goal.y) {
-      console.log('should only be ONCE');
-      goal.x = scene.solids[i].x + Math.round(16 * Math.cos(entity.angle - PI / 2));
-      goal.y = scene.solids[i].y + Math.round(16 * Math.sin(entity.angle - PI / 2));
+      console.log('slide');
+      goal.x = scene.solids[i].x + Math.round(16 * Math.cos(entity.angle));
+      goal.y = scene.solids[i].y + Math.round(16 * Math.sin(entity.angle));
       goal.angle = entity.angle;
       entity.anchor = scene.solids[i];
+      break;
     }
   }
   
@@ -139,6 +141,7 @@ var rotate = function (scene, entity, angle) {
   entity.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: Math.round(goal.angle / (PI / 2)) * PI / 2}, callback: function () {
     this.entity.locked = false;
     this.entity.remove(this);
+    this.entity.exit();
   }});
 };
 

@@ -3,7 +3,8 @@
     {"name": "game.js", "reload": true}
   ],
   "resources": [
-    {"path": "levels.json"},
+    {"path": "0.json"},
+    {"path": "1.json"},
     {"path": "spider.png"},
     {"path": "web.png"},
     {"path": "dust.png", "frames": 4, "animations": 1, "speed": 0.2},

@@ -10,14 +10,32 @@ this.onStart = function () {
   
   this.solids = [];
   this.enemies = [];
+  this.exits = [];
   this.webs = [];
   // solids
+  /*
   for (var i = 0; i < Resources.levels[current_room].layers[1].objects.length; i++) {
     var solidinfo = Resources.levels[current_room].layers[1].objects[i];
     var solid = fg.add(Object.create(Sprite).init(Resources.tile)).set({x: solidinfo.x, y: solidinfo.y, solid: true, z: 4, strands: [], id: solidinfo.id });
     solid.setCollision(Polygon);
-    this.solids.push(solid)
+    this.solids.push(solid);
+  }*/
+
+  for (var i = 0; i < Resources[current_room].layers[0].data.length; i++) {
+    if (Resources[current_room].layers[0].data[i] === 1) {
+      var solid = fg.add(Object.create(Sprite).init(Resources.tile)).set({x: 16 * (i % 10), y: 16 * Math.floor(i / 10), solid: true, z: 4, strands: [], id: i });
+      this.solids.push(solid);      
+    }
   }
+
+  for (var i = 0; i < Resources[current_room].layers[1].objects.length; i++) {
+    var info = Resources[current_room].layers[1].objects[i];
+    if (info.name == "Exit") {
+      var exit = fg.add(Object.create(Entity).init()).set({x: info.x, y: info.y, z: 5, color: "red", opacity: 0.5, goal: {x: info.properties.goalx, y: info.properties.goaly, level: info.properties.level}});
+      this.exits.push(exit);
+    }
+  }
+
 /*
   for (var i = 0; i < 100; i++) {
     var x = randint(-20, 20) * 16, y = randint(-20, 20) * 16;
@@ -26,7 +44,7 @@ this.onStart = function () {
     this.solids.push(fg.add(Object.create(Sprite).init(Resources.tile)).set({x: x, y: y, solid: true, z: 4, strands: [] }));
   }*/
   // enemies
-  for (var i = 0; i < Resources.levels[current_room].layers[2].objects.length; i++) {
+  /*for (var i = 0; i < Resources.levels[current_room].layers[2].objects.length; i++) {
     var enemyinfo = Resources.levels[current_room].layers[2].objects[i];
     var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: enemyinfo.x, y: enemyinfo.y, z: 3, family: FAMILY.enemy});
     enemy.setCollision(Polygon);
@@ -53,7 +71,7 @@ this.onStart = function () {
         }
       }});
     }
-  }
+  }*/
   /*
   for (var i = 1; i <= 10; i++) {   
     var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: this.solids[i].x + 16, y: this.solids[i].y + 16, z: 3, family: FAMILY.enemy});
@@ -71,9 +89,9 @@ this.onStart = function () {
     this.enemies.push(enemy);
   }*/
 
-  var playerinfo = Resources.levels[current_room].layers[3].objects[0];
-  var anchor = this.solids.filter(function (e) { return e.id == playerinfo.properties.Anchor; })[0];
-  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: playerinfo.x, y: playerinfo.y, z: 3, anchor: anchor, angle: PI / 2 + PI2 * (playerinfo.rotation / 360) });
+ // var playerinfo = Resources.levels[current_room].layers[3].objects[0];
+  var anchor = this.solids[19]; //this.solids.filter(function (e) { return e.id == playerinfo.properties.Anchor; })[0];
+  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: anchor.x + 16, y: anchor.y, z: 3, anchor: anchor, angle: 0 });
   this.player = player;
   player.add(Behavior, {draw: function (ctx) {
     if (this.entity.locked && this.entity.root && this.entity.anchor) {
@@ -99,15 +117,16 @@ this.onStart = function () {
       this.entity.setVertices();
     }
   }});
-  player.add(Behavior, {update: function (dt) {
-    if (this.entity.y >= game.h) {
-      current_room = (current_room + 1) % Resources.levels.length;
-      game.setScene(0, true);
-    } else if (this.entity.y < 0) {
-      current_room = modulo(current_room - 1, Resources.levels.length);
-      game.setScene(0, true);
+  player.exit = function () {
+    for (var i = 0; i < s.exits.length; i++) {
+      if (this.x === s.exits[i].x && this.y === s.exits[i].y) {
+        current_room = s.exits[i].goal.level;
+        game.setScene(0, true);
+        //game.scene.player.x = s.exits[i].goal.x;
+        //game.scene.player.y = s.exits[i].goal.y;
+      }
     }
-  }});
+  }
   player.setCollision(Polygon);
   player.collision.onHandle = function (obj, other) {
     console.log('enemy hit??');
@@ -124,20 +143,20 @@ this.onStart = function () {
     }
     switch(e.keyCode) {
       case 37:
-        rotate(s, player, -PI);
+        rotate(s, player, -PI / 2);
         break;
       case 39:
-        rotate(s, player, 0);
+        rotate(s, player, PI / 2);
         break;
       case 38:
         var destinations = s.solids.filter(function (solid) {
-          return (player.anchor.x !== solid.x || player.anchor.y !== solid.y) && between(modulo(angle(player.anchor.x, player.anchor.y, solid.x, solid.y), PI2), modulo(player.angle - PI / 2, PI2) - 0.01, modulo(player.angle - PI / 2, PI2) + 0.01);
+          return (player.anchor.x !== solid.x || player.anchor.y !== solid.y) && between(modulo(angle(player.anchor.x, player.anchor.y, solid.x, solid.y), PI2), modulo(player.angle, PI2) - 0.01, modulo(player.angle, PI2) + 0.01);
         }).sort(function (a, b) { return distance(player.anchor.x, player.anchor.y, a.x, a.y) - distance(player.anchor.x, player.anchor.y, b.x, b.y); });
         if (destinations.length > 0) {
           player.root = player.anchor;
           player.anchor = destinations[0];
           player.angle = modulo(Math.round((player.angle + PI) / (PI / 2)) * PI / 2, PI2);
-          var goal = {x: player.anchor.x + Math.round(16 * Math.cos(player.angle - PI / 2)), y: player.anchor.y + Math.round(16 * Math.sin(player.angle - PI / 2))};
+          var goal = {x: player.anchor.x + Math.round(16 * Math.cos(player.angle)), y: player.anchor.y + Math.round(16 * Math.sin(player.angle))};
           player.locked = true;
           player.add(Hybrid, {threshold: 32, speed: 192, rate: 8, goals: {x: goal.x, y: goal.y}, callback: function () {
             this.entity.locked = false;
@@ -151,7 +170,7 @@ this.onStart = function () {
                 y: (this.entity.root.y + this.entity.anchor.y) / 2,
                 w: w,
                 h: 4,
-                angle: this.entity.angle - PI / 2,
+                angle: this.entity.angle,
                 opacity: 0.8,
                 root: this.entity.root,
                 anchor: this.entity.anchor
@@ -171,6 +190,7 @@ this.onStart = function () {
             }
 
             this.entity.root = undefined;
+            this.entity.exit();
           }});
         }
         break;
