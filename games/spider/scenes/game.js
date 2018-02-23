@@ -34,44 +34,37 @@ this.onStart = function () {
       var exit = fg.add(Object.create(Entity).init()).set({x: info.x, y: info.y, z: 5, color: "red", opacity: 0.5, goal: {x: info.properties.goalx, y: info.properties.goaly, level: info.properties.level}});
       this.exits.push(exit);
     }
+    if (info.type == "Enemy") {
+      var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: info.x, y: info.y, z: 3, family: FAMILY.enemy});
+      enemy.setCollision(Polygon);
+      enemy.setVertices([{x: -4, y: -4}, {x: -4, y: 4}, {x: 4, y: 4}, {x: 4, y: -4}]);
+      this.enemies.push(enemy);
+        
+      if (info.name == "Horizontal") {
+        enemy.add(Hybrid, {threshold: 16, speed: 96, rate: 8, start: {x: enemy.x}, goals: {x: info.properties.goalx}, callback: function () {
+          this.goals.x = this.start.x;
+          this.stopped = false;
+          this.start.x = this.entity.x;
+        }});
+      } else if (info.name == "Vertical") {
+        enemy.add(Hybrid, {threshold: 16, speed: 96, rate: 8, start: {y: enemy.y}, goals: {y: info.properties.goaly}, callback: function () {
+          this.goals.y = this.start.y;
+          this.stopped = false;
+          this.start.y = this.entity.y;
+        }});
+      } else if (info.name == "Wallhugger") {
+        enemy.anchor = this.solids.sort(function (a, b) { return distance(a.x, a.y, enemy.x, enemy.y) - distance(b.x, b.y, enemy.x, enemy.y)})[0];
+        enemy.angle = angle(enemy.anchor.x, enemy.anchor.y, enemy.x, enemy.y);
+        enemy.add(Behavior, {update: function (dt) {
+          if (!this.entity.locked) {
+            rotate(s, this.entity, PI / 2);
+          }
+        }});
+      }
+    }
   }
 
-/*
-  for (var i = 0; i < 100; i++) {
-    var x = randint(-20, 20) * 16, y = randint(-20, 20) * 16;
-    //y = 160 + 128 * (i % 2);
-    //x = Math.floor(i / 2) * 16;
-    this.solids.push(fg.add(Object.create(Sprite).init(Resources.tile)).set({x: x, y: y, solid: true, z: 4, strands: [] }));
-  }*/
-  // enemies
-  /*for (var i = 0; i < Resources.levels[current_room].layers[2].objects.length; i++) {
-    var enemyinfo = Resources.levels[current_room].layers[2].objects[i];
-    var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: enemyinfo.x, y: enemyinfo.y, z: 3, family: FAMILY.enemy});
-    enemy.setCollision(Polygon);
-    enemy.setVertices([{x: -4, y: -4}, {x: -4, y: 4}, {x: 4, y: 4}, {x: 4, y: -4}]);
-    this.enemies.push(enemy);
-    if (enemyinfo.name == "Horizontal") {
-      enemy.add(Hybrid, {threshold: 16, speed: 96, rate: 8, start: {x: enemy.x}, goals: {x: enemyinfo.properties.goalx}, callback: function () {
-        this.goals.x = this.start.x;
-        this.stopped = false;
-        this.start.x = this.entity.x;
-      }});
-    } else if (enemyinfo.name == "Vertical") {
-      enemy.add(Hybrid, {threshold: 16, speed: 96, rate: 8, start: {y: enemy.y}, goals: {y: enemyinfo.properties.goaly}, callback: function () {
-        this.goals.y = this.start.y;
-        this.stopped = false;
-        this.start.y = this.entity.y;
-      }});
-    } else if (enemyinfo.name == "Wallhugger") {
-      //console.log('unimplemented');
-      enemy.anchor = this.solids.filter(function (e) { return e.id == enemyinfo.properties.Anchor; })[0];
-      enemy.add(Behavior, {update: function (dt) {
-        if (!this.entity.locked) {
-          rotate(s, this.entity, 0);
-        }
-      }});
-    }
-  }*/
+
   /*
   for (var i = 1; i <= 10; i++) {   
     var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: this.solids[i].x + 16, y: this.solids[i].y + 16, z: 3, family: FAMILY.enemy});
@@ -90,8 +83,16 @@ this.onStart = function () {
   }*/
 
  // var playerinfo = Resources.levels[current_room].layers[3].objects[0];
-  var anchor = this.solids[19]; //this.solids.filter(function (e) { return e.id == playerinfo.properties.Anchor; })[0];
-  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: anchor.x + 16, y: anchor.y, z: 3, anchor: anchor, angle: 0 });
+  //var anchor = this.solids[19]; //this.solids.filter(function (e) { return e.id == playerinfo.properties.Anchor; })[0];
+  if (playerinfo === undefined) {
+    playerinfo = Resources[current_room].layers[1].objects.filter(function (o) { return o.name === "Player"; })[0];
+  }
+
+  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: playerinfo.x, y: playerinfo.y, z: 3 });
+  player.anchor = this.solids.sort(function (a, b) { return distance(a.x, a.y, player.x, player.y) - distance(b.x, b.y, player.x, player.y)})[0];
+  player.angle = angle(player.anchor.x, player.anchor.y, player.x, player.y);
+  playerinfo = undefined;
+
   this.player = player;
   player.add(Behavior, {draw: function (ctx) {
     if (this.entity.locked && this.entity.root && this.entity.anchor) {
@@ -104,10 +105,10 @@ this.onStart = function () {
     if (this.entity.locked && this.entity.root && this.entity.anchor) {
       var d = distance(this.entity.x, this.entity.y, this.entity.root.x, this.entity.root.y);
       this.entity.setVertices([
-        {x: 1, y: -d},
-        {x: -1, y: -d},
+        {x: d, y: 1},
+        {x: d, y: -1},
+        {x: -this.entity.w / 2, y: -this.entity.h / 2},
         {x: -this.entity.w / 2, y: this.entity.h / 2},
-        {x: this.entity.w / 2, y: this.entity.h / 2},
         /*{x: -this.entity.w / 2, y: -this.entity.h / 2},
         {x: -this.entity.w / 2, y: this.entity.h / 2},
         {x: this.entity.w / 2, y: this.entity.h / 2},
@@ -122,8 +123,9 @@ this.onStart = function () {
       if (this.x === s.exits[i].x && this.y === s.exits[i].y) {
         current_room = s.exits[i].goal.level;
         game.setScene(0, true);
-        //game.scene.player.x = s.exits[i].goal.x;
-        //game.scene.player.y = s.exits[i].goal.y;
+        playerinfo = {};
+        playerinfo.x = s.exits[i].goal.x;
+        playerinfo.y = s.exits[i].goal.y;
       }
     }
   }
@@ -166,8 +168,8 @@ this.onStart = function () {
             if (this.entity.root.strands.indexOf(this.entity.anchor) === -1 && this.entity.anchor.strands.indexOf(this.entity.root) === -1) {              
               var e = this.entity.layer.add(Object.create(TiledBackground).init(Resources.web)).set({
                 z: this.entity.z - 1,
-                x: (this.entity.root.x + this.entity.anchor.x) / 2,
-                y: (this.entity.root.y + this.entity.anchor.y) / 2,
+                x: Math.floor((this.entity.root.x + this.entity.anchor.x) / 2) + 0.5,
+                y: Math.floor((this.entity.root.y + this.entity.anchor.y) / 2) + 0.5,
                 w: w,
                 h: 4,
                 angle: this.entity.angle,

@@ -1,3 +1,6 @@
+// globals... probably a mistake??
+var playerinfo = undefined;
+
 // raindrop
 function round(n, interval) {
   return Math.round(n / interval) * interval;
@@ -117,9 +120,9 @@ var rotate = function (scene, entity, angle) {
   var block = {
     x: entity.x + Math.round(16 * Math.cos(entity.angle + angle)),
     y: entity.y + Math.round(16 * Math.sin(entity.angle + angle))
-  }
+  };
   for (var i = 0; i < scene.solids.length; i++) {
-    if (scene.solids[i].x === block.x && scene.solids[i].y === block.y) {
+    if ((scene.solids[i].x === block.x) && (scene.solids[i].y === block.y)) {
       console.log('blocked');
       goal.x = entity.x;
       goal.y = entity.y
@@ -133,7 +136,6 @@ var rotate = function (scene, entity, angle) {
       goal.y = scene.solids[i].y + Math.round(16 * Math.sin(entity.angle));
       goal.angle = entity.angle;
       entity.anchor = scene.solids[i];
-      break;
     }
   }
   
@@ -141,7 +143,7 @@ var rotate = function (scene, entity, angle) {
   entity.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: Math.round(goal.angle / (PI / 2)) * PI / 2}, callback: function () {
     this.entity.locked = false;
     this.entity.remove(this);
-    this.entity.exit();
+    if (this.entity.exit) this.entity.exit();
   }});
 };
 

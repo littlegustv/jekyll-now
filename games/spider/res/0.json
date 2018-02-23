@@ -22,7 +22,7 @@
                  "properties":
                     {
                      "goalx":16,
-                     "goaly":304,
+                     "goaly":0,
                      "level":1
                     },
                  "propertytypes":
@@ -46,7 +46,7 @@
                     {
                      "goalx":128,
                      "goaly":16,
-                     "level":2
+                     "level":1
                     },
                  "propertytypes":
                     {
@@ -60,6 +60,66 @@
                  "width":16,
                  "x":128,
                  "y":304
+                }, 
+                {
+                 "height":16,
+                 "id":4,
+                 "name":"Wallhugger",
+                 "rotation":0,
+                 "type":"Enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":48,
+                 "y":144
+                }, 
+                {
+                 "height":16,
+                 "id":5,
+                 "name":"Vertical",
+                 "properties":
+                    {
+                     "goaly":240
+                    },
+                 "propertytypes":
+                    {
+                     "goaly":"int"
+                    },
+                 "rotation":0,
+                 "type":"Enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":96,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":6,
+                 "name":"Horizontal",
+                 "properties":
+                    {
+                     "goalx":128
+                    },
+                 "propertytypes":
+                    {
+                     "goalx":"int"
+                    },
+                 "rotation":0,
+                 "type":"Enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":64,
+                 "y":240
+                }, 
+                {
+                 "height":16,
+                 "id":7,
+                 "name":"Player",
+                 "rotation":0,
+                 "type":"Player",
+                 "visible":true,
+                 "width":16,
+                 "x":32,
+                 "y":288
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -67,7 +127,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":4,
+ "nextobjectid":8,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.2",
