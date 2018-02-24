@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.0.2" orientation="orthogonal" renderorder="right-down" width="10" height="20" tilewidth="16" tileheight="16" nextobjectid="4">
+ <tileset firstgid="1" source="../../../../../../Documents/Tiles/spiders.tsx"/>
+ <layer name="Tile Layer 1" width="10" height="20">
+  <data encoding="csv">
+1,1,1,1,1,1,1,1,0,1,
+1,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,1,0,0,1,
+1,0,0,0,0,0,1,0,0,1,
+1,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,1,
+1,0,0,1,1,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,1,
+1,0,0,0,1,1,0,0,0,1,
+1,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,1,
+1,0,1,1,0,0,0,0,0,1,
+1,0,0,0,0,0,1,1,0,1,
+1,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,1,
+1,0,1,1,1,1,1,1,1,1
+</data>
+ </layer>
+ <objectgroup name="Object Layer 1">
+  <object id="1" name="Exit" x="128" y="0" width="16" height="16">
+   <properties>
+    <property name="goalx" type="int" value="16"/>
+    <property name="goaly" type="int" value="304"/>
+    <property name="level" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="3" name="Exit" x="16" y="304" width="16" height="16">
+   <properties>
+    <property name="goalx" type="int" value="16"/>
+    <property name="goaly" type="int" value="304"/>
+    <property name="level" type="int" value="0"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

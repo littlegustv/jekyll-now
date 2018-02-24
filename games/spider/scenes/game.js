@@ -1,6 +1,6 @@
 this.onStart = function () {
   var s = this;
-  console.log(Resources.levels);
+  //console.log(Resources.levels[current_room]);
   this.buffer = undefined;
   var fg = s.add(Object.create(Layer).init(game.w, game.h));
   var ui = s.add(Object.create(Layer).init(game.w, game.h));
@@ -10,8 +10,10 @@ this.onStart = function () {
   
   this.solids = [];
   this.enemies = [];
+  this.exits = [];
   this.webs = [];
   // solids
+
   for (var i = 0; i < Resources.levels.layers[1].objects.length; i++) {
     var solidinfo = Resources.levels.layers[1].objects[i];
     this.solids.push(fg.add(Object.create(Sprite).init(Resources.tile)).set({x: solidinfo.x, y: solidinfo.y, solid: true, z: 4, strands: [], id: solidinfo.id }));
@@ -40,9 +42,18 @@ this.onStart = function () {
     }
   }
 
-  var playerinfo = Resources.levels.layers[3].objects[0];
-  var anchor = this.solids.filter(function (e) { return e.id == playerinfo.properties.Anchor; })[0];
-  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: playerinfo.x, y: playerinfo.y, z: 3, anchor: anchor, angle: PI / 2 + PI2 * (playerinfo.rotation / 360) });
+
+ // var playerinfo = Resources.levels[current_room].layers[3].objects[0];
+  //var anchor = this.solids[19]; //this.solids.filter(function (e) { return e.id == playerinfo.properties.Anchor; })[0];
+  if (playerinfo === undefined) {
+    playerinfo = Resources[current_room].layers[1].objects.filter(function (o) { return o.name === "Player"; })[0];
+  }
+
+  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: playerinfo.x, y: playerinfo.y, z: 3 });
+  player.anchor = this.solids.sort(function (a, b) { return distance(a.x, a.y, player.x, player.y) - distance(b.x, b.y, player.x, player.y)})[0];
+  player.angle = angle(player.anchor.x, player.anchor.y, player.x, player.y);
+  playerinfo = undefined;
+
   this.player = player;
   player.add(Behavior, {draw: function (ctx) {
     if (this.entity.locked && this.entity.root && this.entity.anchor) {
@@ -55,10 +66,10 @@ this.onStart = function () {
     if (this.entity.locked && this.entity.root && this.entity.anchor) {
       var d = distance(this.entity.x, this.entity.y, this.entity.root.x, this.entity.root.y);
       this.entity.setVertices([
-        {x: 1, y: -d},
-        {x: -1, y: -d},
+        {x: d, y: 1},
+        {x: d, y: -1},
+        {x: -this.entity.w / 2, y: -this.entity.h / 2},
         {x: -this.entity.w / 2, y: this.entity.h / 2},
-        {x: this.entity.w / 2, y: this.entity.h / 2},
         /*{x: -this.entity.w / 2, y: -this.entity.h / 2},
         {x: -this.entity.w / 2, y: this.entity.h / 2},
         {x: this.entity.w / 2, y: this.entity.h / 2},
@@ -68,6 +79,17 @@ this.onStart = function () {
       this.entity.setVertices();
     }
   }});
+  player.exit = function () {
+    for (var i = 0; i < s.exits.length; i++) {
+      if (this.x === s.exits[i].x && this.y === s.exits[i].y) {
+        current_room = s.exits[i].goal.level;
+        game.setScene(0, true);
+        playerinfo = {};
+        playerinfo.x = s.exits[i].goal.x;
+        playerinfo.y = s.exits[i].goal.y;
+      }
+    }
+  }
   player.setCollision(Polygon);
   player.collision.onHandle = function (obj, other) {
     console.log('enemy hit??');
@@ -84,33 +106,35 @@ this.onStart = function () {
     }
     switch(e.keyCode) {
       case 37:
-        rotate(s, -PI);
+        rotate(s, player, -PI / 2);
         break;
       case 39:
-        rotate(s, 0);
+        rotate(s, player, PI / 2);
         break;
       case 38:
         var destinations = s.solids.filter(function (solid) {
-          return (player.anchor.x !== solid.x || player.anchor.y !== solid.y) && between(modulo(angle(player.anchor.x, player.anchor.y, solid.x, solid.y), PI2), modulo(player.angle - PI / 2, PI2) - 0.01, modulo(player.angle - PI / 2, PI2) + 0.01);
+          return (player.anchor.x !== solid.x || player.anchor.y !== solid.y) && between(modulo(angle(player.anchor.x, player.anchor.y, solid.x, solid.y), PI2), modulo(player.angle, PI2) - 0.01, modulo(player.angle, PI2) + 0.01);
         }).sort(function (a, b) { return distance(player.anchor.x, player.anchor.y, a.x, a.y) - distance(player.anchor.x, player.anchor.y, b.x, b.y); });
         if (destinations.length > 0) {
           player.root = player.anchor;
           player.anchor = destinations[0];
           player.angle = modulo(Math.round((player.angle + PI) / (PI / 2)) * PI / 2, PI2);
-          var goal = {x: player.anchor.x + Math.round(16 * Math.cos(player.angle - PI / 2)), y: player.anchor.y + Math.round(16 * Math.sin(player.angle - PI / 2))};
+          var goal = {x: player.anchor.x + Math.round(16 * Math.cos(player.angle)), y: player.anchor.y + Math.round(16 * Math.sin(player.angle))};
           player.locked = true;
           player.add(Hybrid, {threshold: 32, speed: 192, rate: 8, goals: {x: goal.x, y: goal.y}, callback: function () {
             this.entity.locked = false;
             this.entity.remove(this);
             // strand - first check that the two blocks aren't already connected...
+            var w = Math.max(Math.abs(this.entity.root.x - this.entity.anchor.x), Math.abs(this.entity.root.y - this.entity.anchor.y))
             if (this.entity.root.strands.indexOf(this.entity.anchor) === -1 && this.entity.anchor.strands.indexOf(this.entity.root) === -1) {              
-              var e = this.entity.layer.add(Object.create(Entity).init()).set({
+              var e = this.entity.layer.add(Object.create(TiledBackground).init(Resources.web)).set({
                 z: this.entity.z - 1,
-                x: (this.entity.root.x + this.entity.anchor.x) / 2,
-                y: (this.entity.root.y + this.entity.anchor.y) / 2,
-                w: Math.abs(this.entity.root.x - this.entity.anchor.x) + 2,
-                h: Math.abs(this.entity.root.y - this.entity.anchor.y) + 2,
-                opacity: 0.2,
+                x: Math.floor((this.entity.root.x + this.entity.anchor.x) / 2) + 0.5,
+                y: Math.floor((this.entity.root.y + this.entity.anchor.y) / 2) + 0.5,
+                w: w,
+                h: 4,
+                angle: this.entity.angle,
+                opacity: 0.8,
                 root: this.entity.root,
                 anchor: this.entity.anchor
               });
@@ -129,6 +153,7 @@ this.onStart = function () {
             }
 
             this.entity.root = undefined;
+            this.entity.exit();
           }});
         }
         break;

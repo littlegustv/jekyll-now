@@ -1,3 +1,11 @@
+// globals... probably a mistake??
+var playerinfo = undefined;
+
+// raindrop
+function round(n, interval) {
+  return Math.round(n / interval) * interval;
+}
+
 // push to raindrop: loader fix! (closure)
 World.loadResources = function () {
   if (!this.gameInfo.resources) return;
@@ -103,37 +111,39 @@ Polygon.onCheck = function (o1, o2) {
   return true;
 }
 
-var rotate = function (scene, angle) {
+var rotate = function (scene, entity, angle) {
   var goal = {
-    x: scene.player.anchor.x + Math.round(16 * Math.cos(scene.player.angle + angle)), 
-    y: scene.player.anchor.y + Math.round(16 * Math.sin(scene.player.angle + angle)), 
-    angle: scene.player.angle + angle + PI / 2
+    x: entity.anchor.x + Math.round(16 * Math.cos(entity.angle + angle)), 
+    y: entity.anchor.y + Math.round(16 * Math.sin(entity.angle + angle)), 
+    angle: entity.angle + angle
   };
   var block = {
-    x: scene.player.x + Math.round(16 * Math.cos(scene.player.angle + angle)), 
-    y: scene.player.y + Math.round(16 * Math.sin(scene.player.angle + angle))
-  }
+    x: entity.x + Math.round(16 * Math.cos(entity.angle + angle)),
+    y: entity.y + Math.round(16 * Math.sin(entity.angle + angle))
+  };
   for (var i = 0; i < scene.solids.length; i++) {
-    if (scene.solids[i].x === block.x && scene.solids[i].y === block.y) {
-      goal.x = scene.player.x;
-      goal.y = scene.player.y
-      goal.angle = scene.player.angle + PI / 2;
-      scene.player.anchor = scene.solids[i];
+    if ((scene.solids[i].x === block.x) && (scene.solids[i].y === block.y)) {
+      console.log('blocked');
+      goal.x = entity.x;
+      goal.y = entity.y
+      goal.angle = entity.angle - angle;
+      entity.anchor = scene.solids[i];
       break;
     }
     if (scene.solids[i].x === goal.x && scene.solids[i].y === goal.y) {
-      console.log('should only be ONCE');
-      goal.x = scene.solids[i].x + Math.round(16 * Math.cos(scene.player.angle - PI / 2));
-      goal.y = scene.solids[i].y + Math.round(16 * Math.sin(scene.player.angle - PI / 2));
-      goal.angle = scene.player.angle;
-      scene.player.anchor = scene.solids[i];
+      console.log('slide');
+      goal.x = scene.solids[i].x + Math.round(16 * Math.cos(entity.angle));
+      goal.y = scene.solids[i].y + Math.round(16 * Math.sin(entity.angle));
+      goal.angle = entity.angle;
+      entity.anchor = scene.solids[i];
     }
   }
   
-  scene.player.locked = true;
-  scene.player.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: Math.round(goal.angle / (PI / 2)) * PI / 2}, callback: function () {
+  entity.locked = true;
+  entity.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: Math.round(goal.angle / (PI / 2)) * PI / 2}, callback: function () {
     this.entity.locked = false;
     this.entity.remove(this);
+    if (this.entity.exit) this.entity.exit();
   }});
 };
 
@@ -187,4 +197,6 @@ Layer.draw = function (ctx) {
   this.ctx.restore();
 }
 
+var current_room = 0;
 var game = Object.create(World).init(180, 320, "index.json");
+//DEBUG = true;
