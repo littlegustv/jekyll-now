@@ -1,5 +1,6 @@
 this.onStart = function () {
   var s = this;
+  console.log(Resources.levels);
   this.buffer = undefined;
   var fg = s.add(Object.create(Layer).init(game.w, game.h));
   var ui = s.add(Object.create(Layer).init(game.w, game.h));
@@ -11,30 +12,37 @@ this.onStart = function () {
   this.enemies = [];
   this.webs = [];
   // solids
-  for (var i = 0; i < 100; i++) {
-    var x = randint(-20, 20) * 16, y = randint(-20, 20) * 16;
-    //y = 160 + 128 * (i % 2);
-    //x = Math.floor(i / 2) * 16;
-    this.solids.push(fg.add(Object.create(Sprite).init(Resources.tile)).set({x: x, y: y, solid: true, z: 4, strands: [] }));
+  for (var i = 0; i < Resources.levels.layers[1].objects.length; i++) {
+    var solidinfo = Resources.levels.layers[1].objects[i];
+    this.solids.push(fg.add(Object.create(Sprite).init(Resources.tile)).set({x: solidinfo.x, y: solidinfo.y, solid: true, z: 4, strands: [], id: solidinfo.id }));
   }
-  // enemies
-  for (var i = 1; i <= 10; i++) {   
-    var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: this.solids[i].x + 16, y: this.solids[i].y + 16, z: 3, family: FAMILY.enemy});
-    enemy.add(Behavior, {speed: 96, moved: 0, range: 128, direction: randint(0,4) * PI / 2, update: function (dt) {
-      if (this.moved > this.range) {
-        this.direction = modulo(this.direction + PI / 2, PI2);
-        this.entity.velocity = {x: this.speed * Math.cos(this.direction), y: this.speed * Math.sin(this.direction)};
-        this.moved = 0;
-      }
-      this.moved += this.speed * dt;
-    }});
-    enemy.add(Velocity);
+
+  for (var i = 0; i < Resources.levels.layers[2].objects.length; i++) {
+    var enemyinfo = Resources.levels.layers[2].objects[i];
+    var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: enemyinfo.x, y: enemyinfo.y, z: 3, family: FAMILY.enemy});
     enemy.setCollision(Polygon);
     enemy.setVertices([{x: -4, y: -4}, {x: -4, y: 4}, {x: 4, y: 4}, {x: 4, y: -4}]);
     this.enemies.push(enemy);
+    if (enemyinfo.name == "Horizontal") {
+      enemy.add(Hybrid, {threshold: 16, speed: 96, rate: 8, start: {x: enemy.x}, goals: {x: enemyinfo.properties.goalx}, callback: function () {
+        this.goals.x = this.start.x;
+        this.stopped = false;
+        this.start.x = this.entity.x;
+      }});
+    } else if (enemyinfo.name == "Vertical") {
+      enemy.add(Hybrid, {threshold: 16, speed: 96, rate: 8, start: {y: enemy.y}, goals: {y: enemyinfo.properties.goaly}, callback: function () {
+        this.goals.y = this.start.y;
+        this.stopped = false;
+        this.start.y = this.entity.y;
+      }});
+    } else if (enemyinfo.name == "Wallhugger") {
+      console.log('unimplemented');
+    }
   }
 
-  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: this.solids[0].x + 16, y: this.solids[0].y, z: 3, anchor: this.solids[0], angle: PI / 2});
+  var playerinfo = Resources.levels.layers[3].objects[0];
+  var anchor = this.solids.filter(function (e) { return e.id == playerinfo.properties.Anchor; })[0];
+  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: playerinfo.x, y: playerinfo.y, z: 3, anchor: anchor, angle: PI / 2 + PI2 * (playerinfo.rotation / 360) });
   this.player = player;
   player.add(Behavior, {draw: function (ctx) {
     if (this.entity.locked && this.entity.root && this.entity.anchor) {
@@ -65,8 +73,10 @@ this.onStart = function () {
     console.log('enemy hit??');
     if (other.family === FAMILY.enemy) game.setScene(0, true);
   };
-  fg.camera.add(Follow, {target: player, offset: { x: -game.w / 2, y: -game.h / 2}});
-  
+  //fg.camera.add(Follow, {target: player, offset: { x: -game.w / 2, y: -game.h / 2}});
+  fg.camera.x -= 18;
+  fg.camera.y -= 8;
+    
   this.onKeyDown = function (e) {
     if (player.locked) {
       s.buffer = e;
@@ -74,71 +84,10 @@ this.onStart = function () {
     }
     switch(e.keyCode) {
       case 37:
-        // check for wall
-        var goal = {
-          x: player.anchor.x + Math.round(16 * Math.cos(player.angle - PI)), 
-          y: player.anchor.y + Math.round(16 * Math.sin(player.angle - PI)), 
-          angle: player.angle - PI / 2
-        };
-        var block = {
-          x: player.x + Math.round(16 * Math.cos(player.angle - PI)), 
-          y: player.y + Math.round(16 * Math.sin(player.angle - PI))
-        }
-        for (var i = 0; i < s.solids.length; i++) {
-          if (s.solids[i].x === block.x && s.solids[i].y === block.y) {
-            goal.x = player.x;
-            goal.y = player.y
-            goal.angle = player.angle + PI / 2;
-            player.anchor = s.solids[i];
-            break;
-          }
-          if (s.solids[i].x === goal.x && s.solids[i].y === goal.y) {
-            console.log('should only be ONCE');
-            goal.x = s.solids[i].x + Math.round(16 * Math.cos(player.angle - PI / 2));
-            goal.y = s.solids[i].y + Math.round(16 * Math.sin(player.angle - PI / 2));
-            goal.angle = player.angle;
-            player.anchor = s.solids[i];
-          }
-        }
-        
-        player.locked = true;
-        player.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: Math.round(goal.angle / (PI / 2)) * PI / 2}, callback: function () {
-          this.entity.locked = false;
-          this.entity.remove(this);
-        }});
+        rotate(s, -PI);
         break;
       case 39:
-        var goal = {
-          x: player.anchor.x + Math.round(16 * Math.cos(player.angle)), 
-          y: player.anchor.y + Math.round(16 * Math.sin(player.angle)),
-          angle: player.angle + PI / 2
-        };
-        var block = {
-          x: player.x + Math.round(16 * Math.cos(player.angle)), 
-          y: player.y + Math.round(16 * Math.sin(player.angle))
-        };
-        for (var i = 0; i < s.solids.length; i++) {
-          if (s.solids[i].x === block.x && s.solids[i].y === block.y) {
-            goal.x = player.x;
-            goal.y = player.y
-            goal.angle = player.angle - PI / 2;
-            player.anchor = s.solids[i];
-            break;
-          }
-          if (s.solids[i].x === goal.x && s.solids[i].y === goal.y) {
-             console.log('should Only be ONCE');
-            goal.x = s.solids[i].x + Math.round(16 * Math.cos(player.angle - PI / 2));
-            goal.y = s.solids[i].y + Math.round(16 * Math.sin(player.angle - PI / 2));
-            goal.angle = player.angle;
-            player.anchor = s.solids[i];
-          }
-        }
-        
-        player.locked = true;
-        player.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: Math.round(goal.angle / (PI / 2)) * PI / 2}, callback: function () {
-          this.entity.locked = false;
-          this.entity.remove(this);
-        }});
+        rotate(s, 0);
         break;
       case 38:
         var destinations = s.solids.filter(function (solid) {

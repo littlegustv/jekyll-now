@@ -1,3 +1,62 @@
+// push to raindrop: loader fix! (closure)
+World.loadResources = function () {
+  if (!this.gameInfo.resources) return;
+  //this.setupControls();
+  this.initAudio();
+
+  this.resourceLoadCount = 0;
+  this.resourceCount = this.gameInfo.resources.length;
+  this.ctx.fillStyle = "gray";
+  this.ctx.fillRect(this.width / 2 - 25 * this.resourceCount + i * 50, this.height / 2 - 12, 50, 25);      
+  this.ctx.fillText("loading...", this.width / 2, this.height / 2 - 50);
+  var w = this;
+
+  for (var i = 0; i < this.gameInfo.resources.length; i++ ) {
+    (function () {
+      var res = w.gameInfo.resources[i].path;
+      var e = res.indexOf(".");
+      var name = res.substring(0, e);
+      var ext = res.substring(e, res.length);
+      if (ext == ".png") {
+        Resources[name] = {image: new Image(), frames: w.gameInfo.resources[i].frames || 1, speed: w.gameInfo.resources[i].speed || 1, animations: w.gameInfo.resources[i].animations || 1 };
+        Resources[name].image.src = "res/" + res;
+        Resources[name].image.onload = function () {
+          w.progressBar();
+        }
+      }
+      else if (ext == ".ogg") {
+        w.loadOGG(res, name);
+  /*        Resources[name] = {sound: new Audio("res/" + res, streaming=false)};
+        w.progressBar();
+        Resources[name].sound.onload = function () {
+          console.log("loaded sound");
+        }*/
+      }
+      else if (ext == ".wav") {
+        w.loadOGG(res, name);
+      }
+      else if (ext == ".js") {
+        var request = new XMLHttpRequest();
+        request.open("GET", "res/" + res, true);
+        request.onload = function () {
+          w.sceneInfo = request.response;
+          w.progressBar();
+        };
+        request.send();
+      }
+      else if (ext == ".json") {
+        var request = new XMLHttpRequest();
+        request.open("GET", "res/" + res, true);
+        request.onload = function () {
+          Resources[name] = JSON.parse(request.response);
+          w.progressBar();
+        };
+        request.send();
+      }
+    })();
+  }
+};
+
 var FAMILY = {enemy: 1};
 
 var Hybrid = Object.create(Lerp);
@@ -18,7 +77,6 @@ Hybrid.update = function (dt) {
     this.callback();
   }
 };
-
 
 Polygon.onCheck = function (o1, o2) {
   if (!o1.getVertices || !o2.getVertices) return false;
@@ -45,6 +103,39 @@ Polygon.onCheck = function (o1, o2) {
   return true;
 }
 
+var rotate = function (scene, angle) {
+  var goal = {
+    x: scene.player.anchor.x + Math.round(16 * Math.cos(scene.player.angle + angle)), 
+    y: scene.player.anchor.y + Math.round(16 * Math.sin(scene.player.angle + angle)), 
+    angle: scene.player.angle + angle + PI / 2
+  };
+  var block = {
+    x: scene.player.x + Math.round(16 * Math.cos(scene.player.angle + angle)), 
+    y: scene.player.y + Math.round(16 * Math.sin(scene.player.angle + angle))
+  }
+  for (var i = 0; i < scene.solids.length; i++) {
+    if (scene.solids[i].x === block.x && scene.solids[i].y === block.y) {
+      goal.x = scene.player.x;
+      goal.y = scene.player.y
+      goal.angle = scene.player.angle + PI / 2;
+      scene.player.anchor = scene.solids[i];
+      break;
+    }
+    if (scene.solids[i].x === goal.x && scene.solids[i].y === goal.y) {
+      console.log('should only be ONCE');
+      goal.x = scene.solids[i].x + Math.round(16 * Math.cos(scene.player.angle - PI / 2));
+      goal.y = scene.solids[i].y + Math.round(16 * Math.sin(scene.player.angle - PI / 2));
+      goal.angle = scene.player.angle;
+      scene.player.anchor = scene.solids[i];
+    }
+  }
+  
+  scene.player.locked = true;
+  scene.player.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: Math.round(goal.angle / (PI / 2)) * PI / 2}, callback: function () {
+    this.entity.locked = false;
+    this.entity.remove(this);
+  }});
+};
 
 Sprite.drawDebug = function (ctx) {
   if (DEBUG) {
