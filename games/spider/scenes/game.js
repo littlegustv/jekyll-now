@@ -13,32 +13,46 @@ this.onStart = function () {
   this.exits = [];
   this.webs = [];
   // solids
-
-  for (var i = 0; i < Resources.levels.layers[1].objects.length; i++) {
-    var solidinfo = Resources.levels.layers[1].objects[i];
-    this.solids.push(fg.add(Object.create(Sprite).init(Resources.tile)).set({x: solidinfo.x, y: solidinfo.y, solid: true, z: 4, strands: [], id: solidinfo.id }));
+  for (var i = 0; i < Resources[current_room].layers[0].data.length; i++) {
+    if (Resources[current_room].layers[0].data[i] === 1) {
+      var solid = fg.add(Object.create(Sprite).init(Resources.tile)).set({x: 16 * (i % 10), y: 16 * Math.floor(i / 10), solid: true, z: 4, strands: [], id: i });
+      this.solids.push(solid);      
+    }
   }
 
-  for (var i = 0; i < Resources.levels.layers[2].objects.length; i++) {
-    var enemyinfo = Resources.levels.layers[2].objects[i];
-    var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: enemyinfo.x, y: enemyinfo.y, z: 3, family: FAMILY.enemy});
-    enemy.setCollision(Polygon);
-    enemy.setVertices([{x: -4, y: -4}, {x: -4, y: 4}, {x: 4, y: 4}, {x: 4, y: -4}]);
-    this.enemies.push(enemy);
-    if (enemyinfo.name == "Horizontal") {
-      enemy.add(Hybrid, {threshold: 16, speed: 96, rate: 8, start: {x: enemy.x}, goals: {x: enemyinfo.properties.goalx}, callback: function () {
-        this.goals.x = this.start.x;
-        this.stopped = false;
-        this.start.x = this.entity.x;
-      }});
-    } else if (enemyinfo.name == "Vertical") {
-      enemy.add(Hybrid, {threshold: 16, speed: 96, rate: 8, start: {y: enemy.y}, goals: {y: enemyinfo.properties.goaly}, callback: function () {
-        this.goals.y = this.start.y;
-        this.stopped = false;
-        this.start.y = this.entity.y;
-      }});
-    } else if (enemyinfo.name == "Wallhugger") {
-      console.log('unimplemented');
+  for (var i = 0; i < Resources[current_room].layers[1].objects.length; i++) {
+    var info = Resources[current_room].layers[1].objects[i];
+    if (info.name == "Exit") {
+      var exit = fg.add(Object.create(Entity).init()).set({x: info.x, y: info.y, z: 5, color: "red", opacity: 0.5, goal: {x: info.properties.goalx, y: info.properties.goaly, level: info.properties.level}});
+      this.exits.push(exit);
+    }
+    if (info.type == "Enemy") {
+      var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: info.x, y: info.y, z: 3, family: FAMILY.enemy});
+      enemy.setCollision(Polygon);
+      enemy.setVertices([{x: -4, y: -4}, {x: -4, y: 4}, {x: 4, y: 4}, {x: 4, y: -4}]);
+      this.enemies.push(enemy);
+        
+      if (info.name == "Horizontal") {
+        enemy.add(Hybrid, {threshold: 16, speed: 96, rate: 8, start: {x: enemy.x}, goals: {x: info.properties.goalx}, callback: function () {
+          this.goals.x = this.start.x;
+          this.stopped = false;
+          this.start.x = this.entity.x;
+        }});
+      } else if (info.name == "Vertical") {
+        enemy.add(Hybrid, {threshold: 16, speed: 96, rate: 8, start: {y: enemy.y}, goals: {y: info.properties.goaly}, callback: function () {
+          this.goals.y = this.start.y;
+          this.stopped = false;
+          this.start.y = this.entity.y;
+        }});
+      } else if (info.name == "Wallhugger") {
+        enemy.anchor = this.solids.sort(function (a, b) { return distance(a.x, a.y, enemy.x, enemy.y) - distance(b.x, b.y, enemy.x, enemy.y)})[0];
+        enemy.angle = angle(enemy.anchor.x, enemy.anchor.y, enemy.x, enemy.y);
+        enemy.add(Behavior, {update: function (dt) {
+          if (!this.entity.locked) {
+            rotate(s, this.entity, PI / 2);
+          }
+        }});
+      }
     }
   }
 
