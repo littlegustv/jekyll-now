@@ -45,7 +45,16 @@ this.onStart = function () {
     this.grid[25][k] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 25 * GRIDSIZE, y: MIN.y + k * GRIDSIZE, z: 4, solid: true}));
     this.grid[28][k] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 28 * GRIDSIZE, y: MIN.y + k * GRIDSIZE, z: 4, solid: true}));
   }
+
+  for (var k = 20; k < 30; k++) {
+    this.grid[k][11] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + k * GRIDSIZE, y: MIN.y + 11 * GRIDSIZE, z: 4, solid: true}));
+    this.grid[k][13] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + k * GRIDSIZE, y: MIN.y + 13 * GRIDSIZE, z: 4, solid: true}));
+  }
+
   this.grid[26][25] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 26 * GRIDSIZE, y: MIN.y + 25 * GRIDSIZE, z: 4, solid: true}));
+  this.grid[24][15] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 24 * GRIDSIZE, y: MIN.y + 15 * GRIDSIZE, z: 4, solid: true}));
+  this.grid[23][15] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 23 * GRIDSIZE, y: MIN.y + 15 * GRIDSIZE, z: 4, solid: true}));
+  this.grid[22][15] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 22 * GRIDSIZE, y: MIN.y + 15 * GRIDSIZE, z: 4, solid: true}));
   // solids
   /*for (var i = 0; i < Resources[current_room].layers[0].data.length; i++) {
     if (Resources[current_room].layers[0].data[i] === 1) {
