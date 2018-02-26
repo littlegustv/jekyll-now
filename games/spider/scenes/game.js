@@ -8,9 +8,10 @@ x- player auto-move
 - player 'jump'
 
 - smooth and polish movement (awkward transitions!!)
-  - figure out distances for various turns, create a 'constant' movement?
-  - or should it be all grid-based, so you can jump smoothly?
-
+  x- figure out distances for various turns, create a 'constant' movement?
+  - round-out "outer" angle turn
+  - make sure we don't stray from the desired path! (which is happening)
+  
 */
 this.onStart = function () {
   var s = this;
