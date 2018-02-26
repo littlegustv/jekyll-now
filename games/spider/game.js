@@ -1,6 +1,7 @@
 // globals... probably a mistake??
 var playerinfo = undefined;
 var GRIDSIZE = 16;
+var WALKSPEED = 40;
 var WIDTH = 320;
 var HEIGHT = 180;
 var MIN = {x: 0, y: 0};

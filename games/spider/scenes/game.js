@@ -4,8 +4,12 @@ new movement:
 x- grid system
 x- camera follow player
 x- player auto-move
+
 - player 'jump'
+
 - smooth and polish movement (awkward transitions!!)
+  - figure out distances for various turns, create a 'constant' movement?
+  - or should it be all grid-based, so you can jump smoothly?
 
 */
 this.onStart = function () {
@@ -92,45 +96,64 @@ this.onStart = function () {
   }
 
   var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: 26 * GRIDSIZE, y: 20 * GRIDSIZE, z: 3 });
-  player.add(Velocity);
-  player.velocity = {x: 0, y: 20};
+  //player.add(Velocity);
+  game.player = player;
+  player.direction = {x: 0, y: 1};
+  //player.velocity = {x: 0, y: WALKSPEED};
   player.add(Behavior, {update: function (dt) {
-    if (this.entity.locked) return;
+    if (this.entity.locked > 0) {
+      this.entity.locked -= dt;
+      return;
+    }
     var c = toGrid(this.entity.x, this.entity.y);
-    this.entity.direction = {x: sign(this.entity.velocity.x), y: sign(this.entity.velocity.y)};
+    //this.entity.direction = {x: sign(this.entity.velocity.x), y: sign(this.entity.velocity.y)};
     
     // check for floor (outer angle)
     //console.log(c.x, c.y, direction.x, direction.y, s.grid[c.x - direction.y][c.y + direction.x]);
     
     // blocked - inner rotate
     if (s.grid[c.x + this.entity.direction.x] !== undefined && s.grid[c.x + this.entity.direction.x][c.y + this.entity.direction.y] !== false) {
-      this.entity.velocity = {x: 0, y: 0};
+      /*this.entity.velocity = {x: 0, y: 0};
       this.entity.locked = true;
       var goal = toCoord(c.x, c.y);
       goal.angle = this.entity.angle - PI / 2;
       this.entity.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: round(goal.angle, PI / 2)}, callback: function () {
         this.entity.locked = false;
         this.entity.direction = {x: this.entity.direction.y, y: -this.entity.direction.x};
-        this.entity.velocity = {x: this.entity.direction.x * 20, y: this.entity.direction.y * 20};
+        this.entity.velocity = {x: this.entity.direction.x * WALKSPEED, y: this.entity.direction.y * WALKSPEED};
         this.entity.remove(this);
-      }});     
+      }});*/
+      this.entity.angle = round(this.entity.angle - PI / 2, PI / 2);
+      this.entity.direction = {x: this.entity.direction.y, y: -this.entity.direction.x};
     }
     // no floor - outer rotate
-    else if (s.grid[c.x - this.entity.direction.y] !== undefined && s.grid[c.x - this.entity.direction.y][c.y + this.entity.direction.x] === false) {
-      var coords = toCoord(c.x, c.y);
+    else if (s.grid[c.x - this.entity.direction.y + this.entity.direction.x] !== undefined && s.grid[c.x - this.entity.direction.y + this.entity.direction.x][c.y + this.entity.direction.x + this.entity.direction.y] === false) {
+      /*var coords = toCoord(c.x, c.y);
       this.entity.x = coords.x;
       this.entity.y = coords.y;
       this.entity.velocity = {x: 0, y: 0};
       this.entity.locked = true;
-      var goal = toCoord(c.x - this.entity.direction.y, c.y + this.entity.direction.x);
-      goal.angle = this.entity.angle + PI / 2;
-      this.entity.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: round(goal.angle, PI / 2)}, callback: function () {
+      var goal = toCoord(c.x - this.entity.direction.y + this.entity.direction.x, c.y + this.entity.direction.x + this.entity.direction.y);
+      goal.angle = round(this.entity.angle + PI / 2, PI / 2);
+      this.entity.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: goal.angle}, callback: function () {
         this.entity.locked = false;
         this.entity.direction = {x: -this.entity.direction.y, y: this.entity.direction.x};
-        this.entity.velocity = {x: this.entity.direction.x * 20, y: this.entity.direction.y * 20};
+        this.entity.velocity = {x: this.entity.direction.x * WALKSPEED, y: this.entity.direction.y * WALKSPEED};
         this.entity.remove(this);
-      }});
+      }});*/
+      var goal = toCoord(c.x - this.entity.direction.y + this.entity.direction.x, c.y + this.entity.direction.x + this.entity.direction.y);
+      this.entity.x = goal.x;
+      this.entity.y = goal.y;
+      this.entity.angle = round(this.entity.angle + PI / 2, PI / 2);
+      this.entity.direction = {x: -this.entity.direction.y, y: this.entity.direction.x};
     }
+
+    else {
+      this.entity.x += GRIDSIZE * this.entity.direction.x;
+      this.entity.y += GRIDSIZE * this.entity.direction.y;      
+    }
+    this.entity.locked = 0.3;
+
   }});
   /*player.anchor = this.solids.sort(function (a, b) { return distance(a.x, a.y, player.x, player.y) - distance(b.x, b.y, player.x, player.y)})[0];
   player.angle = angle(player.anchor.x, player.anchor.y, player.x, player.y);
@@ -178,10 +201,12 @@ this.onStart = function () {
     if (other.family === FAMILY.enemy) game.setScene(0, true);
   };*/
 
-  fg.camera.add(Follow, {target: player, offset: { x: -game.w / 2, y: -game.h / 2}});
+  //fg.camera.add(Follow, {target: player, offset: { x: -game.w / 2, y: -game.h / 2}});
   //fg.camera.x -= 18;
   //fg.camera.y -= 8;
-    
+  fg.camera.x = player.x - game.w / 2;
+  fg.camera.y = player.y - game.h / 2;
+
   this.onKeyDown = function (e) {
     if (player.locked) {
       s.buffer = e;
