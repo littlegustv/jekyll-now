@@ -23,6 +23,11 @@ function round(n, interval) {
   return Math.round(n / interval) * interval;
 }
 
+// raindrop - is this really an 'ease' function??
+EASE.constant = function (start, end, t) {
+  return start + (end - start) * t;
+};
+
 // push to raindrop: loader fix! (closure)
 World.loadResources = function () {
   if (!this.gameInfo.resources) return;

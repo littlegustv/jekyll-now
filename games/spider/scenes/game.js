@@ -100,9 +100,12 @@ this.onStart = function () {
   game.player = player;
   player.direction = {x: 0, y: 1};
   //player.velocity = {x: 0, y: WALKSPEED};
-  player.add(Behavior, {update: function (dt) {
+  player.add(Behavior, {goal: {}, rate: 3, update: function (dt) {
     if (this.entity.locked > 0) {
-      this.entity.locked -= dt;
+      this.entity.locked -= this.rate * dt;
+      for (var key in this.goal) {
+        this.entity[key] = EASE.constant(this.start[key], this.goal[key], 1 - this.entity.locked);
+      }
       return;
     }
     var c = toGrid(this.entity.x, this.entity.y);
@@ -123,7 +126,11 @@ this.onStart = function () {
         this.entity.velocity = {x: this.entity.direction.x * WALKSPEED, y: this.entity.direction.y * WALKSPEED};
         this.entity.remove(this);
       }});*/
-      this.entity.angle = round(this.entity.angle - PI / 2, PI / 2);
+      
+      //this.entity.angle = round(this.entity.angle - PI / 2, PI / 2);
+      this.goal = {angle: round(this.entity.angle - PI / 2, PI / 2)};
+      this.start = {angle: this.entity.angle};
+      
       this.entity.direction = {x: this.entity.direction.y, y: -this.entity.direction.x};
     }
     // no floor - outer rotate
@@ -142,17 +149,19 @@ this.onStart = function () {
         this.entity.remove(this);
       }});*/
       var goal = toCoord(c.x - this.entity.direction.y + this.entity.direction.x, c.y + this.entity.direction.x + this.entity.direction.y);
-      this.entity.x = goal.x;
-      this.entity.y = goal.y;
-      this.entity.angle = round(this.entity.angle + PI / 2, PI / 2);
+      //this.entity.x = goal.x;
+      //this.entity.y = goal.y;
+      this.goal = {angle: round(this.entity.angle + PI / 2, PI / 2), x: goal.x, y: goal.y};
+      this.start = {angle: this.entity.angle, x: this.entity.x, y: this.entity.y};
+      //this.entity.angle = round(this.entity.angle + PI / 2, PI / 2);
       this.entity.direction = {x: -this.entity.direction.y, y: this.entity.direction.x};
     }
 
     else {
-      this.entity.x += GRIDSIZE * this.entity.direction.x;
-      this.entity.y += GRIDSIZE * this.entity.direction.y;      
+      this.goal = {x: this.entity.x + GRIDSIZE * this.entity.direction.x, y: this.entity.y + GRIDSIZE * this.entity.direction.y};
+      this.start = {x: this.entity.x, y: this.entity.y};
     }
-    this.entity.locked = 0.3;
+    this.entity.locked = 1;
 
   }});
   /*player.anchor = this.solids.sort(function (a, b) { return distance(a.x, a.y, player.x, player.y) - distance(b.x, b.y, player.x, player.y)})[0];
