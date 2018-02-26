@@ -10,7 +10,7 @@ x- player auto-move
 - smooth and polish movement (awkward transitions!!)
   x- figure out distances for various turns, create a 'constant' movement?
   - round-out "outer" angle turn
-  - make sure we don't stray from the desired path! (which is happening)
+  x- make sure we don't stray from the desired path! (which is happening)
   
 */
 this.onStart = function () {
@@ -43,6 +43,7 @@ this.onStart = function () {
 
   for (var k = 15; k < 25; k++) {
     this.grid[25][k] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 25 * GRIDSIZE, y: MIN.y + k * GRIDSIZE, z: 4, solid: true}));
+    this.grid[28][k] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 28 * GRIDSIZE, y: MIN.y + k * GRIDSIZE, z: 4, solid: true}));
   }
   this.grid[26][25] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 26 * GRIDSIZE, y: MIN.y + 25 * GRIDSIZE, z: 4, solid: true}));
   // solids
@@ -101,34 +102,22 @@ this.onStart = function () {
   game.player = player;
   player.direction = {x: 0, y: 1};
   //player.velocity = {x: 0, y: WALKSPEED};
-  player.add(Behavior, {goal: {}, rate: 3, update: function (dt) {
+  player.movement = player.add(Behavior, {goal: {}, rate: 0.5, threshold: 2, update: function (dt) {
     if (this.entity.locked > 0) {
       this.entity.locked -= this.rate * dt;
       for (var key in this.goal) {
-        this.entity[key] = EASE.constant(this.start[key], this.goal[key], 1 - this.entity.locked);
+        if (round(this.entity[key], this.threshold) !== this.goal[key]) {
+          this.entity[key] = EASE.constant(this.start[key], this.goal[key], 1 - this.entity.locked);          
+        } else {
+          this.entity[key] = this.goal[key];
+        }
       }
       return;
     }
     var c = toGrid(this.entity.x, this.entity.y);
-    //this.entity.direction = {x: sign(this.entity.velocity.x), y: sign(this.entity.velocity.y)};
-    
-    // check for floor (outer angle)
-    //console.log(c.x, c.y, direction.x, direction.y, s.grid[c.x - direction.y][c.y + direction.x]);
     
     // blocked - inner rotate
     if (s.grid[c.x + this.entity.direction.x] !== undefined && s.grid[c.x + this.entity.direction.x][c.y + this.entity.direction.y] !== false) {
-      /*this.entity.velocity = {x: 0, y: 0};
-      this.entity.locked = true;
-      var goal = toCoord(c.x, c.y);
-      goal.angle = this.entity.angle - PI / 2;
-      this.entity.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: round(goal.angle, PI / 2)}, callback: function () {
-        this.entity.locked = false;
-        this.entity.direction = {x: this.entity.direction.y, y: -this.entity.direction.x};
-        this.entity.velocity = {x: this.entity.direction.x * WALKSPEED, y: this.entity.direction.y * WALKSPEED};
-        this.entity.remove(this);
-      }});*/
-      
-      //this.entity.angle = round(this.entity.angle - PI / 2, PI / 2);
       this.goal = {angle: round(this.entity.angle - PI / 2, PI / 2)};
       this.start = {angle: this.entity.angle};
       
@@ -136,25 +125,9 @@ this.onStart = function () {
     }
     // no floor - outer rotate
     else if (s.grid[c.x - this.entity.direction.y + this.entity.direction.x] !== undefined && s.grid[c.x - this.entity.direction.y + this.entity.direction.x][c.y + this.entity.direction.x + this.entity.direction.y] === false) {
-      /*var coords = toCoord(c.x, c.y);
-      this.entity.x = coords.x;
-      this.entity.y = coords.y;
-      this.entity.velocity = {x: 0, y: 0};
-      this.entity.locked = true;
       var goal = toCoord(c.x - this.entity.direction.y + this.entity.direction.x, c.y + this.entity.direction.x + this.entity.direction.y);
-      goal.angle = round(this.entity.angle + PI / 2, PI / 2);
-      this.entity.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: goal.angle}, callback: function () {
-        this.entity.locked = false;
-        this.entity.direction = {x: -this.entity.direction.y, y: this.entity.direction.x};
-        this.entity.velocity = {x: this.entity.direction.x * WALKSPEED, y: this.entity.direction.y * WALKSPEED};
-        this.entity.remove(this);
-      }});*/
-      var goal = toCoord(c.x - this.entity.direction.y + this.entity.direction.x, c.y + this.entity.direction.x + this.entity.direction.y);
-      //this.entity.x = goal.x;
-      //this.entity.y = goal.y;
       this.goal = {angle: round(this.entity.angle + PI / 2, PI / 2), x: goal.x, y: goal.y};
       this.start = {angle: this.entity.angle, x: this.entity.x, y: this.entity.y};
-      //this.entity.angle = round(this.entity.angle + PI / 2, PI / 2);
       this.entity.direction = {x: -this.entity.direction.y, y: this.entity.direction.x};
     }
 
@@ -165,71 +138,26 @@ this.onStart = function () {
     this.entity.locked = 1;
 
   }});
-  /*player.anchor = this.solids.sort(function (a, b) { return distance(a.x, a.y, player.x, player.y) - distance(b.x, b.y, player.x, player.y)})[0];
-  player.angle = angle(player.anchor.x, player.anchor.y, player.x, player.y);
-  playerinfo = undefined;
-
-  this.player = player;
-  player.add(Behavior, {draw: function (ctx) {
-    if (this.entity.locked && this.entity.root && this.entity.anchor) {
-      ctx.fillStyle = "black";
-      ctx.globalAlpha = 0.2;
-      ctx.fillRect(this.entity.root.x - 1, this.entity.root.y - 1, (this.entity.x - this.entity.root.x) + 2, (this.entity.y - this.entity.root.y) + 2);
-      ctx.globalAlpha = 1;
-    }
-  }, update: function (dt) {
-    if (this.entity.locked && this.entity.root && this.entity.anchor) {
-      var d = distance(this.entity.x, this.entity.y, this.entity.root.x, this.entity.root.y);
-      this.entity.setVertices([
-        {x: d, y: 1},
-        {x: d, y: -1},
-        {x: -this.entity.w / 2, y: -this.entity.h / 2},
-        {x: -this.entity.w / 2, y: this.entity.h / 2},
-        /*{x: -this.entity.w / 2, y: -this.entity.h / 2},
-        {x: -this.entity.w / 2, y: this.entity.h / 2},
-        {x: this.entity.w / 2, y: this.entity.h / 2},
-        {x: this.entity.w / 2, y: -this.entity.h / 2},
-      ]);
-    } else {
-      this.entity.setVertices();
-    }
-  }});
-  player.exit = function () {
-    for (var i = 0; i < s.exits.length; i++) {
-      if (this.x === s.exits[i].x && this.y === s.exits[i].y) {
-        current_room = s.exits[i].goal.level;
-        game.setScene(0, true);
-        playerinfo = {};
-        playerinfo.x = s.exits[i].goal.x;
-        playerinfo.y = s.exits[i].goal.y;
-      }
-    }
-  }
-  player.setCollision(Polygon);
-  player.collision.onHandle = function (obj, other) {
-    console.log('enemy hit??');
-    if (other.family === FAMILY.enemy) game.setScene(0, true);
-  };*/
-
-  //fg.camera.add(Follow, {target: player, offset: { x: -game.w / 2, y: -game.h / 2}});
-  //fg.camera.x -= 18;
-  //fg.camera.y -= 8;
+  
   fg.camera.x = player.x - game.w / 2;
   fg.camera.y = player.y - game.h / 2;
 
   this.onKeyDown = function (e) {
-    if (player.locked) {
-      s.buffer = e;
-      return;
-    }
     switch(e.keyCode) {
-      case 37:
-        //rotate(s, player, -PI / 2);
-        break;
-      case 39:
-       // rotate(s, player, PI / 2);
-        break;
       case 38:
+        var normal = {x: player.direction.y, y: -player.direction.x };
+        var c = toGrid(player.x, player.y);
+        console.log(c, normal);
+        if (player.movement.goal.angle !== undefined) {
+
+        } else if (s.grid[c.x + normal.x * 2] !== undefined && s.grid[c.x + normal.x * 2][c.y + normal.y * 2]) {
+          player.angle += PI;
+          player.movement.goal.x = player.movement.goal.x + normal.x * GRIDSIZE;
+          player.movement.goal.y = player.movement.goal.y + normal.y * GRIDSIZE;
+          //console.log('mhm', coords, player.movement.start, player.movement.goal);
+        } else {
+          //console.log(s.grid[c.x + normal.x * 2][c.y + normal.y * 2]);
+        }
         /*var destinations = s.solids.filter(function (solid) {
           return (player.anchor.x !== solid.x || player.anchor.y !== solid.y) && between(modulo(angle(player.anchor.x, player.anchor.y, solid.x, solid.y), PI2), modulo(player.angle, PI2) - 0.01, modulo(player.angle, PI2) + 0.01);
         }).sort(function (a, b) { return distance(player.anchor.x, player.anchor.y, a.x, a.y) - distance(player.anchor.x, player.anchor.y, b.x, b.y); });
@@ -279,12 +207,5 @@ this.onStart = function () {
   };
 };
 this.onUpdate = function (dt) {
-  /*if (this.buffer && this.player.locked === false) {
-    this.onKeyDown(this.buffer);
-    this.buffer = undefined;
-  }
-  //this.player.checkCollisions(0, this.enemies);
-  for (var i = 0; i < this.enemies.length; i++) {
-    this.enemies[i].checkCollisions(0, this.webs);
-  }*/
+
 };
