@@ -5,7 +5,7 @@ x- grid system
 x- camera follow player
 x- player auto-move
 
-- player 'jump'
+x- player 'jump'
 
 - smooth and polish movement (awkward transitions!!)
   x- figure out distances for various turns, create a 'constant' movement?
@@ -102,7 +102,7 @@ this.onStart = function () {
   game.player = player;
   player.direction = {x: 0, y: 1};
   //player.velocity = {x: 0, y: WALKSPEED};
-  player.movement = player.add(Behavior, {goal: {}, rate: 0.5, threshold: 2, update: function (dt) {
+  player.movement = player.add(Behavior, {goal: {}, rate: 3, threshold: 2, update: function (dt) {
     if (this.entity.locked > 0) {
       this.entity.locked -= this.rate * dt;
       for (var key in this.goal) {
@@ -154,6 +154,7 @@ this.onStart = function () {
           player.angle += PI;
           player.movement.goal.x = player.movement.goal.x + normal.x * GRIDSIZE;
           player.movement.goal.y = player.movement.goal.y + normal.y * GRIDSIZE;
+          player.direction = {x: -player.direction.x, y: -player.direction.y};
           //console.log('mhm', coords, player.movement.start, player.movement.goal);
         } else {
           //console.log(s.grid[c.x + normal.x * 2][c.y + normal.y * 2]);
