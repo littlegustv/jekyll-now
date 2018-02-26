@@ -1,5 +1,21 @@
 // globals... probably a mistake??
 var playerinfo = undefined;
+var GRIDSIZE = 16;
+var WIDTH = 320;
+var HEIGHT = 180;
+var MIN = {x: 0, y: 0};
+
+function sign (n) {
+  return n > 0 ? 1 : (n < 0 ? -1 : 0);
+}
+
+function toGrid(x, y) {
+  return {x: Math.round((x - MIN.x) / GRIDSIZE), y: Math.round((y - MIN.y) / GRIDSIZE)};
+}
+
+function toCoord(x, y) {
+  return {x: MIN.x + x * GRIDSIZE, y: MIN.y + y * GRIDSIZE};
+}
 
 // raindrop
 function round(n, interval) {

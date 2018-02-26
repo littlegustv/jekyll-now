@@ -3,9 +3,7 @@
     {"name": "game.js", "reload": true}
   ],
   "resources": [
-    {"path": "0.json"},
-    {"path": "1.json"},
-    {"path": "spider.png"},
+    {"path": "spider.png", "frames": 2, "speed": 0.4 },
     {"path": "web.png"},
     {"path": "dust.png", "frames": 4, "animations": 1, "speed": 0.2},
     {"path": "tile.png"},

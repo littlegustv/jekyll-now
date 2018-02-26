@@ -1,8 +1,18 @@
+/*
+
+new movement:
+x- grid system
+x- camera follow player
+x- player auto-move
+- player 'jump'
+- smooth and polish movement (awkward transitions!!)
+
+*/
 this.onStart = function () {
   var s = this;
   //console.log(Resources.levels[current_room]);
   this.buffer = undefined;
-  var fg = s.add(Object.create(Layer).init(game.w, game.h));
+  var fg = s.add(Object.create(Layer).init(120 * GRIDSIZE, 120 * GRIDSIZE));
   var ui = s.add(Object.create(Layer).init(game.w, game.h));
   fg.add(Object.create(Entity).init()).set({x: 0, y: 0, w: 100 * 16, h: 100 * 16, z: -1, color: "#f5f5f5"});
   
@@ -12,14 +22,32 @@ this.onStart = function () {
   this.enemies = [];
   this.exits = [];
   this.webs = [];
+
+  this.grid = [];
+
+  for (var i = 0; i < 100; i++) {
+    this.grid.push([]);
+    for (var j = 0; j < 100; j++) {
+      if (false)
+        this.grid[i].push(fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + i * GRIDSIZE, y: MIN.y + j * GRIDSIZE, z: 4, solid: true})));
+      else {
+        this.grid[i].push(false);
+      }
+    }
+  }
+
+  for (var k = 15; k < 25; k++) {
+    this.grid[25][k] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 25 * GRIDSIZE, y: MIN.y + k * GRIDSIZE, z: 4, solid: true}));
+  }
+  this.grid[26][25] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 26 * GRIDSIZE, y: MIN.y + 25 * GRIDSIZE, z: 4, solid: true}));
   // solids
-  for (var i = 0; i < Resources[current_room].layers[0].data.length; i++) {
+  /*for (var i = 0; i < Resources[current_room].layers[0].data.length; i++) {
     if (Resources[current_room].layers[0].data[i] === 1) {
       var solid = fg.add(Object.create(Sprite).init(Resources.tile)).set({x: 16 * (i % 10), y: 16 * Math.floor(i / 10), solid: true, z: 4, strands: [], id: i });
       this.solids.push(solid);      
     }
-  }
-
+  }*/
+/*
   for (var i = 0; i < Resources[current_room].layers[1].objects.length; i++) {
     var info = Resources[current_room].layers[1].objects[i];
     if (info.name == "Exit") {
@@ -54,17 +82,57 @@ this.onStart = function () {
         }});
       }
     }
-  }
+  }*/
 
 
  // var playerinfo = Resources.levels[current_room].layers[3].objects[0];
   //var anchor = this.solids[19]; //this.solids.filter(function (e) { return e.id == playerinfo.properties.Anchor; })[0];
   if (playerinfo === undefined) {
-    playerinfo = Resources[current_room].layers[1].objects.filter(function (o) { return o.name === "Player"; })[0];
+    //playerinfo = Resources[current_room].layers[1].objects.filter(function (o) { return o.name === "Player"; })[0];
   }
 
-  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: playerinfo.x, y: playerinfo.y, z: 3 });
-  player.anchor = this.solids.sort(function (a, b) { return distance(a.x, a.y, player.x, player.y) - distance(b.x, b.y, player.x, player.y)})[0];
+  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: 26 * GRIDSIZE, y: 20 * GRIDSIZE, z: 3 });
+  player.add(Velocity);
+  player.velocity = {x: 0, y: 20};
+  player.add(Behavior, {update: function (dt) {
+    if (this.entity.locked) return;
+    var c = toGrid(this.entity.x, this.entity.y);
+    this.entity.direction = {x: sign(this.entity.velocity.x), y: sign(this.entity.velocity.y)};
+    
+    // check for floor (outer angle)
+    //console.log(c.x, c.y, direction.x, direction.y, s.grid[c.x - direction.y][c.y + direction.x]);
+    
+    // blocked - inner rotate
+    if (s.grid[c.x + this.entity.direction.x] !== undefined && s.grid[c.x + this.entity.direction.x][c.y + this.entity.direction.y] !== false) {
+      this.entity.velocity = {x: 0, y: 0};
+      this.entity.locked = true;
+      var goal = toCoord(c.x, c.y);
+      goal.angle = this.entity.angle - PI / 2;
+      this.entity.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: round(goal.angle, PI / 2)}, callback: function () {
+        this.entity.locked = false;
+        this.entity.direction = {x: this.entity.direction.y, y: -this.entity.direction.x};
+        this.entity.velocity = {x: this.entity.direction.x * 20, y: this.entity.direction.y * 20};
+        this.entity.remove(this);
+      }});     
+    }
+    // no floor - outer rotate
+    else if (s.grid[c.x - this.entity.direction.y] !== undefined && s.grid[c.x - this.entity.direction.y][c.y + this.entity.direction.x] === false) {
+      var coords = toCoord(c.x, c.y);
+      this.entity.x = coords.x;
+      this.entity.y = coords.y;
+      this.entity.velocity = {x: 0, y: 0};
+      this.entity.locked = true;
+      var goal = toCoord(c.x - this.entity.direction.y, c.y + this.entity.direction.x);
+      goal.angle = this.entity.angle + PI / 2;
+      this.entity.add(Lerp, {rate: 10, goals: {x: goal.x, y: goal.y, angle: round(goal.angle, PI / 2)}, callback: function () {
+        this.entity.locked = false;
+        this.entity.direction = {x: -this.entity.direction.y, y: this.entity.direction.x};
+        this.entity.velocity = {x: this.entity.direction.x * 20, y: this.entity.direction.y * 20};
+        this.entity.remove(this);
+      }});
+    }
+  }});
+  /*player.anchor = this.solids.sort(function (a, b) { return distance(a.x, a.y, player.x, player.y) - distance(b.x, b.y, player.x, player.y)})[0];
   player.angle = angle(player.anchor.x, player.anchor.y, player.x, player.y);
   playerinfo = undefined;
 
@@ -87,7 +155,7 @@ this.onStart = function () {
         /*{x: -this.entity.w / 2, y: -this.entity.h / 2},
         {x: -this.entity.w / 2, y: this.entity.h / 2},
         {x: this.entity.w / 2, y: this.entity.h / 2},
-        {x: this.entity.w / 2, y: -this.entity.h / 2},*/
+        {x: this.entity.w / 2, y: -this.entity.h / 2},
       ]);
     } else {
       this.entity.setVertices();
@@ -108,10 +176,11 @@ this.onStart = function () {
   player.collision.onHandle = function (obj, other) {
     console.log('enemy hit??');
     if (other.family === FAMILY.enemy) game.setScene(0, true);
-  };
-  //fg.camera.add(Follow, {target: player, offset: { x: -game.w / 2, y: -game.h / 2}});
-  fg.camera.x -= 18;
-  fg.camera.y -= 8;
+  };*/
+
+  fg.camera.add(Follow, {target: player, offset: { x: -game.w / 2, y: -game.h / 2}});
+  //fg.camera.x -= 18;
+  //fg.camera.y -= 8;
     
   this.onKeyDown = function (e) {
     if (player.locked) {
@@ -120,13 +189,13 @@ this.onStart = function () {
     }
     switch(e.keyCode) {
       case 37:
-        rotate(s, player, -PI / 2);
+        //rotate(s, player, -PI / 2);
         break;
       case 39:
-        rotate(s, player, PI / 2);
+       // rotate(s, player, PI / 2);
         break;
       case 38:
-        var destinations = s.solids.filter(function (solid) {
+        /*var destinations = s.solids.filter(function (solid) {
           return (player.anchor.x !== solid.x || player.anchor.y !== solid.y) && between(modulo(angle(player.anchor.x, player.anchor.y, solid.x, solid.y), PI2), modulo(player.angle, PI2) - 0.01, modulo(player.angle, PI2) + 0.01);
         }).sort(function (a, b) { return distance(player.anchor.x, player.anchor.y, a.x, a.y) - distance(player.anchor.x, player.anchor.y, b.x, b.y); });
         if (destinations.length > 0) {
@@ -169,18 +238,18 @@ this.onStart = function () {
             this.entity.root = undefined;
             this.entity.exit();
           }});
-        }
+        }*/
         break;
     }
   };
 };
 this.onUpdate = function (dt) {
-  if (this.buffer && this.player.locked === false) {
+  /*if (this.buffer && this.player.locked === false) {
     this.onKeyDown(this.buffer);
     this.buffer = undefined;
   }
-  this.player.checkCollisions(0, this.enemies);
+  //this.player.checkCollisions(0, this.enemies);
   for (var i = 0; i < this.enemies.length; i++) {
     this.enemies[i].checkCollisions(0, this.webs);
-  }
+  }*/
 };
