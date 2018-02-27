@@ -37,6 +37,16 @@ Crawl.update = function (dt) {
     for (var key in this.goal) {
       if (round(this.entity[key], this.threshold) !== this.goal[key]) {
         this.entity[key] = EASE.constant(this.start[key], this.goal[key], 1 - this.entity.locked);
+        
+        // fix: add rounded handling for outer turn
+        // 
+        // EASE.linear for jump looks kinda nice?
+
+        /*if (this.goal.angle !== undefined && this.goal.x !== undefined) {
+          this.entity[key] = EASE.linear(this.entity[key], this.goal[key], 1 - this.entity.locked);
+        } else {
+        }*/
+
       } else {
         this.entity[key] = this.goal[key];
       }
