@@ -28,6 +28,70 @@ EASE.constant = function (start, end, t) {
   return start + (end - start) * t;
 };
 
+
+var Crawl = Object.create(Behavior);
+Crawl.update = function (dt) {
+  if (this.entity.locked > 0) {
+    this.entity.locked -= this.rate * dt;
+    //console.log(this.goal.x);
+    for (var key in this.goal) {
+      if (round(this.entity[key], this.threshold) !== this.goal[key]) {
+        this.entity[key] = EASE.constant(this.start[key], this.goal[key], 1 - this.entity.locked);
+      } else {
+        this.entity[key] = this.goal[key];
+      }
+    }
+    return;
+  } else if (this.jump) {
+    var normal = {x: this.entity.direction.y, y: -this.entity.direction.x };
+    var c = toGrid(this.entity.x, this.entity.y);
+    var distance = false;
+    this.jump = false;
+    if (this.grid[c.x + normal.x * 1] !== undefined && this.grid[c.x + normal.x * 1][c.y + normal.y * 1]) {
+      distance = 0;
+    } else if (this.grid[c.x + normal.x * 2] !== undefined && this.grid[c.x + normal.x * 2][c.y + normal.y * 2]) {
+      distance = 1;
+    } else if (this.grid[c.x + normal.x * 3] !== undefined && this.grid[c.x + normal.x * 3][c.y + normal.y * 3]) {
+      distance = 2;
+    } else { // too far away!
+      console.log('jumping failed');
+      return;
+    }
+    this.entity.locked = 1;
+    this.start = {x: this.entity.x, y: this.entity.y, angle: this.entity.angle};
+    this.goal = {x: c.x + distance * normal.x, y: c.y + distance * normal.y};
+    this.goal = toCoord(this.goal.x, this.goal.y);
+    this.goal.angle = round(this.entity.angle + PI, PI / 2);
+    //console.log('jumping succeeded');
+    this.entity.direction = {x: -this.entity.direction.x, y: -this.entity.direction.y};
+    return;
+  } else {
+    console.log('setting goal');
+    var c = toGrid(this.entity.x, this.entity.y);
+    
+    // blocked - inner rotate
+    if (this.grid[c.x + this.entity.direction.x] !== undefined && this.grid[c.x + this.entity.direction.x][c.y + this.entity.direction.y] !== false) {
+      this.goal = {angle: round(this.entity.angle - PI / 2, PI / 2)};
+      this.start = {angle: this.entity.angle};
+      
+      this.entity.direction = {x: this.entity.direction.y, y: -this.entity.direction.x};
+    }
+    // no floor - outer rotate
+    else if (this.grid[c.x - this.entity.direction.y + this.entity.direction.x] !== undefined && this.grid[c.x - this.entity.direction.y + this.entity.direction.x][c.y + this.entity.direction.x + this.entity.direction.y] === false) {
+      var goal = toCoord(c.x - this.entity.direction.y + this.entity.direction.x, c.y + this.entity.direction.x + this.entity.direction.y);
+      this.goal = {angle: round(this.entity.angle + PI / 2, PI / 2), x: goal.x, y: goal.y};
+      this.start = {angle: this.entity.angle, x: this.entity.x, y: this.entity.y};
+      this.entity.direction = {x: -this.entity.direction.y, y: this.entity.direction.x};
+    }
+
+    else {
+      this.goal = {x: this.entity.x + GRIDSIZE * this.entity.direction.x, y: this.entity.y + GRIDSIZE * this.entity.direction.y};
+      this.start = {x: this.entity.x, y: this.entity.y};
+    }
+    this.entity.locked = 1;
+  }
+};
+
 // push to raindrop: loader fix! (closure)
 World.loadResources = function () {
   if (!this.gameInfo.resources) return;
