@@ -3,7 +3,7 @@
     {"name": "game.js", "reload": true}
   ],
   "resources": [
-    {"path": "spider.png", "frames": 2, "speed": 0.4 },
+    {"path": "spider.png", "frames": 2, "speed": 0.1 },
     {"path": "web.png"},
     {"path": "dust.png", "frames": 4, "animations": 1, "speed": 0.2},
     {"path": "tile.png"},

@@ -47,8 +47,8 @@ this.onStart = function () {
   }
 
   for (var k = 20; k < 30; k++) {
-    this.grid[k][11] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + k * GRIDSIZE, y: MIN.y + 11 * GRIDSIZE, z: 4, solid: true}));
-    this.grid[k][13] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + k * GRIDSIZE, y: MIN.y + 13 * GRIDSIZE, z: 4, solid: true}));
+    this.grid[k][9] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + k * GRIDSIZE, y: MIN.y + 9 * GRIDSIZE, z: 4, solid: true}));
+    this.grid[k][12] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + k * GRIDSIZE, y: MIN.y + 12 * GRIDSIZE, z: 4, solid: true}));
   }
 
   this.grid[26][25] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 26 * GRIDSIZE, y: MIN.y + 25 * GRIDSIZE, z: 4, solid: true}));
@@ -148,8 +148,9 @@ this.onStart = function () {
 
   }});
   
-  fg.camera.x = player.x - game.w / 2;
-  fg.camera.y = player.y - game.h / 2;
+  //fg.camera.x = player.x - game.w / 2;
+  //fg.camera.y = player.y - game.h / 2;
+  fg.camera.add(Follow, {target: player, offset: {x: -game.w / 2, y: -game.h / 2}});
 
   this.onKeyDown = function (e) {
     switch(e.keyCode) {
@@ -160,6 +161,7 @@ this.onStart = function () {
         if (player.movement.goal.angle !== undefined) {
 
         } else if (s.grid[c.x + normal.x * 2] !== undefined && s.grid[c.x + normal.x * 2][c.y + normal.y * 2]) {
+          console.log('found solid');
           player.angle += PI;
           player.movement.goal.x = player.movement.goal.x + normal.x * GRIDSIZE;
           player.movement.goal.y = player.movement.goal.y + normal.y * GRIDSIZE;
