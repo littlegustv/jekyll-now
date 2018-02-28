@@ -53,7 +53,10 @@ Crawl.update = function (dt) {
     }
     return;
   } else if (this.jump) {
-    var normal = {x: this.entity.direction.y, y: -this.entity.direction.x };
+    var a = round(Math.cos(this.entity.angle), 1), b = round(Math.sin(this.entity.angle), 1);
+    var clockwise = (this.entity.direction.x == -b && this.entity.direction.y == a) ? 1 : -1;
+
+    var normal = {x: clockwise * this.entity.direction.y, y: clockwise * -this.entity.direction.x };
     var c = toGrid(this.entity.x, this.entity.y);
     var distance = false;
     this.jump = false;
@@ -73,25 +76,28 @@ Crawl.update = function (dt) {
     this.goal = toCoord(this.goal.x, this.goal.y);
     this.goal.angle = round(this.entity.angle + PI, PI / 2);
     //console.log('jumping succeeded');
-    this.entity.direction = {x: -this.entity.direction.x, y: -this.entity.direction.y};
+    //this.entity.direction = {x: -this.entity.direction.x, y: -this.entity.direction.y};
     return;
   } else {
-    console.log('setting goal');
+    var a = round(Math.cos(this.entity.angle), 1), b = round(Math.sin(this.entity.angle), 1);
+    var clockwise = (this.entity.direction.x == -b && this.entity.direction.y == a) ? 1 : -1;
+
     var c = toGrid(this.entity.x, this.entity.y);
     
     // blocked - inner rotate
     if (this.grid[c.x + this.entity.direction.x] !== undefined && this.grid[c.x + this.entity.direction.x][c.y + this.entity.direction.y] !== false) {
-      this.goal = {angle: round(this.entity.angle - PI / 2, PI / 2)};
+      this.goal = {angle: round(this.entity.angle - clockwise * PI / 2, PI / 2)};
       this.start = {angle: this.entity.angle};
       
-      this.entity.direction = {x: this.entity.direction.y, y: -this.entity.direction.x};
+      this.entity.direction = {x: clockwise * this.entity.direction.y, y: -this.entity.direction.x * clockwise};
+      //console.log(this.goal.angle, this.entity.direction.x, this.entity.direction.y);
     }
     // no floor - outer rotate
-    else if (this.grid[c.x - this.entity.direction.y + this.entity.direction.x] !== undefined && this.grid[c.x - this.entity.direction.y + this.entity.direction.x][c.y + this.entity.direction.x + this.entity.direction.y] === false) {
-      var goal = toCoord(c.x - this.entity.direction.y + this.entity.direction.x, c.y + this.entity.direction.x + this.entity.direction.y);
-      this.goal = {angle: round(this.entity.angle + PI / 2, PI / 2), x: goal.x, y: goal.y};
+    else if (this.grid[c.x -  clockwise * this.entity.direction.y + this.entity.direction.x] !== undefined && this.grid[c.x - clockwise * this.entity.direction.y + this.entity.direction.x][c.y + clockwise * this.entity.direction.x + this.entity.direction.y] === false) {
+      var goal = toCoord(c.x -  clockwise * this.entity.direction.y + this.entity.direction.x, c.y +  clockwise * this.entity.direction.x + this.entity.direction.y);
+      this.goal = {angle: round(this.entity.angle + clockwise * PI / 2, PI / 2), x: goal.x, y: goal.y};
       this.start = {angle: this.entity.angle, x: this.entity.x, y: this.entity.y};
-      this.entity.direction = {x: -this.entity.direction.y, y: this.entity.direction.x};
+      this.entity.direction = {x: clockwise * -this.entity.direction.y, y: clockwise * this.entity.direction.x};
     }
 
     else {

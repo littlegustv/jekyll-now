@@ -12,7 +12,7 @@ this.onStart = function () {
   this.buffer = undefined;
   var fg = s.add(Object.create(Layer).init(120 * GRIDSIZE, 120 * GRIDSIZE));
   var ui = s.add(Object.create(Layer).init(game.w, game.h));
-  fg.add(Object.create(Entity).init()).set({x: 0, y: 0, w: 100 * 16, h: 100 * 16, z: -1, color: "tomato"});
+  fg.add(Object.create(Entity).init()).set({x: 0, y: 0, w: 100 * 16, h: 100 * 16, z: -1, color: "#eee"});
   
   this.score = ui.add(Object.create(SpriteFont).init(Resources.font)).set({x: game.w - 10, y: 16, align: "right", spacing: -2, text: "10"});
   
@@ -55,10 +55,10 @@ this.onStart = function () {
   this.enemies.push(enemy);
   enemy.setCollision(Polygon);
 
-  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: 26 * GRIDSIZE, y: 20 * GRIDSIZE, z: 3 });
+  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: 26 * GRIDSIZE, y: 24 * GRIDSIZE, z: 3 });
   game.player = player;
   this.player = player;
-  player.direction = {x: 0, y: 1};
+  player.direction = {x: 0, y: -1};
   player.movement = player.add(Crawl, {goal: {}, rate: 3, threshold: 2, grid: this.grid});
   player.setCollision(Polygon);
   player.collision.onHandle = function (obj, other) {
