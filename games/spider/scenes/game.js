@@ -1,18 +1,9 @@
 /*
 
 new movement:
-x- grid system
-x- camera follow player
-x- player auto-move
-
-x- player 'jump'
-
-- smooth and polish movement (awkward transitions!!)
-  x- figure out distances for various turns, create a 'constant' movement?
   - round-out "outer" angle turn
-  x- make sure we don't stray from the desired path! (which is happening)
   - handle BOTH clockwise and counterclockwise movement (jumping should toggle between them);
-  x- jumping... three possible distances, 
+  - is there a better way to handle jumping?
   
 */
 this.onStart = function () {
@@ -61,12 +52,19 @@ this.onStart = function () {
   enemy.locked = 0;
   enemy.angle = PI;
   enemy.add(Crawl, {goal: {}, rate: 2, threshold: 2, grid: this.grid});
+  this.enemies.push(enemy);
+  enemy.setCollision(Polygon);
 
   var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: 26 * GRIDSIZE, y: 20 * GRIDSIZE, z: 3 });
   game.player = player;
+  this.player = player;
   player.direction = {x: 0, y: 1};
   player.movement = player.add(Crawl, {goal: {}, rate: 3, threshold: 2, grid: this.grid});
-  
+  player.setCollision(Polygon);
+  player.collision.onHandle = function (obj, other) {
+    game.setScene(0, true);
+  }
+
   fg.camera.add(Follow, {target: player, offset: {x: -game.w / 2, y: -game.h / 2}});
 
   this.onKeyDown = function (e) {
@@ -78,5 +76,5 @@ this.onStart = function () {
   };
 };
 this.onUpdate = function (dt) {
-
+  this.player.checkCollisions(0, this.enemies);
 };
