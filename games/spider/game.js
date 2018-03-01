@@ -18,16 +18,13 @@ function toCoord(x, y) {
   return {x: MIN.x + x * GRIDSIZE, y: MIN.y + y * GRIDSIZE};
 }
 
-// raindrop
 function round(n, interval) {
   return Math.round(n / interval) * interval;
 }
 
-// raindrop - is this really an 'ease' function??
 EASE.constant = function (start, end, t) {
   return start + (end - start) * t;
 };
-
 
 var Crawl = Object.create(Behavior);
 Crawl.update = function (dt) {
@@ -108,7 +105,6 @@ Crawl.update = function (dt) {
   }
 };
 
-// push to raindrop: loader fix! (closure)
 World.loadResources = function () {
   if (!this.gameInfo.resources) return;
   //this.setupControls();
@@ -284,7 +280,6 @@ Sprite.drawDebug = function (ctx) {
 }
 Entity.drawDebug = Sprite.drawDebug;
 
-// PUSH TO RAINDROP ALREADY???
 Layer.draw = function (ctx) {
   //this.ctx.fillStyle = this.bg;
   this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
