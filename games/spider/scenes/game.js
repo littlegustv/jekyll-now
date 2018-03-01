@@ -2,7 +2,7 @@
 
 new movement:
   - round-out "outer" angle turn
-  - handle BOTH clockwise and counterclockwise movement (jumping should toggle between them);
+  x- handle BOTH clockwise and counterclockwise movement (jumping should toggle between them);
   - is there a better way to handle jumping?
   
 */
