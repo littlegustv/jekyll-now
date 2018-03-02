@@ -12,8 +12,14 @@ this.onStart = function () {
   this.buffer = undefined;
   var fg = s.add(Object.create(Layer).init(120 * GRIDSIZE, 120 * GRIDSIZE));
   var ui = s.add(Object.create(Layer).init(game.w, game.h));
-  fg.add(Object.create(Entity).init()).set({x: 0, y: 0, w: 100 * 16, h: 100 * 16, z: -1, color: "#eee"});
+  //fg.add(Object.create(Entity).init()).set({x: 0, y: 0, w: 100 * 16, h: 100 * 16, z: -1, color: "#eee"});
   
+  console.log(Resources.a);
+
+  for (var i = 0; i < Resources.a.layers.length - 1; i++) { // not including object layer
+    fg.add(Object.create(TiledMap).init(Resources.tileset, Resources.a.layers[i])).set({x: 25 * GRIDSIZE - GRIDSIZE / 2, y: 25 * GRIDSIZE - GRIDSIZE / 2, z: i * 0.5}); 
+  }
+
   this.score = ui.add(Object.create(SpriteFont).init(Resources.font)).set({x: game.w - 10, y: 16, align: "right", spacing: -2, text: "10"});
   
   this.enemies = [];
@@ -21,44 +27,33 @@ this.onStart = function () {
 
   this.grid = [];
 
-  for (var i = 0; i < 100; i++) {
-    this.grid.push([]);
-    for (var j = 0; j < 100; j++) {
-      if (false)
-        this.grid[i].push(fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + i * GRIDSIZE, y: MIN.y + j * GRIDSIZE, z: 4, solid: true})));
-      else {
-        this.grid[i].push(false);
-      }
+  for (var i = 0; i < Resources.a.layers[1].data.length; i++) { // solids currently inferred as being on layer[1]
+    if (!this.grid[i % 50]) this.grid[i % 50] = [];
+    if (Resources.a.layers[1].data[i] == 1) {
+      this.grid[i % 50][round(i / 50, 1)] = true; //fg.add(Object.create(Sprite).init(Resources.tile).set({opacity: 0, x: MIN.x + (i % 50) * GRIDSIZE, y: MIN.y + round(i / 50, 1) * GRIDSIZE, z: 4, solid: true}));
+    } else {
+      this.grid[i % 50][round(i / 50, 1)] = false;
     }
   }
-
-  for (var k = 15; k < 25; k++) {
-    this.grid[25][k] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 25 * GRIDSIZE, y: MIN.y + k * GRIDSIZE, z: 4, solid: true}));
-    this.grid[29][k - 1] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 29 * GRIDSIZE, y: MIN.y + (k - 1) * GRIDSIZE, z: 4, solid: true}));
+  
+  var enemyinfo = Resources.a.layers[3].objects.filter(function (o) { return o.name == "Enemy"; });
+  for (var i = 0; i < enemyinfo.length; i++) {
+    var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: enemyinfo[i].x, y: enemyinfo[i].y, z: 3});
+    enemy.direction = {x: enemyinfo[i].properties.directionx, y: enemyinfo[i].properties.directiony};
+    enemy.locked = 0;
+    enemy.angle = enemyinfo[i].properties.angle * PI2 / 360;
+    enemy.add(Crawl, {goal: {}, rate: 2, threshold: 2, grid: this.grid});
+    this.enemies.push(enemy);
+    enemy.setCollision(Polygon);
   }
 
-  for (var k = 20; k < 30; k++) {
-    this.grid[k][8] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + k * GRIDSIZE, y: MIN.y + 8 * GRIDSIZE, z: 4, solid: true}));
-    this.grid[k][12] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + k * GRIDSIZE, y: MIN.y + 12 * GRIDSIZE, z: 4, solid: true}));
-  }
+  var playerinfo = Resources.a.layers[3].objects.filter(function (o) { return o.name == "Player"; })[0];
 
-  this.grid[26][22] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 26 * GRIDSIZE, y: MIN.y + 22 * GRIDSIZE, z: 4, solid: true}));
-  this.grid[24][15] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 24 * GRIDSIZE, y: MIN.y + 15 * GRIDSIZE, z: 4, solid: true}));
-  this.grid[23][15] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 23 * GRIDSIZE, y: MIN.y + 15 * GRIDSIZE, z: 4, solid: true}));
-  this.grid[22][15] = fg.add(Object.create(Sprite).init(Resources.tile).set({x: MIN.x + 22 * GRIDSIZE, y: MIN.y + 15 * GRIDSIZE, z: 4, solid: true}));
-
-  var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: 28 * GRIDSIZE, y: 16 * GRIDSIZE, z: 3});
-  enemy.direction = {x: 0, y: -1};
-  enemy.locked = 0;
-  enemy.angle = PI;
-  enemy.add(Crawl, {goal: {}, rate: 2, threshold: 2, grid: this.grid});
-  this.enemies.push(enemy);
-  enemy.setCollision(Polygon);
-
-  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: 26 * GRIDSIZE, y: 24 * GRIDSIZE, z: 3 });
+  var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: playerinfo.x, y: playerinfo.y, z: 3 });
   game.player = player;
   this.player = player;
-  player.direction = {x: 0, y: -1};
+  player.direction = {x: playerinfo.properties.directionx, y: playerinfo.properties.directiony};
+  player.angle = playerinfo.properties.angle;
   player.movement = player.add(Crawl, {goal: {}, rate: 3, threshold: 2, grid: this.grid});
   player.setCollision(Polygon);
   player.collision.onHandle = function (obj, other) {
