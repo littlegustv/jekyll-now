@@ -4,6 +4,11 @@ new movement:
   - round-out "outer" angle turn
   x- handle BOTH clockwise and counterclockwise movement (jumping should toggle between them);
   - is there a better way to handle jumping?
+
+DUNGEON DESIGN:
+  - item or ability that recontextualizes - unblocks obstacles you were passing previously
+  - one-way movement, to keep you from wandering without cost and force you to mentally map the dungeon
+  - 
   
 */
 this.onStart = function () {
