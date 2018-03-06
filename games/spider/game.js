@@ -6,6 +6,10 @@ var WIDTH = 320;
 var HEIGHT = 180;
 var MIN = {x: 0, y: 0};
 
+var TEAMS = {
+  enemy: 0,
+}
+
 function sign (n) {
   return n > 0 ? 1 : (n < 0 ? -1 : 0);
 }
