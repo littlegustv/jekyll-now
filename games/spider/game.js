@@ -37,7 +37,11 @@ Crawl.update = function (dt) {
     //console.log(this.goal.x);
     for (var key in this.goal) {
       if (round(this.entity[key], this.threshold) !== this.goal[key]) {
-        this.entity[key] = EASE.constant(this.start[key], this.goal[key], 1 - this.entity.locked);
+        if (key == "angle") {
+          this.entity[key] = EASE.constant(this.start[key], this.start[key] + short_angle(this.start[key], this.goal[key]), 1 - this.entity.locked);
+        } else {
+          this.entity[key] = EASE.constant(this.start[key], this.goal[key], 1 - this.entity.locked);          
+        }
         
         // fix: add rounded handling for outer turn
         // 
@@ -49,6 +53,11 @@ Crawl.update = function (dt) {
         }*/
 
       } else {
+        this.entity[key] = this.goal[key];
+      }
+    }
+    if (this.entity.locked <= 0) {
+      for (var key in this.goal) {
         this.entity[key] = this.goal[key];
       }
     }
