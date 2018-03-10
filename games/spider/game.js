@@ -62,6 +62,9 @@ Crawl.update = function (dt) {
       }
     }
     return;
+  } else if (this.paused) {
+    this.entity.behaviors[0].paused = true; // raindrop - make 'animate' behavior stored as entity.animate    
+    return;
   } else if (this.jump) {
     var a = round(Math.cos(this.entity.angle), 1), b = round(Math.sin(this.entity.angle), 1);
     var clockwise = (this.entity.direction.x == -b && this.entity.direction.y == a) ? 1 : -1;

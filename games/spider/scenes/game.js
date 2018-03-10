@@ -102,10 +102,19 @@ this.onStart = function () {
   this.onKeyDown = function (e) {
     switch(e.keyCode) {
       case 38:
-        player.movement.jump = true;
+        player.movement.paused = true;
         break;
     }
   };
+  this.onKeyUp = function (e) {
+    switch(e.keyCode) {
+      case 38:
+        player.movement.paused = false;
+        player.movement.jump = true;
+        player.behaviors[0].paused = false;        
+        break;
+    }
+  }
 };
 this.onUpdate = function (dt) {
   this.player.checkCollisions(0, this.enemies);
