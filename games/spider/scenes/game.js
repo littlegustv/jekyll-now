@@ -53,12 +53,15 @@ this.onStart = function () {
   var objects = Resources.a.layers[3].objects;
 
   for (var i = 0; i < objects.length; i++) {
-    if (objects[i].name == "Enemy") {      
-      var enemy = fg.add(Object.create(Sprite).init(Resources.ghost)).set({x: objects[i].x, y: objects[i].y, z: 3, team: 0});
+    if (objects[i].name == "Enemy") {
+      var key = objects[i].properties.crawl ? "ghost" : "spikes";
+      var enemy = fg.add(Object.create(Sprite).init(Resources[key])).set({x: objects[i].x, y: objects[i].y, z: 3, team: 0});
       enemy.direction = {x: objects[i].properties.directionx, y: objects[i].properties.directiony};
-      enemy.locked = 0;
       enemy.angle = objects[i].properties.angle * PI2 / 360;
-      enemy.add(Crawl, {goal: {}, rate: 2, threshold: 2, grid: this.grid});
+      if (objects[i].properties.crawl) {   
+        enemy.locked = 0;
+        enemy.add(Crawl, {goal: {}, rate: 2, threshold: 2, grid: this.grid});
+      }
       this.enemies.push(enemy);
       enemy.setCollision(Polygon);
       enemy.setVertices([{x: -5, y: -5}, {x: -5, y: 5}, {x: 5, y: 5}, {x: 5, y: -5}]);
@@ -90,7 +93,29 @@ this.onStart = function () {
           // change tileset
         }
       }
-      this.switches.push(lever);      
+      this.switches.push(lever);
+    } else if (objects[i].name == "Trapdoor") {
+      var trapdoor = fg.add(Object.create(Sprite).init(Resources.trapdoor).set({x: objects[i].x, y: objects[i].y, z: 4, direction: {x: objects[i].properties.directionx, y: objects[i].properties.directiony}}));
+      trapdoor.angle = objects[i].properties.angle * PI2 / 360;
+      trapdoor.setCollision(Polygon);
+      trapdoor.setVertices([
+        {x: -8, y: -16},
+        {x: 8, y: -16},
+        {x: 8, y: 8},
+        {x: -8, y: 8}
+      ]);
+      trapdoor.timeout = trapdoor.add(Behavior, {time: 0, update: function (dt) {
+        if (this.time > 0) this.time -= dt;
+      }});
+      trapdoor.collision.onHandle = function (obj, other) {
+        if (obj.timeout.time <= 0) {
+          if (-1 * round(Math.cos(other.angle), 1) === obj.direction.x && -1 * round(Math.sin(other.angle), 1) === obj.direction.y ) {
+            other.movement.trapdoor = true; 
+            obj.timeout.time = 2;
+          }
+        }
+      };
+      this.switches.push(trapdoor);    
     } else if (objects[i].name == "Block") {
       var block = fg.add(Object.create(Entity).init()).set({x: objects[i].x, y: objects[i].y, w: GRIDSIZE, h: GRIDSIZE, z: 3, color: "red",opacity: 0.2, team: objects[i].properties.team});
       this.blocks.push(block);

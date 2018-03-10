@@ -4,6 +4,8 @@
   ],
   "resources": [
     {"path": "a.json"},
+    {"path": "trapdoor.png"},
+    {"path": "spikes.png"},
     {"path": "tileset.png", "frames": 4, "animations": 4},
     {"path": "spider.png", "frames": 2, "speed": 0.1 },
     {"path": "web.png"},

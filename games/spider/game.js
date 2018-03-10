@@ -65,6 +65,13 @@ Crawl.update = function (dt) {
   } else if (this.paused) {
     this.entity.behaviors[0].paused = true; // raindrop - make 'animate' behavior stored as entity.animate    
     return;
+  }
+  else if (this.trapdoor) {
+    this.entity.locked = 1;
+    var theta = (this.entity.angle + PI);
+    this.goal = {angle: theta, x: this.entity.x + 2 * GRIDSIZE * Math.cos(theta), y: this.entity.y + 2 * GRIDSIZE * Math.sin(theta) };
+    this.start = {x: this.entity.x, y: this.entity.y, angle: this.entity.angle};
+    this.trapdoor = false;
   } else if (this.jump) {
     var a = round(Math.cos(this.entity.angle), 1), b = round(Math.sin(this.entity.angle), 1);
     var clockwise = (this.entity.direction.x == -b && this.entity.direction.y == a) ? 1 : -1;
@@ -225,6 +232,7 @@ Polygon.onCheck = function (o1, o2) {
   return true;
 }
 
+// can remove, no?
 var rotate = function (scene, entity, angle) {
   var goal = {
     x: entity.anchor.x + Math.round(16 * Math.cos(entity.angle + angle)), 
