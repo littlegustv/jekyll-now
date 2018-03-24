@@ -30,7 +30,8 @@ this.onStart = function () {
   }
 
   this.score = ui.add(Object.create(SpriteFont).init(Resources.font)).set({x: game.w - 10, y: 16, align: "right", spacing: -2, text: "10"});
-  
+  this.message = ui.add(Object.create(SpriteFont).init(Resources.font)).set({x: game.w / 2, y: game.h / 4, align: "center", spacing: -2, text: ""});
+
   this.enemies = [];
   this.exits = [];
 
@@ -70,14 +71,26 @@ this.onStart = function () {
       game.player = player;
       this.player = player;
       player.direction = {x: objects[i].properties.directionx, y: objects[i].properties.directiony};
-      player.angle = objects[i].properties.angle;
+      player.angle = round(objects[i].properties.angle * PI / 180, PI / 2);
       player.movement = player.add(Crawl, {goal: {}, rate: 3, threshold: 2, grid: this.grid});
       player.setCollision(Polygon);
       player.collision.onHandle = function (obj, other) {
         if (other.team === TEAMS.enemy) {
+          console.log('restarting');
           game.setScene(0, true);          
         }
       }
+      player.arrow = fg.add(Object.create(Sprite).init(Resources.arrow));
+      player.arrow.add(Behavior, { target: player, update: function (dt) {
+        if (!this.target.movement.jump && !this.target.movement.goal.angle) {
+          this.entity.opacity = 1;
+          this.entity.x = this.target.x + this.target.direction.x * GRIDSIZE;
+          this.entity.y = this.target.y + this.target.direction.y * GRIDSIZE;
+          this.entity.angle = Math.atan2(this.target.direction.y, this.target.direction.x);
+        } else {
+          this.entity.opacity = 0;
+        }
+      }});
       player.setVertices([{x: -5, y: -5}, {x: -5, y: 5}, {x: 5, y: 5}, {x: 5, y: -5}]);
     } else if (objects[i].name == "Switch") {
       var lever = fg.add(Object.create(Sprite).init(Resources.tile)).set({x: objects[i].x, y: objects[i].y, z: 2, target: objects[i].properties.target});
@@ -119,10 +132,21 @@ this.onStart = function () {
     } else if (objects[i].name == "Block") {
       var block = fg.add(Object.create(Entity).init()).set({x: objects[i].x, y: objects[i].y, w: GRIDSIZE, h: GRIDSIZE, z: 3, color: "red",opacity: 0.2, team: objects[i].properties.team});
       this.blocks.push(block);
+    } else if (objects[i].name == "Message") {
+      var message = fg.add(Object.create(Entity).init()).set({message: objects[i].properties.message, x: objects[i].x, y: objects[i].y, w: GRIDSIZE, h: GRIDSIZE, color: "orange", z: 10, opacity: 0.1 });
+      message.setCollision(Polygon);
+      this.switches.push(message);
+      console.log('creating message');
+      message.collision.onHandle = function (obj, other) {
+        obj.alive = false;
+        s.switches.splice(s.switches.indexOf(obj), 1);
+        console.log('handling message');
+        s.message.text = obj.message;
+      }
     }
   }
 
-  fg.camera.add(Follow, {target: player, offset: {x: -game.w / 2, y: -game.h / 2}});
+  fg.camera.add(LerpFollow, {target: player, offset: {x: -game.w / 2, y: -game.h / 2}, rate: 2});
 
   this.onKeyDown = function (e) {
     switch(e.keyCode) {

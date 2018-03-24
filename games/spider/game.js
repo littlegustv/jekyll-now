@@ -35,6 +35,7 @@ Crawl.update = function (dt) {
   if (this.entity.locked > 0) {
     this.entity.locked -= this.rate * dt;
     //console.log(this.goal.x);
+  /**/
     for (var key in this.goal) {
       if (round(this.entity[key], this.threshold) !== this.goal[key]) {
         if (key == "angle") {
@@ -50,7 +51,8 @@ Crawl.update = function (dt) {
         /*if (this.goal.angle !== undefined && this.goal.x !== undefined) {
           this.entity[key] = EASE.linear(this.entity[key], this.goal[key], 1 - this.entity.locked);
         } else {
-        }*/
+        }
+          */
 
       } else {
         this.entity[key] = this.goal[key];
@@ -106,11 +108,11 @@ Crawl.update = function (dt) {
     
     // blocked - inner rotate
     if (this.grid[c.x + this.entity.direction.x] !== undefined && this.grid[c.x + this.entity.direction.x][c.y + this.entity.direction.y] !== false) {
+      //this.entity.angle = round(this.entity.angle - clockwise * PI / 2, PI / 2);
       this.goal = {angle: round(this.entity.angle - clockwise * PI / 2, PI / 2)};
       this.start = {angle: this.entity.angle};
       
       this.entity.direction = {x: clockwise * this.entity.direction.y, y: -this.entity.direction.x * clockwise};
-      //console.log(this.goal.angle, this.entity.direction.x, this.entity.direction.y);
     }
     // no floor - outer rotate
     else if (this.grid[c.x -  clockwise * this.entity.direction.y + this.entity.direction.x] !== undefined && this.grid[c.x - clockwise * this.entity.direction.y + this.entity.direction.x][c.y + clockwise * this.entity.direction.x + this.entity.direction.y] === false) {
