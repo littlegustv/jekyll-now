@@ -45,6 +45,9 @@ Crawl.update = function (dt) {
         }
         
         // fix: add rounded handling for outer turn
+
+        // 3-24-2018::: x^4 + y^4 = r^4        ---> 'squarer' circle, now just get it into code somehow!!
+
         // 
         // EASE.linear for jump looks kinda nice?
 
