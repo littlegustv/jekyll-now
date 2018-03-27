@@ -40,6 +40,9 @@ Crawl.update = function (dt) {
       if (round(this.entity[key], this.threshold) !== this.goal[key]) {
         if (key == "angle") {
           this.entity[key] = EASE.constant(this.start[key], this.start[key] + short_angle(this.start[key], this.goal[key]), 1 - this.entity.locked);
+        } else if (false) {//this.outer) {
+          // FIX ME: want the change in position without the change in timing...
+          this.entity[key] = this.start[key] + Math.sin((1 - this.entity.locked) * PI / 2) * (this.goal[key] - this.start[key]);          
         } else {
           this.entity[key] = EASE.constant(this.start[key], this.goal[key], 1 - this.entity.locked);          
         }
@@ -61,10 +64,12 @@ Crawl.update = function (dt) {
         this.entity[key] = this.goal[key];
       }
     }
+    // done
     if (this.entity.locked <= 0) {
       for (var key in this.goal) {
         this.entity[key] = this.goal[key];
       }
+      this.outer = false;
     }
     return;
   } else if (this.paused) {
@@ -100,6 +105,7 @@ Crawl.update = function (dt) {
     this.goal = {x: c.x + distance * normal.x, y: c.y + distance * normal.y};
     this.goal = toCoord(this.goal.x, this.goal.y);
     this.goal.angle = round(this.entity.angle + PI, PI / 2);
+    
     //console.log('jumping succeeded');
     //this.entity.direction = {x: -this.entity.direction.x, y: -this.entity.direction.y};
     return;
@@ -123,6 +129,7 @@ Crawl.update = function (dt) {
       this.goal = {angle: round(this.entity.angle + clockwise * PI / 2, PI / 2), x: goal.x, y: goal.y};
       this.start = {angle: this.entity.angle, x: this.entity.x, y: this.entity.y};
       this.entity.direction = {x: clockwise * -this.entity.direction.y, y: clockwise * this.entity.direction.x};
+      this.outer = true;
     }
 
     else {

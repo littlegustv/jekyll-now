@@ -1,16 +1,44 @@
 /*
 
-new movement:
-  - round-out "outer" angle turn
-  x- handle BOTH clockwise and counterclockwise movement (jumping should toggle between them);
-  - is there a better way to handle jumping?
+"Tricks"
 
-DUNGEON DESIGN:
-  - item or ability that recontextualizes - unblocks obstacles you were passing previously
-  - one-way movement, to keep you from wandering without cost and force you to mentally map the dungeon
-  - 
-  
-*/
+Directions: In this example, jumping will
+result in going up RIGHT side, meaning LEFT side
+is inaccessible unless you can change your direction.
+
+       #
+       #
+       #
+
+    * ->
+###############
+
+Folding Back: Jumping from current wall to itself will
+CHANGE DIRECTION
+
+          
+        # <-*#
+ * ->   #    #
+##############
+
+Odd Numbers: Similarly, making an 'odd' number of jumps
+
+      ### -> # -> #
+             #    #
+ * ->  ^          #
+###################
+
+While 'even' retains the same orientation
+
+
+Possibilities: 
+ - Enter a whole sub-area just to change direction, then have to maintain it on the way out
+ - Enemies vulnerable on one side
+ - 
+
+ */
+
+
 this.onStart = function () {
   var s = this;
   //console.log(Resources.levels[current_room]);
