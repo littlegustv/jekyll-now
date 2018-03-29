@@ -43,6 +43,10 @@ this.onStart = function () {
   var s = this;
   //console.log(Resources.levels[current_room]);
   this.buffer = undefined;
+  var bg = s.add(Object.create(Layer).init(game.w, game.h));
+  //bg.bg = "red";
+  game.colorize = bg.add(Object.create(Entity).init()).set({x: game.w / 2, y: game.h / 2, w: game.w, h: game.h, color: "pink"})
+  
   var fg = s.add(Object.create(Layer).init(120 * GRIDSIZE, 120 * GRIDSIZE));
   var ui = s.add(Object.create(Layer).init(game.w, game.h));
   //fg.add(Object.create(Entity).init()).set({x: 0, y: 0, w: 100 * 16, h: 100 * 16, z: -1, color: "#eee"});
@@ -58,7 +62,9 @@ this.onStart = function () {
   }
 
   this.score = ui.add(Object.create(SpriteFont).init(Resources.font)).set({x: game.w - 10, y: 16, align: "right", spacing: -2, text: "10"});
-  this.message = ui.add(Object.create(SpriteFont).init(Resources.font)).set({x: game.w / 2, y: game.h / 4, align: "center", spacing: -2, text: ""});
+  this.message_bg = ui.add(Object.create(Entity).init()).set({x: game.w / 2, y: game.h / 4, w: game.w * 2, h: 24, color: "darksalmon", z: 3, opacity: 0, angle: PI / 72});
+  this.message_bg_border = ui.add(Object.create(Entity).init()).set({x: game.w / 2, y: game.h / 4 + 4, w: game.w * 2, h: 24, color: "black", z: 2, opacity: 0, angle: 1.1 * PI / 72});
+  this.message = ui.add(Object.create(SpriteFont).init(Resources.font)).set({x: game.w / 2, y: game.h / 4, align: "center", z: 4, spacing: -2, text: ""});
 
   this.enemies = [];
   this.exits = [];
@@ -100,7 +106,7 @@ this.onStart = function () {
       this.player = player;
       player.direction = {x: objects[i].properties.directionx, y: objects[i].properties.directiony};
       player.angle = round(objects[i].properties.angle * PI / 180, PI / 2);
-      player.movement = player.add(Crawl, {goal: {}, rate: 3, threshold: 2, grid: this.grid});
+      player.movement = player.add(Crawl, {goal: {}, rate: 5, threshold: 2, grid: this.grid});
       player.setCollision(Polygon);
       player.collision.onHandle = function (obj, other) {
         if (other.team === TEAMS.enemy) {
@@ -164,12 +170,20 @@ this.onStart = function () {
       var message = fg.add(Object.create(Entity).init()).set({message: objects[i].properties.message, x: objects[i].x, y: objects[i].y, w: GRIDSIZE, h: GRIDSIZE, color: "orange", z: 10, opacity: 0.1 });
       message.setCollision(Polygon);
       this.switches.push(message);
-      console.log('creating message');
+      //console.log('creating message');
       message.collision.onHandle = function (obj, other) {
         obj.alive = false;
         s.switches.splice(s.switches.indexOf(obj), 1);
-        console.log('handling message');
+        //console.log('handling message');        
         s.message.text = obj.message;
+        // fix me: add transitions here eventually...
+        if (obj.message.length > 0) {
+          s.message_bg.opacity = 1;
+          s.message_bg_border.opacity = 1;
+        } else {
+          s.message_bg.opacity = 0;
+          s.message_bg_border.opacity = 0;
+        }
       }
     }
   }

@@ -10,6 +10,8 @@ var TEAMS = {
   enemy: 0,
 }
 
+var COLORS = ["pink", "lightblue"];
+
 function sign (n) {
   return n > 0 ? 1 : (n < 0 ? -1 : 0);
 }
@@ -88,8 +90,10 @@ Crawl.update = function (dt) {
 
     var normal = {x: clockwise * this.entity.direction.y, y: clockwise * -this.entity.direction.x };
     var c = toGrid(this.entity.x, this.entity.y);
+    
     var distance = false;
     this.jump = false;
+
     if (this.grid[c.x + normal.x * 1] !== undefined && this.grid[c.x + normal.x * 1][c.y + normal.y * 1]) {
       distance = 0;
     } else if (this.grid[c.x + normal.x * 2] !== undefined && this.grid[c.x + normal.x * 2][c.y + normal.y * 2]) {
@@ -100,6 +104,7 @@ Crawl.update = function (dt) {
       console.log('jumping failed');
       return;
     }
+    game.colorize.color = COLORS[(COLORS.indexOf(game.colorize.color) + 1) % COLORS.length];
     this.entity.locked = 1;
     this.start = {x: this.entity.x, y: this.entity.y, angle: this.entity.angle};
     this.goal = {x: c.x + distance * normal.x, y: c.y + distance * normal.y};
