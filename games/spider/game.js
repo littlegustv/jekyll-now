@@ -41,12 +41,14 @@ Crawl.update = function (dt) {
     for (var key in this.goal) {
       if (round(this.entity[key], this.threshold) !== this.goal[key]) {
         if (key == "angle") {
-          this.entity[key] = EASE.constant(this.start[key], this.start[key] + short_angle(this.start[key], this.goal[key]), 1 - this.entity.locked);
+          //this.entity[key] = EASE.constant(this.start[key], this.start[key] + short_angle(this.start[key], this.goal[key]), 1 - this.entity.locked);
+          this.entity[key] = EASE.linear(this.entity[key], this.goal[key], 1 - this.entity.locked);
         } else if (false) {//this.outer) {
           // FIX ME: want the change in position without the change in timing...
           this.entity[key] = this.start[key] + Math.sin((1 - this.entity.locked) * PI / 2) * (this.goal[key] - this.start[key]);          
         } else {
-          this.entity[key] = EASE.constant(this.start[key], this.goal[key], 1 - this.entity.locked);          
+          this.entity[key] = EASE.linear(this.entity[key], this.goal[key], 1 - this.entity.locked);          
+          //this.entity[key] = EASE.constant(this.start[key], this.goal[key], 1 - this.entity.locked);          
         }
         
         // fix: add rounded handling for outer turn

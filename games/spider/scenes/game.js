@@ -106,7 +106,7 @@ this.onStart = function () {
       this.player = player;
       player.direction = {x: objects[i].properties.directionx, y: objects[i].properties.directiony};
       player.angle = round(objects[i].properties.angle * PI / 180, PI / 2);
-      player.movement = player.add(Crawl, {goal: {}, rate: 5, threshold: 2, grid: this.grid});
+      player.movement = player.add(Crawl, {goal: {}, rate: 2, threshold: 2, grid: this.grid});
       player.setCollision(Polygon);
       player.collision.onHandle = function (obj, other) {
         if (other.team === TEAMS.enemy) {
