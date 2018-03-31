@@ -4,14 +4,15 @@
   ],
   "resources": [
     {"path": "a.json"},
+    {"path": "ui.json"},
+    {"path": "key.png"},
     {"path": "trapdoor.png"},
+    {"path": "door.png", "animations": 2},
     {"path": "spikes.png"},
     {"path": "arrow.png"},
-    {"path": "tileset.png", "frames": 4, "animations": 4},
+    {"path": "tiles.png", "frames": 8, "animations": 8},
     {"path": "spider.png", "frames": 2, "speed": 0.1 },
-    {"path": "web.png"},
     {"path": "dust.png", "frames": 4, "animations": 1, "speed": 0.2},
-    {"path": "tile.png"},
     {"path": "font.png", "frames": 95, "animations": 1, "speed": 0.1},
     {"path": "ghost.png"}
   ]

@@ -45,11 +45,13 @@ this.onStart = function () {
   this.buffer = undefined;
   var bg = s.add(Object.create(Layer).init(game.w, game.h));
   //bg.bg = "red";
-  game.colorize = bg.add(Object.create(Entity).init()).set({x: game.w / 2, y: game.h / 2, w: game.w, h: game.h, color: "pink"})
-  
+
   var fg = s.add(Object.create(Layer).init(120 * GRIDSIZE, 120 * GRIDSIZE));
   var ui = s.add(Object.create(Layer).init(game.w, game.h));
   //fg.add(Object.create(Entity).init()).set({x: 0, y: 0, w: 100 * 16, h: 100 * 16, z: -1, color: "#eee"});
+  
+  game.colorize = bg.add(Object.create(Entity).init()).set({x: game.w / 2, y: game.h / 2, w: game.w, h: game.h, color: "pink"})
+  game.direction_indicator = ui.add(Object.create(SpriteFont).init(Resources.font, DIRECTIONS[1])).set({x: game.w / 2, y: game.h - 9, spacing: -2, align: "center"});
   
   //console.log(Resources.a);
 
@@ -58,13 +60,19 @@ this.onStart = function () {
   this.tilemaps = [];
 
   for (var i = 0; i < Resources.a.layers.length - 1; i++) { // not including object layer
-    this.tilemaps.push(fg.add(Object.create(TiledMap).init(Resources.tileset, Resources.a.layers[i])).set({x: 25 * GRIDSIZE - GRIDSIZE / 2, y: 25 * GRIDSIZE - GRIDSIZE / 2, z: i * 0.5}));
+    this.tilemaps.push(fg.add(Object.create(TiledMap).init(Resources.tiles, Resources.a.layers[i])).set({x: 25 * GRIDSIZE - GRIDSIZE / 2, y: 25 * GRIDSIZE - GRIDSIZE / 2, z: i * 0.5}));
   }
 
-  this.score = ui.add(Object.create(SpriteFont).init(Resources.font)).set({x: game.w - 10, y: 16, align: "right", spacing: -2, text: "10"});
-  this.message_bg = ui.add(Object.create(Entity).init()).set({x: game.w / 2, y: game.h / 4, w: game.w * 2, h: 24, color: "darksalmon", z: 3, opacity: 0, angle: PI / 72});
+  for (var i = 0; i < Resources.ui.layers.length; i++) { // not including object layer
+    ui.add(Object.create(TiledMap).init(Resources.tiles, Resources.ui.layers[i])).set({x: game.w / 2, y: game.h / 2, z: 0});
+  }
+  
+  //this.score = ui.add(Object.create(SpriteFont).init(Resources.font)).set({x: game.w - 10, y: 16, align: "right", spacing: -2, text: "10"});
+  /*this.message_bg = ui.add(Object.create(Entity).init()).set({x: game.w / 2, y: game.h / 4, w: game.w * 2, h: 24, color: "darksalmon", z: 3, opacity: 0, angle: PI / 72});
   this.message_bg_border = ui.add(Object.create(Entity).init()).set({x: game.w / 2, y: game.h / 4 + 4, w: game.w * 2, h: 24, color: "black", z: 2, opacity: 0, angle: 1.1 * PI / 72});
-  this.message = ui.add(Object.create(SpriteFont).init(Resources.font)).set({x: game.w / 2, y: game.h / 4, align: "center", z: 4, spacing: -2, text: ""});
+  this.message = ui.add(Object.create(SpriteFont).init(Resources.font)).set({x: game.w / 2, y: game.h / 4, align: "center", z: 4, spacing: -2, text: ""});*/
+  this.message = ui.add(Object.create(SpriteFont).init(Resources.font)).set({x: game.w / 2, y: 12, align: "center", z: 4, spacing: -2, text: ""});
+  game.keys_count = ui.add(Object.create(SpriteFont).init(Resources.font)).set({x: game.w / 2, y: 36, align: "center", z: 4, spacing: -2, text: "0 keys"});
 
   this.enemies = [];
   this.exits = [];
@@ -101,12 +109,12 @@ this.onStart = function () {
       enemy.setCollision(Polygon);
       enemy.setVertices([{x: -5, y: -5}, {x: -5, y: 5}, {x: 5, y: 5}, {x: 5, y: -5}]);
     } else if (objects[i].name == "Player") {
-      var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: objects[i].x, y: objects[i].y, z: 3 });
+      var player = fg.add(Object.create(Sprite).init(Resources.spider)).set({x: objects[i].x, y: objects[i].y, z: 3, keys: 0 });
       game.player = player;
       this.player = player;
       player.direction = {x: objects[i].properties.directionx, y: objects[i].properties.directiony};
       player.angle = round(objects[i].properties.angle * PI / 180, PI / 2);
-      player.movement = player.add(Crawl, {goal: {}, rate: 2, threshold: 2, grid: this.grid});
+      player.movement = player.add(Crawl, {goal: {}, rate: 5, threshold: 2, grid: this.grid});
       player.setCollision(Polygon);
       player.collision.onHandle = function (obj, other) {
         if (other.team === TEAMS.enemy) {
@@ -126,6 +134,34 @@ this.onStart = function () {
         }
       }});
       player.setVertices([{x: -5, y: -5}, {x: -5, y: 5}, {x: 5, y: 5}, {x: 5, y: -5}]);
+    } else if (objects[i].name == "Door") {
+      var door = fg.add(Object.create(Sprite).init(Resources.door)).set({locked: objects[i].properties.locked, x: objects[i].x, y: objects[i].y, z: 2, animation: objects[i].properties.locked ? 0 : 1, target: objects[i].properties.target});
+      door.setCollision(Polygon);
+      door.collision.onHandle = function (obj, other) {
+        if (obj.locked && other.keys >= 1) {
+          other.keys -= 1;
+          game.keys_count.text = other.keys + " keys";
+          obj.locked = false;
+          obj.animaton = 1;
+        } else if (!obj.locked) {
+          // eventually this should move you to the OTHER door.
+          game.setScene(0, true);
+        } else {
+          // nothing, locked
+
+        }
+      };
+      this.switches.push(door);
+    } else if (objects[i].name == "Key") {
+      var key = fg.add(Object.create(Sprite).init(Resources.key)).set({x: objects[i].x, y: objects[i].y, z: 2 });
+      key.setCollision(Polygon);
+      key.collision.onHandle = function (obj, other) {
+        obj.alive = false;
+        other.keys += 1;
+        game.keys_count.text = other.keys + " keys";
+        s.switches.splice(s.switches.indexOf(obj), 1);
+      };
+      this.switches.push(key);
     } else if (objects[i].name == "Switch") {
       var lever = fg.add(Object.create(Sprite).init(Resources.tile)).set({x: objects[i].x, y: objects[i].y, z: 2, target: objects[i].properties.target});
       lever.setCollision(Polygon);
@@ -167,7 +203,7 @@ this.onStart = function () {
       var block = fg.add(Object.create(Entity).init()).set({x: objects[i].x, y: objects[i].y, w: GRIDSIZE, h: GRIDSIZE, z: 3, color: "red",opacity: 0.2, team: objects[i].properties.team});
       this.blocks.push(block);
     } else if (objects[i].name == "Message") {
-      var message = fg.add(Object.create(Entity).init()).set({message: objects[i].properties.message, x: objects[i].x, y: objects[i].y, w: GRIDSIZE, h: GRIDSIZE, color: "orange", z: 10, opacity: 0.1 });
+      var message = fg.add(Object.create(Entity).init()).set({message: objects[i].properties.message, x: objects[i].x, y: objects[i].y, w: GRIDSIZE, h: GRIDSIZE, color: "orange", z: 10, opacity: 0 });
       message.setCollision(Polygon);
       this.switches.push(message);
       //console.log('creating message');
@@ -178,17 +214,17 @@ this.onStart = function () {
         s.message.text = obj.message;
         // fix me: add transitions here eventually...
         if (obj.message.length > 0) {
-          s.message_bg.opacity = 1;
-          s.message_bg_border.opacity = 1;
+          //s.message_bg.opacity = 1;
+          //s.message_bg_border.opacity = 1;
         } else {
-          s.message_bg.opacity = 0;
-          s.message_bg_border.opacity = 0;
+          //s.message_bg.opacity = 0;
+          //s.message_bg_border.opacity = 0;
         }
       }
     }
   }
 
-  fg.camera.add(LerpFollow, {target: player, offset: {x: -game.w / 2, y: -game.h / 2}, rate: 2});
+  fg.camera.add(TiledLerpFollow, {target: player, tilesize: 128, offset: {x: -game.w / 2, y: -game.h / 2}, rate: 2});
 
   this.onKeyDown = function (e) {
     switch(e.keyCode) {
