@@ -104,9 +104,11 @@ Crawl.update = function (dt) {
 
     var normal = {x: clockwise * this.entity.direction.y, y: clockwise * -this.entity.direction.x };
     var c = toGrid(this.entity.x, this.entity.y);
+    var c2 = toCoord(c.x, c.y);
     
     var distance = false;
     this.jump = false;
+
 
     if (this.grid[c.x + normal.x * 1] !== undefined && this.grid[c.x + normal.x * 1][c.y + normal.y * 1]) {
       distance = 0;
@@ -118,6 +120,12 @@ Crawl.update = function (dt) {
       console.log('jumping failed');
       return;
     }
+
+    var dust = this.entity.layer.add(Object.create(Sprite).init(Resources.dust)).set({x: c2.x, y: c2.y, z: this.entity.z - 1});
+    dust.behaviors[0].onEnd = function () {
+      this.entity.alive = false;
+    }
+
     game.colorize.color = COLORS[(COLORS.indexOf(game.colorize.color) + 1) % COLORS.length];
     game.direction_indicator.text = DIRECTIONS[(DIRECTIONS.indexOf(game.direction_indicator.text) + 1) % DIRECTIONS.length];
     this.entity.locked = 1;
