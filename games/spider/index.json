@@ -8,6 +8,7 @@
     {"path": "key.png"},
     {"path": "trapdoor.png"},
     {"path": "door.png", "animations": 2},
+    {"path": "icons.png", "animations": 1},
     {"path": "spikes.png"},
     {"path": "arrow.png"},
     {"path": "tiles.png", "frames": 8, "animations": 8},

@@ -45,6 +45,13 @@ TiledLerpFollow.update = function (dt) {
 };
 
 var Crawl = Object.create(Behavior);
+Crawl.draw = function (ctx) {
+  if (this.jump) {
+    ctx.fillStyle = "rgba(255,0,0,0.5)";
+    ctx.fillRect(this.goal.x - GRIDSIZE / 2, this.goal.y - GRIDSIZE / 2, GRIDSIZE, GRIDSIZE);
+    // fix me: jump icon here
+  }
+}
 Crawl.update = function (dt) {
   if (this.entity.locked > 0) {
     this.entity.locked -= this.rate * dt;
@@ -109,15 +116,16 @@ Crawl.update = function (dt) {
     var distance = false;
     this.jump = false;
 
-
     if (this.grid[c.x + normal.x * 1] !== undefined && this.grid[c.x + normal.x * 1][c.y + normal.y * 1]) {
       distance = 0;
     } else if (this.grid[c.x + normal.x * 2] !== undefined && this.grid[c.x + normal.x * 2][c.y + normal.y * 2]) {
       distance = 1;
     } else if (this.grid[c.x + normal.x * 3] !== undefined && this.grid[c.x + normal.x * 3][c.y + normal.y * 3]) {
       distance = 2;
-    } else { // too far away!
+    } else { // too far away! ...
       console.log('jumping failed');
+      var e = this.entity.layer.add(Object.create(Sprite).init(Resources.icons)).set({x: this.entity.x + normal.x * GRIDSIZE, y: this.entity.y + normal.y * GRIDSIZE});
+      e.add(FadeOut, {delay: 0.5, duration: 0.2, remove: true});
       return;
     }
 
@@ -125,6 +133,8 @@ Crawl.update = function (dt) {
     dust.behaviors[0].onEnd = function () {
       this.entity.alive = false;
     }
+
+    this.entity.behaviors[0].paused = false;
 
     game.colorize.color = COLORS[(COLORS.indexOf(game.colorize.color) + 1) % COLORS.length];
     game.direction_indicator.text = DIRECTIONS[(DIRECTIONS.indexOf(game.direction_indicator.text) + 1) % DIRECTIONS.length];
